@@ -1,0 +1,12 @@
+{
+  "elapsed_ms": 4949,
+  "model": "qwen3.5:4b",
+  "model_digest": null,
+  "prompt_hash": "f98e462a0c08950499c13baef323ae9ac6ef314b0b0d139f7c99ff77be1ce8f6",
+  "result": {
+    "ok": true
+  },
+  "runtime": null,
+  "settings_hash": "c04385f370c9b0ad508567230a55d0100d0e2b9d577cac7b5c37beee16dee3cf",
+  "wall_ms": 5074
+}

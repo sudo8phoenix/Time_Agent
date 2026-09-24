@@ -1,0 +1,13 @@
+activity_id,activity_name,wbs_path,discipline,work_type,area,asset_tags,is_leaf,measurement_basis,planned_quantity,unit,planned_start,planned_finish,baseline_date,baseline_quantity,actual_start,actual_finish,aliases
+PIP-A-ERECT-024,Erect line 24-XX spools,DEMO-UTILITY-01/AREA-A/PIPING/24-XX,piping,pipe_spool_erection,AREA-A,24-XX,true,quantity_ratio,12,spool,2026-09-19,2026-10-02,2026-09-19,0,,,erect spools;spool erection
+PIP-A-WELD-024,Weld line 24-XX joints,DEMO-UTILITY-01/AREA-A/PIPING/24-XX,piping,welding,AREA-A,24-XX,true,quantity_ratio,24,joint,2026-09-19,2026-10-05,2026-09-19,0,,,weld joints;welding
+PIP-A-TEST-024,Hydrotest line 24-XX,DEMO-UTILITY-01/AREA-A/PIPING/24-XX,piping,hydrotest,AREA-A,24-XX,true,milestone,,,2026-09-19,2026-10-08,2026-09-19,0,,,hydrotest
+PIP-B-ERECT-024,Erect line 24-XX spools,DEMO-UTILITY-01/AREA-B/PIPING/24-XX,piping,pipe_spool_erection,AREA-B,24-XX,true,quantity_ratio,10,spool,2026-09-19,2026-10-02,2026-09-19,0,,,erect spools;spool erection
+PIP-A-ERECT-025,Erect line 25-YY spools,DEMO-UTILITY-01/AREA-A/PIPING/25-YY,piping,pipe_spool_erection,AREA-A,25-YY,true,quantity_ratio,8,spool,2026-09-19,2026-10-02,2026-09-19,0,,,
+CIV-A-EXC-01,Excavate footing F-01,DEMO-UTILITY-01/AREA-A/CIVIL/F-01,civil,excavation,AREA-A,F-01,true,quantity_ratio,100,m3,2026-09-19,2026-09-29,2026-09-19,0,,,
+CIV-A-REBAR-01,Fix rebar for footing F-01,DEMO-UTILITY-01/AREA-A/CIVIL/F-01,civil,rebar_installation,AREA-A,F-01,true,quantity_ratio,1000,kg,2026-09-19,2026-10-01,2026-09-19,0,,,
+CIV-A-FORM-01,Formwork for footing F-01,DEMO-UTILITY-01/AREA-A/CIVIL/F-01,civil,formwork,AREA-A,F-01,true,quantity_ratio,80,m2,2026-09-19,2026-10-01,2026-09-19,0,,,
+CIV-A-POUR-01,Concrete footing F-01,DEMO-UTILITY-01/AREA-A/CIVIL/F-01,civil,concrete_pour,AREA-A,F-01,true,quantity_ratio,50,m3,2026-09-19,2026-10-03,2026-09-19,0,,,concrete placed
+ELE-A-CABLE-01,Lay cable on tray TR-A,DEMO-UTILITY-01/AREA-A/ELECTRICAL/TR-A,electrical,cable_laying,AREA-A,TR-A,true,quantity_ratio,500,m,2026-09-19,2026-10-10,2026-09-19,0,,,
+ELE-A-TERM-01,Terminate panel PANEL-A,DEMO-UTILITY-01/AREA-A/ELECTRICAL/PANEL-A,electrical,cable_termination,AREA-A,PANEL-A,true,quantity_ratio,20,point,2026-09-19,2026-10-10,2026-09-19,0,,,
+MEC-A-PUMP-01,Install pump P-101,DEMO-UTILITY-01/AREA-A/MECHANICAL/P-101,mechanical,equipment_installation,AREA-A,P-101,true,milestone,,,2026-09-19,2026-10-12,2026-09-19,0,,,

@@ -1,0 +1,38 @@
+{
+  "dataset": "w29-native-import-synthetic-observations",
+  "origin": "synthetic",
+  "provenance": "Authored synthetic DPR observations; native schedules are independently attributed reference fixtures.",
+  "reviewer_status": "pending_human_review",
+  "human_review_completed": false,
+  "sources": {
+    "workspace_PROJECT_xer": {
+      "schedule_origin": "workspace-supplied reference fixture",
+      "format": "p6_xer",
+      "path": "../PROJECT.xer",
+      "source_project_id": "4507",
+      "source_sha256": "a1a0a4ee63a33cc585d28bc048a9e6c0bdf322c7d2075e4a7c421ca8275a7420",
+      "normalized_schedule_sha256": "43aff06f73a0cbb9ae45981efe5caeda729ab73993ac26f9b7a75f0d19647a6e",
+      "parser_version": "MPXJ 14.0.0",
+      "mapping_version": "native-import-contract-1.1",
+      "oil_and_gas_coverage": "pending; this fixture is not claimed as Oil & Gas"
+    },
+    "microsoft_public_sample_mpp": {
+      "schedule_origin": "public reference fixture",
+      "format": "msp_mpp",
+      "path": "backend/tests/fixtures/native_schedule/public_sample.mpp",
+      "source_project_id": "project-1:13d3b051b70ca51a",
+      "source_sha256": "13d3b051b70ca51ac2db410c7d763baab21169b861667b1af3ea59832430c424",
+      "normalized_schedule_sha256": "fe54578fd05bc3d1f1fa63ad1495c8f78412abbb199cda77e668ccf94ffdc0cd",
+      "parser_version": "MPXJ 14.0.0",
+      "mapping_version": "native-import-contract-1.1"
+    }
+  },
+  "counts": {"observations": 40, "per_source": 20, "splits": {"development": 24, "validation": 8, "held_out": 8}},
+  "hashes_sha256": {
+    "reports.jsonl": "14d0bf2a57993a12a77431a9205769a271f6b13d0420fcc8c8da83eaff368c97",
+    "labels.jsonl": "509baa16e221242ef0c61f61cdc243c0320069f9cf8567564e356f2b87ed6846",
+    "splits.json": "36cec94f79c0abd109604681ce9dd1e6625ac3924b148e5d9e2bbea778c4bc6a",
+    "enrichment.json": "8ae850a5dc228c1196be4ab0065f30f5d194c2e00a9a0ac97ae0a188d3fc8ade"
+  },
+  "limitations": ["Labels are proposed and pending human review.", "No physical quantity, denominator, area, tag, or baseline was inferred from either native schedule.", "Held-out labels must not be used before predictions are saved."]
+}

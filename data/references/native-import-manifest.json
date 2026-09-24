@@ -1,0 +1,74 @@
+{
+  "contract_version": "1.1",
+  "fixtures": [
+    {
+      "path": "../PROJECT.xer",
+      "format": "p6_xer",
+      "provenance": "workspace-supplied P6 XER; inspected locally with MPXJ 14.0.0",
+      "required": true,
+      "expected_projects": 1,
+      "expected_project_id": "4507",
+      "expected_tasks": 24,
+      "sha256": "a1a0a4ee63a33cc585d28bc048a9e6c0bdf322c7d2075e4a7c421ca8275a7420"
+    },
+    {
+      "path": "backend/tests/fixtures/native_schedule/tiny.xer",
+      "format": "p6_xer",
+      "provenance": "authored with MPXJ 14.0.0 writer and independently read through the bounded parser",
+      "required": true,
+      "expected_projects": 1,
+      "expected_tasks": 4,
+      "expected_relationships": 1,
+      "sha256": "3d1743781c3d4452a06fe354903b46ff08b2fcdbf25ba98414718c595b81031f"
+    },
+    {
+      "path": "backend/tests/fixtures/native_schedule/tiny_p6.xml",
+      "format": "p6_xml",
+      "provenance": "authored with MPXJ 14.0.0 PMXML writer and independently read through the bounded parser",
+      "required": true,
+      "expected_projects": 1,
+      "expected_tasks": 4,
+      "expected_relationships": 1,
+      "sha256": "4f35d5e822322aae6b218977f70dbf7d23c553e529fb3ac73e0427f3b91ba625"
+    },
+    {
+      "path": "backend/tests/fixtures/native_schedule/tiny_mspdi.xml",
+      "format": "msp_xml",
+      "provenance": "authored MSPDI-compatible XML fixture; inspected locally with MPXJ 14.0.0",
+      "required": true,
+      "expected_projects": 1,
+      "expected_tasks": 4,
+      "expected_relationships": 1,
+      "sha256": "93e1fb464698b74d3dedc8eb09d8dff9b3f6ecc6456bcc2184bf740f260a8e7a"
+    },
+    {
+      "path": "backend/tests/fixtures/native_schedule/two_projects.xer",
+      "format": "p6_xer",
+      "provenance": "authored with MPXJ 14.0.0 XER writer; project enumeration and explicit selection checked",
+      "required": true,
+      "expected_projects": 2,
+      "sha256": "4d5971c4d4c91d901bd97ed51eaa9f2ddc6f465d6749c5dc7315aa69eb9121a3"
+    },
+    {
+      "path": "backend/tests/fixtures/native_schedule/public_sample.mpp",
+      "format": "msp_mpp",
+      "provenance": "Microsoft Tech Community, Project Plan for Data Science by Buck Woody; downloaded 2026-09-23 from the article's public template link",
+      "source_url": "https://techcommunity.microsoft.com/blog/dataarchitectureblog/a-data-science-process-documentation-and-project-template-you-can-use-in-your-so/3038051",
+      "usage_note": "Publicly downloadable project template; article references GPL-3.0 for use. Retained solely as a parser/evaluation fixture.",
+      "required": true,
+      "expected_projects": 1,
+      "expected_tasks": 35,
+      "expected_relationships": 33,
+      "size_bytes": 951808,
+      "sha256": "13d3b051b70ca51ac2db410c7d763baab21169b861667b1af3ea59832430c424"
+    },
+    {
+      "path": "backend/tests/fixtures/native_schedule/bad_malformed.xml",
+      "format": "unknown",
+      "provenance": "authored malformed-input case",
+      "required": false,
+      "sha256": "3f8159d5c0a0c33f2bfff310c6addaf1e69f490f4f83c52d055fc8281bdc1e6c"
+    }
+  ],
+  "mpp": {"status": "validated", "fixture": "backend/tests/fixtures/native_schedule/public_sample.mpp", "parser": "MPXJ 14.0.0"}
+}

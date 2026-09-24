@@ -1,0 +1,10 @@
+{
+  "denominator": 17,
+  "recall_at_8": 1.0,
+  "label": "fixture retrieval only",
+  "schedule_path": "/Users/cyrilsabugeorge/Documents/python_project/site-progress-agent/data/synthetic/schedules/demo-utility-01.csv",
+  "labels_path": "/Users/cyrilsabugeorge/Documents/python_project/site-progress-agent/data/synthetic/labels/seed-labels.jsonl",
+  "limitations": [
+    "synthetic seed labels; no model benchmark"
+  ]
+}

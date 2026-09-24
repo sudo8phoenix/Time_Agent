@@ -1,0 +1,14 @@
+{
+  "dataset": "demo-utility-01-seed",
+  "origin": "synthetic",
+  "status": "prototype_seed_only",
+  "counts": {"development": 10, "validation": 4, "held_out": 6, "total": 20},
+  "splits": {
+    "development": ["family-02", "family-03", "family-04", "family-05", "family-06", "family-12", "family-13", "family-14", "family-15", "family-16"],
+    "validation": ["family-17", "family-18", "family-19", "family-20"],
+    "held_out": ["family-01", "family-07", "family-08", "family-09", "family-10", "family-11"]
+  },
+  "case_assignment": {"C01":"held_out","C02":"development","C03":"development","C04":"development","C05":"development","C06":"development","C07":"held_out","C08":"held_out","C09":"held_out","C10":"held_out","C11":"held_out","C12":"development","C13":"development","C14":"development","C15":"development","C16":"development","C17":"validation","C18":"validation","C19":"validation","C20":"validation"},
+  "leakage_rule": "event families, paraphrases, duplicates, and correction sequences remain within one split",
+  "remaining_work": "Expand to 60 leaf activities and 300 atomic labelled observations after human review; this seed does not claim the 180/60/60 target."
+}

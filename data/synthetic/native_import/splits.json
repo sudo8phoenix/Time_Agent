@@ -1,0 +1,6 @@
+{
+  "assignment_unit": "event_family_id",
+  "development": ["P6-F01", "P6-F02", "P6-F03", "P6-F04", "P6-F05", "P6-F06", "P6-F07", "P6-F08", "P6-F09", "P6-F10", "P6-F11", "P6-F12", "MPP-F01", "MPP-F02", "MPP-F03", "MPP-F04", "MPP-F05", "MPP-F06", "MPP-F07", "MPP-F08", "MPP-F09", "MPP-F10", "MPP-F11", "MPP-F12"],
+  "validation": ["P6-F13", "P6-F14", "P6-F15", "P6-F16", "MPP-F13", "MPP-F14", "MPP-F15", "MPP-F16"],
+  "held_out": ["P6-F17", "P6-F19", "P6-F20", "MPP-F17", "MPP-F19", "MPP-F20"]
+}

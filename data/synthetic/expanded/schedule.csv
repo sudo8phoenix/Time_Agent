@@ -1,0 +1,64 @@
+activity_id,activity_name,wbs_path,discipline,work_type,area,asset_tags,is_leaf,measurement_basis,planned_quantity,unit,planned_start,planned_finish,baseline_date,baseline_quantity,actual_start,actual_finish,aliases
+WBS-AREA-A,AREA-A summary WBS,DEMO-UTILITY-EXPANDED/AREA-A,other,other,AREA-A,,false,manual_physical,,,2026-10-01,2026-10-20,2026-10-01,,,,
+WBS-AREA-B,AREA-B summary WBS,DEMO-UTILITY-EXPANDED/AREA-B,other,other,AREA-B,,false,manual_physical,,,2026-10-01,2026-10-20,2026-10-01,,,,
+WBS-AREA-C,AREA-C summary WBS,DEMO-UTILITY-EXPANDED/AREA-C,other,other,AREA-C,,false,manual_physical,,,2026-10-01,2026-10-20,2026-10-01,,,,
+CIV-A-EXC-01,Excavate footing F-01,DEMO-UTILITY-EXPANDED/AREA-A/CIVIL/F-01,civil,excavation,AREA-A,F-01,true,quantity_ratio,100,m3,2026-10-01,2026-10-20,2026-10-01,0,,,excavation
+CIV-A-REBAR-01,Fix rebar for footing F-01,DEMO-UTILITY-EXPANDED/AREA-A/CIVIL/F-01,civil,rebar_installation,AREA-A,F-01,true,quantity_ratio,1000,kg,2026-10-01,2026-10-20,2026-10-01,0,,,rebar
+CIV-A-POUR-01,Place concrete footing F-01,DEMO-UTILITY-EXPANDED/AREA-A/CIVIL/F-01,civil,concrete_pour,AREA-A,F-01,true,quantity_ratio,50,m3,2026-10-01,2026-10-20,2026-10-01,0,,,concrete placed
+PIP-A-ERECT-01,Erect spools on line 21-XX,DEMO-UTILITY-EXPANDED/AREA-A/PIPING/21-XX,piping,pipe_spool_erection,AREA-A,21-XX,true,quantity_ratio,12,spool,2026-10-01,2026-10-20,2026-10-01,0,,,spool erection
+PIP-A-WELD-01,Weld joints on line 21-XX,DEMO-UTILITY-EXPANDED/AREA-A/PIPING/21-XX,piping,welding,AREA-A,21-XX,true,quantity_ratio,24,joint,2026-10-01,2026-10-20,2026-10-01,0,,,weld joints
+PIP-A-TEST-01,Hydrotest line 21-XX,DEMO-UTILITY-EXPANDED/AREA-A/PIPING/21-XX,piping,hydrotest,AREA-A,21-XX,true,milestone,,,2026-10-01,2026-10-20,2026-10-01,0,,,hydrotest
+ELE-A-CABLE-01,Lay cable on tray TR-A,DEMO-UTILITY-EXPANDED/AREA-A/ELECTRICAL/TR-A,electrical,cable_laying,AREA-A,TR-A,true,quantity_ratio,500,m,2026-10-01,2026-10-20,2026-10-01,0,,,cable laying
+ELE-A-TERM-01,Terminate panel PNL-A,DEMO-UTILITY-EXPANDED/AREA-A/ELECTRICAL/PNL-A,electrical,cable_termination,AREA-A,PNL-A,true,quantity_ratio,20,point,2026-10-01,2026-10-20,2026-10-01,0,,,termination
+MEC-A-PUMP-01,Install pump P-A01,DEMO-UTILITY-EXPANDED/AREA-A/MECHANICAL/P-A01,mechanical,equipment_installation,AREA-A,P-A01,true,milestone,,,2026-10-01,2026-10-20,2026-10-01,0,,,pump installation
+STR-A-STEEL-01,Erect steel frame FR-A1,DEMO-UTILITY-EXPANDED/AREA-A/STRUCTURAL/FR-A1,structural,structural_erection,AREA-A,FR-A1,true,quantity_ratio,30,each,2026-10-01,2026-10-20,2026-10-01,0,,,steel erection
+CIV-A-FORM-01,Install formwork F-01,DEMO-UTILITY-EXPANDED/AREA-A/CIVIL/F-01,civil,formwork,AREA-A,F-01,true,quantity_ratio,80,m2,2026-10-01,2026-10-20,2026-10-01,0,,,formwork
+PIP-A-INSP-01,Inspect welds on line 21-XX,DEMO-UTILITY-EXPANDED/AREA-A/PIPING/21-XX,piping,weld_inspection,AREA-A,21-XX,true,quantity_ratio,24,joint,2026-10-01,2026-10-20,2026-10-01,0,,,weld inspection
+CIV-A-CURE-01,Cure concrete footing F-01,DEMO-UTILITY-EXPANDED/AREA-A/CIVIL/F-01,civil,curing,AREA-A,F-01,true,milestone,,,2026-10-01,2026-10-20,2026-10-01,0,,,curing
+CIV-A-BACK-01,Backfill footing F-01,DEMO-UTILITY-EXPANDED/AREA-A/CIVIL/F-01,civil,backfill,AREA-A,F-01,true,quantity_ratio,100,m3,2026-10-01,2026-10-20,2026-10-01,0,,,backfill
+MEC-A-SKID-01,Install process skid SK-A1,DEMO-UTILITY-EXPANDED/AREA-A/MECHANICAL/SK-A1,mechanical,equipment_installation,AREA-A,SK-A1,true,milestone,,,2026-10-01,2026-10-20,2026-10-01,0,,,skid installation
+PIP-A-ERECT2-01,Erect spools on line 31-YY,DEMO-UTILITY-EXPANDED/AREA-A/PIPING/31-YY,piping,pipe_spool_erection,AREA-A,31-YY,true,quantity_ratio,10,spool,2026-10-01,2026-10-20,2026-10-01,0,,,spool erection
+ELE-A-CABLE2-01,Lay cable on tray TR-A2,DEMO-UTILITY-EXPANDED/AREA-A/ELECTRICAL/TR-A2,electrical,cable_laying,AREA-A,TR-A2,true,quantity_ratio,400,m,2026-10-01,2026-10-20,2026-10-01,0,,,cable laying
+ELE-A-TERM2-01,Terminate panel PNL-A2,DEMO-UTILITY-EXPANDED/AREA-A/ELECTRICAL/PNL-A2,electrical,cable_termination,AREA-A,PNL-A2,true,quantity_ratio,16,point,2026-10-01,2026-10-20,2026-10-01,0,,,termination
+STR-A-STEEL2-01,Erect steel frame FR-A2,DEMO-UTILITY-EXPANDED/AREA-A/STRUCTURAL/FR-A2,structural,structural_erection,AREA-A,FR-A2,true,quantity_ratio,20,each,2026-10-01,2026-10-20,2026-10-01,0,,,steel erection
+PIP-A-WELD2-01,Weld joints on line 31-YY,DEMO-UTILITY-EXPANDED/AREA-A/PIPING/31-YY,piping,welding,AREA-A,31-YY,true,quantity_ratio,20,joint,2026-10-01,2026-10-20,2026-10-01,0,,,weld joints
+CIV-B-EXC-02,Excavate footing F-02,DEMO-UTILITY-EXPANDED/AREA-B/CIVIL/F-02,civil,excavation,AREA-B,F-02,true,quantity_ratio,100,m3,2026-10-01,2026-10-20,2026-10-01,0,,,excavation
+CIV-B-REBAR-02,Fix rebar for footing F-02,DEMO-UTILITY-EXPANDED/AREA-B/CIVIL/F-02,civil,rebar_installation,AREA-B,F-02,true,quantity_ratio,1000,kg,2026-10-01,2026-10-20,2026-10-01,0,,,rebar
+CIV-B-POUR-02,Place concrete footing F-02,DEMO-UTILITY-EXPANDED/AREA-B/CIVIL/F-02,civil,concrete_pour,AREA-B,F-02,true,quantity_ratio,50,m3,2026-10-01,2026-10-20,2026-10-01,0,,,concrete placed
+PIP-B-ERECT-02,Erect spools on line 22-XX,DEMO-UTILITY-EXPANDED/AREA-B/PIPING/22-XX,piping,pipe_spool_erection,AREA-B,22-XX,true,quantity_ratio,12,spool,2026-10-01,2026-10-20,2026-10-01,0,,,spool erection
+PIP-B-WELD-02,Weld joints on line 22-XX,DEMO-UTILITY-EXPANDED/AREA-B/PIPING/22-XX,piping,welding,AREA-B,22-XX,true,quantity_ratio,24,joint,2026-10-01,2026-10-20,2026-10-01,0,,,weld joints
+PIP-B-TEST-02,Hydrotest line 22-XX,DEMO-UTILITY-EXPANDED/AREA-B/PIPING/22-XX,piping,hydrotest,AREA-B,22-XX,true,milestone,,,2026-10-01,2026-10-20,2026-10-01,0,,,hydrotest
+ELE-B-CABLE-02,Lay cable on tray TR-B,DEMO-UTILITY-EXPANDED/AREA-B/ELECTRICAL/TR-B,electrical,cable_laying,AREA-B,TR-B,true,quantity_ratio,500,m,2026-10-01,2026-10-20,2026-10-01,0,,,cable laying
+ELE-B-TERM-02,Terminate panel PNL-B,DEMO-UTILITY-EXPANDED/AREA-B/ELECTRICAL/PNL-B,electrical,cable_termination,AREA-B,PNL-B,true,quantity_ratio,20,point,2026-10-01,2026-10-20,2026-10-01,0,,,termination
+MEC-B-PUMP-02,Install pump P-B01,DEMO-UTILITY-EXPANDED/AREA-B/MECHANICAL/P-B01,mechanical,equipment_installation,AREA-B,P-B01,true,milestone,,,2026-10-01,2026-10-20,2026-10-01,0,,,pump installation
+STR-B-STEEL-02,Erect steel frame FR-B1,DEMO-UTILITY-EXPANDED/AREA-B/STRUCTURAL/FR-B1,structural,structural_erection,AREA-B,FR-B1,true,quantity_ratio,30,each,2026-10-01,2026-10-20,2026-10-01,0,,,steel erection
+CIV-B-FORM-02,Install formwork F-02,DEMO-UTILITY-EXPANDED/AREA-B/CIVIL/F-02,civil,formwork,AREA-B,F-02,true,quantity_ratio,80,m2,2026-10-01,2026-10-20,2026-10-01,0,,,formwork
+PIP-B-INSP-02,Inspect welds on line 22-XX,DEMO-UTILITY-EXPANDED/AREA-B/PIPING/22-XX,piping,weld_inspection,AREA-B,22-XX,true,quantity_ratio,24,joint,2026-10-01,2026-10-20,2026-10-01,0,,,weld inspection
+CIV-B-CURE-02,Cure concrete footing F-02,DEMO-UTILITY-EXPANDED/AREA-B/CIVIL/F-02,civil,curing,AREA-B,F-02,true,milestone,,,2026-10-01,2026-10-20,2026-10-01,0,,,curing
+CIV-B-BACK-02,Backfill footing F-02,DEMO-UTILITY-EXPANDED/AREA-B/CIVIL/F-02,civil,backfill,AREA-B,F-02,true,quantity_ratio,100,m3,2026-10-01,2026-10-20,2026-10-01,0,,,backfill
+MEC-B-SKID-02,Install process skid SK-B1,DEMO-UTILITY-EXPANDED/AREA-B/MECHANICAL/SK-B1,mechanical,equipment_installation,AREA-B,SK-B1,true,milestone,,,2026-10-01,2026-10-20,2026-10-01,0,,,skid installation
+PIP-B-ERECT2-02,Erect spools on line 32-YY,DEMO-UTILITY-EXPANDED/AREA-B/PIPING/32-YY,piping,pipe_spool_erection,AREA-B,32-YY,true,quantity_ratio,10,spool,2026-10-01,2026-10-20,2026-10-01,0,,,spool erection
+ELE-B-CABLE2-02,Lay cable on tray TR-B2,DEMO-UTILITY-EXPANDED/AREA-B/ELECTRICAL/TR-B2,electrical,cable_laying,AREA-B,TR-B2,true,quantity_ratio,400,m,2026-10-01,2026-10-20,2026-10-01,0,,,cable laying
+ELE-B-TERM2-02,Terminate panel PNL-B2,DEMO-UTILITY-EXPANDED/AREA-B/ELECTRICAL/PNL-B2,electrical,cable_termination,AREA-B,PNL-B2,true,quantity_ratio,16,point,2026-10-01,2026-10-20,2026-10-01,0,,,termination
+STR-B-STEEL2-02,Erect steel frame FR-B2,DEMO-UTILITY-EXPANDED/AREA-B/STRUCTURAL/FR-B2,structural,structural_erection,AREA-B,FR-B2,true,quantity_ratio,20,each,2026-10-01,2026-10-20,2026-10-01,0,,,steel erection
+PIP-B-WELD2-02,Weld joints on line 32-YY,DEMO-UTILITY-EXPANDED/AREA-B/PIPING/32-YY,piping,welding,AREA-B,32-YY,true,quantity_ratio,20,joint,2026-10-01,2026-10-20,2026-10-01,0,,,weld joints
+CIV-C-EXC-03,Excavate footing F-03,DEMO-UTILITY-EXPANDED/AREA-C/CIVIL/F-03,civil,excavation,AREA-C,F-03,true,quantity_ratio,100,m3,2026-10-01,2026-10-20,2026-10-01,0,,,excavation
+CIV-C-REBAR-03,Fix rebar for footing F-03,DEMO-UTILITY-EXPANDED/AREA-C/CIVIL/F-03,civil,rebar_installation,AREA-C,F-03,true,quantity_ratio,1000,kg,2026-10-01,2026-10-20,2026-10-01,0,,,rebar
+CIV-C-POUR-03,Place concrete footing F-03,DEMO-UTILITY-EXPANDED/AREA-C/CIVIL/F-03,civil,concrete_pour,AREA-C,F-03,true,quantity_ratio,50,m3,2026-10-01,2026-10-20,2026-10-01,0,,,concrete placed
+PIP-C-ERECT-03,Erect spools on line 23-XX,DEMO-UTILITY-EXPANDED/AREA-C/PIPING/23-XX,piping,pipe_spool_erection,AREA-C,23-XX,true,quantity_ratio,12,spool,2026-10-01,2026-10-20,2026-10-01,0,,,spool erection
+PIP-C-WELD-03,Weld joints on line 23-XX,DEMO-UTILITY-EXPANDED/AREA-C/PIPING/23-XX,piping,welding,AREA-C,23-XX,true,quantity_ratio,24,joint,2026-10-01,2026-10-20,2026-10-01,0,,,weld joints
+PIP-C-TEST-03,Hydrotest line 23-XX,DEMO-UTILITY-EXPANDED/AREA-C/PIPING/23-XX,piping,hydrotest,AREA-C,23-XX,true,milestone,,,2026-10-01,2026-10-20,2026-10-01,0,,,hydrotest
+ELE-C-CABLE-03,Lay cable on tray TR-C,DEMO-UTILITY-EXPANDED/AREA-C/ELECTRICAL/TR-C,electrical,cable_laying,AREA-C,TR-C,true,quantity_ratio,500,m,2026-10-01,2026-10-20,2026-10-01,0,,,cable laying
+ELE-C-TERM-03,Terminate panel PNL-C,DEMO-UTILITY-EXPANDED/AREA-C/ELECTRICAL/PNL-C,electrical,cable_termination,AREA-C,PNL-C,true,quantity_ratio,20,point,2026-10-01,2026-10-20,2026-10-01,0,,,termination
+MEC-C-PUMP-03,Install pump P-C01,DEMO-UTILITY-EXPANDED/AREA-C/MECHANICAL/P-C01,mechanical,equipment_installation,AREA-C,P-C01,true,milestone,,,2026-10-01,2026-10-20,2026-10-01,0,,,pump installation
+STR-C-STEEL-03,Erect steel frame FR-C1,DEMO-UTILITY-EXPANDED/AREA-C/STRUCTURAL/FR-C1,structural,structural_erection,AREA-C,FR-C1,true,quantity_ratio,30,each,2026-10-01,2026-10-20,2026-10-01,0,,,steel erection
+CIV-C-FORM-03,Install formwork F-03,DEMO-UTILITY-EXPANDED/AREA-C/CIVIL/F-03,civil,formwork,AREA-C,F-03,true,quantity_ratio,80,m2,2026-10-01,2026-10-20,2026-10-01,0,,,formwork
+PIP-C-INSP-03,Inspect welds on line 23-XX,DEMO-UTILITY-EXPANDED/AREA-C/PIPING/23-XX,piping,weld_inspection,AREA-C,23-XX,true,quantity_ratio,24,joint,2026-10-01,2026-10-20,2026-10-01,0,,,weld inspection
+CIV-C-CURE-03,Cure concrete footing F-03,DEMO-UTILITY-EXPANDED/AREA-C/CIVIL/F-03,civil,curing,AREA-C,F-03,true,milestone,,,2026-10-01,2026-10-20,2026-10-01,0,,,curing
+CIV-C-BACK-03,Backfill footing F-03,DEMO-UTILITY-EXPANDED/AREA-C/CIVIL/F-03,civil,backfill,AREA-C,F-03,true,quantity_ratio,100,m3,2026-10-01,2026-10-20,2026-10-01,0,,,backfill
+MEC-C-SKID-03,Install process skid SK-C1,DEMO-UTILITY-EXPANDED/AREA-C/MECHANICAL/SK-C1,mechanical,equipment_installation,AREA-C,SK-C1,true,milestone,,,2026-10-01,2026-10-20,2026-10-01,0,,,skid installation
+PIP-C-ERECT2-03,Erect spools on line 33-YY,DEMO-UTILITY-EXPANDED/AREA-C/PIPING/33-YY,piping,pipe_spool_erection,AREA-C,33-YY,true,quantity_ratio,10,spool,2026-10-01,2026-10-20,2026-10-01,0,,,spool erection
+ELE-C-CABLE2-03,Lay cable on tray TR-C2,DEMO-UTILITY-EXPANDED/AREA-C/ELECTRICAL/TR-C2,electrical,cable_laying,AREA-C,TR-C2,true,quantity_ratio,400,m,2026-10-01,2026-10-20,2026-10-01,0,,,cable laying
+ELE-C-TERM2-03,Terminate panel PNL-C2,DEMO-UTILITY-EXPANDED/AREA-C/ELECTRICAL/PNL-C2,electrical,cable_termination,AREA-C,PNL-C2,true,quantity_ratio,16,point,2026-10-01,2026-10-20,2026-10-01,0,,,termination
+STR-C-STEEL2-03,Erect steel frame FR-C2,DEMO-UTILITY-EXPANDED/AREA-C/STRUCTURAL/FR-C2,structural,structural_erection,AREA-C,FR-C2,true,quantity_ratio,20,each,2026-10-01,2026-10-20,2026-10-01,0,,,steel erection
+PIP-C-WELD2-03,Weld joints on line 33-YY,DEMO-UTILITY-EXPANDED/AREA-C/PIPING/33-YY,piping,welding,AREA-C,33-YY,true,quantity_ratio,20,joint,2026-10-01,2026-10-20,2026-10-01,0,,,weld joints

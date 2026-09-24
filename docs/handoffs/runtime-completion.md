@@ -1,0 +1,9 @@
+# Runtime completion handoff
+
+The worker now has a real CLI at `python ops/run_worker.py` (or `--once`) and runs the database pipeline through the configured local Ollama adapter. Claims are committed before model work, leases renew from an independent database session during slow model calls, ownership is checked before each call and before publishing, and SIGINT/SIGTERM stop polling and release a shutdown-interrupted job for retry. Extraction and candidate selection use the same configured Ollama model. Trusted report date context is supplied only when the report date has recorded evidence. Existing observations make retries idempotent.
+
+`ops/model_smoke.py --run` remains an explicit real request; it refuses to call Ollama without the flag. No benchmark was run: Ollama 0.23.2 is installed but no server was reachable at `127.0.0.1:11434`, so installed model names/digests could not be inspected. The CLI reported `Operation not permitted` for that connection. No weights were downloaded.
+
+Updated after W-10 persistence: migration `0007` and the worker now persist/reuse activity vectors by model revision and composed-text hash, with lexical fallback. This checkout still has no provisioned `sentence-transformers` runtime or cached model weights, so live hybrid quality remains unmeasured. No synthetic or fixture embeddings are used by production.
+
+Verification: 35 unit tests across extraction, selection, retrieval and Ollama passed. The changed worker/rebuild helpers and CLI pass Ruff; the runtime modules compile, and `ops/run_worker.py --help` works. A broader Ruff run reports existing compact-style violations in the pre-existing service, pipeline and retrieval index files. Seven PostgreSQL integration tests could not initialize because sandbox networking denied access to the configured PostgreSQL endpoint `127.0.0.1:5432`.

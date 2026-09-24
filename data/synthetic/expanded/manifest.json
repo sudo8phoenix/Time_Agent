@@ -1,0 +1,35 @@
+{
+  "dataset": "demo-utility-expanded-w03",
+  "origin": "synthetic",
+  "provenance": "authored fictional project; not public or field data",
+  "reviewer_status": "pending_human_review",
+  "human_review_completed": false,
+  "counts": {
+    "executable_leaf_activities": 60,
+    "summary_rows_excluded": 3,
+    "reports": 100,
+    "atomic_labelled_observations": 300,
+    "report_styles": 5,
+    "primary_case_types": {
+      "unambiguous_actual": 120,
+      "ambiguous_match": 45,
+      "unmatched": 30,
+      "future_plan_or_no_work": 30,
+      "duplicate_correction_quantity": 30,
+      "messy_date_unit": 30,
+      "injection_or_unreadable": 15
+    }
+  },
+  "hashes_sha256": {
+    "schedule.csv": "d576de978efcad0f3a7c014ed13119a36e7f6d5212c010d14a2d175eaebacad8",
+    "reports.jsonl": "7e22107aab344799949d8381047abcd37103940f0dff08e6d8a8a37c62e878c1",
+    "labels.jsonl": "fed48887d2c7b50c20c6b8f41149893e52d13f2bd43303b110d39d88405c5f8c",
+    "splits.json": "b7d226cdf9e0b1026ddaf205ecd5c82ac1f75c91ac7a75e10d4cb1c16250f3d8"
+  },
+  "reproducibility": "Generated deterministically by W-03 authoring script; retain this manifest with the data package.",
+  "limitations": [
+    "Synthetic labels are not a completed gold set.",
+    "No human has reviewed or adjudicated these mappings, dates, quantities, or effects.",
+    "Held-out labels must not be exposed to an evaluator before predictions are saved."
+  ]
+}

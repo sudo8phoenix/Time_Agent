@@ -1,0 +1,9 @@
+{
+  "dataset": "demo-utility-01-seed",
+  "origin": "synthetic",
+  "generated_on": "2026-09-22",
+  "references": [],
+  "provenance": [{"path":"data/synthetic/schedules/demo-utility-01.csv","source":"original fictional schedule authored for demonstration","transformation":"canonical CSV serialization","synthetic":true},{"path":"data/synthetic/reports/seed-reports.jsonl","source":"original fictional report text based on worked cases C01-C20","transformation":"JSONL packaging","synthetic":true},{"path":"data/synthetic/labels/seed-labels.jsonl","source":"worked cases in progress-agent-plan/03_DATA_AND_EVALUATION.md §4","transformation":"human-authored expected behavior labels; pending review","synthetic":true}],
+  "reviewer_status": "pending_human_review",
+  "note": "No third-party report is represented as project ground truth. Expansion to 60/300 remains outstanding."
+}

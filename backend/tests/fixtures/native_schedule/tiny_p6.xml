@@ -1,0 +1,247 @@
+<?xml version="1.0" encoding="UTF-8"?><APIBusinessObjects xmlns="http://xmlns.oracle.com/Primavera/P6/V24.12/API/BusinessObjects" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="">
+  <Currency>
+    <DecimalPlaces>2</DecimalPlaces>
+    <DecimalSymbol>Period</DecimalSymbol>
+    <DigitGroupingSymbol>Comma</DigitGroupingSymbol>
+    <ExchangeRate>1</ExchangeRate>
+    <Id>CUR</Id>
+    <Name>Default Currency</Name>
+    <NegativeSymbol>(#1.1)</NegativeSymbol>
+    <ObjectId>1</ObjectId>
+    <PositiveSymbol>#1.1</PositiveSymbol>
+    <Symbol>$</Symbol>
+  </Currency>
+  <Calendar>
+    <HoursPerDay>8</HoursPerDay>
+    <HoursPerMonth>160</HoursPerMonth>
+    <HoursPerWeek>40</HoursPerWeek>
+    <HoursPerYear>1920</HoursPerYear>
+    <IsDefault>1</IsDefault>
+    <IsPersonal>0</IsPersonal>
+    <Name>Standard</Name>
+    <ObjectId>1</ObjectId>
+    <Type>Global</Type>
+    <StandardWorkWeek>
+      <StandardWorkHours>
+        <DayOfWeek>Sunday</DayOfWeek>
+      </StandardWorkHours>
+      <StandardWorkHours>
+        <DayOfWeek>Monday</DayOfWeek>
+        <WorkTime>
+          <Start>08:00:00</Start>
+          <Finish>11:59:00</Finish>
+        </WorkTime>
+        <WorkTime>
+          <Start>13:00:00</Start>
+          <Finish>16:59:00</Finish>
+        </WorkTime>
+      </StandardWorkHours>
+      <StandardWorkHours>
+        <DayOfWeek>Tuesday</DayOfWeek>
+        <WorkTime>
+          <Start>08:00:00</Start>
+          <Finish>11:59:00</Finish>
+        </WorkTime>
+        <WorkTime>
+          <Start>13:00:00</Start>
+          <Finish>16:59:00</Finish>
+        </WorkTime>
+      </StandardWorkHours>
+      <StandardWorkHours>
+        <DayOfWeek>Wednesday</DayOfWeek>
+        <WorkTime>
+          <Start>08:00:00</Start>
+          <Finish>11:59:00</Finish>
+        </WorkTime>
+        <WorkTime>
+          <Start>13:00:00</Start>
+          <Finish>16:59:00</Finish>
+        </WorkTime>
+      </StandardWorkHours>
+      <StandardWorkHours>
+        <DayOfWeek>Thursday</DayOfWeek>
+        <WorkTime>
+          <Start>08:00:00</Start>
+          <Finish>11:59:00</Finish>
+        </WorkTime>
+        <WorkTime>
+          <Start>13:00:00</Start>
+          <Finish>16:59:00</Finish>
+        </WorkTime>
+      </StandardWorkHours>
+      <StandardWorkHours>
+        <DayOfWeek>Friday</DayOfWeek>
+        <WorkTime>
+          <Start>08:00:00</Start>
+          <Finish>11:59:00</Finish>
+        </WorkTime>
+        <WorkTime>
+          <Start>13:00:00</Start>
+          <Finish>16:59:00</Finish>
+        </WorkTime>
+      </StandardWorkHours>
+      <StandardWorkHours>
+        <DayOfWeek>Saturday</DayOfWeek>
+      </StandardWorkHours>
+    </StandardWorkWeek>
+    <HolidayOrExceptions/>
+  </Calendar>
+  <Project>
+    <ActivityDefaultActivityType>Task Dependent</ActivityDefaultActivityType>
+    <ActivityDefaultCalendarObjectId>1</ActivityDefaultCalendarObjectId>
+    <ActivityDefaultDurationType>Fixed Duration and Units</ActivityDefaultDurationType>
+    <ActivityDefaultPercentCompleteType>Duration</ActivityDefaultPercentCompleteType>
+    <ActivityDefaultPricePerUnit>0</ActivityDefaultPricePerUnit>
+    <ActivityIdBasedOnSelectedActivity>1</ActivityIdBasedOnSelectedActivity>
+    <ActivityIdIncrement>10</ActivityIdIncrement>
+    <ActivityIdPrefix>A</ActivityIdPrefix>
+    <ActivityIdSuffix>1000</ActivityIdSuffix>
+    <ActivityPercentCompleteBasedOnActivitySteps>0</ActivityPercentCompleteBasedOnActivitySteps>
+    <AddActualToRemaining>0</AddActualToRemaining>
+    <AllowNegativeActualUnitsFlag>0</AllowNegativeActualUnitsFlag>
+    <AssignmentDefaultDrivingFlag>1</AssignmentDefaultDrivingFlag>
+    <AssignmentDefaultRateType>Price / Unit</AssignmentDefaultRateType>
+    <CheckOutStatus>0</CheckOutStatus>
+    <CostQuantityRecalculateFlag>0</CostQuantityRecalculateFlag>
+    <CriticalActivityFloatLimit>0</CriticalActivityFloatLimit>
+    <CriticalActivityPathType>Critical Float</CriticalActivityPathType>
+    <DefaultPriceTimeUnits>Hour</DefaultPriceTimeUnits>
+    <DiscountApplicationPeriod>Month</DiscountApplicationPeriod>
+    <EarnedValueComputeType>Activity Percent Complete</EarnedValueComputeType>
+    <EarnedValueETCComputeType>ETC = Remaining Cost for Activity</EarnedValueETCComputeType>
+    <EarnedValueETCUserValue>0.88</EarnedValueETCUserValue>
+    <EarnedValueUserPercent>0.06</EarnedValueUserPercent>
+    <EnableSummarization>1</EnableSummarization>
+    <FiscalYearStartMonth>1</FiscalYearStartMonth>
+    <Id>PROJECT</Id>
+    <LevelingPriority>10</LevelingPriority>
+    <LinkActualToActualThisPeriod>1</LinkActualToActualThisPeriod>
+    <LinkPercentCompleteWithActual>1</LinkPercentCompleteWithActual>
+    <LinkPlannedAndAtCompletionFlag>1</LinkPlannedAndAtCompletionFlag>
+    <Name>Tiny MSP Demo</Name>
+    <ObjectId>1</ObjectId>
+    <PlannedStartDate>2026-09-01T08:00:00</PlannedStartDate>
+    <PrimaryResourcesCanMarkActivitiesAsCompleted>1</PrimaryResourcesCanMarkActivitiesAsCompleted>
+    <RelationshipLagCalendar>Predecessor Activity Calendar</RelationshipLagCalendar>
+    <ResetPlannedToRemainingFlag>0</ResetPlannedToRemainingFlag>
+    <ResourceCanBeAssignedToSameActivityMoreThanOnce>1</ResourceCanBeAssignedToSameActivityMoreThanOnce>
+    <ResourcesCanAssignThemselvesToActivities>1</ResourcesCanAssignThemselvesToActivities>
+    <ResourcesCanEditAssignmentPercentComplete>0</ResourcesCanEditAssignmentPercentComplete>
+    <ResourcesCanMarkAssignmentAsCompleted>0</ResourcesCanMarkAssignmentAsCompleted>
+    <ResourcesCanViewInactiveActivities>0</ResourcesCanViewInactiveActivities>
+    <RiskLevel>Medium</RiskLevel>
+    <StartDate>2026-09-01T08:00:00</StartDate>
+    <Status>Active</Status>
+    <StrategicPriority>500</StrategicPriority>
+    <SummarizeToWBSLevel>2</SummarizeToWBSLevel>
+    <SummaryLevel>Assignment Level</SummaryLevel>
+    <UseProjectBaselineForEarnedValue>1</UseProjectBaselineForEarnedValue>
+    <WBSCodeSeparator>.</WBSCodeSeparator>
+    <WBS>
+      <Code>1</Code>
+      <Name>Utilities summary</Name>
+      <ObjectId>10</ObjectId>
+      <ProjectObjectId>1</ProjectObjectId>
+      <SequenceNumber>0</SequenceNumber>
+      <Status>Active</Status>
+    </WBS>
+    <Activity>
+      <ActualLaborUnits>0</ActualLaborUnits>
+      <ActualNonLaborUnits>0</ActualNonLaborUnits>
+      <CalendarObjectId>1</CalendarObjectId>
+      <DurationType>Fixed Units/Time</DurationType>
+      <Id>00024</Id>
+      <LevelingPriority>Normal</LevelingPriority>
+      <Name>Erect spools</Name>
+      <ObjectId>24</ObjectId>
+      <PercentCompleteType>Duration</PercentCompleteType>
+      <PlannedLaborUnits>0</PlannedLaborUnits>
+      <PlannedNonLaborUnits>0</PlannedNonLaborUnits>
+      <ProjectObjectId>1</ProjectObjectId>
+      <RemainingLaborCost>0</RemainingLaborCost>
+      <RemainingLaborUnits>0</RemainingLaborUnits>
+      <RemainingNonLaborCost>0</RemainingNonLaborCost>
+      <RemainingNonLaborUnits>0</RemainingNonLaborUnits>
+      <Status>Not Started</Status>
+      <Type>Resource Dependent</Type>
+      <WBSObjectId>10</WBSObjectId>
+    </Activity>
+    <Activity>
+      <ActualLaborUnits>0</ActualLaborUnits>
+      <ActualNonLaborUnits>0</ActualNonLaborUnits>
+      <AtCompletionDuration>0</AtCompletionDuration>
+      <CalendarObjectId>1</CalendarObjectId>
+      <DurationType>Fixed Units/Time</DurationType>
+      <Id>MILE-1</Id>
+      <LevelingPriority>Normal</LevelingPriority>
+      <Name>Inspect line</Name>
+      <ObjectId>25</ObjectId>
+      <PercentCompleteType>Duration</PercentCompleteType>
+      <PlannedDuration>0</PlannedDuration>
+      <PlannedLaborUnits>0</PlannedLaborUnits>
+      <PlannedNonLaborUnits>0</PlannedNonLaborUnits>
+      <ProjectObjectId>1</ProjectObjectId>
+      <RemainingLaborCost>0</RemainingLaborCost>
+      <RemainingLaborUnits>0</RemainingLaborUnits>
+      <RemainingNonLaborCost>0</RemainingNonLaborCost>
+      <RemainingNonLaborUnits>0</RemainingNonLaborUnits>
+      <Status>Not Started</Status>
+      <Type>Finish Milestone</Type>
+      <WBSObjectId>10</WBSObjectId>
+    </Activity>
+    <Activity>
+      <ActualLaborUnits>0</ActualLaborUnits>
+      <ActualNonLaborUnits>0</ActualNonLaborUnits>
+      <CalendarObjectId>1</CalendarObjectId>
+      <DurationType>Fixed Units/Time</DurationType>
+      <Id>00025</Id>
+      <LevelingPriority>Normal</LevelingPriority>
+      <Name>Install supports</Name>
+      <ObjectId>26</ObjectId>
+      <PercentCompleteType>Duration</PercentCompleteType>
+      <PlannedLaborUnits>0</PlannedLaborUnits>
+      <PlannedNonLaborUnits>0</PlannedNonLaborUnits>
+      <ProjectObjectId>1</ProjectObjectId>
+      <RemainingLaborCost>0</RemainingLaborCost>
+      <RemainingLaborUnits>0</RemainingLaborUnits>
+      <RemainingNonLaborCost>0</RemainingNonLaborCost>
+      <RemainingNonLaborUnits>0</RemainingNonLaborUnits>
+      <Status>Not Started</Status>
+      <Type>Resource Dependent</Type>
+      <WBSObjectId>10</WBSObjectId>
+    </Activity>
+    <Relationship>
+      <Lag>0</Lag>
+      <ObjectId>1</ObjectId>
+      <PredecessorActivityObjectId>24</PredecessorActivityObjectId>
+      <PredecessorProjectObjectId>1</PredecessorProjectObjectId>
+      <SuccessorActivityObjectId>25</SuccessorActivityObjectId>
+      <SuccessorProjectObjectId>1</SuccessorProjectObjectId>
+      <Type>Finish to Start</Type>
+    </Relationship>
+    <ScheduleOptions>
+      <CalculateFloatBasedOnFinishDate>1</CalculateFloatBasedOnFinishDate>
+      <ComputeTotalFloatType>Smallest of Start Float and Finish Float</ComputeTotalFloatType>
+      <CriticalActivityFloatThreshold>0</CriticalActivityFloatThreshold>
+      <CriticalActivityPathType>Critical Float</CriticalActivityPathType>
+      <ExternalProjectPriorityLimit>5</ExternalProjectPriorityLimit>
+      <IgnoreOtherProjectRelationships>0</IgnoreOtherProjectRelationships>
+      <IncludeExternalResAss>0</IncludeExternalResAss>
+      <LevelAllResources>1</LevelAllResources>
+      <LevelWithinFloat>0</LevelWithinFloat>
+      <MakeOpenEndedActivitiesCritical>0</MakeOpenEndedActivitiesCritical>
+      <MaximumMultipleFloatPaths>10</MaximumMultipleFloatPaths>
+      <MinFloatToPreserve>1</MinFloatToPreserve>
+      <MultipleFloatPathsEnabled>0</MultipleFloatPathsEnabled>
+      <MultipleFloatPathsUseTotalFloat>1</MultipleFloatPathsUseTotalFloat>
+      <OutOfSequenceScheduleType>Retained Logic</OutOfSequenceScheduleType>
+      <OverAllocationPercentage>25</OverAllocationPercentage>
+      <PreserveScheduledEarlyAndLateDates>1</PreserveScheduledEarlyAndLateDates>
+      <PriorityList>(0||priority_type(sort_type|ASC)())</PriorityList>
+      <ProjectObjectId>1</ProjectObjectId>
+      <RelationshipLagCalendar>Predecessor Activity Calendar</RelationshipLagCalendar>
+      <StartToStartLagCalculationType>1</StartToStartLagCalculationType>
+      <UseExpectedFinishDates>1</UseExpectedFinishDates>
+    </ScheduleOptions>
+  </Project>
+</APIBusinessObjects>

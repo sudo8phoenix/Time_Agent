@@ -1,0 +1,22 @@
+{
+  "openapi": "3.1.0",
+  "info": {"title": "Site Progress Agent API", "version": "1.0"},
+  "paths": {
+    "/api/v1/health/live": {"get": {"responses": {"200": {"description": "API process is responding", "content": {"application/json": {"schema": {"$ref": "#/components/schemas/Health"}}}}}}},
+    "/api/v1/jobs/{id}": {"get": {"responses": {"200": {"description": "Job status", "content": {"application/json": {"schema": {"$ref": "#/components/schemas/JobStatusEnvelope"}}}}, "404": {"$ref": "#/components/responses/Error"}}}},
+    "/api/v1/projects/{id}/proposals": {"get": {"responses": {"200": {"description": "Review queue", "content": {"application/json": {"schema": {"$ref": "#/components/schemas/ProposalListEnvelope"}}}}, "422": {"$ref": "#/components/responses/Error"}}}},
+    "/api/v1/proposals/{id}/approve": {"post": {"requestBody":{"required":true,"content":{"application/json":{"schema":{"$ref":"#/components/schemas/ApprovalRequest"}}}},"responses": {"200": {"description": "Approved proposal", "content": {"application/json": {"schema": {"$ref": "#/components/schemas/ProposalEnvelope"}}}}, "409": {"$ref": "#/components/responses/Error"}, "422": {"$ref": "#/components/responses/Error"}}}}
+  },
+  "components": {"schemas": {
+    "Health": {"type":"object","required":["status"],"properties":{"status":{"type":"string","const":"ok"}},"additionalProperties":false},
+    "Observation": {"type":"object","required":["discipline","work_type","event_type","observed_status","area","asset_tags","explicit_activity_id","work_date","date_basis","quantity","quantity_kind","unit","raw_unit","reported_percent","actual_start","actual_finish","blocker","summary","evidence","warnings"],"additionalProperties":false},
+    "Candidate": {"type":"object","required":["candidate_id","external_id","activity_name","area","work_type","is_leaf","retrieval_rank","retrieval_score"],"additionalProperties":false},
+    "Proposal": {"type":"object","required":["candidate_id","mapping_state","match_strength","evidence_fragment_ids","reason_codes","explanation","missing_information","candidates","review_state","proposed_effects"],"additionalProperties":false},
+    "ApprovalRequest": {"type":"object","required":["expected_proposal_revision","expected_activity_revision","idempotency_key","resolution_notes"],"properties":{"expected_proposal_revision":{"type":"integer","minimum":1},"expected_activity_revision":{"type":"integer","minimum":1},"idempotency_key":{"type":"string","minLength":1},"resolution_notes":{"type":["string","null"]}},"additionalProperties":false},
+    "JobStatus": {"type":"object","required":["job_id","state","stage","attempts","extracted_count","proposal_count","error_code"],"additionalProperties":false},
+    "JobStatusEnvelope": {"type":"object","required":["data","request_id"],"properties":{"data":{"$ref":"#/components/schemas/JobStatus"},"request_id":{"type":"string"}},"additionalProperties":false},
+    "ProposalEnvelope": {"type":"object","required":["data","request_id"],"properties":{"data":{"$ref":"#/components/schemas/Proposal"},"request_id":{"type":"string"}},"additionalProperties":false},
+    "ProposalListEnvelope": {"type":"object","required":["data","request_id"],"properties":{"data":{"type":"object","required":["items","next_cursor"],"properties":{"items":{"type":"array","items":{"$ref":"#/components/schemas/Proposal"}},"next_cursor":{"type":["string","null"]}},"additionalProperties":false},"request_id":{"type":"string"}},"additionalProperties":false},
+    "Error": {"type":"object","required":["error","request_id"],"properties":{"error":{"type":"object","required":["code","message","details"],"additionalProperties":false},"request_id":{"type":"string"}},"additionalProperties":false}
+  }, "responses": {"Error": {"description":"Validation, conflict, or missing resource", "content":{"application/json":{"schema":{"$ref":"#/components/schemas/Error"}}}}}}
+}
