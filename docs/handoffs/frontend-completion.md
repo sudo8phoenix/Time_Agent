@@ -24,7 +24,8 @@ Commands run and results:
 
 Evidence and limitations:
 
-- The test is a dependency-free source-contract test because the repository has no Playwright/Vitest harness.
+- The repository now includes a Playwright fixture-mode smoke suite at `frontend/tests/e2e/fixture-flow.spec.ts`. It covers report intake through approval/progress and native schedule import through staging without requiring PostgreSQL, Ollama, or real uploaded source bytes.
+- Run it with `make test-e2e` after `cd frontend && npm ci` (and `npx playwright install chromium` on a fresh machine). Real API/authentication, database, model, and visual browser walkthrough gates remain separate.
 - Browser walkthrough, keyboard/mobile visual QA, real authenticated API flow, and native parser runtime scenarios were not run; browser plugin/harness is unavailable.
 - Task overrides expose discipline in this compact screen; the backend remains the validation authority for the full reviewed-mapping schema.
 

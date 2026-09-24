@@ -36,7 +36,15 @@ def _serve_frontend() -> None:
         # main.py lives at <project>/backend/app/main.py.
         dist = Path(__file__).resolve().parents[2] / dist
     dist = dist.resolve()
+    # Production serves the built bundle.  Keep the root route useful in unit
+    # tests and source checkouts where the optional frontend build is absent.
+    source_frontend = dist.parent / "index.html"
+    if not dist.is_dir() and not source_frontend.is_file():
+        return
     if not dist.is_dir():
+        @app.get("/", include_in_schema=False)
+        def frontend_source():
+            return FileResponse(source_frontend)
         return
     assets = dist / "assets"
     if assets.is_dir():

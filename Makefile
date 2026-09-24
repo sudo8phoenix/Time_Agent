@@ -30,7 +30,7 @@ test-integration:
 	DATABASE_URL=$(TEST_DATABASE_URL) PYTHONPATH=backend $(VENV)/bin/alembic upgrade head
 	DATABASE_URL=$(TEST_DATABASE_URL) $(PYTEST) backend/tests/integration
 test-e2e:
-	@echo 'ERROR: end-to-end tests require the assembled workflow.' >&2; exit 2
+	cd frontend && npm run test:e2e
 evaluate:
 	PYTHONPATH=backend $(VENV)/bin/python -m evaluation.run $(ARGS)
 build-web:

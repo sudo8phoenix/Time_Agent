@@ -13,7 +13,7 @@ MAX_OUTPUT_BYTES = 50 * 1024 * 1024
 DEFAULT_TIMEOUT_SECONDS = 30
 
 
-@dataclass(frozen=True)
+@dataclass
 class ParserRuntimeError(Exception):
     code: str
     message: str
