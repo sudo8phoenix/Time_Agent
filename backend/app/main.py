@@ -1,7 +1,7 @@
 """FastAPI application entrypoint."""
 from pathlib import Path
-from fastapi import FastAPI, HTTPException
-from fastapi.responses import FileResponse
+from fastapi import FastAPI, HTTPException, Request
+from fastapi.responses import FileResponse, JSONResponse
 from fastapi.staticfiles import StaticFiles
 from .settings import get_settings
 from .api.endpoints.auth import router as auth_router
@@ -23,6 +23,14 @@ app.include_router(jobs_router, prefix="/api/v1")
 app.include_router(review_router, prefix="/api/v1")
 app.include_router(progress_router, prefix="/api/v1")
 app.include_router(schedule_imports_router, prefix="/api/v1")
+
+
+@app.exception_handler(404)
+async def api_not_found_handler(request: Request, exc: HTTPException):
+    """Keep unknown API paths distinct from the browser's SPA fallback."""
+    if request.url.path.startswith("/api/"):
+        return JSONResponse(status_code=404, content={"detail": "API route not found"})
+    return JSONResponse(status_code=404, content={"detail": "Not Found"})
 
 
 @app.get("/api/v1/health/live", tags=["health"])
