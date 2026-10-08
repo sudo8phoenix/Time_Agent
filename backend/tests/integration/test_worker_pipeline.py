@@ -1,10 +1,14 @@
 from uuid import uuid4
+from datetime import date
+import json
 import pytest
+from sqlalchemy import event, inspect
 from sqlalchemy.orm import sessionmaker
 from app.db.session import engine
 from app.db.models import Project, ScheduleVersion, Report, Job, Fragment, Activity, ActivityEmbedding, Observation, Proposal, ProgressEvent, ActivityState
 from app.jobs.pipeline import process_job
 from app.jobs.worker import run_once
+from app.llm.ollama import LLMResult, OllamaChatAdapter
 from app.schemas.observation import Observation as Extracted
 
 @pytest.fixture
@@ -45,7 +49,8 @@ def test_pipeline_persists_traceable_proposal_and_is_idempotent(db):
     job, fragment, activity = _job(db); calls=[]
     def extract(_): calls.append(1); return [_obs(fragment)]
     def select(obs, candidates, fragments): return {"candidate_id":str(activity.id),"mapping_state":"suggested","match_strength":"review","evidence_fragment_ids":[str(fragment.id)],"reason_codes":[],"explanation":"matched","missing_information":[],"candidates":[{"candidate_id":str(activity.id),"external_id":"A-1","activity_name":"Install pipe","area":"A","work_type":"pipe_spool_erection","is_leaf":True,"retrieval_rank":1,"retrieval_score":1.0}],"review_state":"pending","proposed_effects":{}}
-    result=process_job(db,job,extraction_call=extract,selection_call=select); db.commit()
+    result=process_job(db,job,extraction_call=extract,selection_call=select,
+                       retrieve_call=lambda *args: [activity]); db.commit()
     assert result["extracted_count"]==result["proposal_count"]==1
     row=db.query(Observation).filter(Observation.job_id == job.id).one()
     proposal=db.query(Proposal).filter(Proposal.observation_id == row.id).one()
@@ -56,53 +61,12 @@ def test_pipeline_persists_traceable_proposal_and_is_idempotent(db):
     assert again["extracted_count"]==again["proposal_count"]==1
     assert db.query(Observation).filter(Observation.job_id == job.id).count()==1
 
-def test_pipeline_persists_embeddings_without_leaking_embed_into_extraction(db):
-    job, fragment, activity = _job(db)
-
-    class Embedder:
-        model_revision = "fixture-embedding-v1"
-
-        def __call__(self, text):
-            return [float(len(text)), 1.0]
-
-    def extract(_):
-        return [_obs(fragment)]
-
-    def select(obs, candidates, fragments):
-        return {
-            "candidate_id": str(activity.id),
-            "mapping_state": "suggested",
-            "match_strength": "review",
-            "evidence_fragment_ids": [str(fragment.id)],
-            "reason_codes": [],
-            "explanation": "matched",
-            "missing_information": [],
-            "candidates": [],
-            "review_state": "pending",
-            "proposed_effects": {},
-        }
-
-    result = process_job(
-        db,
-        job,
-        extraction_call=extract,
-        selection_call=select,
-        embed=Embedder(),
-    )
-    db.flush()
-    assert result["proposal_count"] == 1
-    stored = db.query(ActivityEmbedding).filter(
-        ActivityEmbedding.activity_id == activity.id,
-        ActivityEmbedding.model_revision == "fixture-embedding-v1",
-    ).one()
-    assert stored.activity_id == activity.id
-    assert stored.model_revision == "fixture-embedding-v1"
-
 def test_pipeline_failure_leaves_no_partial_rows(db):
-    job, fragment, _ = _job(db)
+    job, fragment, activity = _job(db)
     def extract(_): return [_obs(fragment)]
     def fail(*_): raise RuntimeError("selection failed")
-    with pytest.raises(RuntimeError): process_job(db,job,extraction_call=extract,selection_call=fail)
+    with pytest.raises(RuntimeError): process_job(db,job,extraction_call=extract,selection_call=fail,
+                                                 retrieve_call=lambda *args: [activity])
     db.rollback()
     assert db.query(Observation).filter(Observation.job_id == job.id).count()==0
     assert (
@@ -112,3 +76,120 @@ def test_pipeline_failure_leaves_no_partial_rows(db):
         .count()
         == 0
     )
+
+
+def test_typed_extraction_through_ollama_selection_produces_approvable_effects(db):
+    from app.api.endpoints.review import approve, ApprovalRequest
+    from app.db.models import User, ProjectMembership
+
+    job, fragment, activity = _job(db)
+    activity.planned_quantity = 10
+    activity.baseline_quantity = 0
+    activity.baseline_date = date(2026, 1, 1)
+    fragment.original_text = fragment.normalised_text = "On 2026-01-02, installed 2 spools in Area A."
+    raw = _obs(fragment).model_dump(mode="json")
+    raw.update(work_date="2026-01-02", date_basis="explicit")
+    raw["evidence"][0]["quote"] = fragment.original_text
+    calls = []
+
+    def transport(method, url, payload, timeout, headers):
+        content = payload["messages"][1]["content"]
+        assert isinstance(content, str), "Ollama requires text message content"
+        if "observations" in payload["format"].get("properties", {}):
+            calls.append("extract")
+            assert fragment.original_text in content
+            result = {"observations": [raw]}
+        elif "candidate_ids" in payload["format"].get("properties", {}):
+            calls.append("schedule")
+            context = json.loads(content)
+            assert context["observation"]["work_type"] == "pipe_spool_erection"
+            assert context["schedule_activities"][0]["id"] == str(activity.id)
+            result = {"candidate_ids": [str(activity.id)]}
+        else:
+            calls.append("select")
+            context = json.loads(content)
+            assert context["observation"]["work_type"] == "pipe_spool_erection"
+            assert context["candidates"][0]["candidate_id"] == str(activity.id)
+            result = {"candidate_id": str(activity.id), "mapping_state": "suggested",
+                      "evidence_fragment_ids": [str(fragment.id)], "reason_codes": [],
+                      "explanation": "Supported by the source.", "missing_information": []}
+        return 200, {"message": {"content": json.dumps(result)}}
+
+    adapter = OllamaChatAdapter("http://127.0.0.1:11434", "fixture", transport=transport)
+    process_job(db, job, model_call=adapter.chat)
+    proposal = db.query(Proposal).join(Observation).filter(Observation.job_id == job.id).one()
+    assert calls == ["extract", "schedule", "select"]
+    assert proposal.chosen_activity_id == activity.id
+    assert proposal.proposed_effects == {"event_type": "actual_progress", "quantity_semantics": "delta",
+                                         "quantity": "2", "unit": "spool", "effective_date": "2026-01-02"}
+    reviewer = User(username=f"flow-{uuid4().hex}", password_hash="unused", role="reviewer")
+    db.add(reviewer); db.flush()
+    db.add(ProjectMembership(project_id=job.project_id, user_id=reviewer.id)); db.flush()
+    approve(proposal.id, ApprovalRequest(expected_proposal_revision=1, expected_activity_revision=0,
+                                        idempotency_key=str(uuid4())), reviewer, db)
+    assert db.get(ActivityState, activity.id).completed_quantity == 2
+    assert proposal.review_state == "approved"
+
+
+def test_pipeline_does_not_lock_job_row_before_model_calls(db):
+    job, fragment, _ = _job(db)
+    db.add(Fragment(
+        report_id=fragment.report_id,
+        ordinal=2,
+        locator="paragraph:2",
+        original_text="Installed 3 spools in Area A",
+        normalised_text="Installed 3 spools in Area A",
+    ))
+    db.flush()
+    job_metadata_flushed = False
+    heartbeat_calls = 0
+
+    def observe_flush(session, _context):
+        nonlocal job_metadata_flushed
+        state = inspect(job)
+        if any(
+            state.attrs[name].history.has_changes()
+            for name in ("model_version", "prompt_version", "config_version")
+        ):
+            job_metadata_flushed = True
+
+    event.listen(db, "after_flush", observe_flush)
+
+    def heartbeat(_job, _token):
+        nonlocal heartbeat_calls
+        heartbeat_calls += 1
+        assert not job_metadata_flushed, "job row was locked before a model call"
+        return True
+
+    calls = 0
+
+    def model_call(**_kwargs):
+        nonlocal calls
+        calls += 1
+        return LLMResult(
+            value={"observations": []},
+            model="fixture-model",
+            model_digest="fixture-digest",
+            runtime="fixture-runtime",
+            elapsed_ms=1,
+            settings_hash="fixture-settings",
+            prompt_hash="fixture-prompt",
+        )
+
+    try:
+        result = process_job(
+            db,
+            job,
+            model_call=model_call,
+            heartbeat_callback=heartbeat,
+            lease_token="fixture-lease",
+            max_chars=40,
+        )
+    finally:
+        event.remove(db, "after_flush", observe_flush)
+
+    assert result["proposal_count"] == 0
+    assert heartbeat_calls == calls == 2
+    assert job.model_version == "fixture-model"
+    assert job.prompt_version is not None
+    assert job.config_version is not None

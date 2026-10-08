@@ -29,6 +29,12 @@ def require_reviewer(user: User = Depends(require_csrf)) -> User:
         raise HTTPException(403, "Reviewer role required")
     return user
 
+def current_reviewer(user: User = Depends(current_user)) -> User:
+    """Authorize safe reviewer reads without requiring a CSRF header."""
+    if user.role != "reviewer":
+        raise HTTPException(403, "Reviewer role required")
+    return user
+
 def project_access(project_id: str, user: User = Depends(current_user), db: DBSession = Depends(get_session)) -> Project:
     project = db.scalar(
         select(Project)

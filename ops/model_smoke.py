@@ -31,9 +31,11 @@ def main() -> int:
         ),
     )
     started = time.monotonic()
-    metadata = adapter.metadata()
+    health = adapter.health()
+    if not health["ok"]:
+        raise RuntimeError("Configured Ollama model is not installed")
     result = adapter.chat(system="Return the requested JSON object.", user="Reply with {\"ok\": true}.", schema={"type": "object", "properties": {"ok": {"type": "boolean"}}, "required": ["ok"], "additionalProperties": False})
-    record = {"runtime": result.runtime, "model": result.model, "model_digest": result.model_digest or metadata.get("digest"), "elapsed_ms": result.elapsed_ms, "wall_ms": int((time.monotonic() - started) * 1000), "settings_hash": result.settings_hash, "prompt_hash": result.prompt_hash, "result": result.value}
+    record = {"runtime": result.runtime or health["runtime"], "model": result.model, "model_digest": result.model_digest or health["model_digest"], "elapsed_ms": result.elapsed_ms, "wall_ms": int((time.monotonic() - started) * 1000), "settings_hash": result.settings_hash, "prompt_hash": result.prompt_hash, "result": result.value}
     rendered = json.dumps(record, indent=2, sort_keys=True)
     print(rendered)
     if args.output:

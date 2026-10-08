@@ -2,13 +2,14 @@ from datetime import date
 from uuid import UUID
 from fastapi import APIRouter, Depends, HTTPException, Request
 from pydantic import BaseModel, ConfigDict, Field
+from sqlalchemy import select
 from sqlalchemy.orm import Session as DBSession
 from starlette.datastructures import UploadFile
-from ...db.models import Project, Fragment
+from ...db.models import Project, Fragment, Observation, Proposal
 from ...db.session import get_session
 from ...ingest.reports import ingest_report
 from ...jobs.service import enqueue_job
-from ..dependencies import project_access, require_reviewer
+from ..dependencies import current_reviewer, project_access, require_reviewer
 
 router=APIRouter(prefix="/projects/{project_id}/reports", tags=["reports"])
 class TextReport(BaseModel):
@@ -60,10 +61,30 @@ async def create_report(request: Request, project: Project=Depends(project_acces
     except ValueError as exc: raise HTTPException(409 if str(exc)=="PROJECT_HAS_NO_ACTIVE_SCHEDULE" else 422, detail={"code":str(exc) if str(exc)=="PROJECT_HAS_NO_ACTIVE_SCHEDULE" else "REPORT_INVALID","message":str(exc)}) from exc
     except OSError as exc:
         raise HTTPException(503, detail={"code": "REPORT_STORAGE_FAILED", "message": "report storage is unavailable"}) from exc
-    return {"report_id":str(report.id),"job_id":str(job.id),"existing":existing or job_existing,"state":job.state,"fragments_url":f"/api/v1/reports/{report.id}"}
+    proposal_ids = db.scalars(
+        select(Proposal.id)
+        .join(Observation, Observation.id == Proposal.observation_id)
+        .where(Observation.job_id == job.id, Proposal.review_state == "pending")
+        .order_by(Proposal.created_at)
+    ).all()
+    return {
+        "report_id": str(report.id),
+        "job_id": str(job.id),
+        "project_id": str(job.project_id),
+        "schedule_version_id": str(job.schedule_version_id),
+        "existing": existing or job_existing,
+        "state": job.state,
+        "stage": job.stage,
+        "attempts": job.attempts,
+        "extracted_count": job.extracted_count,
+        "proposal_count": job.proposal_count,
+        "proposal_ids": [str(value) for value in proposal_ids],
+        "error_code": job.error_code,
+        "fragments_url": f"/api/v1/reports/{report.id}",
+    }
 
 @router.get("/{report_id}")
-def get_report(report_id: UUID, project: Project=Depends(project_access), db: DBSession=Depends(get_session), _reviewer=Depends(require_reviewer)):
+def get_report(report_id: UUID, project: Project=Depends(project_access), db: DBSession=Depends(get_session), _reviewer=Depends(current_reviewer)):
     from ...db.models import Report
     report=db.query(Report).filter(Report.id==report_id,Report.project_id==project.id).first()
     if not report: raise HTTPException(404,"Report not found")

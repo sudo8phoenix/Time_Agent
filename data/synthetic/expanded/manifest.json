@@ -2,7 +2,7 @@
   "dataset": "demo-utility-expanded-w03",
   "origin": "synthetic",
   "provenance": "authored fictional project; not public or field data",
-  "reviewer_status": "pending_human_review",
+  "reviewer_status": "ai_assisted_review",
   "human_review_completed": false,
   "counts": {
     "executable_leaf_activities": 60,
@@ -31,5 +31,6 @@
     "Synthetic labels are not a completed gold set.",
     "No human has reviewed or adjudicated these mappings, dates, quantities, or effects.",
     "Held-out labels must not be exposed to an evaluator before predictions are saved."
-  ]
+  ],
+  "review_note": "AI-assisted review at owner explicit request 2026-09-24; reviewer_id=cyril"
 }

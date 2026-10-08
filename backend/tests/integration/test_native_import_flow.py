@@ -18,7 +18,7 @@ from app.db.passwords import hash_password
 from app.db.session import engine, get_session
 from app.ingest.native_schedule.runner import ParserRuntimeError
 from app.main import app
-from app.retrieval.index import retrieve_candidates
+from app.agent.schedule_decision import shortlist_activities
 from app.settings import get_settings
 
 
@@ -132,9 +132,13 @@ def test_each_native_format_real_parser_maps_stages_activates_and_retrieves(
     activities = list(db.scalars(select(Activity).where(Activity.schedule_version_id == version_id)))
     activity = next(activity for activity in activities if activity.external_id == expected_external_id)
     assert activity.measurement_basis == "unsupported"
-    result = retrieve_candidates({"summary": activity.name, "explicit_activity_id": expected_external_id}, version_id, activities)
-    assert result.candidates and result.candidates[0].external_id == expected_external_id
-    assert all(candidate.is_leaf for candidate in result.candidates)
+    result = shortlist_activities(
+        {"summary": activity.name, "explicit_activity_id": expected_external_id},
+        version_id, activities,
+        model_call=lambda **_: {"candidate_ids": [str(activity.id)]},
+    )
+    assert result and result[0].external_id == expected_external_id
+    assert all(candidate.is_leaf for candidate in result)
     db.close()
 
 

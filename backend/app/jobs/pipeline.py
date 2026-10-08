@@ -8,9 +8,7 @@ from sqlalchemy.orm import Session
 
 from ..db.models import Activity, Fragment, Job, Observation as DBObservation, Proposal, Report
 from ..llm.extract import FragmentInput, extract_fragments, deduplicate_results
-from ..retrieval.index import retrieve_candidates
-from ..retrieval.rebuild import ensure_activity_embeddings
-from ..matching.selection import select_candidate
+from ..agent.schedule_decision import shortlist_activities, select_activity
 
 
 def _dump(value: Any) -> dict[str, Any]:
@@ -34,9 +32,15 @@ def _effects(obs: Any) -> dict[str, Any]:
     unit = getattr(obs, "unit", None)
     work_date = getattr(obs, "work_date", None)
     if event.endswith("actual_progress") or event == "actual_progress":
-        out: dict[str, Any] = {}
+        kind = getattr(obs, "quantity_kind", "unknown")
+        out: dict[str, Any] = {
+            "event_type": event,
+            "quantity_semantics": getattr(kind, "value", kind),
+        }
         if quantity is not None: out["quantity"] = str(quantity)
-        if unit is not None: out["unit"] = str(unit)
+        if unit is not None: out["unit"] = getattr(unit, "value", str(unit))
+        reported_percent = getattr(obs, "reported_percent", None)
+        if reported_percent is not None: out["reported_percent"] = str(reported_percent)
         if work_date is not None: out["effective_date"] = work_date.isoformat()
         return out
     return {}
@@ -60,24 +64,16 @@ def process_job(db: Session, job: Job, *, model_call: Callable[..., Any] | None 
     if not fragments:
         return {"stage": "persist", "state": "ready_for_review", "extracted_count": 0, "proposal_count": 0}
     activities = list(db.scalars(select(Activity).where(Activity.schedule_version_id == job.schedule_version_id, Activity.is_leaf.is_(True))))
-    embedding_vectors = None
-    # ``embed`` configures retrieval; it is not an extraction keyword.
-    embedder = kwargs.pop("embed", None)
-    embedding_model_revision = str(getattr(embedder, "model_revision", "none"))
-    if embedder is not None and embedding_model_revision != "none":
-        # A missing/corrupt local model must never prevent lexical retrieval or
-        # leave a partly rebuilt index.  The savepoint keeps this optional
-        # optimisation isolated from the durable job/proposal transaction.
-        try:
-            with db.begin_nested():
-                embedding_vectors = ensure_activity_embeddings(
-                    db, activities, embedder, embedding_model_revision
-                )
-        except (RuntimeError, TypeError, ValueError):
-            embedding_vectors = None
-            embedder = None
+    kwargs.pop("embed", None)
     report = db.get(Report, job.report_id)
     frag_inputs = [FragmentInput(str(f.id), f.locator, f.normalised_text or f.original_text, f.ordinal) for f in fragments]
+    # Keep job metadata out of the database transaction until all model calls
+    # finish.  Flushing a Job update here locks the lease row; the independent
+    # heartbeat session would then block on that lock before it can call the
+    # model, deadlocking the worker until the lease expires.
+    model_version = job.model_version
+    prompt_version = job.prompt_version
+    config_version = job.config_version
     if model_call is None and extraction_call is None:
         from ..llm.ollama import OllamaChatAdapter
         from ..settings import get_settings
@@ -89,7 +85,7 @@ def process_job(db: Session, job: Job, *, model_call: Callable[..., Any] | None 
         )
         model_call = adapter.chat
         model_metadata = adapter.metadata()
-        job.model_version = f"{config.ollama_model}:{model_metadata.get('digest', 'unknown')}"
+        model_version = f"{config.ollama_model}:{model_metadata.get('digest', 'unknown')}"
     else:
         model_metadata = {}
 
@@ -115,9 +111,9 @@ def process_job(db: Session, job: Job, *, model_call: Callable[..., Any] | None 
         for result in results:
             metadata = getattr(result, "metadata", None)
             if metadata:
-                job.model_version = metadata.model or job.model_version
-                job.prompt_version = metadata.prompt_version or job.prompt_version
-                job.config_version = metadata.settings_hash or job.config_version
+                model_version = metadata.model or model_version
+                prompt_version = metadata.prompt_version or prompt_version
+                config_version = metadata.settings_hash or config_version
         proposal_count = 0
         for index, obs in enumerate(observations):
             fields = _dump(obs)
@@ -129,14 +125,18 @@ def process_job(db: Session, job: Job, *, model_call: Callable[..., Any] | None 
                                 field_evidence={"evidence": evidence})
             db.add(row); db.flush()
             retrieved = (retrieve_call(obs, job.schedule_version_id, activities) if retrieve_call else
-                         retrieve_candidates(obs, job.schedule_version_id, activities, embed=embedder,
-                                             activity_embeddings=embedding_vectors,
-                                             model_version=embedding_model_revision))
+                         shortlist_activities(obs, job.schedule_version_id, activities,
+                                              model_call=checked_model_call))
             candidates = retrieved.candidates if hasattr(retrieved, "candidates") else retrieved
             fragments_map = {str(f.id): f.normalised_text or f.original_text for f in fragments}
             selected = (selection_call(obs, candidates, fragments_map) if selection_call else
-                        select_candidate(obs, candidates, fragments_map, model_call=selection_model_call if model_call else None))
+                        select_activity(obs, candidates, fragments_map,
+                                        model_call=selection_model_call))
             payload = _dump(selected)
+            row.field_evidence = {
+                "evidence": evidence,
+                "selection": {key: payload.get(key) for key in ("explanation", "reason_codes", "missing_information")},
+            }
             chosen = payload.get("candidate_id")
             chosen_activity = next((a for a in activities if str(a.id) == str(chosen)), None) if chosen else None
             db.add(Proposal(observation_id=row.id, project_id=job.project_id, chosen_activity_id=chosen_activity.id if chosen_activity else None,
@@ -144,6 +144,9 @@ def process_job(db: Session, job: Job, *, model_call: Callable[..., Any] | None 
                             match_strength=payload.get("match_strength", "unresolved"), review_state="pending",
                             warnings=fields.get("warnings", []), proposed_effects=_effects(obs)))
             proposal_count += 1
+        job.model_version = model_version
+        job.prompt_version = prompt_version
+        job.config_version = config_version
         job.extracted_count = len(observations); job.proposal_count = proposal_count
         db.flush()
     return {"stage": "persist", "state": "ready_for_review", "extracted_count": len(observations), "proposal_count": proposal_count}

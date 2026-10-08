@@ -10,7 +10,7 @@ from fastapi import HTTPException
 from sqlalchemy import delete, select
 from sqlalchemy.orm import sessionmaker
 
-from app.api.endpoints.review import ApprovalRequest, ReviewChange, approve, revise
+from app.api.endpoints.review import ApprovalRequest, ReviewChange, approve, revise, reject
 from app.db.models import (
     Activity, ActivityState, AuditEvent, IdempotencyKey, Job, Observation,
     ProgressEvent, Project, ProjectMembership, Proposal, Report,
@@ -287,6 +287,35 @@ def test_warning_requires_explicit_review_resolution_before_approval(db_pair):
     assert result["state_revision"] == 1
     db.rollback()
     db.close()
+
+
+@pytest.mark.parametrize("quantity", ["yes", "done", "NaN", "Infinity", "-1"])
+def test_invalid_quantity_revision_preserves_pending_proposal(db_pair, quantity):
+    user_id, proposal_id, activity_id, _ = _pending(db_pair)
+    with db_pair() as db:
+        with pytest.raises(HTTPException) as exc:
+            revise(proposal_id, ReviewChange(expected_proposal_revision=1,
+                   chosen_activity_id=activity_id, field_changes={"proposed_effects": {"quantity": quantity}},
+                   reason="Correction"), db.get(User, user_id), db)
+        assert exc.value.detail["code"] == "INVALID_QUANTITY"
+        assert db.get(Proposal, proposal_id).review_state == "pending"
+
+
+def test_revised_proposal_can_be_rejected_and_leaves_pending_queue(db_pair):
+    from app.api.endpoints.jobs import status
+
+    user_id, proposal_id, activity_id, _ = _pending(db_pair)
+    with db_pair() as db:
+        user = db.get(User, user_id)
+        proposal = db.get(Proposal, proposal_id)
+        job_id = db.get(Observation, proposal.observation_id).job_id
+        revised = revise(proposal_id, ReviewChange(expected_proposal_revision=1,
+                         chosen_activity_id=activity_id, reason="Checked match"), user, db)
+        assert status(job_id, db, user)["proposal_ids"] == [revised["id"]]
+        result = reject(revised["id"], ReviewChange(expected_proposal_revision=2, reason="Duplicate report"), user, db)
+        assert result["review_state"] == "rejected"
+        assert status(job_id, db, user)["proposal_ids"] == []
+        assert db.get(ActivityState, activity_id).revision == 0
 
 
 def test_approval_rejects_activity_outside_the_job_pinned_schedule(db_pair):

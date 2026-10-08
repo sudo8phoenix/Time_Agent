@@ -1,4 +1,4 @@
-"""Run the durable PostgreSQL-backed extraction/matching worker."""
+"""Run the durable PostgreSQL-backed report agent worker."""
 from __future__ import annotations
 
 import argparse
@@ -31,7 +31,6 @@ def main() -> int:
 
     signal.signal(signal.SIGINT, stop)
     signal.signal(signal.SIGTERM, stop)
-    embedder = _load_embedder()
     settings = get_settings()
 
     def pipeline(db, job, *, token, should_stop, heartbeat_callback):
@@ -46,11 +45,9 @@ def main() -> int:
                 database_url=settings.database_url,
                 should_stop=should_stop,
                 heartbeat_callback=heartbeat_callback,
-                embedder=embedder,
             )
         return process_job(db, job, lease_token=token, should_stop=should_stop,
-                           heartbeat_callback=heartbeat_callback,
-                           embed=embedder)
+                           heartbeat_callback=heartbeat_callback)
 
     def beat(job, token):
         with session_factory() as db:
@@ -67,15 +64,6 @@ def main() -> int:
     run_loop(session_factory, pipeline, should_stop=should_stop,
              poll_seconds=args.poll_seconds)
     return 0
-
-
-def _load_embedder():
-    try:
-        from app.retrieval.rebuild import LocalEmbeddingModel
-        return LocalEmbeddingModel()
-    except RuntimeError as exc:
-        print(f"Embedding retrieval unavailable; using lexical retrieval: {exc}", file=sys.stderr)
-        return None
 
 
 if __name__ == "__main__":

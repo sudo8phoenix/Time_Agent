@@ -14,7 +14,7 @@ from app.agent.tools import AgentToolError, AgentTools, ReportMetadata
 from app.db.base import Base
 from app.db.models import Activity, Fragment, Job, Project, Report, ScheduleVersion
 from app.llm.extract import ExtractionError
-from app.matching.selection import SelectionValidationError
+from app.agent.schedule_decision import AgentDecisionError as SelectionValidationError
 from app.schemas.matching import Candidate
 from app.schemas.observation import Observation
 
@@ -61,6 +61,8 @@ class Fixture:
         self.model_calls = 0
         def model(**kwargs):
             self.model_calls += 1
+            if "candidate_ids" in kwargs.get("schema", {}).get("properties", {}):
+                return {"candidate_ids": [str(self.activity_id)]}
             if "schema" in kwargs and "properties" in kwargs["schema"] and "candidate_id" in kwargs["schema"]["properties"]:
                 return {"candidate_id": str(self.activity_id), "mapping_state": "suggested",
                         "evidence_fragment_ids": [str(self.fragment_id)], "reason_codes": ["DIRECT_MATCH"],
@@ -175,7 +177,7 @@ def test_load_context_rejects_expired_lease_and_inconsistent_relations(mutation)
         fixture.load(fixture.tools())
 
 
-def test_empty_retrieval_skips_selection_model_and_embeddings_fallback():
+def test_empty_schedule_decision_skips_selection_model_and_ignores_unused_embedder():
     fixture = Fixture()
     tools = fixture.tools(retrieval_service=lambda *args, **kwargs: type("Result", (), {"candidates": []})())
     scope = fixture.load(tools)
@@ -198,7 +200,7 @@ def test_empty_retrieval_skips_selection_model_and_embeddings_fallback():
     scope2 = fixture2.load(tools2)
     tools2.extract_observations(scope2.fragment_ids, ReportMetadata(report_date=date(2026, 9, 1), report_date_trusted=True))
     result = tools2.retrieve_candidates("obs-0001", fixture2.observation, scope2.schedule_version_id)
-    assert result.candidates and result.warnings[0].code == "EMBEDDINGS_UNAVAILABLE"
+    assert result.candidates and result.warnings == []
 
 
 def test_candidate_validation_budgets_and_bad_selection_rejected():

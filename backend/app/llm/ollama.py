@@ -147,8 +147,11 @@ class OllamaChatAdapter:
             raise OllamaResponseError("Ollama model metadata request failed")
         return dict(body)
 
-    def chat(self, *, system: str, user: str, schema: Mapping[str, Any], settings: Mapping[str, Any] | None = None,
+    def chat(self, *, system: str, user: str | Mapping[str, Any], schema: Mapping[str, Any], settings: Mapping[str, Any] | None = None,
              metadata: bool = True) -> LLMResult:
+        # Selection supplies structured context; Ollama message content is text.
+        if isinstance(user, Mapping):
+            user = json.dumps(user, ensure_ascii=False, default=str)
         options = {"temperature": 0.0, "num_ctx": 8192, "num_predict": 1536}
         if settings:
             options.update(settings)

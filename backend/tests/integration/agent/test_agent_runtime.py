@@ -101,8 +101,11 @@ class RuntimeFixture:
 
     def model(self, **kwargs):
         is_selection = "candidate_id" in kwargs["schema"].get("properties", {})
-        self.calls.append("selection" if is_selection else "extraction")
-        if is_selection:
+        is_schedule = "candidate_ids" in kwargs["schema"].get("properties", {})
+        self.calls.append("selection" if is_selection else "schedule" if is_schedule else "extraction")
+        if is_schedule:
+            value = {"candidate_ids": [str(self.activity_id)]}
+        elif is_selection:
             value = {
                 "candidate_id": str(self.activity_id),
                 "mapping_state": "suggested",
@@ -242,7 +245,7 @@ def test_postgres_graph_happy_path_has_sanitized_trace(runtime_fixture):
 
 @pytest.mark.parametrize(
     ("stop_check", "expected_additional_model_calls"),
-    [(5, 1), (11, 0)],
+    [(5, 2), (11, 0)],
     ids=["after-extraction", "after-selection"],
 )
 def test_postgres_restart_rehydrates_provenance_without_repeating_completed_model_stage(
@@ -275,7 +278,7 @@ def test_expired_lease_is_replaced_and_new_owner_resumes(runtime_fixture):
         assert job.id == runtime_fixture.job_id
     result = runtime_fixture.run(token=replacement)
     assert result["state"] == "ready_for_review"
-    assert len(runtime_fixture.calls) - before == 1
+    assert len(runtime_fixture.calls) - before == 2
     with session_factory() as db:
         job = db.get(Job, runtime_fixture.job_id)
         assert job.attempts == 2

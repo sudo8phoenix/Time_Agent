@@ -28,7 +28,7 @@ def status(job_id: UUID, db: Session=Depends(get_session), user: User=Depends(cu
         select(Proposal.id)
         .join(Observation, Observation.id == Proposal.observation_id)
         .where(Observation.job_id == job.id, Proposal.review_state == "pending")
-        .order_by(Proposal.created_at)
+        .order_by(Observation.ordinal, Proposal.revision, Proposal.id)
     ).all()
     return {"job_id":str(job.id),"project_id":str(job.project_id),"report_id":str(job.report_id),"schedule_version_id":str(job.schedule_version_id),"state":job.state,"stage":job.stage,"attempts":job.attempts,"extracted_count":job.extracted_count,"proposal_count":job.proposal_count,"proposal_ids":[str(value) for value in proposal_ids],"error_code":job.error_code}
 

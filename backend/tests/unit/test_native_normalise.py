@@ -20,6 +20,9 @@ def test_reviewer_mapping_produces_valid_csv_without_inventing_quantities():
             "24": {
                 "discipline": "piping",
                 "work_type": "pipe_spool_erection",
+                "area": "Area A",
+                "asset_tags": ["24-XX", "24-YY"],
+                "aliases": ["Spool erection line 24-XX"],
                 "measurement_basis": "quantity_ratio",
                 "planned_quantity": "12",
                 "unit": "spool",
@@ -31,6 +34,8 @@ def test_reviewer_mapping_produces_valid_csv_without_inventing_quantities():
     result = normalise_schedule(preview, mapping)
     assert "24,Erect spools" in result.canonical_csv
     assert "25,Inspect line" in result.canonical_csv
+    assert "Area A,24-XX;24-YY" in result.canonical_csv
+    assert "Spool erection line 24-XX" in result.canonical_csv
     assert result.task_metadata["24"].source_task_id == "24"
 
 

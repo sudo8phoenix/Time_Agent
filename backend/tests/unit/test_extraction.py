@@ -93,6 +93,24 @@ def test_schema_rejection_is_visible():
         extract_batch(batch(fragment()), lambda **_: {"observations": [{"unexpected": True}]})
 
 
+def test_model_null_placeholders_are_normalised_for_optional_fields():
+    item = observation("On 2026-09-21, erected 3 spools on line 24-XX in AREA-A.")
+    item.update({
+        "area": "unknown", "explicit_activity_id": "unknown", "work_date": "unknown",
+        "reported_percent": "unknown", "actual_start": "unknown", "actual_finish": "unknown",
+        "blocker": "unknown",
+    })
+    result = extract_batch(batch(fragment()), lambda **_: {"observations": [item]})
+    kept = result.observations[0]
+    assert kept.area is None
+    assert kept.explicit_activity_id is None
+    assert kept.work_date is None
+    assert kept.reported_percent is None
+    assert kept.actual_start is None
+    assert kept.actual_finish is None
+    assert kept.blocker is None
+
+
 @pytest.mark.parametrize("event_type", ["planned_work", "no_work", "material_delivery"])
 def test_non_progress_quantity_is_removed(event_type):
     item = observation("On 2026-09-21, erected 3 spools on line 24-XX in AREA-A.", event_type=event_type)

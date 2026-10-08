@@ -9,13 +9,13 @@ This is the execution record for the application. The user-facing checklist rema
 | W-02 | unit validated | builder agent | W-01 interface | generated OpenAPI comparison |
 | W-03 | 60/300 expansion validated; human review pending | builder agent | W-02 interface | user review of seed, expanded and native-linked labels |
 | W-04 | complete | builder agent | W-02 interface | expiry/revocation/roles/CSRF/cross-project acceptance passed |
-| W-08 | remote-private adapter complete; benchmark blocked | builder agent | friend-host endpoint/model | live readiness, digest and measured benchmark |
+| W-08 | live Gemma readiness and structured JSON smoke passed; benchmark pending | builder agent | private endpoint/model | representative latency and throughput benchmark |
 | W-05 | complete | builder agent | W-03/W-04 interfaces | CSV and activation safety integrated with native flows |
 | W-06 | complete | builder agent | W-04/W-05 interfaces | PostgreSQL constraint rollback and file cleanup passed |
 | W-07 | runtime complete; live model pending | builder agent | W-04/W-06 interfaces | run CLI worker against friend-hosted Ollama |
-| W-09 | extraction fixtures validated; real-model evaluation pending | builder agent | W-03/W-06/W-08 interfaces | 20 seed-case results from an actual local model |
+| W-09 | extraction fixtures and one Gemma smoke validated; real-model evaluation pending | builder agent | W-03/W-06/W-08 interfaces | 20 seed-case results from an actual local model |
 | W-10 | persisted hybrid retrieval validated; live model pending | builder agent | W-02/W-03/W-05 interfaces | provision pinned local embedding weights and evaluate reviewed labels |
-| W-11 | deterministic and persistence integration validated | builder agent | W-09/W-10 interfaces | live-model selection evaluation |
+| W-11 | deterministic and persistence integration plus one Gemma selection smoke validated | builder agent | W-09/W-10 interfaces | live-model selection evaluation |
 | W-12 | unit validated | builder agent | W-02/W-03/W-04 interfaces | database-backed approval integration |
 | W-13 | complete | builder agent | W-07/W-11/W-12 interfaces | real two-session race and correction/supersession passed |
 | W-14 | build/API contract validated | builder agent | W-01/W-02 interfaces | browser walkthrough with provisioned demo account |

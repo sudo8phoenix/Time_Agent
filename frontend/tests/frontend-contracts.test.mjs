@@ -14,5 +14,6 @@ assert.match(source, /task_overrides: taskOverrides/);
 assert.match(source, /Stage canonical CSV/);
 assert.match(source, /Create your first project/);
 assert.match(source, /Schedule version \$\{result\.version\} is \$\{result\.state\}/);
+assert.match(source, /Activate CSV version \{csvVersion\}/);
 
 console.log("frontend contract wiring assertions passed");

@@ -41,6 +41,7 @@ class ProgressEvent:
     active: bool = True
     supersedes_event_id: str | None = None
     correction_of: str | None = None
+    reported_percent: Decimal | int | str | None = None
 
 
 @dataclass
@@ -97,6 +98,39 @@ def recompute_progress(baseline: ActivityBaseline | Mapping[str, Any],
     basis = str(_value(baseline, "measurement_basis", "quantity_ratio"))
     conflicts: list[str] = []
     warnings: list[str] = []
+    if basis in {"manual_physical", "milestone"}:
+        superseded = {
+            str(prior) for event in events if _value(event, "active", True)
+            for prior in (_value(event, "supersedes_event_id"), _value(event, "correction_of"))
+            if prior
+        }
+        active = sorted(
+            (event for event in events if _value(event, "active", True)
+             and str(_value(event, "event_id")) not in superseded),
+            key=lambda event: (_value(event, "effective_date") or date.min,
+                               str(_value(event, "event_id", ""))),
+        )
+        percent = None
+        applied: list[str] = []
+        for event in active:
+            if str(_value(event, "event_type", "work")).lower() in _NON_PROGRESS:
+                continue
+            value = _decimal(_value(event, "reported_percent"))
+            event_date = _value(event, "effective_date")
+            if value is None or not value.is_finite() or not 0 <= value <= 100:
+                conflicts.append(f"event {_value(event, 'event_id')} has invalid reported percent")
+            elif event_date is None:
+                conflicts.append(f"event {_value(event, 'event_id')} has no effective date")
+            elif _value(baseline, "baseline_date") and event_date < _value(baseline, "baseline_date"):
+                warnings.append(f"event {_value(event, 'event_id')} predates baseline and is historical only")
+            elif percent is not None and value < percent and not (
+                _value(event, "correction_of") or _value(event, "supersedes_event_id")
+            ):
+                conflicts.append(f"event {_value(event, 'event_id')} lowers reported percent")
+            else:
+                percent = value
+                applied.append(str(_value(event, "event_id")))
+        return ProgressResult(None, percent if not conflicts else None, conflicts, warnings, applied)
     if basis != "quantity_ratio":
         return ProgressResult(None, None, [f"measurement basis {basis} does not calculate quantity ratio"])
     planned = _decimal(_value(baseline, "planned_quantity"))

@@ -12,9 +12,7 @@ from sqlalchemy import select
 
 from ..db.models import Activity, Fragment, Job, Project, Report, ScheduleVersion
 from ..llm.extract import ExtractionError, FragmentInput, deduplicate_results, extract_fragments
-from ..matching.selection import SelectionValidationError, select_candidate as default_selection_service
-from ..prompts.selection_v1 import PROMPT_VERSION as SELECTION_PROMPT_VERSION
-from ..retrieval.index import retrieve_candidates as default_retrieval_service
+from .schedule_decision import AgentDecisionError, select_activity as default_selection_service, shortlist_activities as default_retrieval_service
 from ..schemas.common import StrictModel
 from ..schemas.matching import Candidate, Proposal
 from ..schemas.observation import Observation
@@ -444,26 +442,16 @@ class AgentTools:
             raise AgentToolError("AGENT_TOOL_FAILED", "Invalid observation.") from None
         if self._observations.get(observation_key) != obs:
             raise AgentToolError("AGENT_TOOL_FAILED", "Observation does not match the extracted report data.")
-        kwargs: dict[str, Any] = {}
-        if self._context.embedder is not None:
-            kwargs["embed"] = self._context.embedder
-            kwargs["model_version"] = str(getattr(self._context.embedder, "model_revision", "none"))
         try:
-            raw = self._retrieve(obs, scope.schedule_version_id, list(self._activities.values()), **kwargs)
-        except (RuntimeError, TypeError, ValueError):
-            if self._context.embedder is None:
-                raise AgentToolError("AGENT_TOOL_FAILED", "Retrieval failed safely.") from None
-            kwargs.pop("embed", None)
-            kwargs.pop("model_version", None)
-            raw = _safe_call(self._retrieve, obs, scope.schedule_version_id, list(self._activities.values()), **kwargs)
-            warnings = [AgentWarning(code="EMBEDDINGS_UNAVAILABLE", message="Optional embeddings were unavailable; lexical retrieval was used.")]
+            if self._retrieve is default_retrieval_service:
+                raw = self._retrieve(obs, scope.schedule_version_id, list(self._activities.values()),
+                                     model_call=self._context.model_callable)
+            else:
+                raw = self._retrieve(obs, scope.schedule_version_id, list(self._activities.values()))
         except Exception:
-            raise AgentToolError("AGENT_TOOL_FAILED", "Retrieval failed safely.") from None
-        else:
-            warnings = []
+            raise AgentToolError("AGENT_TOOL_FAILED", "Schedule decision failed safely.") from None
+        warnings = []
         try:
-            if getattr(raw, "conflicts", None):
-                warnings.append(AgentWarning(code="CANDIDATE_CONFLICTS", message="Some schedule activities were excluded by supported fact conflicts."))
             rows = list(raw.candidates if hasattr(raw, "candidates") else raw)
             if len(rows) > MAX_CANDIDATES:
                 raise AgentToolError("AGENT_TOOL_FAILED", "Retrieval returned more than eight candidates.")
@@ -515,7 +503,7 @@ class AgentTools:
         if not supplied:
             try:
                 proposal = self._select(obs, supplied, {key: self._fragments[key].text for key in ids}, model_call=None)
-            except SelectionValidationError:
+            except AgentDecisionError:
                 raise AgentToolError("AGENT_TOOL_FAILED", "Selection output failed validation.", stage="selection", retryable=True) from None
             except Exception:
                 raise AgentToolError("AGENT_TOOL_FAILED", "The requested agent operation failed safely.") from None
@@ -544,7 +532,7 @@ class AgentTools:
                     "model_digest": (
                         getattr(value, "model_digest", None) or self._model_metadata.model_digest
                     ),
-                    "selection_prompt_version": SELECTION_PROMPT_VERSION,
+                    "selection_prompt_version": "agent-schedule-v1",
                     "selection_prompt_hash": getattr(value, "prompt_hash", None),
                     "settings_hash": (
                         getattr(value, "settings_hash", None) or self._model_metadata.settings_hash
@@ -556,7 +544,7 @@ class AgentTools:
                 obs, supplied, {key: self._fragments[key].text for key in ids},
                 model_call=selection_model, project_id=scope.project_id,
             )
-        except SelectionValidationError:
+        except AgentDecisionError:
             raise AgentToolError("AGENT_TOOL_FAILED", "Selection output failed validation.", stage="selection", retryable=True) from None
         except ValidationError:
             raise AgentToolError("AGENT_TOOL_FAILED", "Selection output failed validation.", stage="selection", retryable=True) from None

@@ -10,6 +10,15 @@ class Candidate(StrictModel):
     area: str | None = Field(max_length=200)
     work_type: WorkType
     is_leaf: bool
+    asset_tags: list[str] = Field(default_factory=list)
+    wbs: str | None = None
+    discipline: str | None = None
+    aliases: str | None = None
+    measurement_basis: str | None = None
+    planned_quantity: str | None = None
+    unit: str | None = None
+    planned_start: str | None = None
+    planned_finish: str | None = None
     retrieval_rank: int | None = Field(ge=1, le=1000)
     retrieval_score: float | None
 

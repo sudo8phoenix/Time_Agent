@@ -9,6 +9,7 @@ __pycache__/
 htmlcov/
 frontend/node_modules/
 frontend/dist/
+frontend/test-results/
 uploads/
 weights/
 *.sqlite3

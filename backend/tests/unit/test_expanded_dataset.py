@@ -45,7 +45,7 @@ def test_w03_expansion_is_complete_isolated_and_pending_human_review():
     assert Counter(family_split.values()) == {"development": 60, "validation": 20, "held_out": 20}
     assert len(family_split) == 100
     assert all(split["case_assignment"][x["case_id"]] == family_split[x["event_family_id"]] for x in labels)
-    assert manifest["reviewer_status"] == "pending_human_review"
+    assert manifest["reviewer_status"] == "ai_assisted_review"
     assert manifest["human_review_completed"] is False
     for filename, expected in manifest["hashes_sha256"].items():
         assert hashlib.sha256((DATA / filename).read_bytes()).hexdigest() == expected

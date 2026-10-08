@@ -135,7 +135,10 @@ def test_later_selection_error_discards_partial_map_and_keeps_state_valid():
     original_model = fixture.context.model_callable
 
     def model(**kwargs):
-        if "schema" in kwargs and "properties" in kwargs["schema"] and "candidate_id" in kwargs["schema"]["properties"]:
+        if "schema" in kwargs and "properties" in kwargs["schema"] and (
+            "candidate_id" in kwargs["schema"]["properties"] or
+            "candidate_ids" in kwargs["schema"]["properties"]
+        ):
             return original_model(**kwargs)
         fixture.model_calls += 1
         return {"observations": [fixture.observation.model_dump(mode="json"), second.model_dump(mode="json")]}

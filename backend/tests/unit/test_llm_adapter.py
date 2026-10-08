@@ -1,3 +1,5 @@
+import json
+
 import pytest
 
 from app.llm.ollama import (
@@ -9,6 +11,21 @@ from app.llm.ollama import (
 
 
 SCHEMA = {"type": "object", "properties": {"ok": {"type": "boolean"}}, "required": ["ok"]}
+
+
+def test_structured_selection_context_is_sent_as_message_text():
+    context = {"observation": {"work_type": "welding"}, "candidates": [{"candidate_id": "a"}]}
+
+    def transport(method, url, payload, timeout, headers):
+        content = payload["messages"][1]["content"]
+        assert isinstance(content, str)
+        assert json.loads(content) == context
+        return 200, {"message": {"content": '{"ok": true}'}}
+
+    result = OllamaChatAdapter("http://127.0.0.1:11434", "fixture", transport=transport).chat(
+        system="select", user=context, schema=SCHEMA,
+    )
+    assert result.value == {"ok": True}
 
 
 def response_transport(content='{"ok": true}'):

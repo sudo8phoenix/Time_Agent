@@ -30,8 +30,7 @@ from ..db.models import (
 )
 from ..jobs.service import publish_stage
 from ..llm.extract import extract_fragments
-from ..matching.selection import select_candidate
-from ..retrieval.index import retrieve_candidates
+from .schedule_decision import select_activity, shortlist_activities
 from ..settings import get_settings
 from .context import AgentRuntimeContext
 from .graph import build_report_analysis_graph
@@ -200,11 +199,16 @@ def _json(value: Any) -> Any:
 def _effects(observation: Any) -> dict[str, Any]:
     if observation.event_type.value != "actual_progress":
         return {}
-    result: dict[str, Any] = {}
+    result: dict[str, Any] = {
+        "event_type": observation.event_type.value,
+        "quantity_semantics": observation.quantity_kind.value,
+    }
     if observation.quantity is not None:
         result["quantity"] = str(observation.quantity)
     if observation.unit is not None:
         result["unit"] = observation.unit.value
+    if observation.reported_percent is not None:
+        result["reported_percent"] = str(observation.reported_percent)
     if observation.work_date is not None:
         result["effective_date"] = observation.work_date.isoformat()
     return result
@@ -222,12 +226,17 @@ def _verify_existing_output(db: Session, state: AgentState, rows: list[DBObserva
     keys = [f"obs-{index:04d}" for index in range(1, len(rows) + 1)]
     for row, key, observation in zip(rows, keys, state.observation_drafts, strict=True):
         evidence = [item.model_dump(mode="json") for item in observation.evidence]
+        expected = state.selection_drafts[key]
         if row.fields != observation.model_dump(mode="json") or row.field_evidence != {
-            "evidence": evidence
+            "evidence": evidence,
+            "selection": {
+                "explanation": expected.explanation,
+                "reason_codes": expected.reason_codes,
+                "missing_information": expected.missing_information,
+            },
         }:
             raise AgentToolError("AGENT_RUN_CONFLICT", SAFE_ERRORS["AGENT_RUN_CONFLICT"])
         proposal = db.scalar(select(DBProposal).where(DBProposal.observation_id == row.id))
-        expected = state.selection_drafts[key]
         if proposal is None or (
             str(proposal.chosen_activity_id) if proposal.chosen_activity_id else None
         ) != (str(expected.candidate_id) if expected.candidate_id else None):
@@ -309,7 +318,12 @@ def _persistence_callback(session_factory, token: str, state: AgentState, *, ide
                     ordinal=ordinal,
                     fields=observation.model_dump(mode="json"),
                     field_evidence={
-                        "evidence": [item.model_dump(mode="json") for item in observation.evidence]
+                        "evidence": [item.model_dump(mode="json") for item in observation.evidence],
+                        "selection": {
+                            "explanation": selection.explanation,
+                            "reason_codes": selection.reason_codes,
+                            "missing_information": selection.missing_information,
+                        },
                     },
                 )
                 db.add(row)
@@ -438,8 +452,8 @@ def process_job_with_graph(
     model_callable: Callable[..., Any] | None = None,
     embedder: Callable[..., Any] | None = None,
     extraction_service: Callable[..., Any] = extract_fragments,
-    retrieval_service: Callable[..., Any] = retrieve_candidates,
-    selection_service: Callable[..., Any] = select_candidate,
+    retrieval_service: Callable[..., Any] = shortlist_activities,
+    selection_service: Callable[..., Any] = select_activity,
     checkpointer: Any | None = None,
     clock: Callable[[], datetime] = _now,
 ) -> dict[str, Any]:

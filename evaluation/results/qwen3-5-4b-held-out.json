@@ -1,0 +1,91 @@
+{
+  "critical_fields": {
+    "quantity": {
+      "accuracy": 0.6666666666666666,
+      "applicable": 36,
+      "correct": 24
+    },
+    "quantity_kind": {
+      "accuracy": 0.36666666666666664,
+      "applicable": 60,
+      "correct": 22
+    },
+    "tag": {
+      "accuracy": 0.0,
+      "applicable": 45,
+      "correct": 0
+    },
+    "unit": {
+      "accuracy": 0.6296296296296297,
+      "applicable": 27,
+      "correct": 17
+    },
+    "work_date": {
+      "accuracy": 0.0,
+      "applicable": 0,
+      "correct": 0
+    }
+  },
+  "errors": [
+    {
+      "category": "correct",
+      "count": 43
+    },
+    {
+      "category": "event_type",
+      "count": 13
+    },
+    {
+      "category": "quantity",
+      "count": 12
+    }
+  ],
+  "extraction": {
+    "f1": 0.0,
+    "false_negative": 60,
+    "false_positive": 60,
+    "precision": 0.0,
+    "recall": 0.0,
+    "true_positive": 0
+  },
+  "latency": {
+    "count": 60,
+    "mean_ms": 4993.295,
+    "median_ms": 3728.7,
+    "p95_ms": 9237.6
+  },
+  "run": {
+    "config": {
+      "family": "qwen35",
+      "method": "ollama",
+      "model": "qwen3.5:4b",
+      "model_digest": "2a654d98e6fba55d452b7043684e9b57a947e393bbffa62485a7aac05ee4eefd",
+      "num_predict": 200,
+      "parameter_size": "4.7B",
+      "quantization": "Q4_K_M",
+      "real_model": true,
+      "temperature": 0.0,
+      "think": false
+    },
+    "config_sha256": "798a81f80cbf45726b19f9b59196aa5b04f415e6887b5b19c0605683e2ba3244",
+    "label_count": 60,
+    "label_sha256": "fed48887d2c7b50c20c6b8f41149893e52d13f2bd43303b110d39d88405c5f8c",
+    "prediction_sha256": "f05b57e6f9de8007e805d00c3a9f1a8e7ad24a2cc6bdaf4962beaddede4deed4",
+    "real_model": true,
+    "split": "held_out"
+  },
+  "selection": {
+    "coverage": 0.2,
+    "exact_choice": 0.0,
+    "exact_choice_denominator": 45,
+    "exact_choice_numerator": 0,
+    "matchable": 45,
+    "recall_at_8": 0.0,
+    "recall_at_8_denominator": 45,
+    "recall_at_8_numerator": 0,
+    "safe_abstention": 1.0,
+    "safe_abstention_denominator": 15,
+    "selected": 9,
+    "selected_precision": 0.0
+  }
+}

@@ -7,7 +7,6 @@ from __future__ import annotations
 
 import hashlib
 import json
-import re
 from dataclasses import dataclass
 from datetime import date, timedelta
 from typing import Any, Callable, Mapping, Sequence
@@ -123,6 +122,40 @@ def _fact_key(o: Observation) -> tuple[Any, ...]:
 ModelCall = Callable[..., Any]
 
 
+_NULL_LITERALS = frozenset({"", "n/a", "na", "none", "null", "unknown"})
+_NULLABLE_OBSERVATION_FIELDS = frozenset({
+    "area", "explicit_activity_id", "work_date", "quantity", "unit", "raw_unit",
+    "reported_percent", "actual_start", "actual_finish", "blocker",
+})
+
+
+def _normalise_nullable_literals(raw: Any) -> Any:
+    """Convert model null placeholders to JSON null before strict schema validation.
+
+    Local models occasionally emit ``\"unknown\"`` for optional scalar fields despite
+    the supplied JSON schema.  That is absence of a fact, not a malformed report, so
+    retain the observation and let the ordinary matching/review safeguards decide
+    whether it is actionable.  Required fields and non-placeholder values remain
+    strictly validated.
+    """
+    if not isinstance(raw, Mapping) or not isinstance(raw.get("observations"), list):
+        return raw
+    normalised = dict(raw)
+    observations: list[Any] = []
+    for item in raw["observations"]:
+        if not isinstance(item, Mapping):
+            observations.append(item)
+            continue
+        observation = dict(item)
+        for field in _NULLABLE_OBSERVATION_FIELDS:
+            value = observation.get(field)
+            if isinstance(value, str) and value.strip().casefold() in _NULL_LITERALS:
+                observation[field] = None
+        observations.append(observation)
+    normalised["observations"] = observations
+    return normalised
+
+
 def extract_batch(batch: BatchInput, model_call: ModelCall, *, model: str = "unknown",
                  model_digest: str | None = None, runtime: str | None = None,
                  settings: Mapping[str, Any] | None = None) -> ExtractionResult:
@@ -141,7 +174,7 @@ def extract_batch(batch: BatchInput, model_call: ModelCall, *, model: str = "unk
         model = getattr(raw, "model", model)
         raw = raw.value
     try:
-        parsed = ObservationBatch.model_validate(raw)
+        parsed = ObservationBatch.model_validate(_normalise_nullable_literals(raw))
     except ValidationError as exc:
         raise ExtractionError(f"model output failed observation schema: {exc}") from exc
     accepted: list[Observation] = []

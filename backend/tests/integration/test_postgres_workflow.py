@@ -149,10 +149,22 @@ def test_postgres_authenticated_schedule_and_report_idempotency(client):
         proposed_effects={"quantity": "3", "unit": "spool", "quantity_semantics": "delta", "event_type": "actual_progress", "effective_date": "2026-09-21"},
     )
     session.add(proposal)
+    queued_job.state = "ready_for_review"
+    queued_job.stage = "persist"
+    queued_job.extracted_count = 1
+    queued_job.proposal_count = 1
     session.commit()
     session.close()
 
-    review = browser.get(f"/api/v1/proposals/{proposal.id}", headers=headers)
+    completed_retry = browser.post(f"/api/v1/projects/{project_id}/reports", json=payload, headers=headers)
+    assert completed_retry.status_code == 202
+    assert completed_retry.json()["existing"] is True
+    assert completed_retry.json()["state"] == "ready_for_review"
+    assert completed_retry.json()["proposal_ids"] == [str(proposal.id)]
+
+    # Safe reviewer reads authenticate with the session cookie and do not
+    # require a CSRF header; mutations below still require it.
+    review = browser.get(f"/api/v1/proposals/{proposal.id}")
     assert review.status_code == 200
     assert review.json()["evidence"][0]["locator"] == "paragraph:1"
     assert review.json()["current_activity_revision"] == 0

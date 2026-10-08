@@ -2,6 +2,7 @@
 from __future__ import annotations
 
 from datetime import date
+from decimal import Decimal, InvalidOperation
 import hashlib
 from uuid import UUID
 
@@ -16,13 +17,13 @@ from ...db.models import (
 )
 from ...db.session import get_session
 from ...progress.ledger import ActivityBaseline, ProgressEvent as LedgerEvent, recompute_progress
-from ..dependencies import require_reviewer
+from ..dependencies import current_reviewer, require_reviewer
 
 router = APIRouter(prefix="/proposals", tags=["review"])
 
 
 class ReviewChange(BaseModel):
-    model_config = ConfigDict(extra="forbid")
+    model_config = ConfigDict(extra="forbid", str_strip_whitespace=True)
     expected_proposal_revision: int = Field(ge=1)
     chosen_activity_id: UUID | None = None
     field_changes: dict[str, object] = Field(default_factory=dict)
@@ -85,6 +86,7 @@ def _candidate_payload(candidate: object, rank: int) -> dict[str, object]:
 def _proposal_payload(db: DBSession, proposal: Proposal) -> dict[str, object]:
     observation = db.get(Observation, proposal.observation_id)
     fields = dict(observation.fields or {}) if observation else {}
+    selection = (observation.field_evidence or {}).get("selection", {}) if observation else {}
     evidence_records = fields.get("evidence", [])
     evidence: list[dict[str, str]] = []
     if isinstance(evidence_records, list):
@@ -102,6 +104,7 @@ def _proposal_payload(db: DBSession, proposal: Proposal) -> dict[str, object]:
         if fragment:
             evidence.append({"quote": fragment.original_text, "locator": fragment.locator, "fragment_id": str(fragment.id)})
     state = db.get(ActivityState, proposal.chosen_activity_id) if proposal.chosen_activity_id else None
+    chosen_activity = db.get(Activity, proposal.chosen_activity_id) if proposal.chosen_activity_id else None
     return {
         "id": str(proposal.id),
         "observation_id": str(proposal.observation_id),
@@ -109,12 +112,14 @@ def _proposal_payload(db: DBSession, proposal: Proposal) -> dict[str, object]:
         "current_activity_revision": state.revision if state else 0,
         "candidates": [_candidate_payload(candidate, index) for index, candidate in enumerate(proposal.candidates or [], 1)],
         "chosen_activity_id": str(proposal.chosen_activity_id) if proposal.chosen_activity_id else None,
+        "chosen_activity_measurement_basis": chosen_activity.measurement_basis if chosen_activity else None,
         "mapping_state": proposal.mapping_state,
         "match_strength": proposal.match_strength,
         "review_state": proposal.review_state,
         "warnings": proposal.warnings or [],
         "proposed_effects": proposal.proposed_effects or {},
-        "missing_information": fields.get("missing_information", []),
+        "missing_information": selection.get("missing_information") or fields.get("missing_information", []),
+        "selection_explanation": selection.get("explanation"),
         "observation": {
             "summary": fields.get("summary", "No observation summary was stored."),
             "quantity": str(fields["quantity"]) if fields.get("quantity") is not None else None,
@@ -129,7 +134,7 @@ def _proposal_payload(db: DBSession, proposal: Proposal) -> dict[str, object]:
 
 
 @router.get("/{proposal_id}")
-def get_proposal(proposal_id: UUID, user: User = Depends(require_reviewer), db: DBSession = Depends(get_session)):
+def get_proposal(proposal_id: UUID, user: User = Depends(current_reviewer), db: DBSession = Depends(get_session)):
     return _proposal_payload(db, _proposal(db, proposal_id, user))
 
 
@@ -143,6 +148,25 @@ def _revise(db: DBSession, proposal: Proposal, body: ReviewChange, user: User) -
     effects_change = body.field_changes.get("proposed_effects", {})
     if not isinstance(effects_change, dict):
         raise HTTPException(422, detail={"code": "INVALID_REVIEW_CHANGE"})
+    if "quantity" in effects_change:
+        try:
+            quantity = Decimal(str(effects_change["quantity"]))
+            if not quantity.is_finite() or quantity < 0:
+                raise ValueError()
+        except (InvalidOperation, ValueError):
+            raise HTTPException(422, detail={"code": "INVALID_QUANTITY", "message": "Quantity must be a finite, non-negative number."}) from None
+    if "reported_percent" in effects_change:
+        try:
+            percent = Decimal(str(effects_change["reported_percent"]))
+            if not percent.is_finite() or not 0 <= percent <= 100:
+                raise ValueError()
+        except (InvalidOperation, ValueError):
+            raise HTTPException(422, detail={"code": "INVALID_PERCENT", "message": "Percent must be between 0 and 100."}) from None
+    if "effective_date" in effects_change:
+        try:
+            date.fromisoformat(str(effects_change["effective_date"]))
+        except ValueError:
+            raise HTTPException(422, detail={"code": "INVALID_DATE", "message": "Work date must be a valid calendar date."}) from None
     existing_warnings = list(proposal.warnings or [])
     resolutions = body.field_changes.get("resolve_warnings", [])
     if not isinstance(resolutions, list) or any(not isinstance(item, str) for item in resolutions):
@@ -190,8 +214,17 @@ def reject(proposal_id: UUID, body: ReviewChange, user: User = Depends(require_r
 
 def _effects(proposal: Proposal) -> tuple[dict[str, object], date | None]:
     effects = dict(proposal.proposed_effects or {})
-    allowed = {"quantity", "unit", "quantity_semantics", "event_type", "effective_date", "source_id", "correction_of", "supersedes_event_id"}
-    if set(effects) - allowed or "quantity" not in effects or "quantity_semantics" not in effects:
+    allowed = {"quantity", "unit", "quantity_semantics", "reported_percent", "event_type", "effective_date", "source_id", "correction_of", "supersedes_event_id"}
+    if set(effects) - allowed or ("quantity" not in effects and "reported_percent" not in effects):
+        raise HTTPException(422, detail={"code": "INVALID_EFFECT"})
+    if "reported_percent" in effects:
+        try:
+            percent = Decimal(str(effects["reported_percent"]))
+            if not percent.is_finite() or not 0 <= percent <= 100:
+                raise ValueError()
+        except (InvalidOperation, ValueError):
+            raise HTTPException(422, detail={"code": "INVALID_EFFECT"}) from None
+    if "quantity" in effects and "quantity_semantics" not in effects:
         raise HTTPException(422, detail={"code": "INVALID_EFFECT"})
     try:
         effective_date = date.fromisoformat(str(effects["effective_date"])) if effects.get("effective_date") else None
@@ -241,6 +274,12 @@ def approve(proposal_id: UUID, body: ApprovalRequest, user: User = Depends(requi
     if state.revision != body.expected_activity_revision:
         raise HTTPException(409, detail={"code": "STALE_ACTIVITY", "current_revision": state.revision})
     effects, effective_date = _effects(proposal)
+    if activity.measurement_basis in {"manual_physical", "milestone"}:
+        if "reported_percent" not in effects:
+            raise HTTPException(422, detail={"code": "PERCENT_REQUIRED"})
+    elif activity.measurement_basis == "quantity_ratio":
+        if "quantity" not in effects:
+            raise HTTPException(422, detail={"code": "QUANTITY_REQUIRED"})
     supersedes = UUID(str(effects["supersedes_event_id"])) if effects.get("supersedes_event_id") else None
     prior = db.scalars(select(ProgressEvent).where(ProgressEvent.activity_id == activity.id).with_for_update()).all()
     ledger = [
@@ -250,6 +289,7 @@ def approve(proposal_id: UUID, body: ApprovalRequest, user: User = Depends(requi
             (event.approved_values or {}).get("event_type", event.effect_kind), str(event.observation_id), True,
             str(event.supersedes_event_id) if event.supersedes_event_id else None,
             (event.approved_values or {}).get("correction_of"),
+            (event.approved_values or {}).get("reported_percent"),
         ) for event in prior
     ]
     candidate = LedgerEvent(
@@ -257,6 +297,7 @@ def approve(proposal_id: UUID, body: ApprovalRequest, user: User = Depends(requi
         str(effects.get("quantity_semantics", "unknown")), str(effects.get("event_type", "actual_progress")),
         str(proposal.observation_id), True, str(supersedes) if supersedes else None,
         str(effects["correction_of"]) if effects.get("correction_of") else None,
+        effects.get("reported_percent"),
     )
     result = recompute_progress(
         ActivityBaseline(activity.planned_quantity, activity.unit, activity.baseline_quantity, activity.baseline_date, activity.measurement_basis),
