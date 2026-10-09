@@ -93,6 +93,8 @@ make worker
 
 Open <http://127.0.0.1:8000>. The default worker uses the accepted legacy pipeline. Keep `AGENT_EXECUTION_MODE=legacy` until the documented W-39 and O-04 gates pass.
 
+New users can create an account from the sign-in page. Registration stores a password hash, creates a private project, and starts a 12-hour database-backed session. Projects, reports, jobs, and approved progress remain available after signing out and signing in again. Each account sees only projects it belongs to; an administrator can still provision shared project memberships separately.
+
 ## Configuration
 
 Copy `.env.example` to `.env`. Important settings include:

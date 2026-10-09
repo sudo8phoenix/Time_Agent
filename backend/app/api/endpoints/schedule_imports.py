@@ -63,8 +63,11 @@ def _record(project: Project, import_id: UUID, db: DBSession, *, lock: bool = Fa
     return record
 
 
-def _payload(record: ScheduleImport) -> dict[str, object]:
+def _payload(record: ScheduleImport, db: DBSession) -> dict[str, object]:
+    version = db.get(ScheduleVersion, record.staged_schedule_version_id) if record.staged_schedule_version_id else None
     return {
+        "version": version.version_number if version else None,
+        "schedule_version_id": str(version.id) if version else None,
         "id": str(record.id),
         "project_id": str(record.project_id),
         "revision": record.revision,
@@ -98,7 +101,7 @@ async def create_schedule_import(
             mime_type=upload.content_type or "application/octet-stream",
             creator_id=reviewer.id,
         )
-        return _payload(record)
+        return _payload(record, db)
     except (ParserRuntimeError, MappingError, ValueError) as exc:
         raise _error(exc) from exc
 
@@ -110,7 +113,7 @@ def get_schedule_import(
     _user: User = Depends(current_user),
     db: DBSession = Depends(get_session),
 ):
-    return _payload(_record(project, import_id, db))
+    return _payload(_record(project, import_id, db), db)
 
 
 @router.post("/{import_id}/select-project")
@@ -142,7 +145,7 @@ def select_source_project(
     record.state = "needs_mapping"
     record.revision += 1
     db.flush()
-    return _payload(record)
+    return _payload(record, db)
 
 
 @router.post("/{import_id}/mapping")
@@ -167,7 +170,7 @@ def save_mapping(
     record.state = "ready"
     record.revision += 1
     db.flush()
-    return _payload(record)
+    return _payload(record, db)
 
 
 @router.post("/{import_id}/stage", status_code=201)
@@ -191,7 +194,7 @@ def stage_schedule_import(
         )
     except (MappingError, ValueError) as exc:
         raise _error(exc) from exc
-    result = _payload(staged)
+    result = _payload(staged, db)
     result.update(
         {
             "schedule_version_id": str(staged.staged_schedule_version_id),

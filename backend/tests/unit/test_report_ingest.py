@@ -9,6 +9,7 @@ from fastapi import HTTPException
 from starlette.datastructures import UploadFile
 from io import BytesIO
 import asyncio
+from datetime import date
 
 
 class FakeDB:
@@ -115,3 +116,18 @@ def test_multipart_rejects_missing_input_and_invalid_date():
     with pytest.raises(HTTPException) as invalid_date:
         asyncio.run(_multipart_input({"text": "report", "report_date": "2026-99-99"}))
     assert invalid_date.value.detail["code"] == "REPORT_INVALID"
+
+
+def test_same_bytes_on_different_dates_have_distinct_report_identity(tmp_path, monkeypatch):
+    monkeypatch.setattr(reports, "get_settings", lambda: SimpleNamespace(upload_dir=str(tmp_path)))
+    project = SimpleNamespace(id=uuid4())
+    first_db, second_db = FakeDB(), FakeDB()
+    first, _ = reports.ingest_report(first_db, project, b"same report", report_date=date(2026, 1, 1))
+    second, _ = reports.ingest_report(second_db, project, b"same report", report_date=date(2026, 1, 2))
+    assert first.content_hash != second.content_hash
+    assert first.report_date != second.report_date
+
+
+def test_broken_docx_is_validation_error():
+    with pytest.raises(ValueError, match="invalid document archive"):
+        reports.parse_bytes(b"not a zip", "broken.docx", "application/vnd.openxmlformats-officedocument.wordprocessingml.document")

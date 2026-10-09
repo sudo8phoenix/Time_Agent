@@ -13,7 +13,10 @@ def current_user(session_token: str | None = Cookie(None, alias="progress_sessio
     if not session_token:
         raise HTTPException(401, "Authentication required")
     record = db.get(Session, _digest(session_token))
-    if not record or record.revoked_at or record.expires_at <= datetime.now(timezone.utc):
+    expires_at = record.expires_at if record else None
+    if expires_at and expires_at.tzinfo is None:
+        expires_at = expires_at.replace(tzinfo=timezone.utc)
+    if not record or record.revoked_at or expires_at <= datetime.now(timezone.utc) or not record.user.is_active:
         raise HTTPException(401, "Invalid or expired session")
     return record.user
 

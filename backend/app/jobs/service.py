@@ -29,6 +29,11 @@ def enqueue_job(db: Session, project: Project, report: Report) -> tuple[Job, boo
 def claim_job(db: Session, *, now: datetime | None = None) -> tuple[Job, str] | None:
     """Atomically claim one queued or expired-running job with a fresh random token."""
     now = now or _now()
+    # Exhausted leases must become visible as failed before looking for work.
+    db.execute(update(Job).where(Job.state == "running", Job.lease_expires_at < now,
+        Job.attempts >= MAX_ATTEMPTS).values(state="failed", error_code="JOB_ATTEMPT_LIMIT",
+        error_message="Worker lease expired after the final attempt",
+        lease_token=None, lease_expires_at=None))
     job = db.scalar(select(Job).where(
         or_(Job.state == "queued", (Job.state == "running") & (Job.lease_expires_at < now)),
         Job.attempts < MAX_ATTEMPTS).order_by(Job.created_at).with_for_update(skip_locked=True))

@@ -24,7 +24,8 @@ for (const width of [390, 1440]) {
       const request = route.request();
       const path = new URL(request.url()).pathname.replace("/api/v1", "");
       const method = request.method();
-      if (path === "/auth/login") return route.fulfill({ json: { csrf_token: "test-csrf" } });
+      if (path === "/auth/me") return route.fulfill({ status: 401, json: { detail: "Authentication required" } });
+      if (path === "/auth/login") return route.fulfill({ json: { csrf_token: "test-csrf", user: { id: "reviewer-1", username: "reviewer", role: "reviewer" } } });
       if (path === "/projects") return route.fulfill({ json: { items: [project] } });
       if (path === `/projects/${project.id}/reports`) {
         expect(request.postDataJSON()).toMatchObject({ text: "Installed 2 spools today.", report_date: "2026-09-25", report_date_evidence: "Reviewer-entered report date" });

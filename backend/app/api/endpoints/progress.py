@@ -20,6 +20,7 @@ from ...db.models import (
     ProgressEvent,
     Project,
     Proposal,
+    Report,
     ScheduleVersion,
     User,
 )
@@ -167,12 +168,13 @@ def approved_export(
     schedule = _version(project, version, db)
     rows = db.execute(
         select(
-            ProgressEvent, Activity, ActivityState, Job, Fragment, Proposal, User, AuditEvent.reason
+            ProgressEvent, Activity, ActivityState, Job, Fragment, Proposal, User, AuditEvent.reason, Report.file_id
         )
         .join(Activity, Activity.id == ProgressEvent.activity_id)
         .outerjoin(ActivityState, ActivityState.activity_id == Activity.id)
         .join(Observation, Observation.id == ProgressEvent.observation_id)
         .join(Job, Job.id == Observation.job_id)
+        .join(Report, Report.id == Job.report_id)
         .outerjoin(Fragment, Fragment.id == Observation.fragment_id)
         .join(Proposal, Proposal.id == ProgressEvent.proposal_id)
         .join(User, User.id == ProgressEvent.reviewer_id)
@@ -211,7 +213,7 @@ def approved_export(
     ]
     writer = csv.DictWriter(output, fieldnames=columns, lineterminator="\n")
     writer.writeheader()
-    for event, activity, state, job, fragment, proposal, reviewer, explanation in rows:
+    for event, activity, state, job, fragment, proposal, reviewer, explanation, file_id in rows:
         values = event.approved_values or {}
         values_by_column = {
             "project_name": project.name,
@@ -231,7 +233,7 @@ def approved_export(
             "reviewer": reviewer.username,
             "review_time": event.approved_at,
             "report_id": job.report_id,
-            "source_file_id": fragment.id if fragment else None,
+            "source_file_id": file_id,
             "source_locator": fragment.locator if fragment else None,
             "explanation": explanation,
             "warnings": "; ".join(map(str, proposal.warnings or [])),

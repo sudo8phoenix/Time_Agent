@@ -38,8 +38,9 @@ class ApprovalRequest(BaseModel):
     resolution_notes: str | None = Field(default=None, max_length=2000)
 
 
-def _proposal(db: DBSession, proposal_id: UUID, user: User) -> Proposal:
-    proposal = db.get(Proposal, proposal_id)
+def _proposal(db: DBSession, proposal_id: UUID, user: User, *, lock: bool = False) -> Proposal:
+    statement = select(Proposal).where(Proposal.id == proposal_id)
+    proposal = db.scalar(statement.with_for_update() if lock else statement)
     if proposal is None:
         raise HTTPException(404, "Proposal not found")
     membership = db.scalar(select(ProjectMembership).where(
@@ -196,12 +197,12 @@ def _revise(db: DBSession, proposal: Proposal, body: ReviewChange, user: User) -
 
 @router.post("/{proposal_id}/revise")
 def revise(proposal_id: UUID, body: ReviewChange, user: User = Depends(require_reviewer), db: DBSession = Depends(get_session)):
-    return _proposal_payload(db, _revise(db, _proposal(db, proposal_id, user), body, user))
+    return _proposal_payload(db, _revise(db, _proposal(db, proposal_id, user, lock=True), body, user))
 
 
 @router.post("/{proposal_id}/reject")
 def reject(proposal_id: UUID, body: ReviewChange, user: User = Depends(require_reviewer), db: DBSession = Depends(get_session)):
-    proposal = _proposal(db, proposal_id, user)
+    proposal = _proposal(db, proposal_id, user, lock=True)
     if body.expected_proposal_revision != proposal.revision or proposal.review_state != "pending":
         raise HTTPException(409, detail={"code": "STALE_PROPOSAL", "current_revision": proposal.revision})
     proposal.review_state = "rejected"
@@ -235,8 +236,8 @@ def _effects(proposal: Proposal) -> tuple[dict[str, object], date | None]:
 
 @router.post("/{proposal_id}/approve")
 def approve(proposal_id: UUID, body: ApprovalRequest, user: User = Depends(require_reviewer), db: DBSession = Depends(get_session)):
-    proposal = _proposal(db, proposal_id, user)
-    request_hash = hashlib.sha256(body.model_dump_json().encode()).hexdigest()
+    proposal = _proposal(db, proposal_id, user, lock=True)
+    request_hash = hashlib.sha256((str(proposal_id) + ":" + body.model_dump_json()).encode()).hexdigest()
     old = db.scalar(select(IdempotencyKey).where(
         IdempotencyKey.actor_id == user.id, IdempotencyKey.endpoint == "approve", IdempotencyKey.key == body.idempotency_key,
     ))

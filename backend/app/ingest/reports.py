@@ -1,9 +1,9 @@
 """Immutable report ingestion and bounded, provenance-preserving parsers."""
 from __future__ import annotations
-import hashlib, io, json, re, uuid
+import hashlib, io, json, re, uuid, zipfile
 from datetime import date
 from pathlib import Path
-from sqlalchemy import select
+from sqlalchemy import and_, or_, select
 from sqlalchemy.orm import Session
 from ..db.models import FileRecord, Fragment, Project, Report
 from ..settings import get_settings
@@ -11,6 +11,8 @@ from ..settings import get_settings
 MAX_BYTES = 10 * 1024 * 1024
 MAX_PDF_PAGES = 20
 MAX_XLSX_ROWS = 5000
+MAX_EXTRACTED_CHARS = 2_000_000
+MAX_ZIP_EXPANDED_BYTES = 50 * 1024 * 1024
 SAFE_NAME = re.compile(r"^[A-Za-z0-9][A-Za-z0-9._ -]{0,254}$")
 
 def _normalise(text: str) -> str:
@@ -63,24 +65,42 @@ def _remove_original(storage_key: str) -> None:
 def parse_bytes(raw: bytes, filename: str, mime: str) -> tuple[list[tuple[str, str]], list[str], str]:
     suffix = Path(filename).suffix.lower()
     warnings: list[str] = []
+    extracted_chars = 0
+    def add_part(parts: list[tuple[str, str]], locator: str, value: str) -> None:
+        nonlocal extracted_chars
+        extracted_chars += len(value)
+        if extracted_chars > MAX_EXTRACTED_CHARS:
+            raise ValueError("extracted report text exceeds limit")
+        parts.append((locator, value))
+    if suffix in {".docx", ".xlsx"}:
+        try:
+            with zipfile.ZipFile(io.BytesIO(raw)) as archive:
+                if sum(item.file_size for item in archive.infolist()) > MAX_ZIP_EXPANDED_BYTES:
+                    raise ValueError("document expands beyond 50 MB limit")
+        except zipfile.BadZipFile as exc:
+            raise ValueError("invalid document archive") from exc
     if suffix in ("", ".txt") or mime.startswith("text/"):
         try: text = raw.decode("utf-8-sig")
         except UnicodeDecodeError as exc: raise ValueError("text file must be UTF-8") from exc
         if not text.strip(): raise ValueError("report is empty")
-        parts = [(f"paragraph:{i}", p) for i, p in enumerate(re.split(r"\n\s*\n", text), 1) if p.strip()]
+        parts=[]
+        for i, paragraph in enumerate(re.split(r"\n\s*\n", text), 1):
+            if paragraph.strip(): add_part(parts, f"paragraph:{i}", paragraph)
         if not parts: raise ValueError("report is empty")
         return parts, warnings, "text"
     if suffix == ".docx":
         try:
             from docx import Document
         except ImportError as exc: raise ValueError("DOCX support is unavailable") from exc
-        doc = Document(io.BytesIO(raw)); parts=[]
+        try: doc = Document(io.BytesIO(raw))
+        except Exception as exc: raise ValueError("invalid DOCX document") from exc
+        parts=[]
         for i,p in enumerate(doc.paragraphs,1):
-            if p.text.strip(): parts.append((f"paragraph:{i}", p.text))
+            if p.text.strip(): add_part(parts, f"paragraph:{i}", p.text)
         for ti, table in enumerate(doc.tables,1):
             for ri,row in enumerate(table.rows,1):
                 text = " | ".join(c.text for c in row.cells)
-                if text.strip(): parts.append((f"table:{ti}/row:{ri}", text))
+                if text.strip(): add_part(parts, f"table:{ti}/row:{ri}", text)
         if not parts: raise ValueError("DOCX contains no readable text")
         return parts, warnings, "docx"
     if suffix == ".pdf":
@@ -94,23 +114,26 @@ def parse_bytes(raw: bytes, filename: str, mime: str) -> tuple[list[tuple[str, s
             text=(page.extract_text() or "").strip()
             if len(re.sub(r"\s+", "", text)) < 40:
                 warnings.append(f"NEEDS_TRANSCRIPTION:page:{i}")
-            if text: parts.append((f"page:{i}", text))
+            if text: add_part(parts, f"page:{i}", text)
         if not parts: raise ValueError("PDF contains no extractable text")
         return parts,warnings,"pdf"
     if suffix in (".xlsx",):
         try:
             from openpyxl import load_workbook
         except ImportError as exc: raise ValueError("XLSX support is unavailable") from exc
-        wb=load_workbook(io.BytesIO(raw), read_only=True, data_only=True)
+        try: wb=load_workbook(io.BytesIO(raw), read_only=True, data_only=True)
+        except Exception as exc: raise ValueError("invalid XLSX document") from exc
         parts=[]
         for ws in wb.worksheets:
-            headers=[str(x.value or "").strip() for x in next(ws.iter_rows())]
+            first_row = next(ws.iter_rows(), None)
+            if first_row is None: raise ValueError(f"sheet {ws.title} is empty")
+            headers=[str(x.value or "").strip() for x in first_row]
             required={"report_date","area","asset_tag","work_description","quantity","unit","quantity_kind"}
             if not required.issubset(set(headers)): raise ValueError(f"sheet {ws.title} missing required columns")
             for ri,row in enumerate(ws.iter_rows(min_row=2),2):
                 if ri>MAX_XLSX_ROWS+1: raise ValueError("XLSX exceeds 5,000 row limit")
                 vals=[x.value for x in row]; text=" | ".join(f"{h}: {v}" for h,v in zip(headers,vals) if v is not None)
-                if text.strip(): parts.append((f"sheet:{ws.title}/row:{ri}",text))
+                if text.strip(): add_part(parts, f"sheet:{ws.title}/row:{ri}",text)
         if not parts: raise ValueError("XLSX contains no report rows")
         return parts,warnings,"xlsx"
     raise ValueError("unsupported report format")
@@ -119,15 +142,22 @@ def ingest_report(db: Session, project: Project, raw: bytes, *, filename: str|No
     if not raw: raise ValueError("report is empty")
     if len(raw)>MAX_BYTES: raise ValueError("report exceeds 10 MB limit")
     name=_filename(filename); digest=hashlib.sha256(raw).hexdigest()
-    existing=db.scalar(select(Report).where(Report.project_id==project.id, Report.content_hash==digest))
+    # The existing unique constraint covers project and content_hash. Include the
+    # work date in that identity while preserving the raw checksum on FileRecord.
+    identity=hashlib.sha256(f"{digest}:{report_date.isoformat() if report_date else ''}".encode()).hexdigest()
+    existing=db.scalar(select(Report).where(Report.project_id==project.id, or_(
+        Report.content_hash==identity,
+        and_(Report.content_hash==digest, Report.report_date==report_date),
+    )))
     if existing: return existing, True
     fragments,warnings,kind=parse_bytes(raw,name,mime)
+    if sum(len(text) for _, text in fragments)>MAX_EXTRACTED_CHARS: raise ValueError("extracted report text exceeds limit")
     storage_key=f"{project.id}/{uuid.uuid4().hex}-{name}"
     _store_original(storage_key, raw)
     try:
         record=FileRecord(project_id=project.id, original_filename=name, storage_key=storage_key, sha256=digest, mime_type=mime, size=len(raw), source_kind=kind, uploader_id=uploader_id)
         db.add(record); db.flush()
-        report=Report(project_id=project.id,file_id=record.id,report_date=report_date,report_date_evidence=report_date_evidence,source_label=source_label,content_hash=digest,parsing_warnings=json.dumps(warnings))
+        report=Report(project_id=project.id,file_id=record.id,report_date=report_date,report_date_evidence=report_date_evidence,source_label=source_label,content_hash=identity,parsing_warnings=json.dumps(warnings))
         db.add(report); db.flush()
         for ordinal,(locator,text) in enumerate(fragments,1):
             db.add(Fragment(report_id=report.id,ordinal=ordinal,locator=locator,original_text=text,normalised_text=_normalise(text),ocr_status="NEEDS_TRANSCRIPTION" if locator in {w.split(":",1)[1] for w in warnings if w.startswith("NEEDS_TRANSCRIPTION:")} else "NOT_REQUIRED"))

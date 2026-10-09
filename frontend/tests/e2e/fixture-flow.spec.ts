@@ -46,6 +46,8 @@ test("fixture schedule import validates and stages a native source", async ({ pa
   await page.getByLabel("Find activity").fill("");
   expect(await page.getByRole("button", { name: "Sign out" }).evaluate(element => element.getBoundingClientRect().right <= window.innerWidth)).toBe(true);
   expect(await page.evaluate(() => document.documentElement.scrollWidth <= window.innerWidth)).toBe(true);
+  await expect(page.getByLabel("Discipline")).toBeVisible();
+  await page.getByRole("heading", { name: "Inspect the source before it becomes a schedule." }).scrollIntoViewIfNeeded();
   await page.screenshot({ path: "test-results/import-390.png", fullPage: true });
   await page.getByLabel("Reviewer reason").fill("Verified source project and baseline against the imported schedule.");
   await page.getByRole("button", { name: "Validate mapping" }).click();

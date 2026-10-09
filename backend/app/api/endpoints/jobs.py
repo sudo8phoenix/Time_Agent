@@ -1,8 +1,8 @@
 from uuid import UUID
-from fastapi import APIRouter, Depends, HTTPException
+from fastapi import APIRouter, Depends, HTTPException, Query
 from sqlalchemy.orm import Session
-from sqlalchemy import select
-from ...db.models import Job, Observation, ProjectMembership, Proposal, User
+from sqlalchemy import select, func
+from ...db.models import Job, Observation, ProjectMembership, Proposal, User, Report, FileRecord
 from ...db.session import get_session
 from ...jobs.service import retry_job
 from ..dependencies import current_user, require_reviewer
@@ -19,6 +19,38 @@ def _job_for_user(db: Session, job_id: UUID, user: User, *, lock: bool = False) 
     if lock:
         statement = statement.with_for_update()
     return db.scalar(statement)
+
+@router.get("")
+def list_jobs(
+    project_id: UUID,
+    pending_only: bool = False,
+    limit: int = Query(25, ge=1, le=100),
+    offset: int = Query(0, ge=0),
+    db: Session = Depends(get_session),
+    user: User = Depends(current_user),
+):
+    membership = db.get(ProjectMembership, (project_id, user.id))
+    if not membership:
+        raise HTTPException(403, "Project access denied")
+    pending = (select(func.count(Proposal.id))
+        .join(Observation, Observation.id == Proposal.observation_id)
+        .where(Observation.job_id == Job.id, Proposal.review_state == "pending")
+        .correlate(Job).scalar_subquery())
+    statement = (select(Job, Report.source_label, FileRecord.original_filename, pending)
+        .join(Report, Report.id == Job.report_id)
+        .outerjoin(FileRecord, FileRecord.id == Report.file_id)
+        .where(Job.project_id == project_id))
+    if pending_only:
+        statement = statement.where(pending > 0)
+    rows = db.execute(statement.order_by(Job.created_at.desc(), Job.id.desc())
+        .offset(offset).limit(limit + 1)).all()
+    items = [{"job_id": str(job.id), "project_id": str(job.project_id),
+        "state": job.state, "stage": job.stage, "proposal_count": job.proposal_count,
+        "attempts": job.attempts,
+        "pending_count": count, "report_name": label or filename or "Pasted field report",
+        "created_at": job.created_at.isoformat(), "error_code": job.error_code}
+        for job, label, filename, count in rows[:limit]]
+    return {"items": items, "next_offset": offset + limit if len(rows) > limit else None}
 
 @router.get("/{job_id}")
 def status(job_id: UUID, db: Session=Depends(get_session), user: User=Depends(current_user)):

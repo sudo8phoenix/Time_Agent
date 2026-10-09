@@ -10,7 +10,7 @@ assert.match(source, /resolve_warnings/);
 assert.match(source, /\/jobs\/" \+ job\.id \+ "\/retry/);
 assert.match(source, /body\.append\("upload", file\)/);
 assert.match(source, /\/select-project/);
-assert.match(source, /task_overrides: taskOverrides/);
+assert.match(source, /task_overrides, reason/);
 assert.match(source, /Stage canonical CSV/);
 assert.match(source, /Create your first project/);
 assert.match(source, /Schedule version \$\{result\.version\} is \$\{result\.state\}/);

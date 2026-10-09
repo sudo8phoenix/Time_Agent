@@ -7,7 +7,7 @@ export default defineConfig({
   use: { ...devices["Desktop Chrome"], baseURL: "http://127.0.0.1:4173" },
   projects: [
     { name: "fixtures", testMatch: "**/fixture-flow.spec.ts" },
-    { name: "review-api", testMatch: "**/review-api.spec.ts", use: { baseURL: "http://127.0.0.1:4174" } },
+    { name: "review-api", testMatch: ["**/review-api.spec.ts", "**/session-recovery.spec.ts", "**/workflow-safeguards.spec.ts"], use: { baseURL: "http://127.0.0.1:4174" } },
   ],
   webServer: [{
     command: "VITE_FIXTURE_MODE=true npm run dev -- --host 127.0.0.1 --port 4173",
