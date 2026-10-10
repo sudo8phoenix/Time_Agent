@@ -12,10 +12,12 @@ import shutil
 import subprocess
 from datetime import datetime, timezone
 
-from sqlalchemy import select
+from sqlalchemy import select, text
 from sqlalchemy.engine import make_url
 
-from app.db.models import FileRecord, Fragment, Observation, ProgressEvent, ScheduleSourceMetadata
+from app.db.models import (ActivityState, AgentRun, AuditEvent, Conversation, ConversationTurn,
+                           FileRecord, Fragment, IntegrationOutbox, Observation, ProgressEvent,
+                           Job, Proposal, ScheduleSourceMetadata)
 from app.db.session import session_factory
 from app.settings import get_settings
 
@@ -23,6 +25,26 @@ from app.settings import get_settings
 def sha(path):
     with path.open("rb") as handle:
         return hashlib.file_digest(handle, "sha256").hexdigest()
+
+
+RECOVERY_TABLES = {
+    "agent_runs": AgentRun, "conversations": Conversation,
+    "conversation_turns": ConversationTurn, "integration_outbox": IntegrationOutbox,
+    "activity_states": ActivityState, "progress_events": ProgressEvent,
+    "observations": Observation, "proposals": Proposal, "audit_events": AuditEvent,
+    "jobs": Job,
+}
+
+
+def table_digest(db, model):
+    digest = hashlib.sha256()
+    table = model.__tablename__
+    primary_key = model.__mapper__.primary_key[0].name
+    for raw in db.execute(text(f"SELECT row_to_json(t)::text FROM {table} t ORDER BY {primary_key}")).scalars():
+        record = json.loads(raw)
+        digest.update(json.dumps(record, sort_keys=True, separators=(",", ":"), default=str).encode())
+        digest.update(b"\n")
+    return digest.hexdigest()
 
 
 def main():
@@ -49,6 +71,9 @@ def main():
             )
         ]
         native = [str(value) for value in db.scalars(select(ScheduleSourceMetadata.schedule_version_id))]
+        recovery_rows = {table: {"ids": [str(value) for value in db.scalars(select(getattr(model, model.__mapper__.primary_key[0].name)))],
+                                 "sha256": table_digest(db, model)}
+                         for table, model in RECOVERY_TABLES.items()}
         files = []
         for record in records:
             source = (upload_root / record.storage_key).resolve()
@@ -70,7 +95,8 @@ def main():
     os.chmod(dump, 0o600)
     manifest = {"created_at": datetime.now(timezone.utc).isoformat(), "database_sha256": sha(dump),
                 "files": files, "approved_event_ids": events,
-                "approved_evidence_fragment_ids": evidence, "native_metadata_ids": native}
+                "approved_evidence_fragment_ids": evidence, "native_metadata_ids": native,
+                "recovery_rows": recovery_rows}
     (destination / "manifest.json").write_text(json.dumps(manifest, indent=2) + "\n")
     print(f"Backup created: {destination}; {len(files)} originals, {len(events)} approved events, {len(evidence)} evidence fragments")
 

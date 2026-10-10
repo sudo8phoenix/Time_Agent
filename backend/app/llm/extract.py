@@ -7,8 +7,9 @@ from __future__ import annotations
 
 import hashlib
 import json
+import re
 from dataclasses import dataclass
-from datetime import date, timedelta
+from datetime import date
 from typing import Any, Callable, Mapping, Sequence
 
 from pydantic import ValidationError
@@ -103,7 +104,7 @@ def _resolve_relative(value: date | None, basis: DateBasis, batch: BatchInput) -
 
 def _validate_evidence(observation: Observation, fragments: Sequence[FragmentInput]) -> None:
     by_id = {f.fragment_id: f.text for f in fragments}
-    for evidence in observation.evidence:
+    for evidence in [*observation.evidence, *(ev for effect in observation.lifecycle_effects for ev in effect.evidence)]:
         source = by_id.get(evidence.fragment_id)
         if source is None or evidence.quote not in source:
             raise ExtractionError(f"evidence quote is not present in fragment {evidence.fragment_id}")
@@ -116,7 +117,8 @@ def _validate_evidence(observation: Observation, fragments: Sequence[FragmentInp
 def _fact_key(o: Observation) -> tuple[Any, ...]:
     return (o.discipline, o.work_type, o.event_type, o.observed_status, o.area,
             tuple(sorted(o.asset_tags)), o.explicit_activity_id, o.work_date,
-            o.quantity, o.quantity_kind, o.unit, o.blocker, o.summary)
+            o.quantity, o.quantity_kind, o.unit, o.blocker, o.summary,
+            tuple(effect.model_dump_json() for effect in o.lifecycle_effects))
 
 
 ModelCall = Callable[..., Any]
@@ -156,6 +158,67 @@ def _normalise_nullable_literals(raw: Any) -> Any:
     return normalised
 
 
+def _repair_source_stated_clock(raw: Any) -> Any:
+    """Repair only clock details repeated in exact source evidence.
+
+    A quoted clock can supply an omitted local time or its minute precision. A
+    model-added UTC suffix is removed only when the quote gives a local clock.
+    Other timezone-bearing or unsupported clock values still fail validation.
+    """
+    if not isinstance(raw, Mapping) or not isinstance(raw.get("observations"), list):
+        return raw
+    repaired = dict(raw)
+    observations = []
+    for original in raw["observations"]:
+        item = dict(original) if isinstance(original, Mapping) else original
+        if isinstance(item, dict):
+            effects = []
+            for original_effect in item.get("lifecycle_effects", []):
+                effect = dict(original_effect) if isinstance(original_effect, Mapping) else original_effect
+                if isinstance(effect, dict) and isinstance(effect.get("endpoint"), Mapping):
+                    endpoint = dict(effect["endpoint"])
+                    clock = endpoint.get("local_time")
+                    quotes = [e.get("quote", "") for e in effect.get("evidence", []) if isinstance(e, Mapping)]
+                    if clock is None and endpoint.get("precision") == "date":
+                        match = re.search(r"\b(?:[01]?\d|2[0-3]):[0-5]\d\b", str(endpoint.get("raw_expression", "")))
+                        if match and any(match.group(0) in quote for quote in quotes):
+                            endpoint["local_time"] = match.group(0) + ":00"
+                            endpoint["precision"] = "minute"
+                            effect["endpoint"] = endpoint
+                            item["warnings"] = [*item.get("warnings", []),
+                                                "source-stated clock restored from date-only model endpoint"]
+                    clock = endpoint.get("local_time")
+                    if clock is None and endpoint.get("precision") == "minute":
+                        match = re.search(r"\b(?:[01]?\d|2[0-3]):[0-5]\d\b", str(endpoint.get("raw_expression", "")))
+                        if match and any(match.group(0) in quote for quote in quotes):
+                            endpoint["local_time"] = match.group(0) + ":00"
+                            effect["endpoint"] = endpoint
+                            item["warnings"] = [*item.get("warnings", []),
+                                                "source-stated clock restored to incomplete model endpoint"]
+                    clock = endpoint.get("local_time")
+                    if (isinstance(clock, str) and endpoint.get("precision") == "date"
+                            and len(clock) in {5, 8} and clock[:5] in " ".join(quotes)
+                            and (len(clock) == 5 or clock.endswith(":00"))):
+                        endpoint["precision"] = "minute"
+                        effect["endpoint"] = endpoint
+                        item["warnings"] = [*item.get("warnings", []),
+                                            "model date precision corrected to source-stated clock minute"]
+                    if (isinstance(clock, str) and clock.endswith("Z") and len(clock) == 9
+                            and endpoint.get("timezone") is None
+                            and any(clock[:5] in quote and "UTC" not in quote and "Z" not in quote
+                                    for quote in quotes)):
+                        endpoint["local_time"] = clock[:-1]
+                        effect["endpoint"] = endpoint
+                        item["warnings"] = [*item.get("warnings", []),
+                                            "model-added UTC suffix removed from source-local clock"]
+                effects.append(effect)
+            if "lifecycle_effects" in item:
+                item["lifecycle_effects"] = effects
+        observations.append(item)
+    repaired["observations"] = observations
+    return repaired
+
+
 def extract_batch(batch: BatchInput, model_call: ModelCall, *, model: str = "unknown",
                  model_digest: str | None = None, runtime: str | None = None,
                  settings: Mapping[str, Any] | None = None) -> ExtractionResult:
@@ -174,7 +237,7 @@ def extract_batch(batch: BatchInput, model_call: ModelCall, *, model: str = "unk
         model = getattr(raw, "model", model)
         raw = raw.value
     try:
-        parsed = ObservationBatch.model_validate(_normalise_nullable_literals(raw))
+        parsed = ObservationBatch.model_validate(_repair_source_stated_clock(_normalise_nullable_literals(raw)))
     except ValidationError as exc:
         raise ExtractionError(f"model output failed observation schema: {exc}") from exc
     accepted: list[Observation] = []
@@ -182,6 +245,17 @@ def extract_batch(batch: BatchInput, model_call: ModelCall, *, model: str = "unk
     for observation in parsed.observations:
         try:
             _validate_evidence(observation, batch.fragments)
+            if observation.event_type in {EventType.actual_start, EventType.actual_finish}:
+                if observation.quantity is not None or observation.reported_percent is not None:
+                    raise ExtractionError("lifecycle assertion must not carry quantity or percent")
+                for effect in observation.lifecycle_effects:
+                    if effect.kind.value != observation.event_type.value:
+                        raise ExtractionError("lifecycle endpoint kind does not match observation")
+                    if effect.endpoint.basis == "report_context":
+                        if not batch.report_date_trusted or effect.endpoint.local_date != batch.report_date:
+                            raise ExtractionError("lifecycle endpoint requires trusted matching report date")
+                    if observation.work_date and effect.endpoint.local_date != observation.work_date:
+                        raise ExtractionError("lifecycle endpoint conflicts with work date")
             # Relative dates are accepted only when a trusted report context exists.
             if observation.date_basis == DateBasis.relative_resolved and not batch.report_date_trusted:
                 raise ExtractionError("relative date requires trusted report date")

@@ -1,0 +1,11 @@
+{
+  "version": 1,
+  "source": "synthetic_ai_authored",
+  "schedule_family": "GT10BLDG",
+  "split": "development",
+  "report_count": 16,
+  "label_status": "ai_proposed_unreviewed",
+  "independent_review_count": 0,
+  "label_sha256": "0690d1561891c0f9802405e0ebe63a82c0cdff4dee4612f05e3975d2ff661471",
+  "evaluation_eligible": false
+}

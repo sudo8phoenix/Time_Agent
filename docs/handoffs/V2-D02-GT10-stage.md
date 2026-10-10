@@ -1,0 +1,7 @@
+# GT10 development schedule staging
+
+The selected GT10 P6 export hash is enforced by the XLSX preview adapter. It now enters the authenticated schedule-import preview, reviewer mapping and stage flow. The staged activity table uses date-only planned dates because that is the current canonical schedule contract; the `ScheduleSourceMetadata` sidecar retains every source task cell, its original timestamp string, precision marker, source row, and relationship cells/lag-header evidence. Actual dates remain null, quantities and discipline/work type remain unsupported/unknown, and F8/logic/calendar issues remain warnings. Activation is a separate explicit action.
+
+An isolated SQLite integration test exercises source bytes through preview, mapping, staging, explicit activation and task retrieval. It verifies 140 activities, 176 relationships, raw `08:00:00` timestamp retention, no manufactured actual dates, and `SUB-010` retrieval. PostgreSQL API integration could not run in this sandbox because localhost:5432 is unavailable. No persistent user project/database was modified by this test. The test's `Asia/Kolkata` project setting is a test-only application requirement, not a claim about the GT10 source timezone.
+
+Next: independently review GT10 F8, FF/FS, plaster lag and lag unit before using dependency-based durations or approved correction overlays. L01 should then add first-class date/time precision to activity storage; until then, source time is available only in the sidecar.

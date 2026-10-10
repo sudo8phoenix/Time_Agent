@@ -15,15 +15,52 @@ def _now() -> datetime:
 
 def enqueue_job(db: Session, project: Project, report: Report) -> tuple[Job, bool]:
     """Create or reuse the report's job. Caller commits report and job together."""
-    job = db.scalar(select(Job).where(Job.project_id == project.id, Job.report_id == report.id))
+    job = db.scalar(select(Job).where(Job.project_id == project.id, Job.report_id == report.id,
+                                      Job.parent_job_id.is_(None)))
     if job:
         return job, True
     if project.active_schedule_version_id is None:
         raise ValueError("PROJECT_HAS_NO_ACTIVE_SCHEDULE")
+    needs_transcription = "NEEDS_TRANSCRIPTION:" in (report.parsing_warnings or "")
     job = Job(project_id=project.id, report_id=report.id,
               schedule_version_id=project.active_schedule_version_id,
-              state="queued", stage="parse", attempts=0)
+              state="needs_transcription" if needs_transcription else "queued", stage="parse", attempts=0)
     db.add(job); db.flush()
+    return job, False
+
+
+def enqueue_reanalysis(db: Session, project: Project, report: Report, *, actor_id: UUID,
+                       reason: str, idempotency_key: str) -> tuple[Job, bool]:
+    """Create an auditable child run; retries with the same key return that run."""
+    report = db.scalar(select(Report).where(Report.id == report.id).with_for_update())
+    existing = db.scalar(select(Job).where(Job.reanalysis_key == idempotency_key))
+    if existing:
+        if (existing.project_id != project.id or existing.report_id != report.id
+                or existing.reanalysis_actor_id != actor_id or existing.reanalysis_reason != reason):
+            raise ValueError("REANALYSIS_KEY_CONFLICT")
+        return existing, True
+    base = db.scalar(select(Job).where(Job.project_id == project.id, Job.report_id == report.id,
+                                       Job.parent_job_id.is_(None)))
+    if base is None:
+        raise ValueError("REPORT_RUN_NOT_FOUND")
+    if project.active_schedule_version_id is None:
+        raise ValueError("PROJECT_HAS_NO_ACTIVE_SCHEDULE")
+    if base.schedule_version_id != project.active_schedule_version_id:
+        raise ValueError("REPORT_SCHEDULE_NOT_ACTIVE")
+    needs_transcription = "NEEDS_TRANSCRIPTION:" in (report.parsing_warnings or "")
+    from ..settings import get_settings
+    settings = get_settings()
+    from ..prompts.extraction_v1 import PROMPT_VERSION
+    config_snapshot = {"execution_mode": settings.agent_execution_mode,
+                       "model": settings.ollama_model,
+                       "extraction_prompt_version": PROMPT_VERSION}
+    job = Job(project_id=project.id, report_id=report.id, parent_job_id=base.id,
+              reanalysis_key=idempotency_key, reanalysis_actor_id=actor_id,
+              reanalysis_reason=reason, config_snapshot=config_snapshot,
+              schedule_version_id=project.active_schedule_version_id,
+              state="needs_transcription" if needs_transcription else "queued", stage="parse", attempts=0)
+    db.add(job)
+    db.flush()
     return job, False
 
 def claim_job(db: Session, *, now: datetime | None = None) -> tuple[Job, str] | None:

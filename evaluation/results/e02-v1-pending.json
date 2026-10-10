@@ -1,0 +1,24 @@
+{
+  "task": "E02",
+  "date": "2026-10-10",
+  "acceptance": "pending",
+  "capture_tool": "operator-supplied observations; does not automate or attest the live workflow",
+  "metrics_status": "fixture-tested preparation",
+  "live_results": null,
+  "independent_review_status": "pending D04",
+  "split_freeze_status": "pending D05",
+  "agreed_targets": false,
+  "targets_draft": "docs/evaluation-targets-draft.md",
+  "owner_package": "not_received",
+  "blocking_inputs": [
+    "independently adjudicated unseen cases",
+    "reviewed frozen leakage-aware splits",
+    "agreed quality and latency targets",
+    "authentic UI-to-live-model-to-export artifacts"
+  ],
+  "claims": {
+    "unseen_live_flow_passed": false,
+    "independently_validated_accuracy": false,
+    "latency_targets_achieved": false
+  }
+}

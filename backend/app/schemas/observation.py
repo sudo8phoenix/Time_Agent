@@ -1,6 +1,7 @@
 from datetime import date
 from decimal import Decimal
 from pydantic import Field, field_validator, model_validator
+from .events import LifecycleEffect
 from .common import (StrictModel, Discipline, WorkType, EventType, ObservedStatus, QuantityKind,
     DateBasis, Unit, Evidence, finite_nonnegative)
 
@@ -26,6 +27,7 @@ class Observation(StrictModel):
     summary: str = Field(min_length=1, max_length=2000)
     evidence: list[Evidence] = Field(min_length=1, max_length=30)
     warnings: list[str] = Field(max_length=30)
+    lifecycle_effects: list[LifecycleEffect] = Field(default_factory=list, max_length=2)
 
     _quantity = field_validator("quantity")(finite_nonnegative)
 

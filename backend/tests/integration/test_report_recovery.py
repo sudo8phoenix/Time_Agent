@@ -34,6 +34,10 @@ def test_unique_report_constraint_failure_rolls_back_rows_and_removes_artifact(i
     db, project, upload_dir = intake_db
     raw = b"A report that will collide after its storage write."
     digest = __import__("hashlib").sha256(raw).hexdigest()
+    # Ingestion scopes deduplication identity by report date (and metadata),
+    # even when no date is supplied. Mirror that persisted identity so the
+    # injected competing insert exercises the actual unique constraint.
+    identity = __import__("hashlib").sha256(f"{digest}:".encode()).hexdigest()
     original_store = reports._store_original
 
     def store_then_create_racing_duplicate(storage_key, payload):
@@ -41,7 +45,7 @@ def test_unique_report_constraint_failure_rolls_back_rows_and_removes_artifact(i
         # Simulate a competing intake inserting the same project/content hash
         # after this request's preflight lookup. PostgreSQL enforces the real
         # reports(project_id, content_hash) unique constraint below.
-        db.add(Report(project_id=project.id, content_hash=digest))
+        db.add(Report(project_id=project.id, content_hash=identity))
         db.flush()
 
     monkeypatch.setattr(reports, "_store_original", store_then_create_racing_duplicate)
@@ -51,4 +55,4 @@ def test_unique_report_constraint_failure_rolls_back_rows_and_removes_artifact(i
     db.rollback()
     assert not list(Path(upload_dir).rglob("*.pending"))
     assert not list(Path(upload_dir).rglob("*.txt"))
-    assert db.query(Report).filter(Report.project_id == project.id, Report.content_hash == digest).count() == 0
+    assert db.query(Report).filter(Report.project_id == project.id, Report.content_hash == identity).count() == 0

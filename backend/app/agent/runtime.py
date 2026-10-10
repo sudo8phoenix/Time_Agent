@@ -18,6 +18,7 @@ os.environ.setdefault("LANGGRAPH_STRICT_MSGPACK", "true")
 
 from langgraph.checkpoint.postgres import PostgresSaver
 
+from ..progress.effects import build_effects as _effects
 from ..db.models import (
     Activity,
     ActivityState,
@@ -168,13 +169,13 @@ def _ensure_active(
             raise AgentRuntimeError("SCHEDULE_VERSION_STALE")
 
 
-def _model_callable() -> Callable[..., Any]:
+def _model_callable(model_name: str | None = None) -> Callable[..., Any]:
     from ..llm.ollama import OllamaChatAdapter
 
     settings = get_settings()
     adapter = OllamaChatAdapter(
         settings.ollama_base_url,
-        settings.ollama_model,
+        model_name or settings.ollama_model,
         bearer_token=(
             settings.ollama_api_key.get_secret_value() if settings.ollama_api_key else None
         ),
@@ -196,22 +197,6 @@ def _json(value: Any) -> Any:
     return value
 
 
-def _effects(observation: Any) -> dict[str, Any]:
-    if observation.event_type.value != "actual_progress":
-        return {}
-    result: dict[str, Any] = {
-        "event_type": observation.event_type.value,
-        "quantity_semantics": observation.quantity_kind.value,
-    }
-    if observation.quantity is not None:
-        result["quantity"] = str(observation.quantity)
-    if observation.unit is not None:
-        result["unit"] = observation.unit.value
-    if observation.reported_percent is not None:
-        result["reported_percent"] = str(observation.reported_percent)
-    if observation.work_date is not None:
-        result["effective_date"] = observation.work_date.isoformat()
-    return result
 
 
 def _persisted_rows(db: Session, job_id: UUID) -> list[DBObservation]:
@@ -227,7 +212,9 @@ def _verify_existing_output(db: Session, state: AgentState, rows: list[DBObserva
     for row, key, observation in zip(rows, keys, state.observation_drafts, strict=True):
         evidence = [item.model_dump(mode="json") for item in observation.evidence]
         expected = state.selection_drafts[key]
-        if row.fields != observation.model_dump(mode="json") or row.field_evidence != {
+        if row.fields != observation.model_dump(mode="json") or {
+            k: v for k, v in row.field_evidence.items() if k != "provenance"
+        } != {
             "evidence": evidence,
             "selection": {
                 "explanation": expected.explanation,
@@ -326,6 +313,12 @@ def _persistence_callback(session_factory, token: str, state: AgentState, *, ide
                         },
                     },
                 )
+                from ..confidence.provenance import capture
+                row.field_evidence = {**row.field_evidence, "provenance": capture(
+                    row.fields, selection.model_dump(mode="json"),
+                    metadata={**state.model_metadata.model_dump(mode="json"),
+                              "validation_errors": [item.model_dump(mode="json") for item in state.validation_errors],
+                              "run_warnings": [item.model_dump(mode="json") for item in state.warnings]})}
                 db.add(row)
                 db.flush()
                 chosen = activities.get(str(selection.candidate_id)) if selection.candidate_id else None
@@ -497,7 +490,7 @@ def process_job_with_graph(
     context = AgentRuntimeContext(
         session_factory=session_factory,
         lease_token=token,
-        model_callable=model_callable or _model_callable(),
+        model_callable=model_callable or _model_callable((job.config_snapshot or {}).get("model")),
         embedder=embedder,
         heartbeat_callback=heartbeat_callback or (lambda *_: True),
         shutdown_callback=should_stop or (lambda: False),

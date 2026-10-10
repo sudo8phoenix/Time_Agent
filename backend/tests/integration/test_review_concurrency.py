@@ -45,6 +45,7 @@ def _pending(factory, *, other_project=False, warnings=None):
     state = ActivityState(activity=activity, revision=0, completed_quantity=0)
     db.add_all([user, project, version, activity, state])
     db.flush()
+    project.active_schedule_version_id = version.id
     db.add(ProjectMembership(project_id=project.id, user_id=user.id))
     report = Report(project_id=project.id, content_hash=uuid4().hex, report_date=date(2026, 1, 2))
     db.add(report)
@@ -173,7 +174,9 @@ def test_correction_supersedes_event_and_recomputes_without_rewriting_history(db
         warnings=[],
         proposed_effects={
             "quantity": "1", "unit": "spool", "quantity_semantics": "delta",
-            "event_type": "correction", "effective_date": "2026-01-02",
+            # Corrections retain the accepted event's effect kind; the
+            # supersedes reference marks which active event is replaced.
+            "event_type": "actual_progress", "effective_date": "2026-01-02",
             "supersedes_event_id": original_event_id,
         },
     )

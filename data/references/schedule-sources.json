@@ -1,0 +1,62 @@
+{
+  "schema_version": 1,
+  "owner_package_status": "not_received",
+  "selected_snapshot": "gt10:GT10BLDG_v1_P6_export.xlsx",
+  "sources": [
+    {
+      "source": "cambridge",
+      "url": "https://www.repository.cam.ac.uk/items/6cb214a6-f52d-4846-b2de-3a2e2a34d431",
+      "local_path": "../data/cambridge -construction schedules/JPF_Anonymised_Project_Data.json",
+      "sha256": "e32f311e05c73b8b891b25149d85c95f27536d739f97d17bc52624fbc5ef8f47",
+      "bytes": 1287747624,
+      "retrieval_date": "unknown_user_supplied",
+      "audit_date": "2026-10-09",
+      "role": "historical_schedule_coverage",
+      "license": "CC BY 4.0",
+      "license_text_retained": false,
+      "upstream_byte_identity_verified": false,
+      "owner_data": false,
+      "paired_report_gold": false
+    },
+    {
+      "source": "gt10",
+      "url": "https://github.com/SionRani/GT10BLDG-P6-Schedule",
+      "local_path": "../data/GT10BLDG-P6-Schedule/exports/GT10BLDG_v1_P6_export.xlsx",
+      "sha256": "b84946cc8c279e879979ed174539357b92ac6cb3011562d30a44e4cce2913953",
+      "bytes": 24645,
+      "retrieval_date": "unknown_user_supplied",
+      "audit_date": "2026-10-09",
+      "role": "initial_development_snapshot",
+      "license": "MIT indicated on GitHub; exact LICENSE text not locally retained",
+      "license_text_retained": false,
+      "upstream_byte_identity_verified": false,
+      "owner_data": false,
+      "paired_report_gold": false
+    },
+    {
+      "source": "gt10",
+      "url": "https://github.com/SionRani/GT10BLDG-P6-Schedule",
+      "local_path": "../data/GT10BLDG-P6-Schedule/source/GT10BLDG_input_activities_relationships.xlsx",
+      "sha256": "598e2fcfa2bae290284cb6ca9f4eaff164ce149b4269099b7e763bc2e4ea5951",
+      "bytes": 28295,
+      "retrieval_date": "unknown_user_supplied",
+      "audit_date": "2026-10-09",
+      "role": "reconciliation_only",
+      "license": "MIT indicated on GitHub; exact LICENSE text not locally retained",
+      "license_text_retained": false,
+      "upstream_byte_identity_verified": false,
+      "owner_data": false,
+      "paired_report_gold": false
+    }
+  ],
+  "gt10_unresolved": [
+    "SUP-F8-06 F9 name",
+    "FF vs FS",
+    "F10 plaster lag",
+    "day/hour lag ambiguity",
+    "input/export date differences",
+    "WBS differences",
+    "native XER missing"
+  ],
+  "distribution_gate": "GT10 exact LICENSE text must be retained before redistribution"
+}

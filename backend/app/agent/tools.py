@@ -342,6 +342,8 @@ class AgentTools:
                     text=row.normalised_text or row.original_text, ordinal=row.ordinal,
                     report_id=row.report_id,
                 ) for row in fragment_rows}
+                from .project_aliases import with_project_aliases
+                activity_rows = with_project_aliases(db, job.project_id, activity_rows)
                 self._activities = {str(row.id): SimpleNamespace(**{
                     name: getattr(row, name) for name in (
                         "id", "schedule_version_id", "external_id", "name", "wbs", "discipline",

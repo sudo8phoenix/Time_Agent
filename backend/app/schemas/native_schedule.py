@@ -11,7 +11,7 @@ from .common import StrictModel
 
 RelationType = Literal["FS", "SS", "FF", "SF"]
 Severity = Literal["error", "warning"]
-SourceFormat = Literal["p6_xer", "p6_xml", "msp_xml", "msp_mpp"]
+SourceFormat = Literal["p6_xer", "p6_xml", "msp_xml", "msp_mpp", "gt10_xlsx"]
 
 
 def _decimal_string(value: str | None) -> str | None:
@@ -77,6 +77,7 @@ class SourceRelation(StrictModel):
     lag_value: str | None
     lag_unit: str | None
     external_project_id: str | None
+    source_fields: dict[str, Any] = Field(default_factory=dict)
 
     _validate_lag = field_validator("lag_value")(_decimal_string)
 

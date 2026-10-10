@@ -7,22 +7,26 @@ from .settings import get_settings
 from .api.endpoints.auth import router as auth_router
 from .api.endpoints.projects import router as projects_router
 from .api.endpoints.schedules import router as schedules_router
+from .api.endpoints.report_intake import router as report_intake_router
 from .api.endpoints.reports import router as reports_router
 from .api.endpoints.jobs import router as jobs_router
 from .api.endpoints.review import router as review_router
 from .api.endpoints.progress import router as progress_router
 from .api.endpoints.schedule_imports import router as schedule_imports_router
+from .api.endpoints.conversations import router as conversations_router
 
 settings = get_settings()
 app = FastAPI(title=settings.app_name, version="0.1.0")
 app.include_router(auth_router, prefix="/api/v1")
 app.include_router(projects_router, prefix="/api/v1")
 app.include_router(schedules_router, prefix="/api/v1")
+app.include_router(report_intake_router, prefix="/api/v1")
 app.include_router(reports_router, prefix="/api/v1")
 app.include_router(jobs_router, prefix="/api/v1")
 app.include_router(review_router, prefix="/api/v1")
 app.include_router(progress_router, prefix="/api/v1")
 app.include_router(schedule_imports_router, prefix="/api/v1")
+app.include_router(conversations_router, prefix="/api/v1")
 
 
 @app.exception_handler(404)

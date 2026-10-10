@@ -5,7 +5,10 @@ from pathlib import Path
 from typing import Any
 from .metrics import evaluate
 
-FORBIDDEN = {"expected_activity_ids", "expected_mapping_state", "expected_quantity", "expected_event_type"}
+FORBIDDEN = {"expected_activity_ids", "expected_mapping_state", "expected_quantity", "expected_event_type",
+             "expected_work_date", "expected_start_date", "expected_finish_date", "expected_start_time",
+             "expected_finish_time", "expected_time_precision", "correct_atomic_count", "self_reported_correct",
+             "gold", "ground_truth"}
 
 def _json_hash(value: Any) -> str:
     return hashlib.sha256(json.dumps(value, sort_keys=True, separators=(",", ":")).encode()).hexdigest()
@@ -32,6 +35,19 @@ def validate_split(labels: list[dict[str, Any]], split: dict[str, Any], name: st
             raise ValueError(f"event family appears in more than one split: {sorted(overlap)}")
         all_families.update(fs)
 
+
+def validate_case_ids(labels: list[dict[str, Any]], predictions: list[dict[str, Any]]) -> None:
+    label_list = [str(x.get("case_id", "")) for x in labels]
+    pred_list = [str(x.get("case_id", "")) for x in predictions]
+    if any(not case_id for case_id in label_list + pred_list):
+        raise ValueError("every label and prediction must have a nonempty case_id")
+    if len(set(label_list)) != len(label_list):
+        raise ValueError("labels contain duplicate case IDs")
+    if len(set(pred_list)) != len(pred_list):
+        raise ValueError("predictions contain duplicate case IDs")
+    if set(label_list) != set(pred_list):
+        raise ValueError("predictions and labels must have identical case IDs")
+
 def run(prediction_path: Path, labels_path: Path, splits_path: Path, split_name: str, config: dict[str, Any]) -> dict[str, Any]:
     predictions, all_labels, split = _lines(prediction_path), _lines(labels_path), json.loads(splits_path.read_text())
     chosen_families = set(split.get("splits", {}).get(split_name, []))
@@ -40,16 +56,28 @@ def run(prediction_path: Path, labels_path: Path, splits_path: Path, split_name:
     labels = [label for label in all_labels if str(label.get("event_family_id", "")) in chosen_families]
     if not predictions: raise ValueError("prediction file is empty")
     for row in predictions:
-        leaked = FORBIDDEN & set(row)
+        leaked = _forbidden_fields(row)
         if leaked: raise ValueError(f"prediction contains held-out label fields: {sorted(leaked)}")
     validate_split(labels, split, split_name)
-    label_ids, pred_ids = {str(x["case_id"]) for x in labels}, {str(x.get("case_id")) for x in predictions}
-    if label_ids != pred_ids: raise ValueError("predictions and labels must have identical case IDs")
+    validate_case_ids(labels, predictions)
     result = evaluate(labels, predictions)
     result["run"] = {"split": split_name, "prediction_sha256": hashlib.sha256(prediction_path.read_bytes()).hexdigest(),
                       "label_sha256": hashlib.sha256(labels_path.read_bytes()).hexdigest(), "config": config, "config_sha256": _json_hash(config),
                       "label_count": len(labels), "real_model": bool(config.get("real_model", False))}
     return result
+
+
+def _forbidden_fields(value: Any) -> set[str]:
+    found: set[str] = set()
+    if isinstance(value, dict):
+        for key, child in value.items():
+            if key in FORBIDDEN or key.startswith("expected_"):
+                found.add(key)
+            found.update(_forbidden_fields(child))
+    elif isinstance(value, list):
+        for child in value:
+            found.update(_forbidden_fields(child))
+    return found
 
 def main() -> None:
     ap = argparse.ArgumentParser(); ap.add_argument("predictions"); ap.add_argument("labels"); ap.add_argument("splits"); ap.add_argument("--split", default="held_out"); ap.add_argument("--config", default="{}")

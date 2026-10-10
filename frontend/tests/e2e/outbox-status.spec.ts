@@ -1,0 +1,30 @@
+import { expect, test } from "@playwright/test";
+for (const width of [390, 1440]) test(`mock delivery status and refresh at ${width}`, async ({ page }) => {
+  await page.setViewportSize({ width, height: 1000 });
+  let delivered = false;
+  const errors: string[] = [];
+  page.on("pageerror", error => errors.push(error.message));
+  await page.route("**/api/v1/**", async route => {
+    const path = new URL(route.request().url()).pathname;
+    if (path.endsWith("/auth/me")) return route.fulfill({ status: 401, json: {} });
+    if (path.endsWith("/auth/login")) return route.fulfill({ json: { csrf_token: "csrf", user: { id: "u1", username: "planner", role: "reviewer" } } });
+    if (path.endsWith("/projects")) return route.fulfill({ json: { items: [{ id: "p1", name: "Mock fixture", active_schedule_version_id: "v1" }] } });
+    if (path.endsWith("/progress")) return route.fulfill({ json: { project_id: "p1", schedule_version: 1, counts: { activities: 1, approved_events: 1, pending_review: 0 }, notice: "Developer fixture", items: [{ activity_id: "a1", external_id: "EXC-01", name: "Excavation", wbs: "Site", completed_quantity: "0", planned_quantity: null, unit: null, physical_percent: null, actual_start: "2026-10-02", actual_start_precision: "date", lifecycle_status: "in_progress", approved_event_count: 1, history: [], delivery: { status: delivered ? "delivered" : "retry", revision: 1, attempts: delivered ? 2 : 1, last_error: delivered ? null : "Receiver timed out", delivered_at: delivered ? "2026-10-02T10:00:00Z" : null } }] } });
+    return route.fulfill({ json: { items: [] } });
+  });
+  await page.goto("/");
+  await page.getByLabel("Username").fill("planner");
+  await page.getByLabel("Password", { exact: true }).fill("fixture");
+  await page.getByRole("button", { name: /Sign in/ }).click();
+  await page.getByRole("button", { name: "Approved progress", exact: true }).click();
+  await expect(page.getByText(/retry · revision 1/)).toBeVisible();
+  await expect(page.getByRole("alert")).toContainText("Internal acceptance is saved");
+  delivered = true;
+  await page.getByRole("button", { name: "Refresh delivery status" }).click();
+  await expect(page.getByText(/delivered · revision 1/)).toBeVisible();
+  await expect(page.getByText(/Read-back verified/)).toBeVisible();
+  await expect(page.getByRole("alert")).toHaveCount(0);
+  expect(await page.evaluate(() => document.documentElement.scrollWidth <= innerWidth)).toBeTruthy();
+  await page.screenshot({ path: `../docs/validation/i01-delivery-${width}.png`, fullPage: true });
+  expect(errors).toEqual([]);
+});

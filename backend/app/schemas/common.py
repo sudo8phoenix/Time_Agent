@@ -28,7 +28,7 @@ class WorkType(str, Enum):
 class EventType(str, Enum):
     actual_progress = "actual_progress"; planned_work = "planned_work"; no_work = "no_work"
     blocker = "blocker"; inspection = "inspection"; material_delivery = "material_delivery"
-    correction = "correction"; unknown = "unknown"
+    correction = "correction"; actual_start = "actual_start"; actual_finish = "actual_finish"; unknown = "unknown"
 
 
 class ObservedStatus(str, Enum):

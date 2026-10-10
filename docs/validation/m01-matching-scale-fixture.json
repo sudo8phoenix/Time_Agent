@@ -1,0 +1,31 @@
+{
+  "status": "verified_fixture",
+  "model": "injected exact-ID fixture; no live model",
+  "limitations": "Recall is traversal retention only, not semantic model accuracy. Python timing excludes inference. No retrieval pruning introduced.",
+  "cases": [
+    {
+      "activities": 93,
+      "injected_model_calls": 2,
+      "fixture_target_count": 3,
+      "retained_target_count": 3,
+      "fixture_recall": 1.0,
+      "python_seconds": 0.0005
+    },
+    {
+      "activities": 140,
+      "injected_model_calls": 3,
+      "fixture_target_count": 3,
+      "retained_target_count": 3,
+      "fixture_recall": 1.0,
+      "python_seconds": 0.0004
+    },
+    {
+      "activities": 34407,
+      "injected_model_calls": 717,
+      "fixture_target_count": 3,
+      "retained_target_count": 3,
+      "fixture_recall": 1.0,
+      "python_seconds": 0.0799
+    }
+  ]
+}

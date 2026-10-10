@@ -79,3 +79,15 @@ def test_agent_receives_schedule_context_for_selection():
     candidates = shortlist_activities(report, "schedule", [row], model_call=model)
     proposal = select_activity(report, candidates, {"f1": report["summary"]}, model_call=model)
     assert str(proposal.candidate_id) == row["id"]
+
+
+def test_gt10_floor_conflict_cannot_silently_select_wrong_floor():
+    row = activity("De-shuttering - F9", "", "unknown")
+    row["external_id"] = "SUP-F8-06"
+    candidates = shortlist_activities({"summary": "Finished de-shuttering F9"}, "schedule", [row],
+        model_call=lambda **_: {"candidate_ids": [row["id"]]})
+    proposal = select_activity({"summary": "Finished de-shuttering F9"}, candidates, {"f1": "Finished de-shuttering F9"},
+        model_call=lambda **_: {"candidate_id": row["id"], "mapping_state": "suggested",
+            "evidence_fragment_ids": ["f1"], "reason_codes": [], "explanation": "Floor match", "missing_information": []})
+    assert proposal.candidate_id is None
+    assert "SCHEDULE_LOCATION_CONFLICT" in proposal.reason_codes

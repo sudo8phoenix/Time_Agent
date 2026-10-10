@@ -10,6 +10,7 @@ class Settings(BaseSettings):
     database_url: str = "postgresql+psycopg://progress:progress@127.0.0.1:5432/progress"
     ollama_base_url: str = "http://127.0.0.1:11434"
     ollama_model: str = "qwen3.5:4b"
+    conversation_model_timeout_seconds: int = Field(default=300, ge=30, le=900)
     ollama_api_key: SecretStr | None = None
     secret_key: str = Field(default="development-only-change-me", min_length=16)
     frontend_dist: str = "frontend/dist"

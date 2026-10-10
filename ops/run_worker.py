@@ -34,7 +34,8 @@ def main() -> int:
     settings = get_settings()
 
     def pipeline(db, job, *, token, should_stop, heartbeat_callback):
-        if settings.agent_execution_mode == "graph":
+        execution_mode = (job.config_snapshot or {}).get("execution_mode") or settings.agent_execution_mode
+        if execution_mode == "graph":
             from app.agent.runtime import process_job_with_graph
 
             return process_job_with_graph(

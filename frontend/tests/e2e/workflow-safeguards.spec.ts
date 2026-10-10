@@ -7,6 +7,11 @@ async function base(page: import("@playwright/test").Page, handler: (route: impo
     const path = new URL(route.request().url()).pathname.replace("/api/v1", "");
     if (path === "/auth/me") return route.fulfill({ json: { id: "user", username: "reviewer", role, csrf_token: "csrf" } });
     if (path === "/projects") return route.fulfill({ json: { items: [{ ...project, active_schedule_version_id: active ? "schedule" : null }, { ...project, id: "two", name: "South utility works" }] } });
+    if (/^\/projects\/[^/]+\/(history|blockers|durations)$/.test(path)) {
+      if (path.endsWith("/durations")) return route.fulfill({ json: { items: [], next_offset: null } });
+      if (path.endsWith("/blockers")) return route.fulfill({ json: { items: [] } });
+      return route.fulfill({ json: { items: [], total: 0, next_offset: null } });
+    }
     return handler(route, path);
   });
 }

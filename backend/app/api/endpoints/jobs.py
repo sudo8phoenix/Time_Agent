@@ -62,7 +62,7 @@ def status(job_id: UUID, db: Session=Depends(get_session), user: User=Depends(cu
         .where(Observation.job_id == job.id, Proposal.review_state == "pending")
         .order_by(Observation.ordinal, Proposal.revision, Proposal.id)
     ).all()
-    return {"job_id":str(job.id),"project_id":str(job.project_id),"report_id":str(job.report_id),"schedule_version_id":str(job.schedule_version_id),"state":job.state,"stage":job.stage,"attempts":job.attempts,"extracted_count":job.extracted_count,"proposal_count":job.proposal_count,"proposal_ids":[str(value) for value in proposal_ids],"error_code":job.error_code}
+    return {"job_id":str(job.id),"project_id":str(job.project_id),"report_id":str(job.report_id),"schedule_version_id":str(job.schedule_version_id),"parent_job_id":str(job.parent_job_id) if job.parent_job_id else None,"reanalysis_actor_id":str(job.reanalysis_actor_id) if job.reanalysis_actor_id else None,"reanalysis_reason":job.reanalysis_reason,"reanalysis_config":job.config_snapshot,"state":job.state,"stage":job.stage,"attempts":job.attempts,"extracted_count":job.extracted_count,"proposal_count":job.proposal_count,"proposal_ids":[str(value) for value in proposal_ids],"error_code":job.error_code}
 
 @router.post("/{job_id}/retry", status_code=202)
 def retry(job_id: UUID, db: Session=Depends(get_session), reviewer: User=Depends(require_reviewer)):

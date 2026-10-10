@@ -1,6 +1,8 @@
 # Implementation task state
 
-This is the execution record for the application. The user-facing checklist remains at `progress-agent-plan/TASK_BOARD.md` and is updated when a task has passed its acceptance evidence.
+Current implementation status and remaining release gates are in [release.md](release.md). E01 recovery/reanalysis, E02 evaluation preparation and E03 documentation evidence are in the corresponding [handoffs](handoffs/). E02 independent live validation and full E03 release acceptance remain pending.
+
+The W-series below is the historical execution record for the application. The user-facing checklist remains at `progress-agent-plan/TASK_BOARD.md` and is updated when a task has passed its acceptance evidence.
 
 | Task | Status | Owner | Dependencies | Next acceptance evidence |
 | --- | --- | --- | --- | --- |

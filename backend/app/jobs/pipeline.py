@@ -6,6 +6,8 @@ from typing import Any
 from sqlalchemy import select
 from sqlalchemy.orm import Session
 
+from ..confidence.provenance import capture, call_metadata
+from ..progress.effects import build_effects as _effects
 from ..db.models import Activity, Fragment, Job, Observation as DBObservation, Proposal, Report
 from ..llm.extract import FragmentInput, extract_fragments, deduplicate_results
 from ..agent.schedule_decision import shortlist_activities, select_activity
@@ -25,25 +27,6 @@ def _json(value: Any) -> Any:
     return value
 
 
-def _effects(obs: Any) -> dict[str, Any]:
-    event_value = getattr(obs, "event_type", "")
-    event = getattr(event_value, "value", str(event_value))
-    quantity = getattr(obs, "quantity", None)
-    unit = getattr(obs, "unit", None)
-    work_date = getattr(obs, "work_date", None)
-    if event.endswith("actual_progress") or event == "actual_progress":
-        kind = getattr(obs, "quantity_kind", "unknown")
-        out: dict[str, Any] = {
-            "event_type": event,
-            "quantity_semantics": getattr(kind, "value", kind),
-        }
-        if quantity is not None: out["quantity"] = str(quantity)
-        if unit is not None: out["unit"] = getattr(unit, "value", str(unit))
-        reported_percent = getattr(obs, "reported_percent", None)
-        if reported_percent is not None: out["reported_percent"] = str(reported_percent)
-        if work_date is not None: out["effective_date"] = work_date.isoformat()
-        return out
-    return {}
 
 
 def process_job(db: Session, job: Job, *, model_call: Callable[..., Any] | None = None,
@@ -63,7 +46,13 @@ def process_job(db: Session, job: Job, *, model_call: Callable[..., Any] | None 
     fragments = list(db.scalars(select(Fragment).where(Fragment.report_id == job.report_id).order_by(Fragment.ordinal)))
     if not fragments:
         return {"stage": "persist", "state": "ready_for_review", "extracted_count": 0, "proposal_count": 0}
+    if any(f.ocr_status == "NEEDS_TRANSCRIPTION" for f in fragments):
+        return {"stage": "parse", "state": "needs_transcription", "extracted_count": 0,
+                "proposal_count": 0, "error_code": "NEEDS_TRANSCRIPTION",
+                "error_message": "Attach a reviewed transcription for each unreadable page."}
     activities = list(db.scalars(select(Activity).where(Activity.schedule_version_id == job.schedule_version_id, Activity.is_leaf.is_(True))))
+    from ..agent.project_aliases import with_project_aliases
+    activities = with_project_aliases(db, job.project_id, activities)
     kwargs.pop("embed", None)
     report = db.get(Report, job.report_id)
     frag_inputs = [FragmentInput(str(f.id), f.locator, f.normalised_text or f.original_text, f.ordinal) for f in fragments]
@@ -78,16 +67,19 @@ def process_job(db: Session, job: Job, *, model_call: Callable[..., Any] | None 
         from ..llm.ollama import OllamaChatAdapter
         from ..settings import get_settings
         config = get_settings()
+        pinned_model = (job.config_snapshot or {}).get("model") or config.ollama_model
         adapter = OllamaChatAdapter(
             config.ollama_base_url,
-            config.ollama_model,
+            pinned_model,
             bearer_token=(config.ollama_api_key.get_secret_value() if config.ollama_api_key else None),
         )
         model_call = adapter.chat
         model_metadata = adapter.metadata()
-        model_version = f"{config.ollama_model}:{model_metadata.get('digest', 'unknown')}"
+        model_version = f"{pinned_model}:{model_metadata.get('digest', 'unknown')}"
     else:
         model_metadata = {}
+
+    call_trace = []
 
     def checked_model_call(**call_kwargs):
         if should_stop and should_stop():
@@ -95,7 +87,9 @@ def process_job(db: Session, job: Job, *, model_call: Callable[..., Any] | None 
             raise WorkerShutdown()
         if heartbeat_callback and lease_token and not heartbeat_callback(job, lease_token):
             raise RuntimeError("JOB_LEASE_LOST")
-        return model_call(**call_kwargs)
+        response = model_call(**call_kwargs)
+        call_trace.append(call_metadata(call_kwargs, response))
+        return response
 
     def selection_model_call(**call_kwargs):
         response = checked_model_call(**call_kwargs)
@@ -136,6 +130,13 @@ def process_job(db: Session, job: Job, *, model_call: Callable[..., Any] | None 
             row.field_evidence = {
                 "evidence": evidence,
                 "selection": {key: payload.get(key) for key in ("explanation", "reason_codes", "missing_information")},
+                "provenance": capture(fields, payload, metadata={
+                    "model_version": model_version, "prompt_version": prompt_version,
+                    "config_version": config_version, "selection_prompt_version": "agent-schedule-v1",
+                    "model_calls": list(call_trace),
+                    "extraction_batches": [_dump(r.metadata) for r in results if getattr(r, "metadata", None)],
+                    "extraction_errors": [str(e) for r in results for e in getattr(r, "errors", [])],
+                }),
             }
             chosen = payload.get("candidate_id")
             chosen_activity = next((a for a in activities if str(a.id) == str(chosen)), None) if chosen else None

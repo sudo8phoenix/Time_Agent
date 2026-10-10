@@ -1,0 +1,42 @@
+import { readFileSync } from "node:fs";
+import { expect, test } from "@playwright/test";
+for (const width of [390, 1440]) test(`mapping and page transcription at ${width}`, async ({ page }) => {
+  await page.setViewportSize({ width, height: 1000 });
+  const errors: string[] = []; page.on("pageerror", e => errors.push(e.message));
+  const project = { id: "project-1", name: "Synthetic intake fixture", active_schedule_version_id: "schedule-1" };
+  const spec = { sheet: "Civil", header_row: 1, columns: { work_description: 1, report_date: 2 }, context: {}, date_format: null };
+  const preview = { sheets: [{ name: "Civil", rows: [[{ cell: "A1", value: "Operation" }, { cell: "B1", value: "Day" }], [{ cell: "A2", value: "Started excavation F-01" }, { cell: "B2", value: "2026-10-09" }]] }], mappings: [{ id: "map-1", template: "Civil", revision: 1, spec, header_signature: "f".repeat(64) }], valid_rows: 1, row_errors: [], header_signature: "f".repeat(64) };
+  let scan = false, attached = false;
+  await page.route("**/api/v1/**", async route => {
+    const path = new URL(route.request().url()).pathname.replace("/api/v1", "");
+    if (path === "/auth/me") return route.fulfill({ status: 401, json: {} });
+    if (path === "/auth/login") return route.fulfill({ json: { csrf_token: "csrf", user: { id: "u1", role: "reviewer", username: "reviewer" } } });
+    if (path === "/projects") return route.fulfill({ json: { items: [project] } });
+    if (path.endsWith("/preview")) return route.fulfill({ json: preview });
+    if (path.endsWith("/mappings")) return route.fulfill({ json: { id: "map-1", revision: 1 } });
+    if (path.endsWith("/transcriptions")) { attached = true; return route.fulfill({ json: { job_id: "j2", report_id: "r2", project_id: project.id, state: "queued", stage: "parse" } }); }
+    if (path.endsWith("/original")) return route.fulfill({ contentType: "image/png", body: readFileSync("../data/synthetic/v2/intake/scan-diary.png") });
+    if (path.endsWith("/reports/r1")) return route.fulfill({ json: { report_id: "r1", original_url: "/api/v1/projects/project-1/reports/r1/original", fragments: [{ locator: "page:1", original_text: "", ocr_status: "NEEDS_TRANSCRIPTION" }] } });
+    if (path.endsWith("/reports") || path === "/jobs/j1") return route.fulfill({ json: { job_id: "j1", report_id: "r1", project_id: project.id, state: scan ? "needs_transcription" : "ready_for_review", stage: "parse", proposal_count: 0, proposal_ids: [] } });
+    return route.fulfill({ json: { items: [] } });
+  });
+  await page.goto("/"); await page.getByLabel("Username").fill("reviewer"); await page.getByLabel("Password", { exact: true }).fill("fixture-pass"); await page.getByRole("button", { name: /Sign in/ }).click();
+  await expect(page.getByText("Ready for intake", { exact: true })).toBeVisible();
+  await page.locator('input[type="file"]').setInputFiles({ name: "civil.xlsx", mimeType: "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet", buffer: Buffer.from("UI fixture") });
+  await expect(page.getByRole("heading", { name: "Map report columns" })).toBeVisible();
+  await page.getByLabel("Saved template").selectOption("map-1");
+  await expect(page.getByText("Mapping confirmed. Ready to submit.")).toBeVisible();
+  await page.screenshot({ path: `../docs/validation/f01-mapping-${width}.png`, fullPage: true });
+  expect(await page.evaluate(() => document.documentElement.scrollWidth <= innerWidth)).toBeTruthy();
+  await page.getByRole("button", { name: /Create review job/ }).click(); await expect(page.getByRole("heading", { name: "No observations to review" })).toBeVisible();
+  await page.getByRole("button", { name: /Back to intake/ }).click(); scan = true;
+  await page.locator('input[type="file"]').setInputFiles({ name: "scan.pdf", mimeType: "application/pdf", buffer: Buffer.from("UI scan fixture") });
+  await page.getByRole("button", { name: /Create review job/ }).click();
+  await expect(page.getByRole("heading", { name: "Transcription needed" })).toBeVisible();
+  await expect(page.getByRole("link", { name: "Open immutable original PDF" })).toBeVisible();
+  await page.getByLabel("Reviewed transcription · page:1").fill("Started excavation F-01 on 2026-10-09 at 08:30.");
+  await page.screenshot({ path: `../docs/validation/f02-transcription-${width}.png`, fullPage: true });
+  expect(await page.evaluate(() => document.documentElement.scrollWidth <= innerWidth)).toBeTruthy();
+  await page.getByRole("button", { name: "Attach transcription and create review job" }).click();
+  await expect(page.getByRole("heading", { name: "Transcribed field report" })).toBeVisible(); expect(attached).toBeTruthy(); expect(errors).toEqual([]);
+});

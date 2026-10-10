@@ -2,9 +2,12 @@
 from __future__ import annotations
 from collections.abc import Callable
 import inspect
+import logging
 import threading
 from sqlalchemy.orm import Session
 from .service import LEASE_SECONDS, claim_job, publish_stage, heartbeat, release_job
+
+logger = logging.getLogger(__name__)
 
 Pipeline = Callable[..., dict]
 
@@ -60,6 +63,7 @@ def run_once(db: Session, pipeline: Pipeline, *, should_stop: Callable[[], bool]
             )
             db.commit()
     except Exception as exc:
+        logger.warning("job pipeline failed: %s", type(exc).__name__)
         db.rollback()
         try:
             if isinstance(exc, WorkerShutdown):

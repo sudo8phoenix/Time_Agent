@@ -1,0 +1,14 @@
+{
+  "status": "structural_checks_passed_not_frozen",
+  "provisional_sha256": "1cca54fadc3518cc951a87d19d8e8e433b3cd4cba54cbf87a481243a51afee75",
+  "source_sha256": "e32f311e05c73b8b891b25149d85c95f27536d739f97d17bc52624fbc5ef8f47",
+  "label_sha256": "0690d1561891c0f9802405e0ebe63a82c0cdff4dee4612f05e3975d2ff661471",
+  "projects": {
+    "development": 221,
+    "validation": 39,
+    "held_out_candidate": 39
+  },
+  "groups": 54,
+  "gt10_scenario_count": 16,
+  "review_status": "pending_independent_review"
+}

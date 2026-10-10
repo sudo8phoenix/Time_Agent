@@ -9,6 +9,7 @@ from pathlib import Path
 import re
 import shutil
 import subprocess
+import hashlib
 
 
 def docker(*args, **kwargs):
@@ -18,6 +19,21 @@ def docker(*args, **kwargs):
 def sha(path):
     with path.open("rb") as handle:
         return hashlib.file_digest(handle, "sha256").hexdigest()
+
+
+RECOVERY_TABLES = {"agent_runs", "conversations", "conversation_turns", "integration_outbox",
+                   "activity_states", "progress_events", "observations", "proposals",
+                   "audit_events", "jobs"}
+RECOVERY_PRIMARY_KEYS = {"activity_states": "activity_id"}
+
+
+def recovery_digest(lines):
+    digest = hashlib.sha256()
+    for line in lines:
+        record = json.loads(line)
+        digest.update(json.dumps(record, sort_keys=True, separators=(",", ":")).encode())
+        digest.update(b"\n")
+    return digest.hexdigest()
 
 
 def main():
@@ -56,8 +72,21 @@ def main():
         result = docker("psql", "-U", "progress", "-d", args.database, "-Atc", f"SELECT {column} FROM {table} ORDER BY {column}", capture_output=True, text=True)
         if sorted(result.stdout.splitlines()) != sorted(expected):
             raise SystemExit(f"Restored {table} differs from backup manifest")
+    for table, expected in manifest.get("recovery_rows", {}).items():
+        if table not in RECOVERY_TABLES:
+            raise SystemExit("Backup manifest contains an unsupported recovery table")
+        primary_key = RECOVERY_PRIMARY_KEYS.get(table, "id")
+        result = docker("psql", "-U", "progress", "-d", args.database, "-Atc",
+                        f"SELECT row_to_json(t)::text FROM {table} t ORDER BY {primary_key}", capture_output=True, text=True)
+        lines = result.stdout.splitlines()
+        ids = [str(json.loads(line)[primary_key]) for line in lines]
+        if sorted(ids) != sorted(expected["ids"]):
+            raise SystemExit(f"Restored {table} differs from backup manifest")
+        if recovery_digest(lines) != expected["sha256"]:
+            raise SystemExit(f"Restored {table} content differs from backup manifest")
     print(json.dumps({"database": args.database, "uploads": str(destination), "verified": True,
-                      "approved_events": len(manifest["approved_event_ids"]), "originals": len(manifest["files"])}))
+                      "approved_events": len(manifest["approved_event_ids"]), "originals": len(manifest["files"]),
+                      "recovery_rows": {name: len(row["ids"]) for name, row in manifest.get("recovery_rows", {}).items()}}))
 
 
 if __name__ == "__main__":

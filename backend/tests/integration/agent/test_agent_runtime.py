@@ -29,6 +29,10 @@ from app.jobs.service import claim_job, heartbeat, retry_job
 from app.jobs.worker import WorkerShutdown
 from app.llm.ollama import LLMResult
 from app.agent.tools import AgentToolError
+from app.schemas.observation import Observation as ObservationSchema
+from app.jobs.pipeline import process_job
+from app.settings import get_settings
+from app.llm.extract import FragmentInput, extract_fragments
 from ops.prune_agent_checkpoints import prune
 
 
@@ -37,9 +41,10 @@ def _utcnow():
 
 
 class RuntimeFixture:
-    def __init__(self):
+    def __init__(self, *, lifecycle=False):
         self.token = uuid4().hex
         self.calls: list[str] = []
+        self.lifecycle = lifecycle
         with session_factory.begin() as db:
             project = Project(name=f"agent-runtime-{uuid4().hex}")
             db.add(project)
@@ -65,8 +70,8 @@ class RuntimeFixture:
                 report_id=report.id,
                 ordinal=1,
                 locator="paragraph:1",
-                original_text="Installed 2 m of cable.",
-                normalised_text="Installed 2 m of cable.",
+                original_text="Started on 2026-09-24." if lifecycle else "Installed 2 m of cable.",
+                normalised_text="Started on 2026-09-24." if lifecycle else "Installed 2 m of cable.",
             )
             activity = Activity(
                 schedule_version_id=schedule.id,
@@ -98,6 +103,25 @@ class RuntimeFixture:
             self.fragment_id = fragment.id
             self.activity_id = activity.id
             self.job_id = job.id
+            if lifecycle:
+                evidence = [{"fields": ["endpoint"], "fragment_id": str(fragment.id),
+                             "quote": "Started on 2026-09-24."}]
+                self.lifecycle_observation = ObservationSchema.model_validate({
+                    "discipline": "electrical", "work_type": "cable_laying",
+                    "event_type": "actual_start", "observed_status": "in_progress",
+                    "area": None, "asset_tags": [], "explicit_activity_id": None,
+                    "work_date": "2026-09-24", "date_basis": "explicit", "quantity": None,
+                    "quantity_kind": "none", "unit": None, "raw_unit": None,
+                    "reported_percent": None, "actual_start": "2026-09-24", "actual_finish": None,
+                    "blocker": None, "summary": "Started on 2026-09-24.", "evidence": evidence,
+                    "warnings": [], "lifecycle_effects": [{
+                        "kind": "actual_start", "scope": "whole_activity",
+                        "endpoint": {"local_date": "2026-09-24", "local_time": None,
+                                     "precision": "date", "timezone": None, "basis": "explicit",
+                                     "raw_expression": "2026-09-24", "normalized_instant": None},
+                        "evidence": evidence,
+                    }],
+                })
 
     def model(self, **kwargs):
         is_selection = "candidate_id" in kwargs["schema"].get("properties", {})
@@ -115,7 +139,7 @@ class RuntimeFixture:
                 "missing_information": [],
             }
         else:
-            value = {"observations": [{
+            value = {"observations": [self.lifecycle_observation.model_dump(mode="json")]} if self.lifecycle else {"observations": [{
                 "discipline": "electrical",
                 "work_type": "cable_laying",
                 "event_type": "actual_progress",
@@ -160,9 +184,7 @@ class RuntimeFixture:
                 db.get(Job, self.job_id),
                 token=token or self.token,
                 session_factory=session_factory,
-                database_url=(
-                    "postgresql+psycopg://progress:progress@127.0.0.1:5432/progress_test"
-                ),
+                database_url=get_settings().database_url,
                 should_stop=should_stop,
                 heartbeat_callback=heartbeat_callback,
                 model_callable=self.model,
@@ -241,6 +263,70 @@ def test_postgres_graph_happy_path_has_sanitized_trace(runtime_fixture):
         assert db.scalar(select(func.count()).select_from(ProgressEvent).join(
             Observation, ProgressEvent.observation_id == Observation.id
         ).where(Observation.job_id == runtime_fixture.job_id)) == 0
+
+
+def test_legacy_and_graph_lifecycle_proposals_have_matching_effects():
+    fixture = RuntimeFixture(lifecycle=True)
+    try:
+        with session_factory() as db:
+            fragment = db.get(Fragment, fixture.fragment_id)
+            direct = extract_fragments([FragmentInput(str(fragment.id), fragment.locator,
+                                                       fragment.normalised_text, fragment.ordinal)],
+                                       fixture.model, report_date=date(2026, 9, 24), report_date_trusted=True)
+            assert direct[0].observations, direct[0].errors
+        result = fixture.run()
+        assert result["state"] == "ready_for_review"
+        if result["extracted_count"] != 1:
+            with session_factory() as db:
+                run = db.scalar(select(AgentRun).where(AgentRun.job_id == fixture.job_id))
+                details = [(step.node, step.sanitized_summary) for step in run.steps]
+            pytest.fail(f"lifecycle graph extraction yielded no observation: {result}; {details}")
+        with session_factory.begin() as db:
+            graph_proposal = db.scalar(select(Proposal).join(
+                Observation, Observation.id == Proposal.observation_id
+            ).where(Observation.job_id == fixture.job_id))
+            graph_effects = graph_proposal.proposed_effects
+
+            report = Report(project_id=fixture.project_id, content_hash=uuid4().hex,
+                            report_date=date(2026, 9, 24), report_date_evidence="header")
+            db.add(report)
+            db.flush()
+            fragment = Fragment(report_id=report.id, ordinal=1, locator="paragraph:1",
+                                original_text="Started on 2026-09-24.",
+                                normalised_text="Started on 2026-09-24.")
+            job = Job(project_id=fixture.project_id, report_id=report.id,
+                      schedule_version_id=fixture.schedule_id)
+            db.add_all([fragment, job])
+            db.flush()
+            payload = fixture.lifecycle_observation.model_dump(mode="python")
+            for evidence in payload["evidence"]:
+                evidence["fragment_id"] = str(fragment.id)
+            for effect in payload["lifecycle_effects"]:
+                for evidence in effect["evidence"]:
+                    evidence["fragment_id"] = str(fragment.id)
+            observation = ObservationSchema.model_validate(payload)
+            activity = db.get(Activity, fixture.activity_id)
+            process_job(
+                db, job, extraction_call=lambda _fragments: [observation],
+                retrieve_call=lambda *_args: [activity],
+                selection_call=lambda *_args: {
+                    "candidate_id": str(activity.id), "mapping_state": "suggested",
+                    "match_strength": "review", "candidates": [],
+                    "explanation": "fixture selection", "reason_codes": [],
+                    "missing_information": [], "warnings": [],
+                },
+            )
+            legacy_proposal = db.scalar(select(Proposal).join(
+                Observation, Observation.id == Proposal.observation_id
+            ).where(Observation.job_id == job.id))
+            legacy_effects = json.loads(json.dumps(legacy_proposal.proposed_effects))
+            graph_effects = json.loads(json.dumps(graph_effects))
+            for effects in (legacy_effects, graph_effects):
+                for evidence in effects["evidence"]:
+                    evidence["fragment_id"] = "<source-fragment>"
+            assert legacy_effects == graph_effects
+    finally:
+        fixture.cleanup()
 
 
 @pytest.mark.parametrize(

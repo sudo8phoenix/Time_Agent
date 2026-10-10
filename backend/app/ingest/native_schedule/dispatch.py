@@ -7,6 +7,7 @@ from xml.etree import ElementTree
 
 from app.ingest.native_schedule.microsoft import read_schedule as read_microsoft
 from app.ingest.native_schedule.primavera import read_schedule as read_primavera
+from app.ingest.schedule_datasets.gt10_preview import read_schedule as read_gt10
 from app.ingest.native_schedule.runner import ParserRuntimeError
 from app.schemas.native_schedule import SchedulePreview
 
@@ -17,10 +18,12 @@ def preview_schedule(path: Path, source_project_id: str | None = None) -> Schedu
         return read_primavera(path, source_project_id)
     if suffix == ".mpp":
         return read_microsoft(path, source_project_id)
+    if suffix == ".xlsx":
+        return read_gt10(path, source_project_id)
     if suffix != ".xml":
         raise ParserRuntimeError(
             "SCHEDULE_FORMAT_UNSUPPORTED",
-            "Supported native formats are XER, P6 XML, MSPDI XML and MPP.",
+            "Supported native formats are XER, P6 XML, MSPDI XML, MPP and GT10 XLSX.",
         )
     raw = path.read_bytes()
     if b"<!doctype" in raw.lower():

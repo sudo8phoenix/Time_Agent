@@ -18,3 +18,10 @@ weights/
 *.bak
 *.egg-info/
 .DS_Store
+
+# Local prototype receiver state
+mock-pmis.sqlite3*
+
+# Recursive editor/cache artifacts
+**/.DS_Store
+**/__pycache__/

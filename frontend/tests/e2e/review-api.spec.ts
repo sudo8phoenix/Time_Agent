@@ -69,6 +69,7 @@ for (const width of [390, 1440]) {
     await page.getByLabel("Username").fill("reviewer");
     await page.getByLabel("Password").fill("test-password");
     await page.getByRole("button", { name: /Sign in/ }).click();
+    await expect(page.getByText("Ready for intake", { exact: true })).toBeVisible();
     await page.getByLabel("Paste report text").fill("Installed 2 spools today.");
     await page.getByLabel("Report date", { exact: true }).fill("2026-09-25");
     await page.getByRole("button", { name: /Create review job/ }).click();

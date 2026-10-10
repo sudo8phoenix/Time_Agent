@@ -1,37 +1,40 @@
-# Local release status
+# Local prototype release evidence — 10 October 2026
 
-Status date: 23 September 2026. This is a local release candidate, not a hosted or model-evaluated release.
+This working tree implements the public/synthetic construction-progress prototype. It is not an independently validated release or owner-package acceptance. The completed implementation and remaining acceptance gates are recorded here; versioned task handoffs provide the supporting implementation evidence.
 
-Agent-framework note, 24 September 2026: W-31–W-36 are accepted. The repository now has strict sanitized trace records, migration `0008_agent_runs`, the fixed 11-node graph, migration-owned PostgreSQL checkpoints, lease-aware durable provenance resume, idempotent persistence/finalization, sanitized telemetry and exact terminal checkpoint pruning. The application still defaults to the legacy pipeline. W-37–W-39 status visibility, frontend display, parity/security/backup/rollback and a real private-Ollama graph smoke remain pending.
+## Source and runtime
 
-## Verified
+Base commit: `a174963ab1654e48e909d9aac3713897da7f1db9`. Verification includes uncommitted changes and untracked implementation files; the base commit alone cannot reproduce this state. No new commit was created. The release evidence manifest records SHA-256 for application, migration, test, operations, evaluation and frontend sources. Record a new immutable commit before packaging a release.
 
-- Unit suite: 150 passed.
-- Isolated PostgreSQL integration suite: 49 passed, including persisted worker embeddings and ten durable graph-runtime cases.
-- Four native formats pass bounded parsing and authenticated preview → mapping → staging → activation → retrieval flows, including a real MPP fixture.
-- Production frontend build and source-contract checks pass.
-- Human approval safety, concurrent approval, corrections, source evidence, rollback, safe CSV export, backup and separate-database restore are covered.
-- The API serves the production frontend locally and keeps unknown `/api/*` routes as JSON 404 responses.
-- Private remote-Ollama configuration is server-side, endpoint-restricted, bounded, and has a fail-fast readiness command.
+Python 3.12.14; Node 26.0.0; npm 11.12.1; OpenJDK 25.0.1; PostgreSQL container 16.6. Python pins are in `pyproject.toml`/`uv.lock`; frontend pins are in `frontend/package-lock.json`. Lock hashes:
 
-## Open release gates
+- `uv.lock`: `d9fc6a58f24fbf75fb9d99e5bed28e410ee3a9cde0e6ec9f0b306c3ca45269ce`
+- `frontend/package-lock.json`: `438ccc28d5cbe697e5b8757c2569f8849f4204a8bea766c435601ca4e98ee96f`
 
-- Friend-hosted Ollama readiness, exact model digest, latency and live extraction/selection evaluation.
-- Human review of the W-03 and W-29 label worksheets.
-- Browser walkthrough of login, import, report processing, review/correction/approval, progress history and CSV export.
-- Demo rehearsal on the actual two-laptop Tailscale network.
-- Public-host checks are deferred by user decision.
+Default execution remains `legacy`; graph rollout stays gated. Migration head is `0014_audited_reanalysis`. Only isolated test/recovery databases were migrated for these checks. Applying migrations to the application database remains a deployment action.
 
-Do not present fixture-only retrieval, injected-model tests, synthetic labels, or parser fixtures as live model accuracy. Do not claim W-03/W-29 as reviewed until the review sheets are signed off.
+No model was called in this verification. Fixture models were injected for deterministic pipeline checks; browser fixture tests intercept API responses. The earlier Gemma connection/extraction smoke in [evaluation/RESULTS.md](../evaluation/RESULTS.md) is historical compatibility evidence, not E02 unseen workflow evidence. Server-side configuration controls the endpoint and model. Reanalysis records a requested configuration snapshot and the actual pipeline provenance separately; it does not permit browser-supplied configuration overrides.
 
-## Release procedure
+## Tested behavior
 
-1. Follow [local-run.md](local-run.md) and record `make doctor` output.
-2. Record the exact Ollama tag, digest, runtime version, quantization, configuration and test-machine details.
-3. Complete the label review sheets; preserve corrections and regenerate any derived held-out manifest.
-4. Run the full unit, integration, native smoke, frontend build and contract checks.
-5. Run the real-model evaluation and save predictions separately from reference labels.
-6. Perform the browser walkthrough and record observed failures rather than silently bypassing them.
-7. Stop intake/worker, create a backup, and verify it into a new database.
-8. Rehearse model outage, duplicate submission, unauthorized access and restart recovery.
-9. Update `evaluation/RESULTS.md`, both task boards and this file with measured evidence.
+Quantity-free actual starts/finishes retain date/time precision, scope and source evidence. Authorized reviewers accept proposals; conversations alone do not authorize changes. Corrections/retractions preserve history and recompute current state. Report mapping and PDF transcription preserve original cell/page attribution. History/export separates event values from current state, and duration queries disclose unavailable calendar/labour inputs.
+
+Explicit reanalysis creates a linked job with actor, reason, pinned schedule and configuration. Ordinary duplicate submission returns the original base job. Cross-run repeat application of accepted source work is blocked; accepted work changes through the existing correction workflow. Backup manifests verify row-content hashes for jobs, lifecycle state/events, observations/proposals/audit, graph records, conversations and outbox, plus original-file hashes.
+
+The connector and receiver are labelled **MOCK PMIS — prototype**. Automatic outbox delivery, read-back, retry and correction ordering have fixture coverage. This is not a production PMIS integration.
+
+## Fresh verification
+
+211 unit tests, 102 isolated PostgreSQL integration tests and 33 browser fixtures passed. Final counts and command results are recorded in [E01–E03 verification](validation/e01-e03-verification-2026-10-10.json). Native smoke parsed all six required inputs, including XER, P6 XML, MSPDI and real MPP, and rejected the malformed XML fixture. Frontend type checking, production build and contract assertions passed.
+
+A fresh source database `progress_recovery_e01_20261010` was migrated and seeded with explicitly synthetic data using `ops/seed_e01_recovery.py`. `ops/backup.py` created `/private/tmp/e01-recovery-20261010/backup-v2`; `ops/restore_verify.py` restored it into the new `progress_restore_e01_20261010` database and `/private/tmp/e01-recovery-20261010/restored-uploads`. Verification passed for two accepted events, one immutable original, three jobs, one graph operational record, one conversation/turn and one pending outbox record; state/event/lineage/payload content hashes matched. The restored pending outbox then delivered in one attempt to a separate loopback HTTP receiver, whose read-back matched revision 2 and 08:30 minute precision. The receiver's separate storage is outside this application-database backup. Temporary artifacts and both databases were left separate for inspection.
+
+## Remaining acceptance gates
+
+- D04 independent event-label review/adjudication and D05 reviewed, frozen leakage-aware splits.
+- A02 calibrated thresholds from reviewed validation inputs; no fabricated threshold or confidence probability.
+- E02 real unseen UI → live model → shortlist/match → reviewer acceptance → internal update → mock read-back → export capture, with agreed quality/latency targets and all failures included. [Proposed targets](evaluation-targets-draft.md) await agreement; they are not achieved results.
+- Owner sample package remains `not_received`. Register/hash it when supplied, review mappings and calendar/timezone semantics, and repeat project-specific validation. Cambridge/GT10 and synthetic reports do not replace it.
+- Commit the verified tree, freeze exact model digest/config and release artifacts, and rehearse on the intended laptop/network setup before a release claim.
+
+E03 documentation reconciliation is implemented; its full release gate remains pending E02 and the independent data gates. Public/synthetic fixture verification must be reported separately from owner-package and live-model validation.

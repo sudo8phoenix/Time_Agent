@@ -79,7 +79,7 @@ def parse_bytes(raw: bytes, filename: str, mime: str) -> tuple[list[tuple[str, s
                     raise ValueError("document expands beyond 50 MB limit")
         except zipfile.BadZipFile as exc:
             raise ValueError("invalid document archive") from exc
-    if suffix in ("", ".txt") or mime.startswith("text/"):
+    if suffix in ("", ".txt") or (suffix not in {".pdf", ".xlsx", ".docx"} and mime.startswith("text/")):
         try: text = raw.decode("utf-8-sig")
         except UnicodeDecodeError as exc: raise ValueError("text file must be UTF-8") from exc
         if not text.strip(): raise ValueError("report is empty")
@@ -107,14 +107,19 @@ def parse_bytes(raw: bytes, filename: str, mime: str) -> tuple[list[tuple[str, s
         try:
             from pypdf import PdfReader
         except ImportError as exc: raise ValueError("PDF support is unavailable") from exc
-        reader=PdfReader(io.BytesIO(raw))
+        try:
+            reader=PdfReader(io.BytesIO(raw))
+            if reader.is_encrypted:
+                raise ValueError("encrypted PDF requires an unlocked source")
+        except Exception as exc:
+            raise ValueError("invalid or encrypted PDF document") from exc
         if len(reader.pages)>MAX_PDF_PAGES: raise ValueError("PDF exceeds 20 page limit")
         parts=[]
         for i,page in enumerate(reader.pages,1):
             text=(page.extract_text() or "").strip()
             if len(re.sub(r"\s+", "", text)) < 40:
                 warnings.append(f"NEEDS_TRANSCRIPTION:page:{i}")
-            if text: add_part(parts, f"page:{i}", text)
+            add_part(parts, f"page:{i}", text)
         if not parts: raise ValueError("PDF contains no extractable text")
         return parts,warnings,"pdf"
     if suffix in (".xlsx",):
@@ -138,26 +143,40 @@ def parse_bytes(raw: bytes, filename: str, mime: str) -> tuple[list[tuple[str, s
         return parts,warnings,"xlsx"
     raise ValueError("unsupported report format")
 
-def ingest_report(db: Session, project: Project, raw: bytes, *, filename: str|None=None, mime: str="text/plain", report_date: date|None=None, report_date_evidence: str|None=None, source_label: str|None=None, uploader_id=None):
+def ingest_report(db: Session, project: Project, raw: bytes, *, filename: str|None=None, mime: str="text/plain", report_date: date|None=None, report_date_evidence: str|None=None, source_label: str|None=None, uploader_id=None, mapping=None, ingestion_metadata=None, parsed_parts=None):
     if not raw: raise ValueError("report is empty")
     if len(raw)>MAX_BYTES: raise ValueError("report exceeds 10 MB limit")
     name=_filename(filename); digest=hashlib.sha256(raw).hexdigest()
     # The existing unique constraint covers project and content_hash. Include the
     # work date in that identity while preserving the raw checksum on FileRecord.
-    identity=hashlib.sha256(f"{digest}:{report_date.isoformat() if report_date else ''}".encode()).hexdigest()
+    metadata = dict(ingestion_metadata or {})
+    if mapping is not None:
+        from .report_mapping import mapped_rows
+        fragments, errors, mapped_metadata = mapped_rows(raw, mapping)
+        if errors:
+            raise ValueError("XLSX_ROW_ERRORS:" + json.dumps(errors))
+        if not fragments:
+            raise ValueError("XLSX contains no report rows")
+        metadata.update(mapped_metadata)
+        warnings, kind = [], "xlsx"
+    elif parsed_parts is not None:
+        fragments, warnings, kind = parsed_parts, [], "transcription"
+    else:
+        fragments,warnings,kind=parse_bytes(raw,name,mime)
+    identity_context = json.dumps(metadata, sort_keys=True, default=str) if metadata else ""
+    identity=hashlib.sha256(f"{digest}:{report_date.isoformat() if report_date else ''}:{identity_context}".encode()).hexdigest() if metadata else hashlib.sha256(f"{digest}:{report_date.isoformat() if report_date else ''}".encode()).hexdigest()
     existing=db.scalar(select(Report).where(Report.project_id==project.id, or_(
         Report.content_hash==identity,
-        and_(Report.content_hash==digest, Report.report_date==report_date),
+        and_(Report.content_hash==digest, Report.report_date==report_date) if not metadata else False,
     )))
     if existing: return existing, True
-    fragments,warnings,kind=parse_bytes(raw,name,mime)
     if sum(len(text) for _, text in fragments)>MAX_EXTRACTED_CHARS: raise ValueError("extracted report text exceeds limit")
     storage_key=f"{project.id}/{uuid.uuid4().hex}-{name}"
     _store_original(storage_key, raw)
     try:
         record=FileRecord(project_id=project.id, original_filename=name, storage_key=storage_key, sha256=digest, mime_type=mime, size=len(raw), source_kind=kind, uploader_id=uploader_id)
         db.add(record); db.flush()
-        report=Report(project_id=project.id,file_id=record.id,report_date=report_date,report_date_evidence=report_date_evidence,source_label=source_label,content_hash=identity,parsing_warnings=json.dumps(warnings))
+        report=Report(project_id=project.id,file_id=record.id,report_date=report_date,report_date_evidence=report_date_evidence,source_label=source_label,content_hash=identity,parsing_warnings=json.dumps(warnings),ingestion_metadata=metadata or None)
         db.add(report); db.flush()
         for ordinal,(locator,text) in enumerate(fragments,1):
             db.add(Fragment(report_id=report.id,ordinal=ordinal,locator=locator,original_text=text,normalised_text=_normalise(text),ocr_status="NEEDS_TRANSCRIPTION" if locator in {w.split(":",1)[1] for w in warnings if w.startswith("NEEDS_TRANSCRIPTION:")} else "NOT_REQUIRED"))

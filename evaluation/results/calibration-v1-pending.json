@@ -1,0 +1,25 @@
+{
+  "version": "review-calibration-v1",
+  "status": "pending_independent_review",
+  "verified_fixture": true,
+  "independently_reviewed": false,
+  "thresholds": {
+    "field": null,
+    "event": null,
+    "link": null
+  },
+  "authorized_acceptance_required": true,
+  "reasons": [
+    "D04 labels have not been independently reviewed.",
+    "D05 underlying project/scenario groups and split manifest are not frozen/reviewed.",
+    "Current extraction and linking estimators provide no validated probabilities."
+  ],
+  "dependency_hashes": {
+    "docs/handoffs/V2-D04.md": "b7a33e8b5b11a5cb9070ce5c151932fc2160a3105ec53ca79ff5ef21fe851c5b",
+    "docs/handoffs/V2-D05.md": "c948dfb2c9b16d43ed87da37f2c9ecac4dc57521cf747238925b0e65b3b52601",
+    "data/review/v2-label-adjudication.jsonl": "79dd1be9c41bb0bd984162e0530bfed24e59a7f78dd87fde2f33941c7793862f",
+    "data/synthetic/v2/split-check.json": "6cbe36302ee7c9c86080b27b0138865109bb4017d80140dbaddecffa75620ed5"
+  },
+  "holdout_labels_read": false,
+  "limitation": "No operational thresholds or measured model accuracy are claimed."
+}

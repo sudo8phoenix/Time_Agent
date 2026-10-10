@@ -1,4 +1,4 @@
-from datetime import date, datetime
+from datetime import date, datetime, time
 from decimal import Decimal
 from uuid import UUID, uuid4
 from sqlalchemy import (
@@ -6,11 +6,13 @@ from sqlalchemy import (
     CheckConstraint,
     Date,
     DateTime,
+    Time,
     ForeignKey,
     Integer,
     Numeric,
     String,
     Text,
+    text,
     UniqueConstraint,
     Index,
     func,
@@ -116,6 +118,14 @@ class ActivityState(Base):
     actual_start: Mapped[date | None] = mapped_column(Date)
     actual_finish: Mapped[date | None] = mapped_column(Date)
     last_observed_date: Mapped[date | None] = mapped_column(Date)
+    actual_start_time: Mapped[time | None] = mapped_column(Time)
+    actual_finish_time: Mapped[time | None] = mapped_column(Time)
+    actual_start_precision: Mapped[str | None] = mapped_column(String(10))
+    actual_finish_precision: Mapped[str | None] = mapped_column(String(10))
+    lifecycle_status: Mapped[str | None] = mapped_column(String(30))
+    lifecycle_source_version_id: Mapped[UUID | None] = mapped_column(ForeignKey("schedule_versions.id"))
+    lifecycle_start_event_id: Mapped[UUID | None] = mapped_column(ForeignKey("progress_events.id"))
+    lifecycle_finish_event_id: Mapped[UUID | None] = mapped_column(ForeignKey("progress_events.id"))
     activity: Mapped[Activity] = relationship(back_populates="state")
 
 
@@ -179,6 +189,7 @@ class Report(Base):
     report_date_evidence: Mapped[str | None] = mapped_column(Text)
     source_label: Mapped[str | None] = mapped_column(String(255))
     source_revision: Mapped[str | None] = mapped_column(String(100))
+    ingestion_metadata: Mapped[dict | None] = mapped_column(JSON)
     content_hash: Mapped[str] = mapped_column(String(64), index=True)
     parsing_warnings: Mapped[str | None] = mapped_column(Text)
     created_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), server_default=func.now())
@@ -186,7 +197,9 @@ class Report(Base):
 
 class Job(Base):
     __tablename__ = "jobs"
-    __table_args__ = (UniqueConstraint("project_id", "report_id", name="uq_jobs_project_report"),)
+    __table_args__ = (Index("uq_jobs_project_report_base", "project_id", "report_id", unique=True,
+                            postgresql_where=text("parent_job_id IS NULL")),
+                      UniqueConstraint("reanalysis_key", name="uq_jobs_reanalysis_key"))
     id: Mapped[UUID] = mapped_column(primary_key=True, default=uuid4)
     project_id: Mapped[UUID] = mapped_column(
         ForeignKey("projects.id", ondelete="CASCADE"), index=True
@@ -194,6 +207,11 @@ class Job(Base):
     report_id: Mapped[UUID] = mapped_column(
         ForeignKey("reports.id", ondelete="CASCADE"), index=True
     )
+    parent_job_id: Mapped[UUID | None] = mapped_column(ForeignKey("jobs.id"), nullable=True, index=True)
+    reanalysis_key: Mapped[str | None] = mapped_column(String(200), nullable=True)
+    reanalysis_actor_id: Mapped[UUID | None] = mapped_column(ForeignKey("users.id"), nullable=True)
+    reanalysis_reason: Mapped[str | None] = mapped_column(Text)
+    config_snapshot: Mapped[dict | None] = mapped_column(JSON)
     schedule_version_id: Mapped[UUID] = mapped_column(ForeignKey("schedule_versions.id"))
     state: Mapped[str] = mapped_column(String(32), default="queued", index=True)
     stage: Mapped[str | None] = mapped_column(String(32))
@@ -429,6 +447,15 @@ class ProgressEvent(Base):
         ForeignKey("progress_events.id"), nullable=True
     )
     source_key: Mapped[str | None] = mapped_column(String(255), unique=True, nullable=True)
+    lifecycle_scope: Mapped[str | None] = mapped_column(String(30))
+    endpoint_time: Mapped[time | None] = mapped_column(Time)
+    endpoint_precision: Mapped[str | None] = mapped_column(String(10))
+    endpoint_timezone: Mapped[str | None] = mapped_column(String(64))
+    endpoint_basis: Mapped[str | None] = mapped_column(String(40))
+    endpoint_raw_expression: Mapped[str | None] = mapped_column(String(500))
+    endpoint_instant: Mapped[datetime | None] = mapped_column(DateTime(timezone=True))
+    endpoint_evidence: Mapped[list | None] = mapped_column(JSON)
+    source_schedule_version_id: Mapped[UUID | None] = mapped_column(ForeignKey("schedule_versions.id"))
     __table_args__ = (
         Index(
             "uq_progress_events_active_observation",
@@ -502,4 +529,63 @@ class IdempotencyKey(Base):
     request_hash: Mapped[str] = mapped_column(String(64))
     result_reference: Mapped[dict | None] = mapped_column(JSON, nullable=True)
     status: Mapped[str] = mapped_column(String(24), default="completed")
+    created_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), server_default=func.now())
+
+
+class Conversation(Base):
+    __tablename__ = "conversations"
+    id: Mapped[UUID] = mapped_column(primary_key=True, default=uuid4)
+    project_id: Mapped[UUID] = mapped_column(ForeignKey("projects.id", ondelete="CASCADE"), index=True)
+    creator_id: Mapped[UUID] = mapped_column(ForeignKey("users.id"), index=True)
+    schedule_version_id: Mapped[UUID] = mapped_column(ForeignKey("schedule_versions.id"))
+    revision: Mapped[int] = mapped_column(Integer, default=0)
+    status: Mapped[str] = mapped_column(String(30), default="draft")
+    draft: Mapped[dict] = mapped_column(JSON, default=dict)
+    pending_question: Mapped[str | None] = mapped_column(String(30))
+    job_id: Mapped[UUID | None] = mapped_column(ForeignKey("jobs.id"))
+    created_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), server_default=func.now())
+    updated_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), server_default=func.now(), onupdate=func.now())
+
+
+class ConversationTurn(Base):
+    __tablename__ = "conversation_turns"
+    __table_args__ = (UniqueConstraint("conversation_id", "ordinal"),)
+    id: Mapped[UUID] = mapped_column(primary_key=True, default=uuid4)
+    conversation_id: Mapped[UUID] = mapped_column(ForeignKey("conversations.id", ondelete="CASCADE"), index=True)
+    ordinal: Mapped[int] = mapped_column(Integer)
+    actor_id: Mapped[UUID | None] = mapped_column(ForeignKey("users.id"))
+    role: Mapped[str] = mapped_column(String(20))
+    text: Mapped[str] = mapped_column(Text)
+    created_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), server_default=func.now())
+
+
+class IntegrationOutbox(Base):
+    __tablename__ = "integration_outbox"
+    __table_args__ = (UniqueConstraint("activity_id", "state_revision"),
+                      Index("ix_outbox_pending", "status", "next_attempt_at"))
+    id: Mapped[UUID] = mapped_column(primary_key=True, default=uuid4)
+    project_id: Mapped[UUID] = mapped_column(ForeignKey("projects.id", ondelete="CASCADE"))
+    activity_id: Mapped[UUID] = mapped_column(ForeignKey("activities.id", ondelete="CASCADE"))
+    state_revision: Mapped[int] = mapped_column(Integer)
+    payload: Mapped[dict] = mapped_column(JSON)
+    status: Mapped[str] = mapped_column(String(20), default="pending")
+    attempts: Mapped[int] = mapped_column(Integer, default=0)
+    created_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), server_default=func.now())
+    attempted_at: Mapped[datetime | None] = mapped_column(DateTime(timezone=True))
+    next_attempt_at: Mapped[datetime | None] = mapped_column(DateTime(timezone=True))
+    delivered_at: Mapped[datetime | None] = mapped_column(DateTime(timezone=True))
+    last_error: Mapped[str | None] = mapped_column(Text)
+    receipt: Mapped[dict | None] = mapped_column(JSON)
+
+
+class ReportMapping(Base):
+    __tablename__ = "report_mappings"
+    __table_args__ = (UniqueConstraint("project_id", "template", "header_signature", "revision"),)
+    id: Mapped[UUID] = mapped_column(primary_key=True, default=uuid4)
+    project_id: Mapped[UUID] = mapped_column(ForeignKey("projects.id", ondelete="CASCADE"))
+    template: Mapped[str] = mapped_column(String(100))
+    header_signature: Mapped[str] = mapped_column(String(64))
+    revision: Mapped[int] = mapped_column(Integer)
+    spec: Mapped[dict] = mapped_column(JSON)
+    actor_id: Mapped[UUID] = mapped_column(ForeignKey("users.id"))
     created_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), server_default=func.now())

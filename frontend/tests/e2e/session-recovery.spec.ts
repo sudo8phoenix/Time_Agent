@@ -8,6 +8,11 @@ test("restores session, saves drafts, isolates projects and confirms logout", as
     if (path === "/auth/me") return route.fulfill(authenticated ? { json: { id: "user", username: "reviewer", role: "reviewer", csrf_token: "csrf" } } : { status: 401, json: { detail: "Invalid or expired session" } });
     if (path === "/auth/login") { authenticated = true; return route.fulfill({ json: { csrf_token: "csrf", user: { id: "user", username: "reviewer", role: "reviewer" } } }); }
     if (path === "/projects") return route.fulfill({ json: { items: projects } });
+    if (/^\/projects\/[^/]+\/(history|blockers|durations)$/.test(path)) {
+      if (path.endsWith("/durations")) return route.fulfill({ json: { items: [], next_offset: null } });
+      if (path.endsWith("/blockers")) return route.fulfill({ json: { items: [] } });
+      return route.fulfill({ json: { items: [], total: 0, next_offset: null } });
+    }
     if (path === "/auth/logout") { if (logoutFails) return route.fulfill({ status: 503, json: { detail: "Server unavailable" } }); authenticated = false; return route.fulfill({ status: 204 }); }
     if (path.endsWith("/progress")) return route.fulfill(authenticated ? { json: { project_id: "one", project_name: "Project one", schedule_version: 1, counts: { activities: 0, approved_events: 0, pending_review: 0 }, items: [], notice: "Approved progress" } } : { status: 401, json: { detail: "Invalid or expired session" } });
     throw new Error(`Unexpected request ${path}`);

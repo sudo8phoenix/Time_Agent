@@ -36,7 +36,7 @@ def test_pipeline_no_fragments_is_safe_terminal(db):
 
 def _job(db):
     project = Project(name=f"pipeline-{uuid4().hex}"); db.add(project); db.flush()
-    version = ScheduleVersion(project_id=project.id, version_number=1, content_sha256=uuid4().hex); db.add(version); db.flush()
+    version = ScheduleVersion(project_id=project.id, version_number=1, content_sha256=uuid4().hex, state="active"); db.add(version); db.flush(); project.active_schedule_version_id = version.id
     activity = Activity(schedule_version_id=version.id, external_id="A-1", name="Install pipe", wbs="1", discipline="piping", work_type="pipe_spool_erection", area="A", is_leaf=True, measurement_basis="quantity_ratio", unit="spool"); db.add(activity)
     report = Report(project_id=project.id, content_hash=uuid4().hex); db.add(report); db.flush()
     fragment = Fragment(report_id=report.id, ordinal=1, locator="paragraph:1", original_text="Installed 2 spools in Area A", normalised_text="Installed 2 spools in Area A"); db.add(fragment); db.flush()
@@ -54,6 +54,9 @@ def test_pipeline_persists_traceable_proposal_and_is_idempotent(db):
     assert result["extracted_count"]==result["proposal_count"]==1
     row=db.query(Observation).filter(Observation.job_id == job.id).one()
     proposal=db.query(Proposal).filter(Proposal.observation_id == row.id).one()
+    assert row.field_evidence["provenance"]["original_fields"] == row.fields
+    assert row.field_evidence["provenance"]["original_selection"]["candidate_id"] == str(activity.id)
+    assert row.field_evidence["provenance"]["confidence"]["extraction"]["validation_status"] == "unavailable"
     assert row.fragment_id==fragment.id; assert proposal.chosen_activity_id==activity.id
     assert db.query(ProgressEvent).filter(ProgressEvent.observation_id == row.id).count()==0
     assert db.query(ActivityState).filter(ActivityState.activity_id == activity.id).count()==0

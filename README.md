@@ -22,11 +22,11 @@ The application is intended to run on a laptop with FastAPI, PostgreSQL, and a R
 
 ## Current status
 
-The repository contains the accepted local release candidate plus ongoing lifecycle and schedule-data work. The default execution mode remains `legacy` while the graph path and live model workflow complete their release gates.
+The current working tree implements quantity-free lifecycle events, text conversations, planner resolution, flexible report intake, precision-aware history/durations, automatic **MOCK PMIS — prototype** delivery, and audited report reanalysis. The default execution mode remains `legacy`; graph rollout stays gated.
 
-The documented baseline includes 150 unit tests, 49 PostgreSQL integration tests, native schedule smoke coverage, frontend build and contract checks, approval safety, rollback, backup and restore verification, and private Ollama readiness checks. The current working tree also includes lifecycle acceptance flows, expanded schedule datasets, review artifacts, and browser coverage that are still being consolidated into the next release record.
+Fresh verification and exact runtime/source identifiers are recorded in [`docs/release.md`](docs/release.md). Changes are uncommitted, so the recorded base commit alone does not reproduce this working tree. Tests use isolated databases and explicitly synthetic/injected-model fixtures.
 
-Fixture-only retrieval, injected-model tests, and synthetic labels do not measure live model accuracy. A release still requires real private-Ollama evaluation, human label review, a browser walkthrough, and a two-laptop demo rehearsal. See [`docs/release.md`](docs/release.md) for the evidence and remaining gates.
+Independent label review, frozen evaluation splits, calibrated thresholds and a real unseen UI-to-export model run remain pending. The owner sample package is `not_received`. Public Cambridge/GT10 schedules and synthetic reports are development inputs, not owner-package or independently reviewed field truth. See [`docs/release.md`](docs/release.md) for current validation and remaining release gates.
 
 ## Architecture
 
