@@ -59,6 +59,17 @@ Open `http://127.0.0.1:8000`. The API serves the already-built frontend from `fr
 
 The worker is deliberately single-process for the laptop profile. Stop it with Ctrl-C; durable jobs may be reclaimed after their lease expires.
 
+Report model calls allow one bounded request with `REPORT_MODEL_TIMEOUT_SECONDS`
+(default 360 seconds, configurable from 30 to 900). A reachable model inventory
+does not guarantee generation will finish within that limit. Model connection,
+timeout, and invalid-response failures appear on the job page.
+
+If a model assigns a report-context date without a trusted reviewer-entered report
+date, extraction keeps the evidence-backed observation for clarification and
+removes the unsupported dates and lifecycle effects. It cannot apply progress
+until the reviewer resolves the date. If all items fail evidence validation, the
+job reports an extraction failure instead of an empty successful review.
+
 Hybrid retrieval uses the optional local `sentence-transformers/all-MiniLM-L6-v2` adapter only when its pinned runtime and weights have already been provisioned on this Mac. It never downloads weights while processing a job. Until those assets are installed, the worker reports the limitation and safely uses lexical retrieval; do not describe that fallback as a measured hybrid-model result.
 
 ## Checks
@@ -101,6 +112,10 @@ Run the explicitly labelled local mock receiver and connector in separate termin
 PYTHONPATH=backend .venv/bin/python ops/mock_pmis_server.py --db /absolute/path/mock-pmis.sqlite3 --port 8091
 PYTHONPATH=backend .venv/bin/python ops/run_connector.py --url http://127.0.0.1:8091
 ```
+
+For a test restricted to one project, append `--project-id <project-UUID>` to the
+connector command. Other projects' pending deliveries remain queued. Without
+that option, the connector processes pending deliveries across all projects.
 
 Choose a writable persistent receiver database path before starting it. The outbox is part of the application backup; the receiver's separate persistent store must be backed up separately when preserving destination read-back state.
 

@@ -1,0 +1,6 @@
+activity_id,activity_name,wbs_path,discipline,work_type,area,asset_tags,is_leaf,measurement_basis,planned_quantity,unit,planned_start,planned_finish,baseline_date,baseline_quantity,actual_start,actual_finish,aliases
+CIV-A-EXC-01,Excavate footing F-01,DEMO-UTILITY-01/AREA-A/CIVIL/F-01,civil,excavation,AREA-A,F-01,true,quantity_ratio,100,m3,2026-09-19,2026-09-29,2026-09-19,0,,,
+CIV-A-REBAR-01,Fix rebar for footing F-01,DEMO-UTILITY-01/AREA-A/CIVIL/F-01,civil,rebar_installation,AREA-A,F-01,true,quantity_ratio,1000,kg,2026-09-19,2026-10-01,2026-09-19,0,,,
+CIV-A-FORM-01,Formwork for footing F-01,DEMO-UTILITY-01/AREA-A/CIVIL/F-01,civil,formwork,AREA-A,F-01,true,quantity_ratio,80,m2,2026-09-19,2026-10-01,2026-09-19,0,,,
+CIV-A-POUR-01,Concrete footing F-01,DEMO-UTILITY-01/AREA-A/CIVIL/F-01,civil,concrete_pour,AREA-A,F-01,true,quantity_ratio,50,m3,2026-09-19,2026-10-03,2026-09-19,0,,,concrete placed
+ELE-A-CABLE-01,Lay cable on tray TR-A,DEMO-UTILITY-01/AREA-A/ELECTRICAL/TR-A,electrical,cable_laying,AREA-A,TR-A,true,quantity_ratio,500,m,2026-09-19,2026-10-10,2026-09-19,0,,,

@@ -1,0 +1,10 @@
+{
+  "source": "data/synthetic/schedules/demo-utility-01.csv",
+  "schedule": "data/synthetic/five-entry-review/schedule.csv",
+  "activity_count": 5,
+  "content_sha256": "65a514441b30967e79d8ddd56a6ae6d9b9c8ba0e73853c2ad831b51cfd3d317d",
+  "parser_errors": [],
+  "source_rows_preserved": true,
+  "app_started": false,
+  "schedule_imported": false
+}

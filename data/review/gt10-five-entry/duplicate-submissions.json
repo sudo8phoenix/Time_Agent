@@ -1,0 +1,32 @@
+[
+  {
+    "activity": "SUP-GF-01",
+    "report_id": "219a33b6-aac1-439b-947e-68e5a49b7bc8",
+    "job_id": "8c955efe-d486-41f2-b32e-20159745621b",
+    "existing": true
+  },
+  {
+    "activity": "SUP-GF-02",
+    "report_id": "a80ea932-242f-478c-bb4f-556cfd972290",
+    "job_id": "fc36936e-6f31-4f2d-b46f-932be2d2f82c",
+    "existing": true
+  },
+  {
+    "activity": "SUP-GF-03",
+    "report_id": "9b2f2d0f-1adb-471c-bd99-31e43a43b99b",
+    "job_id": "8f049d7c-646e-4c03-a426-05c6e664046a",
+    "existing": true
+  },
+  {
+    "activity": "SUP-GF-04",
+    "report_id": "8841eb93-5935-469a-b17a-024c40535112",
+    "job_id": "184717e2-da37-4713-8738-b9c459f032f2",
+    "existing": true
+  },
+  {
+    "activity": "SUP-GF-05",
+    "report_id": "ef7091d3-cb1a-4eac-9fe9-65fb3c5b961c",
+    "job_id": "a1ac6bd2-c188-4a7c-9a14-b6dd2f2a488a",
+    "existing": true
+  }
+]

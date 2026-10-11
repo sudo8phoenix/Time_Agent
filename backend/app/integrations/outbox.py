@@ -33,13 +33,14 @@ def enqueue(db, activity, state):
                              state_revision=state.revision, payload=payload))
 
 
-def run_once(factory, connector):
+def run_once(factory, connector, *, project_id=None):
     # Lock held through bounded HTTP IO. A crash rolls back the claim; receiver idempotency
     # makes a retry safe even when it applied the request before the worker crashed.
     with factory() as db, db.begin():
         now = datetime.now(timezone.utc)
         older = aliased(IntegrationOutbox)
         row = db.scalar(select(IntegrationOutbox).where(
+            IntegrationOutbox.project_id == project_id if project_id is not None else True,
             IntegrationOutbox.status.in_(["pending", "retry"]),
             or_(IntegrationOutbox.next_attempt_at.is_(None), IntegrationOutbox.next_attempt_at <= now),
             ~exists(select(older.id).where(older.activity_id == IntegrationOutbox.activity_id,

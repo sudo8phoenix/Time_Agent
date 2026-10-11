@@ -1,0 +1,403 @@
+[
+  {
+    "expected_activity": "SUP-GF-01",
+    "job": {
+      "job_id": "8c955efe-d486-41f2-b32e-20159745621b",
+      "project_id": "a57e01e5-9e4b-4bac-a9a9-7596abb996db",
+      "report_id": "219a33b6-aac1-439b-947e-68e5a49b7bc8",
+      "schedule_version_id": "473a2db3-3aa3-4f80-8fbc-cf93b01f4d2c",
+      "parent_job_id": null,
+      "reanalysis_actor_id": null,
+      "reanalysis_reason": null,
+      "reanalysis_config": null,
+      "state": "ready_for_review",
+      "stage": "persist",
+      "attempts": 1,
+      "extracted_count": 1,
+      "proposal_count": 1,
+      "proposal_ids": [],
+      "error_code": null
+    },
+    "proposals": []
+  },
+  {
+    "expected_activity": "SUP-GF-02",
+    "job": {
+      "job_id": "fc36936e-6f31-4f2d-b46f-932be2d2f82c",
+      "project_id": "a57e01e5-9e4b-4bac-a9a9-7596abb996db",
+      "report_id": "a80ea932-242f-478c-bb4f-556cfd972290",
+      "schedule_version_id": "473a2db3-3aa3-4f80-8fbc-cf93b01f4d2c",
+      "parent_job_id": null,
+      "reanalysis_actor_id": null,
+      "reanalysis_reason": null,
+      "reanalysis_config": null,
+      "state": "ready_for_review",
+      "stage": "persist",
+      "attempts": 1,
+      "extracted_count": 1,
+      "proposal_count": 1,
+      "proposal_ids": [],
+      "error_code": null
+    },
+    "proposals": []
+  },
+  {
+    "expected_activity": "SUP-GF-03",
+    "job": {
+      "job_id": "8f049d7c-646e-4c03-a426-05c6e664046a",
+      "project_id": "a57e01e5-9e4b-4bac-a9a9-7596abb996db",
+      "report_id": "9b2f2d0f-1adb-471c-bd99-31e43a43b99b",
+      "schedule_version_id": "473a2db3-3aa3-4f80-8fbc-cf93b01f4d2c",
+      "parent_job_id": null,
+      "reanalysis_actor_id": null,
+      "reanalysis_reason": null,
+      "reanalysis_config": null,
+      "state": "ready_for_review",
+      "stage": "persist",
+      "attempts": 1,
+      "extracted_count": 1,
+      "proposal_count": 1,
+      "proposal_ids": [],
+      "error_code": null
+    },
+    "proposals": []
+  },
+  {
+    "expected_activity": "SUP-GF-04",
+    "job": {
+      "job_id": "184717e2-da37-4713-8738-b9c459f032f2",
+      "project_id": "a57e01e5-9e4b-4bac-a9a9-7596abb996db",
+      "report_id": "8841eb93-5935-469a-b17a-024c40535112",
+      "schedule_version_id": "473a2db3-3aa3-4f80-8fbc-cf93b01f4d2c",
+      "parent_job_id": null,
+      "reanalysis_actor_id": null,
+      "reanalysis_reason": null,
+      "reanalysis_config": null,
+      "state": "ready_for_review",
+      "stage": "persist",
+      "attempts": 1,
+      "extracted_count": 1,
+      "proposal_count": 1,
+      "proposal_ids": [],
+      "error_code": null
+    },
+    "proposals": []
+  },
+  {
+    "expected_activity": "SUP-GF-05",
+    "job": {
+      "job_id": "a1ac6bd2-c188-4a7c-9a14-b6dd2f2a488a",
+      "project_id": "a57e01e5-9e4b-4bac-a9a9-7596abb996db",
+      "report_id": "ef7091d3-cb1a-4eac-9fe9-65fb3c5b961c",
+      "schedule_version_id": "473a2db3-3aa3-4f80-8fbc-cf93b01f4d2c",
+      "parent_job_id": null,
+      "reanalysis_actor_id": null,
+      "reanalysis_reason": null,
+      "reanalysis_config": null,
+      "state": "ready_for_review",
+      "stage": "persist",
+      "attempts": 1,
+      "extracted_count": 1,
+      "proposal_count": 1,
+      "proposal_ids": [
+        "a01ad5df-1908-48a7-a6fe-9bac825f1c4a"
+      ],
+      "error_code": null
+    },
+    "proposals": [
+      {
+        "provenance": {
+          "version": "proposal-provenance-v1",
+          "confidence": {
+            "extraction": {
+              "score": null,
+              "method": "not_estimated",
+              "version": "extraction-v8-date-context",
+              "validation_status": "unavailable",
+              "stage": "extraction",
+              "reason": "No independently validated probability estimator is available."
+            },
+            "linking": {
+              "score": null,
+              "method": "not_estimated",
+              "version": "agent-schedule-v1",
+              "validation_status": "unavailable",
+              "stage": "linking",
+              "reason": "No independently validated probability estimator is available."
+            }
+          },
+          "validation": {
+            "status": "requires_authorized_review",
+            "field_issues": [
+              {
+                "field": null,
+                "code": "Cumulative quantity reported; not a delta."
+              }
+            ],
+            "missing_information": [],
+            "evidence_check": "source_quote_check_only_not_correctness"
+          },
+          "original_fields": {
+            "discipline": "civil",
+            "work_type": "concrete_pour",
+            "event_type": "actual_progress",
+            "observed_status": "completed",
+            "area": "GF",
+            "asset_tags": [
+              "SUP-GF-05"
+            ],
+            "explicit_activity_id": null,
+            "work_date": "2026-12-28",
+            "date_basis": "report_context",
+            "quantity": "10",
+            "quantity_kind": "cumulative",
+            "unit": "m3",
+            "raw_unit": "m3",
+            "reported_percent": null,
+            "actual_start": null,
+            "actual_finish": null,
+            "blocker": null,
+            "summary": "Cumulative completed quantity for SUP-GF-05 (Slab Concreting - GF) in GF was 10 m3.",
+            "evidence": [
+              {
+                "fields": [
+                  "quantity",
+                  "quantity_kind",
+                  "unit",
+                  "asset_tags",
+                  "area"
+                ],
+                "fragment_id": "b15e35a6-eb10-4a6b-aee6-4bfbe0db2307",
+                "quote": "cumulative completed quantity for SUP-GF-05 (Slab Concreting - GF) in GF was 10 m3."
+              }
+            ],
+            "warnings": [
+              "Cumulative quantity reported; not a delta."
+            ],
+            "lifecycle_effects": []
+          },
+          "original_selection": {
+            "candidate_id": "fa0efa4e-ca72-4fb8-8091-843aed3d62d1",
+            "mapping_state": "suggested",
+            "match_strength": "review",
+            "evidence_fragment_ids": [
+              "b15e35a6-eb10-4a6b-aee6-4bfbe0db2307"
+            ],
+            "reason_codes": [
+              "exact_match_on_asset_tag",
+              "exact_match_on_activity_name",
+              "exact_match_on_area",
+              "exact_match_on_date",
+              "exact_match_on_unit_and_quantity_kind"
+            ],
+            "explanation": "The report evidence explicitly identifies the asset tag 'SUP-GF-05' and the activity name 'Slab Concreting - GF' in the 'GF' area, which perfectly matches the candidate's attributes. The reported date (2026-12-28) also aligns with the planned start and finish dates for this activity.",
+            "missing_information": [],
+            "candidates": [
+              {
+                "candidate_id": "fa0efa4e-ca72-4fb8-8091-843aed3d62d1",
+                "external_id": "SUP-GF-05",
+                "activity_name": "Slab Concreting - GF",
+                "area": "GF",
+                "work_type": "concrete_pour",
+                "is_leaf": true,
+                "asset_tags": [],
+                "wbs": "GT10BLDG.2.1",
+                "discipline": "structural",
+                "aliases": null,
+                "measurement_basis": "quantity_ratio",
+                "planned_quantity": "50.0000",
+                "unit": "m3",
+                "planned_start": "2026-12-28",
+                "planned_finish": "2026-12-28",
+                "retrieval_rank": null,
+                "retrieval_score": null
+              }
+            ],
+            "review_state": "pending",
+            "proposed_effects": {}
+          },
+          "evidence": [
+            {
+              "fields": [
+                "quantity",
+                "quantity_kind",
+                "unit",
+                "asset_tags",
+                "area"
+              ],
+              "fragment_id": "b15e35a6-eb10-4a6b-aee6-4bfbe0db2307",
+              "quote": "cumulative completed quantity for SUP-GF-05 (Slab Concreting - GF) in GF was 10 m3.",
+              "locator": "paragraph:1"
+            }
+          ],
+          "model_metadata": {
+            "model_version": "gemma4:12b",
+            "prompt_version": "extraction-v8-date-context",
+            "config_version": "a9636e1ad83fa94ab18777a9f8313c8d4c0638de56ded723343a0f922d867cc0",
+            "selection_prompt_version": "agent-schedule-v1",
+            "model_calls": [
+              {
+                "model": "gemma4:12b",
+                "model_digest": null,
+                "runtime": null,
+                "system_prompt_hash": "60bdede5ad56f533665c39c183f99132d563476670ea44ed3f895d62600beb81",
+                "schema_hash": "0472ed137c4fd74d4741f45cbcce688f2b162af969c40e20bfb850c997c12c5a",
+                "settings_hash": "c04385f370c9b0ad508567230a55d0100d0e2b9d577cac7b5c37beee16dee3cf",
+                "adapter_prompt_hash": "b8d193bef3b1e0149c1ff98abeec1f7fc6917b99cb102101b00cbe09a294f6fd"
+              },
+              {
+                "model": "gemma4:12b",
+                "model_digest": null,
+                "runtime": null,
+                "system_prompt_hash": "79573c496b88b252e2a66cf83cc81e926465ead7db7e6e75bd5baafb5192db2e",
+                "schema_hash": "353190529a625fe7c92476feb66a2372f8d1ca289ea5952d6508807490b531b2",
+                "settings_hash": "c04385f370c9b0ad508567230a55d0100d0e2b9d577cac7b5c37beee16dee3cf",
+                "adapter_prompt_hash": "96b2f8d151e5d3ff3bf93722b4f1786e92582454678945bb9d5d9d1866ffb9d6"
+              },
+              {
+                "model": "gemma4:12b",
+                "model_digest": null,
+                "runtime": null,
+                "system_prompt_hash": "b7c73b90a695ffe2cbe5a9375b2592b0bbe92eafef2f2fbc78f1a2ff5fec45e7",
+                "schema_hash": "8eeed6d0da15fabdb26b9f9b621e2f91a93bcb56f16d84ecb9d76130cbef683f",
+                "settings_hash": "c04385f370c9b0ad508567230a55d0100d0e2b9d577cac7b5c37beee16dee3cf",
+                "adapter_prompt_hash": "c7627e63bb1b73ec2810965c1891cb023bb3286790e6b63c01eeed2fa963f51a"
+              }
+            ],
+            "extraction_batches": [
+              {
+                "prompt_version": "extraction-v8-date-context",
+                "prompt_hash": "b8d193bef3b1e0149c1ff98abeec1f7fc6917b99cb102101b00cbe09a294f6fd",
+                "settings_hash": "a9636e1ad83fa94ab18777a9f8313c8d4c0638de56ded723343a0f922d867cc0",
+                "model": "gemma4:12b",
+                "model_digest": null,
+                "runtime": null,
+                "batch_id": "batch-1"
+              }
+            ],
+            "extraction_errors": []
+          },
+          "capture_status": "recorded",
+          "source": {
+            "report_id": "ef7091d3-cb1a-4eac-9fe9-65fb3c5b961c",
+            "report_hash": "89b46994e264bd01c8e79f6949b61c8dda3d5a38a774e8a7088f18fc12579f6d",
+            "source_label": "GT10 TEST SUP-GF-05",
+            "source_revision": null,
+            "job_id": "a1ac6bd2-c188-4a7c-9a14-b6dd2f2a488a",
+            "schedule_version_id": "473a2db3-3aa3-4f80-8fbc-cf93b01f4d2c",
+            "model_version": "gemma4:12b",
+            "prompt_version": "extraction-v8-date-context",
+            "config_version": "a9636e1ad83fa94ab18777a9f8313c8d4c0638de56ded723343a0f922d867cc0",
+            "original_url": "/api/v1/projects/a57e01e5-9e4b-4bac-a9a9-7596abb996db/reports/ef7091d3-cb1a-4eac-9fe9-65fb3c5b961c/original"
+          },
+          "intake": {}
+        },
+        "decision_history": {
+          "scope": "report_job",
+          "job_id": "a1ac6bd2-c188-4a7c-9a14-b6dd2f2a488a",
+          "proposals": [
+            {
+              "id": "a01ad5df-1908-48a7-a6fe-9bac825f1c4a",
+              "observation_id": "9173f38c-fa21-4320-a4c7-28397b67f158",
+              "revision": 1,
+              "state": "pending",
+              "chosen_activity_id": "fa0efa4e-ca72-4fb8-8091-843aed3d62d1",
+              "effects": {
+                "event_type": "actual_progress",
+                "quantity_semantics": "cumulative",
+                "quantity": "10",
+                "unit": "m3",
+                "effective_date": "2026-12-28"
+              },
+              "warnings": [
+                "Cumulative quantity reported; not a delta."
+              ],
+              "candidates": [
+                {
+                  "candidate_id": "fa0efa4e-ca72-4fb8-8091-843aed3d62d1",
+                  "external_id": "SUP-GF-05",
+                  "activity_name": "Slab Concreting - GF",
+                  "area": "GF",
+                  "work_type": "concrete_pour",
+                  "is_leaf": true,
+                  "asset_tags": [],
+                  "wbs": "GT10BLDG.2.1",
+                  "discipline": "structural",
+                  "aliases": null,
+                  "measurement_basis": "quantity_ratio",
+                  "planned_quantity": "50.0000",
+                  "unit": "m3",
+                  "planned_start": "2026-12-28",
+                  "planned_finish": "2026-12-28",
+                  "retrieval_rank": null,
+                  "retrieval_score": null
+                }
+              ]
+            }
+          ],
+          "events": [],
+          "decisions": []
+        },
+        "id": "a01ad5df-1908-48a7-a6fe-9bac825f1c4a",
+        "observation_id": "9173f38c-fa21-4320-a4c7-28397b67f158",
+        "revision": 1,
+        "current_activity_revision": 0,
+        "current_lifecycle_state": {
+          "actual_start": null,
+          "actual_start_time": null,
+          "actual_start_precision": null,
+          "actual_finish": null,
+          "actual_finish_time": null,
+          "actual_finish_precision": null,
+          "status": null
+        },
+        "candidates": [
+          {
+            "id": "fa0efa4e-ca72-4fb8-8091-843aed3d62d1",
+            "name": "Slab Concreting - GF",
+            "area": "GF",
+            "work_type": "concrete_pour",
+            "tags": [],
+            "rank": null
+          }
+        ],
+        "chosen_activity_id": "fa0efa4e-ca72-4fb8-8091-843aed3d62d1",
+        "chosen_activity_measurement_basis": "quantity_ratio",
+        "mapping_state": "suggested",
+        "match_strength": "review",
+        "review_state": "pending",
+        "warnings": [
+          "Cumulative quantity reported; not a delta."
+        ],
+        "proposed_effects": {
+          "event_type": "actual_progress",
+          "quantity_semantics": "cumulative",
+          "quantity": "10",
+          "unit": "m3",
+          "effective_date": "2026-12-28"
+        },
+        "missing_information": [],
+        "selection_explanation": "The report evidence explicitly identifies the asset tag 'SUP-GF-05' and the activity name 'Slab Concreting - GF' in the 'GF' area, which perfectly matches the candidate's attributes. The reported date (2026-12-28) also aligns with the planned start and finish dates for this activity.",
+        "observation": {
+          "summary": "Cumulative completed quantity for SUP-GF-05 (Slab Concreting - GF) in GF was 10 m3.",
+          "quantity": "10",
+          "unit": "m3",
+          "work_type": "concrete_pour",
+          "area": "GF",
+          "tags": [
+            "SUP-GF-05"
+          ],
+          "event_type": "actual_progress"
+        },
+        "evidence": [
+          {
+            "quote": "cumulative completed quantity for SUP-GF-05 (Slab Concreting - GF) in GF was 10 m3.",
+            "locator": "paragraph:1",
+            "fragment_id": "b15e35a6-eb10-4a6b-aee6-4bfbe0db2307"
+          }
+        ],
+        "test_matches_expected": false
+      }
+    ]
+  }
+]

@@ -77,6 +77,7 @@ def run_once(db: Session, pipeline: Pipeline, *, should_stop: Callable[[], bool]
                     "AGENT_CHECKPOINT_FAILED", "AGENT_CHECKPOINT_INCOMPATIBLE",
                     "AGENT_TOOL_FAILED", "AGENT_RUN_CONFLICT", "AGENT_INTERNAL_ERROR",
                     "JOB_LEASE_LOST", "SCHEDULE_VERSION_STALE", "PIPELINE_ERROR",
+                    "MODEL_REQUEST_FAILED", "MODEL_RESPONSE_INVALID",
                 }:
                     code = "PIPELINE_ERROR"
                 safe_message = getattr(exc, "safe_message", "The job pipeline failed safely.")

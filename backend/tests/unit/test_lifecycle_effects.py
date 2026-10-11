@@ -59,7 +59,13 @@ def test_extractor_rejects_untrusted_context_and_keeps_two_atomic_events():
     finish["evidence"][0]["quote"] = "Finished excavation at F-01 at 17:00"
     untrusted = extract_batch(BatchInput("b", (fragment,), date(2026, 10, 9), False),
                               lambda **_: {"observations": [start, finish]})
-    assert not untrusted.observations and len(untrusted.errors) == 2
+    assert len(untrusted.observations) == 2
+    assert not untrusted.errors
+    for item in untrusted.observations:
+        assert item.work_date is None
+        assert not item.lifecycle_effects
+        assert build_effects(item) == {}
+        assert item.warnings
     trusted = extract_batch(BatchInput("b", (fragment,), date(2026, 10, 9), True),
                             lambda **_: {"observations": [start, finish]})
     assert len(trusted.observations) == 2
@@ -136,3 +142,24 @@ def test_quoted_clock_upgrades_model_date_only_endpoint_without_fabricating_othe
     raw["lifecycle_effects"][0]["endpoint"]["raw_expression"] = "finished"
     result = extract_batch(batch, lambda **_: {"observations": [raw]})
     assert result.observations[0].lifecycle_effects[0].endpoint.local_time is None
+
+
+def test_live_untrusted_report_context_preserves_start_without_progress_effect():
+    from app.llm.extract import BatchInput, FragmentInput, extract_batch
+    quote = "excavation started today at 08:00"
+    raw = observation(effects=[{
+        "kind": "actual_start", "scope": "whole_activity",
+        "endpoint": {"local_date": "2026-10-10", "precision": "date",
+                     "basis": "report_context", "raw_expression": "today"},
+        "evidence": [{"fields": ["kind", "endpoint"], "fragment_id": "f1", "quote": quote}],
+    }]).model_dump(mode="json")
+    raw.update(work_date="2026-10-10", actual_start="2026-10-10")
+    raw["evidence"][0]["quote"] = quote
+    result = extract_batch(BatchInput("b", (FragmentInput("f1", "p1", quote),)),
+                           lambda **_: {"observations": [raw]})
+    assert len(result.observations) == 1
+    kept = result.observations[0]
+    assert kept.event_type.value == "actual_start"
+    assert kept.actual_start is None and kept.work_date is None
+    assert kept.evidence[0].quote == quote
+    assert build_effects(kept) == {}

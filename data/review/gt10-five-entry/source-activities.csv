@@ -1,0 +1,6 @@
+task_code,status_code,wbs_id,task_name,start_date,end_date,resource_list,delete_record_flag
+SUP-GF-01,Not Started,GT10BLDG.2.1,Column Reinforcement - GF,2026-12-11 08:00:00,2026-12-15 16:00:00,,
+SUP-GF-02,Not Started,GT10BLDG.2.1,Column Concreting - GF,2026-12-16 08:00:00,2026-12-16 16:00:00,,
+SUP-GF-03,Not Started,GT10BLDG.2.1,Slab Shuttering - GF,2026-12-18 08:00:00,2026-12-23 16:00:00,,
+SUP-GF-04,Not Started,GT10BLDG.2.1,Slab Reinforcement - GF,2026-12-22 08:00:00,2026-12-25 16:00:00,,
+SUP-GF-05,Not Started,GT10BLDG.2.1,Slab Concreting - GF,2026-12-28 08:00:00,2026-12-28 16:00:00,,

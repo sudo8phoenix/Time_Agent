@@ -26,11 +26,13 @@ class OllamaConfigurationError(OllamaError):
 
 
 class OllamaTransportError(OllamaError):
-    pass
+    code = "MODEL_REQUEST_FAILED"
+    safe_message = "The model request timed out or could not connect. Check the model service and retry."
 
 
 class OllamaResponseError(OllamaError):
-    pass
+    code = "MODEL_RESPONSE_INVALID"
+    safe_message = "The model returned an invalid response. Retry the report or check the model service."
 
 
 def _hash(value: Any) -> str:

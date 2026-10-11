@@ -8,6 +8,7 @@ from __future__ import annotations
 import hashlib
 import json
 import re
+from decimal import Decimal, InvalidOperation
 from dataclasses import dataclass
 from datetime import date
 from typing import Any, Callable, Mapping, Sequence
@@ -117,7 +118,7 @@ def _validate_evidence(observation: Observation, fragments: Sequence[FragmentInp
 def _fact_key(o: Observation) -> tuple[Any, ...]:
     return (o.discipline, o.work_type, o.event_type, o.observed_status, o.area,
             tuple(sorted(o.asset_tags)), o.explicit_activity_id, o.work_date,
-            o.quantity, o.quantity_kind, o.unit, o.blocker, o.summary,
+            o.quantity, o.quantity_kind, o.unit, o.reported_percent, o.blocker, o.summary,
             tuple(effect.model_dump_json() for effect in o.lifecycle_effects))
 
 
@@ -156,6 +157,40 @@ def _normalise_nullable_literals(raw: Any) -> Any:
         observations.append(observation)
     normalised["observations"] = observations
     return normalised
+
+
+def _repair_unitless_percent_quantity(raw: Any, fragments: Sequence[FragmentInput]) -> Any:
+    """Keep source-stated percentages without a model-invented measured quantity."""
+    if not isinstance(raw, Mapping) or not isinstance(raw.get("observations"), list):
+        return raw
+    sources = {fragment.fragment_id: fragment.text for fragment in fragments}
+    repaired = dict(raw)
+    items = []
+    for original in raw["observations"]:
+        item = dict(original) if isinstance(original, Mapping) else original
+        if (isinstance(item, dict) and item.get("reported_percent") is not None
+                and item.get("quantity") is not None and item.get("unit") is None
+                and item.get("raw_unit") is None and item.get("event_type") == "actual_progress"):
+            try:
+                percent = Decimal(str(item["reported_percent"]))
+                quantity = Decimal(str(item["quantity"]))
+                supported = any(
+                    isinstance(e, Mapping) and isinstance(e.get("quote"), str)
+                    and e["quote"] in sources.get(e.get("fragment_id"), "")
+                    and any(Decimal(number) == percent for number in
+                            re.findall(r"(?<![\d.])(\d+(?:\.\d+)?)\s*(?:%|percent\b)", e["quote"], re.I))
+                    for e in item.get("evidence", [])
+                )
+                if supported and percent.is_finite() and 0 <= percent <= 100 and quantity in {percent, percent / 100}:
+                    item["quantity"] = None
+                    item["quantity_kind"] = "none"
+                    item["warnings"] = [*item.get("warnings", [])[:29],
+                                        "Model's unitless quantity removed; source reports a percentage."]
+            except (InvalidOperation, ValueError, TypeError):
+                pass  # Unsupported or malformed output still undergoes strict validation.
+        items.append(item)
+    repaired["observations"] = items
+    return repaired
 
 
 def _repair_source_stated_clock(raw: Any) -> Any:
@@ -237,7 +272,9 @@ def extract_batch(batch: BatchInput, model_call: ModelCall, *, model: str = "unk
         model = getattr(raw, "model", model)
         raw = raw.value
     try:
-        parsed = ObservationBatch.model_validate(_repair_source_stated_clock(_normalise_nullable_literals(raw)))
+        normalised = _normalise_nullable_literals(raw)
+        repaired = _repair_unitless_percent_quantity(normalised, batch.fragments)
+        parsed = ObservationBatch.model_validate(_repair_source_stated_clock(repaired))
     except ValidationError as exc:
         raise ExtractionError(f"model output failed observation schema: {exc}") from exc
     accepted: list[Observation] = []
@@ -245,6 +282,24 @@ def extract_batch(batch: BatchInput, model_call: ModelCall, *, model: str = "unk
     for observation in parsed.observations:
         try:
             _validate_evidence(observation, batch.fragments)
+            unsupported_context = (
+                observation.date_basis in {DateBasis.report_context, DateBasis.relative_resolved}
+                and not batch.report_date_trusted
+            ) or any(
+                effect.endpoint.basis == "report_context"
+                and (not batch.report_date_trusted or effect.endpoint.local_date != batch.report_date)
+                for effect in observation.lifecycle_effects
+            )
+            if unsupported_context:
+                # Preserve the evidence-backed assertion for clarification, but
+                # never turn an untrusted model date into a ledger effect.
+                observation = observation.model_copy(update={
+                    "work_date": None, "date_basis": DateBasis.unknown,
+                    "actual_start": None, "actual_finish": None,
+                    "lifecycle_effects": [],
+                    "warnings": [*observation.warnings[:29],
+                                 "Work date needs reviewer clarification; unsupported report-context dates were removed."],
+                })
             if observation.event_type in {EventType.actual_start, EventType.actual_finish}:
                 if observation.quantity is not None or observation.reported_percent is not None:
                     raise ExtractionError("lifecycle assertion must not carry quantity or percent")

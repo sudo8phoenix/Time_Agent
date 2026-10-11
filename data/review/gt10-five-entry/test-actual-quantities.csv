@@ -1,0 +1,6 @@
+activity_id,report_date,actual_quantity,unit,quantity_semantics,report_text
+SUP-GF-01,2026-12-11,200,kg,cumulative,"SYNTHETIC TEST REPORT. On 2026-12-11, cumulative completed quantity for SUP-GF-01 (Column Reinforcement - GF) in GF was 200 kg. This is the total completed to date, not an additional quantity."
+SUP-GF-02,2026-12-16,4,m3,cumulative,"SYNTHETIC TEST REPORT. On 2026-12-16, cumulative completed quantity for SUP-GF-02 (Column Concreting - GF) in GF was 4 m3. This is the total completed to date, not an additional quantity."
+SUP-GF-03,2026-12-18,40,m2,cumulative,"SYNTHETIC TEST REPORT. On 2026-12-18, cumulative completed quantity for SUP-GF-03 (Slab Shuttering - GF) in GF was 40 m2. This is the total completed to date, not an additional quantity."
+SUP-GF-04,2026-12-22,600,kg,cumulative,"SYNTHETIC TEST REPORT. On 2026-12-22, cumulative completed quantity for SUP-GF-04 (Slab Reinforcement - GF) in GF was 600 kg. This is the total completed to date, not an additional quantity."
+SUP-GF-05,2026-12-28,10,m3,cumulative,"SYNTHETIC TEST REPORT. On 2026-12-28, cumulative completed quantity for SUP-GF-05 (Slab Concreting - GF) in GF was 10 m3. This is the total completed to date, not an additional quantity."

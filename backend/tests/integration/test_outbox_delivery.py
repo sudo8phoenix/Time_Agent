@@ -68,6 +68,16 @@ def rows(factory, project_id):
         ).all()
 
 
+def test_project_scoped_delivery_leaves_other_projects_pending(db_pair, receiver):
+    _, _, earlier_project, _ = accept(db_pair)
+    _, _, selected_project, _ = accept(db_pair)
+    assert earlier_project != selected_project
+    assert run_once(db_pair, receiver, project_id=selected_project)
+    assert rows(db_pair, selected_project)[0].status == "delivered"
+    assert rows(db_pair, earlier_project)[0].status == "pending"
+    assert not run_once(db_pair, receiver, project_id=selected_project)
+
+
 def test_accept_timeout_retry_retraction_and_old_delivery(db_pair, receiver):
     user, activity, project, result = accept(db_pair)
     assert len(rows(db_pair, project)) == 1

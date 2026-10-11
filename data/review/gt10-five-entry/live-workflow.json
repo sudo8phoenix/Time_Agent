@@ -1,0 +1,150 @@
+{
+  "username": "gt10-test-7d656d",
+  "project": {
+    "id": "a57e01e5-9e4b-4bac-a9a9-7596abb996db",
+    "name": "GT10 five-activity workflow test",
+    "timezone": "Asia/Kolkata",
+    "active_schedule_version_id": null
+  },
+  "schedule": {
+    "id": "473a2db3-3aa3-4f80-8fbc-cf93b01f4d2c",
+    "project_id": "a57e01e5-9e4b-4bac-a9a9-7596abb996db",
+    "version": 1,
+    "state": "staged",
+    "content_sha256": "a2c19a68a7e24acfa8cac093575e1969d61bc0af86e5b0b82347f6768bf8b462",
+    "existing": false,
+    "activity_count": 5
+  },
+  "reports": [
+    {
+      "input": {
+        "text": "SYNTHETIC TEST REPORT. On 2026-12-11, cumulative completed quantity for SUP-GF-01 (Column Reinforcement - GF) in GF was 200 kg. This is the total completed to date, not an additional quantity.",
+        "report_date": "2026-12-11",
+        "report_date_evidence": "Reviewer-entered date for synthetic GT10 test report",
+        "source_label": "GT10 TEST SUP-GF-01"
+      },
+      "expected_activity": "SUP-GF-01",
+      "expected_quantity": "200",
+      "expected_unit": "kg",
+      "result": {
+        "report_id": "219a33b6-aac1-439b-947e-68e5a49b7bc8",
+        "job_id": "8c955efe-d486-41f2-b32e-20159745621b",
+        "project_id": "a57e01e5-9e4b-4bac-a9a9-7596abb996db",
+        "schedule_version_id": "473a2db3-3aa3-4f80-8fbc-cf93b01f4d2c",
+        "existing": false,
+        "state": "queued",
+        "stage": "parse",
+        "attempts": 0,
+        "extracted_count": 0,
+        "proposal_count": 0,
+        "proposal_ids": [],
+        "error_code": null,
+        "fragments_url": "/api/v1/reports/219a33b6-aac1-439b-947e-68e5a49b7bc8"
+      }
+    },
+    {
+      "input": {
+        "text": "SYNTHETIC TEST REPORT. On 2026-12-16, cumulative completed quantity for SUP-GF-02 (Column Concreting - GF) in GF was 4 m3. This is the total completed to date, not an additional quantity.",
+        "report_date": "2026-12-16",
+        "report_date_evidence": "Reviewer-entered date for synthetic GT10 test report",
+        "source_label": "GT10 TEST SUP-GF-02"
+      },
+      "expected_activity": "SUP-GF-02",
+      "expected_quantity": "4",
+      "expected_unit": "m3",
+      "result": {
+        "report_id": "a80ea932-242f-478c-bb4f-556cfd972290",
+        "job_id": "fc36936e-6f31-4f2d-b46f-932be2d2f82c",
+        "project_id": "a57e01e5-9e4b-4bac-a9a9-7596abb996db",
+        "schedule_version_id": "473a2db3-3aa3-4f80-8fbc-cf93b01f4d2c",
+        "existing": false,
+        "state": "queued",
+        "stage": "parse",
+        "attempts": 0,
+        "extracted_count": 0,
+        "proposal_count": 0,
+        "proposal_ids": [],
+        "error_code": null,
+        "fragments_url": "/api/v1/reports/a80ea932-242f-478c-bb4f-556cfd972290"
+      }
+    },
+    {
+      "input": {
+        "text": "SYNTHETIC TEST REPORT. On 2026-12-18, cumulative completed quantity for SUP-GF-03 (Slab Shuttering - GF) in GF was 40 m2. This is the total completed to date, not an additional quantity.",
+        "report_date": "2026-12-18",
+        "report_date_evidence": "Reviewer-entered date for synthetic GT10 test report",
+        "source_label": "GT10 TEST SUP-GF-03"
+      },
+      "expected_activity": "SUP-GF-03",
+      "expected_quantity": "40",
+      "expected_unit": "m2",
+      "result": {
+        "report_id": "9b2f2d0f-1adb-471c-bd99-31e43a43b99b",
+        "job_id": "8f049d7c-646e-4c03-a426-05c6e664046a",
+        "project_id": "a57e01e5-9e4b-4bac-a9a9-7596abb996db",
+        "schedule_version_id": "473a2db3-3aa3-4f80-8fbc-cf93b01f4d2c",
+        "existing": false,
+        "state": "queued",
+        "stage": "parse",
+        "attempts": 0,
+        "extracted_count": 0,
+        "proposal_count": 0,
+        "proposal_ids": [],
+        "error_code": null,
+        "fragments_url": "/api/v1/reports/9b2f2d0f-1adb-471c-bd99-31e43a43b99b"
+      }
+    },
+    {
+      "input": {
+        "text": "SYNTHETIC TEST REPORT. On 2026-12-22, cumulative completed quantity for SUP-GF-04 (Slab Reinforcement - GF) in GF was 600 kg. This is the total completed to date, not an additional quantity.",
+        "report_date": "2026-12-22",
+        "report_date_evidence": "Reviewer-entered date for synthetic GT10 test report",
+        "source_label": "GT10 TEST SUP-GF-04"
+      },
+      "expected_activity": "SUP-GF-04",
+      "expected_quantity": "600",
+      "expected_unit": "kg",
+      "result": {
+        "report_id": "8841eb93-5935-469a-b17a-024c40535112",
+        "job_id": "184717e2-da37-4713-8738-b9c459f032f2",
+        "project_id": "a57e01e5-9e4b-4bac-a9a9-7596abb996db",
+        "schedule_version_id": "473a2db3-3aa3-4f80-8fbc-cf93b01f4d2c",
+        "existing": false,
+        "state": "queued",
+        "stage": "parse",
+        "attempts": 0,
+        "extracted_count": 0,
+        "proposal_count": 0,
+        "proposal_ids": [],
+        "error_code": null,
+        "fragments_url": "/api/v1/reports/8841eb93-5935-469a-b17a-024c40535112"
+      }
+    },
+    {
+      "input": {
+        "text": "SYNTHETIC TEST REPORT. On 2026-12-28, cumulative completed quantity for SUP-GF-05 (Slab Concreting - GF) in GF was 10 m3. This is the total completed to date, not an additional quantity.",
+        "report_date": "2026-12-28",
+        "report_date_evidence": "Reviewer-entered date for synthetic GT10 test report",
+        "source_label": "GT10 TEST SUP-GF-05"
+      },
+      "expected_activity": "SUP-GF-05",
+      "expected_quantity": "10",
+      "expected_unit": "m3",
+      "result": {
+        "report_id": "ef7091d3-cb1a-4eac-9fe9-65fb3c5b961c",
+        "job_id": "a1ac6bd2-c188-4a7c-9a14-b6dd2f2a488a",
+        "project_id": "a57e01e5-9e4b-4bac-a9a9-7596abb996db",
+        "schedule_version_id": "473a2db3-3aa3-4f80-8fbc-cf93b01f4d2c",
+        "existing": false,
+        "state": "queued",
+        "stage": "parse",
+        "attempts": 0,
+        "extracted_count": 0,
+        "proposal_count": 0,
+        "proposal_ids": [],
+        "error_code": null,
+        "fragments_url": "/api/v1/reports/ef7091d3-cb1a-4eac-9fe9-65fb3c5b961c"
+      }
+    }
+  ]
+}

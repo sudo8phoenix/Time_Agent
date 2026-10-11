@@ -1,0 +1,294 @@
+{
+  "deliveries": {
+    "label": "MOCK PMIS \u2014 prototype",
+    "items": [
+      {
+        "id": "a6cd2e57-e492-4ecb-a28f-5839d115b35a",
+        "activity_id": "fa0efa4e-ca72-4fb8-8091-843aed3d62d1",
+        "revision": 1,
+        "status": "delivered",
+        "attempts": 1,
+        "created_at": "2026-10-11T06:35:33.212245+00:00",
+        "attempted_at": "2026-10-11T06:35:33.326342+00:00",
+        "next_attempt_at": null,
+        "delivered_at": "2026-10-11T06:35:33.343078+00:00",
+        "last_error": null,
+        "receipt": {
+          "label": "MOCK PMIS \u2014 prototype",
+          "idempotency_key": "a6cd2e57-e492-4ecb-a28f-5839d115b35a",
+          "applied": true,
+          "received_at": "2026-10-11T06:35:33.339603+00:00",
+          "state_revision": 1,
+          "read_back_revision": 1,
+          "verified": true
+        },
+        "payload": {
+          "label": "MOCK PMIS \u2014 prototype",
+          "idempotency_key": "a6cd2e57-e492-4ecb-a28f-5839d115b35a",
+          "project_id": "a57e01e5-9e4b-4bac-a9a9-7596abb996db",
+          "external_project_id": "a57e01e5-9e4b-4bac-a9a9-7596abb996db",
+          "activity_id": "fa0efa4e-ca72-4fb8-8091-843aed3d62d1",
+          "external_activity_id": "SUP-GF-05",
+          "source_schedule_version_id": "473a2db3-3aa3-4f80-8fbc-cf93b01f4d2c",
+          "source_schedule_version": 1,
+          "state_revision": 1,
+          "state": {
+            "actual_start": null,
+            "actual_finish": null,
+            "lifecycle_status": null,
+            "completed_quantity": "10",
+            "physical_percent": "2E+1"
+          }
+        }
+      },
+      {
+        "id": "b4345c44-bea1-42dc-98b3-98a53b965b26",
+        "activity_id": "5a4355b4-fe19-4bef-b04e-af07fd1a9e23",
+        "revision": 1,
+        "status": "delivered",
+        "attempts": 1,
+        "created_at": "2026-10-11T06:24:22.774627+00:00",
+        "attempted_at": "2026-10-11T06:24:40.728733+00:00",
+        "next_attempt_at": null,
+        "delivered_at": "2026-10-11T06:24:40.731965+00:00",
+        "last_error": null,
+        "receipt": {
+          "label": "MOCK PMIS \u2014 prototype",
+          "idempotency_key": "b4345c44-bea1-42dc-98b3-98a53b965b26",
+          "applied": true,
+          "received_at": "2026-10-11T06:24:40.731421+00:00",
+          "state_revision": 1,
+          "read_back_revision": 1,
+          "verified": true
+        },
+        "payload": {
+          "label": "MOCK PMIS \u2014 prototype",
+          "idempotency_key": "b4345c44-bea1-42dc-98b3-98a53b965b26",
+          "project_id": "a57e01e5-9e4b-4bac-a9a9-7596abb996db",
+          "external_project_id": "a57e01e5-9e4b-4bac-a9a9-7596abb996db",
+          "activity_id": "5a4355b4-fe19-4bef-b04e-af07fd1a9e23",
+          "external_activity_id": "SUP-GF-04",
+          "source_schedule_version_id": "473a2db3-3aa3-4f80-8fbc-cf93b01f4d2c",
+          "source_schedule_version": 1,
+          "state_revision": 1,
+          "state": {
+            "actual_start": null,
+            "actual_finish": null,
+            "lifecycle_status": null,
+            "completed_quantity": "600",
+            "physical_percent": "2E+1"
+          }
+        }
+      },
+      {
+        "id": "51c8468f-17f8-495c-8ee5-b2358e24f191",
+        "activity_id": "d0c68620-9270-4bb3-b164-e9352131a042",
+        "revision": 1,
+        "status": "delivered",
+        "attempts": 1,
+        "created_at": "2026-10-11T06:24:22.741183+00:00",
+        "attempted_at": "2026-10-11T06:24:40.722616+00:00",
+        "next_attempt_at": null,
+        "delivered_at": "2026-10-11T06:24:40.726233+00:00",
+        "last_error": null,
+        "receipt": {
+          "label": "MOCK PMIS \u2014 prototype",
+          "idempotency_key": "51c8468f-17f8-495c-8ee5-b2358e24f191",
+          "applied": true,
+          "received_at": "2026-10-11T06:24:40.725629+00:00",
+          "state_revision": 1,
+          "read_back_revision": 1,
+          "verified": true
+        },
+        "payload": {
+          "label": "MOCK PMIS \u2014 prototype",
+          "idempotency_key": "51c8468f-17f8-495c-8ee5-b2358e24f191",
+          "project_id": "a57e01e5-9e4b-4bac-a9a9-7596abb996db",
+          "external_project_id": "a57e01e5-9e4b-4bac-a9a9-7596abb996db",
+          "activity_id": "d0c68620-9270-4bb3-b164-e9352131a042",
+          "external_activity_id": "SUP-GF-03",
+          "source_schedule_version_id": "473a2db3-3aa3-4f80-8fbc-cf93b01f4d2c",
+          "source_schedule_version": 1,
+          "state_revision": 1,
+          "state": {
+            "actual_start": null,
+            "actual_finish": null,
+            "lifecycle_status": null,
+            "completed_quantity": "40",
+            "physical_percent": "2E+1"
+          }
+        }
+      },
+      {
+        "id": "795bd8fa-4929-4dde-b7ab-d15d6b8506d6",
+        "activity_id": "57adcc3d-d9dd-4248-beea-b83d8a4babfa",
+        "revision": 1,
+        "status": "delivered",
+        "attempts": 1,
+        "created_at": "2026-10-11T06:18:39.948042+00:00",
+        "attempted_at": "2026-10-11T06:24:40.714882+00:00",
+        "next_attempt_at": null,
+        "delivered_at": "2026-10-11T06:24:40.720105+00:00",
+        "last_error": null,
+        "receipt": {
+          "label": "MOCK PMIS \u2014 prototype",
+          "idempotency_key": "795bd8fa-4929-4dde-b7ab-d15d6b8506d6",
+          "applied": true,
+          "received_at": "2026-10-11T06:24:40.719298+00:00",
+          "state_revision": 1,
+          "read_back_revision": 1,
+          "verified": true
+        },
+        "payload": {
+          "label": "MOCK PMIS \u2014 prototype",
+          "idempotency_key": "795bd8fa-4929-4dde-b7ab-d15d6b8506d6",
+          "project_id": "a57e01e5-9e4b-4bac-a9a9-7596abb996db",
+          "external_project_id": "a57e01e5-9e4b-4bac-a9a9-7596abb996db",
+          "activity_id": "57adcc3d-d9dd-4248-beea-b83d8a4babfa",
+          "external_activity_id": "SUP-GF-02",
+          "source_schedule_version_id": "473a2db3-3aa3-4f80-8fbc-cf93b01f4d2c",
+          "source_schedule_version": 1,
+          "state_revision": 1,
+          "state": {
+            "actual_start": null,
+            "actual_finish": null,
+            "lifecycle_status": null,
+            "completed_quantity": "4",
+            "physical_percent": "2E+1"
+          }
+        }
+      },
+      {
+        "id": "1bdf104c-33f0-427a-9293-3cfebce0d965",
+        "activity_id": "430eabfe-feaf-4edd-98d7-dd3623aeae8b",
+        "revision": 1,
+        "status": "delivered",
+        "attempts": 1,
+        "created_at": "2026-10-11T06:18:39.908240+00:00",
+        "attempted_at": "2026-10-11T06:24:40.669486+00:00",
+        "next_attempt_at": null,
+        "delivered_at": "2026-10-11T06:24:40.711324+00:00",
+        "last_error": null,
+        "receipt": {
+          "label": "MOCK PMIS \u2014 prototype",
+          "idempotency_key": "1bdf104c-33f0-427a-9293-3cfebce0d965",
+          "applied": true,
+          "received_at": "2026-10-11T06:24:40.709981+00:00",
+          "state_revision": 1,
+          "read_back_revision": 1,
+          "verified": true
+        },
+        "payload": {
+          "label": "MOCK PMIS \u2014 prototype",
+          "idempotency_key": "1bdf104c-33f0-427a-9293-3cfebce0d965",
+          "project_id": "a57e01e5-9e4b-4bac-a9a9-7596abb996db",
+          "external_project_id": "a57e01e5-9e4b-4bac-a9a9-7596abb996db",
+          "activity_id": "430eabfe-feaf-4edd-98d7-dd3623aeae8b",
+          "external_activity_id": "SUP-GF-01",
+          "source_schedule_version_id": "473a2db3-3aa3-4f80-8fbc-cf93b01f4d2c",
+          "source_schedule_version": 1,
+          "state_revision": 1,
+          "state": {
+            "actual_start": null,
+            "actual_finish": null,
+            "lifecycle_status": null,
+            "completed_quantity": "200",
+            "physical_percent": "2E+1"
+          }
+        }
+      }
+    ]
+  },
+  "independent_readbacks": [
+    {
+      "activity_id": "fa0efa4e-ca72-4fb8-8091-843aed3d62d1",
+      "external_activity_id": "SUP-GF-05",
+      "external_project_id": "a57e01e5-9e4b-4bac-a9a9-7596abb996db",
+      "idempotency_key": "a6cd2e57-e492-4ecb-a28f-5839d115b35a",
+      "label": "MOCK PMIS \u2014 prototype",
+      "project_id": "a57e01e5-9e4b-4bac-a9a9-7596abb996db",
+      "source_schedule_version": 1,
+      "source_schedule_version_id": "473a2db3-3aa3-4f80-8fbc-cf93b01f4d2c",
+      "state": {
+        "actual_finish": null,
+        "actual_start": null,
+        "completed_quantity": "10",
+        "lifecycle_status": null,
+        "physical_percent": "2E+1"
+      },
+      "state_revision": 1
+    },
+    {
+      "activity_id": "5a4355b4-fe19-4bef-b04e-af07fd1a9e23",
+      "external_activity_id": "SUP-GF-04",
+      "external_project_id": "a57e01e5-9e4b-4bac-a9a9-7596abb996db",
+      "idempotency_key": "b4345c44-bea1-42dc-98b3-98a53b965b26",
+      "label": "MOCK PMIS \u2014 prototype",
+      "project_id": "a57e01e5-9e4b-4bac-a9a9-7596abb996db",
+      "source_schedule_version": 1,
+      "source_schedule_version_id": "473a2db3-3aa3-4f80-8fbc-cf93b01f4d2c",
+      "state": {
+        "actual_finish": null,
+        "actual_start": null,
+        "completed_quantity": "600",
+        "lifecycle_status": null,
+        "physical_percent": "2E+1"
+      },
+      "state_revision": 1
+    },
+    {
+      "activity_id": "d0c68620-9270-4bb3-b164-e9352131a042",
+      "external_activity_id": "SUP-GF-03",
+      "external_project_id": "a57e01e5-9e4b-4bac-a9a9-7596abb996db",
+      "idempotency_key": "51c8468f-17f8-495c-8ee5-b2358e24f191",
+      "label": "MOCK PMIS \u2014 prototype",
+      "project_id": "a57e01e5-9e4b-4bac-a9a9-7596abb996db",
+      "source_schedule_version": 1,
+      "source_schedule_version_id": "473a2db3-3aa3-4f80-8fbc-cf93b01f4d2c",
+      "state": {
+        "actual_finish": null,
+        "actual_start": null,
+        "completed_quantity": "40",
+        "lifecycle_status": null,
+        "physical_percent": "2E+1"
+      },
+      "state_revision": 1
+    },
+    {
+      "activity_id": "57adcc3d-d9dd-4248-beea-b83d8a4babfa",
+      "external_activity_id": "SUP-GF-02",
+      "external_project_id": "a57e01e5-9e4b-4bac-a9a9-7596abb996db",
+      "idempotency_key": "795bd8fa-4929-4dde-b7ab-d15d6b8506d6",
+      "label": "MOCK PMIS \u2014 prototype",
+      "project_id": "a57e01e5-9e4b-4bac-a9a9-7596abb996db",
+      "source_schedule_version": 1,
+      "source_schedule_version_id": "473a2db3-3aa3-4f80-8fbc-cf93b01f4d2c",
+      "state": {
+        "actual_finish": null,
+        "actual_start": null,
+        "completed_quantity": "4",
+        "lifecycle_status": null,
+        "physical_percent": "2E+1"
+      },
+      "state_revision": 1
+    },
+    {
+      "activity_id": "430eabfe-feaf-4edd-98d7-dd3623aeae8b",
+      "external_activity_id": "SUP-GF-01",
+      "external_project_id": "a57e01e5-9e4b-4bac-a9a9-7596abb996db",
+      "idempotency_key": "1bdf104c-33f0-427a-9293-3cfebce0d965",
+      "label": "MOCK PMIS \u2014 prototype",
+      "project_id": "a57e01e5-9e4b-4bac-a9a9-7596abb996db",
+      "source_schedule_version": 1,
+      "source_schedule_version_id": "473a2db3-3aa3-4f80-8fbc-cf93b01f4d2c",
+      "state": {
+        "actual_finish": null,
+        "actual_start": null,
+        "completed_quantity": "200",
+        "lifecycle_status": null,
+        "physical_percent": "2E+1"
+      },
+      "state_revision": 1
+    }
+  ]
+}

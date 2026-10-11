@@ -1,0 +1,322 @@
+{
+  "job": {
+    "job_id": "9c08f453-476f-45eb-88be-6bcf4b77f758",
+    "project_id": "a57e01e5-9e4b-4bac-a9a9-7596abb996db",
+    "report_id": "afd5911c-76be-4517-a0b6-08eecc0768c5",
+    "schedule_version_id": "473a2db3-3aa3-4f80-8fbc-cf93b01f4d2c",
+    "parent_job_id": null,
+    "reanalysis_actor_id": null,
+    "reanalysis_reason": null,
+    "reanalysis_config": null,
+    "state": "ready_for_review",
+    "stage": "persist",
+    "attempts": 3,
+    "extracted_count": 1,
+    "proposal_count": 1,
+    "proposal_ids": [
+      "07e09ad5-ac6c-4bef-b838-74400ac38491"
+    ],
+    "error_code": null
+  },
+  "proposals": [
+    {
+      "provenance": {
+        "version": "proposal-provenance-v1",
+        "confidence": {
+          "extraction": {
+            "score": null,
+            "method": "not_estimated",
+            "version": "extraction-v9-source-percent",
+            "validation_status": "unavailable",
+            "stage": "extraction",
+            "reason": "No independently validated probability estimator is available."
+          },
+          "linking": {
+            "score": null,
+            "method": "not_estimated",
+            "version": "agent-schedule-v1",
+            "validation_status": "unavailable",
+            "stage": "linking",
+            "reason": "No independently validated probability estimator is available."
+          }
+        },
+        "validation": {
+          "status": "requires_authorized_review",
+          "field_issues": [],
+          "missing_information": [
+            "The reported date (2026-10-19) precedes the planned start date (2026-12-22), but the activity identity remains a clear match based on description and location."
+          ],
+          "evidence_check": "source_quote_check_only_not_correctness"
+        },
+        "original_fields": {
+          "discipline": "civil",
+          "work_type": "rebar_installation",
+          "event_type": "actual_progress",
+          "observed_status": "in_progress",
+          "area": "ground floor",
+          "asset_tags": [],
+          "explicit_activity_id": null,
+          "work_date": "2026-10-19",
+          "date_basis": "explicit",
+          "quantity": null,
+          "quantity_kind": "none",
+          "unit": null,
+          "raw_unit": null,
+          "reported_percent": "50",
+          "actual_start": null,
+          "actual_finish": null,
+          "blocker": null,
+          "summary": "slab reinforcement in ground floor is 50% done",
+          "evidence": [
+            {
+              "fields": [
+                "observed_status",
+                "reported_percent",
+                "area"
+              ],
+              "fragment_id": "d58a9f9d-f930-48d5-bbc5-4199b6add73a",
+              "quote": "slab reinforcement in ground floor is 50% done"
+            },
+            {
+              "fields": [
+                "work_date",
+                "date_basis"
+              ],
+              "fragment_id": "d58a9f9d-f930-48d5-bbc5-4199b6add73a",
+              "quote": "date is 19th oct 2026"
+            }
+          ],
+          "warnings": [],
+          "lifecycle_effects": []
+        },
+        "original_selection": {
+          "candidate_id": "5a4355b4-fe19-4bef-b04e-af07fd1a9e23",
+          "mapping_state": "suggested",
+          "match_strength": "review",
+          "evidence_fragment_ids": [
+            "d58a9f9d-f930-48d5-bbc5-4199b6add73a"
+          ],
+          "reason_codes": [
+            "exact_match_activity_name",
+            "exact_match_area",
+            "exact_match_work_type"
+          ],
+          "explanation": "The observation report explicitly mentions 'slab reinforcement in ground floor' at 50% completion, which directly matches the activity name 'Slab Reinforcement - GF', the area 'GF', and the work type 'rebar_installation' of the candidate.",
+          "missing_information": [
+            "The reported date (2026-10-19) precedes the planned start date (2026-12-22), but the activity identity remains a clear match based on description and location."
+          ],
+          "candidates": [
+            {
+              "candidate_id": "5a4355b4-fe19-4bef-b04e-af07fd1a9e23",
+              "external_id": "SUP-GF-04",
+              "activity_name": "Slab Reinforcement - GF",
+              "area": "GF",
+              "work_type": "rebar_installation",
+              "is_leaf": true,
+              "asset_tags": [],
+              "wbs": "GT10BLDG.2.1",
+              "discipline": "structural",
+              "aliases": null,
+              "measurement_basis": "quantity_ratio",
+              "planned_quantity": "3000.0000",
+              "unit": "kg",
+              "planned_start": "2026-12-22",
+              "planned_finish": "2026-12-25",
+              "retrieval_rank": null,
+              "retrieval_score": null
+            }
+          ],
+          "review_state": "pending",
+          "proposed_effects": {}
+        },
+        "evidence": [
+          {
+            "fields": [
+              "observed_status",
+              "reported_percent",
+              "area"
+            ],
+            "fragment_id": "d58a9f9d-f930-48d5-bbc5-4199b6add73a",
+            "quote": "slab reinforcement in ground floor is 50% done",
+            "locator": "paragraph:1"
+          },
+          {
+            "fields": [
+              "work_date",
+              "date_basis"
+            ],
+            "fragment_id": "d58a9f9d-f930-48d5-bbc5-4199b6add73a",
+            "quote": "date is 19th oct 2026",
+            "locator": "paragraph:1"
+          }
+        ],
+        "model_metadata": {
+          "model_version": "gemma4:12b",
+          "prompt_version": "extraction-v9-source-percent",
+          "config_version": "a9636e1ad83fa94ab18777a9f8313c8d4c0638de56ded723343a0f922d867cc0",
+          "selection_prompt_version": "agent-schedule-v1",
+          "model_calls": [
+            {
+              "model": "gemma4:12b",
+              "model_digest": null,
+              "runtime": null,
+              "system_prompt_hash": "819d4ba65b8b30fda39fe1f2f7473a331e48db63ad860378f225f794342f95a8",
+              "schema_hash": "0472ed137c4fd74d4741f45cbcce688f2b162af969c40e20bfb850c997c12c5a",
+              "settings_hash": "c04385f370c9b0ad508567230a55d0100d0e2b9d577cac7b5c37beee16dee3cf",
+              "adapter_prompt_hash": "e9458113e0c6784f5387a91e5fe2fa839125c58d210b2a12d1657dad42609ff5"
+            },
+            {
+              "model": "gemma4:12b",
+              "model_digest": null,
+              "runtime": null,
+              "system_prompt_hash": "79573c496b88b252e2a66cf83cc81e926465ead7db7e6e75bd5baafb5192db2e",
+              "schema_hash": "353190529a625fe7c92476feb66a2372f8d1ca289ea5952d6508807490b531b2",
+              "settings_hash": "c04385f370c9b0ad508567230a55d0100d0e2b9d577cac7b5c37beee16dee3cf",
+              "adapter_prompt_hash": "0d8adc83ab2251205b00520013b338f01511228b0506c96dbe581b1075676228"
+            },
+            {
+              "model": "gemma4:12b",
+              "model_digest": null,
+              "runtime": null,
+              "system_prompt_hash": "b7c73b90a695ffe2cbe5a9375b2592b0bbe92eafef2f2fbc78f1a2ff5fec45e7",
+              "schema_hash": "3ba3a665419e1d5ab30bcfb5384b4fff51689eb77c0e480ddd6add6b316cddb5",
+              "settings_hash": "c04385f370c9b0ad508567230a55d0100d0e2b9d577cac7b5c37beee16dee3cf",
+              "adapter_prompt_hash": "196b02ad1a25b7746bb328a7435ce484338ebeffcce6b3c80fcef122e8bb1a62"
+            }
+          ],
+          "extraction_batches": [
+            {
+              "prompt_version": "extraction-v9-source-percent",
+              "prompt_hash": "e9458113e0c6784f5387a91e5fe2fa839125c58d210b2a12d1657dad42609ff5",
+              "settings_hash": "a9636e1ad83fa94ab18777a9f8313c8d4c0638de56ded723343a0f922d867cc0",
+              "model": "gemma4:12b",
+              "model_digest": null,
+              "runtime": null,
+              "batch_id": "batch-1"
+            }
+          ],
+          "extraction_errors": []
+        },
+        "capture_status": "recorded",
+        "source": {
+          "report_id": "afd5911c-76be-4517-a0b6-08eecc0768c5",
+          "report_hash": "317d00fee3d5942bebbc6ba768114cb9599673bfbff952ab6e713373d556beb3",
+          "source_label": null,
+          "source_revision": null,
+          "job_id": "9c08f453-476f-45eb-88be-6bcf4b77f758",
+          "schedule_version_id": "473a2db3-3aa3-4f80-8fbc-cf93b01f4d2c",
+          "model_version": "gemma4:12b",
+          "prompt_version": "extraction-v9-source-percent",
+          "config_version": "a9636e1ad83fa94ab18777a9f8313c8d4c0638de56ded723343a0f922d867cc0",
+          "original_url": "/api/v1/projects/a57e01e5-9e4b-4bac-a9a9-7596abb996db/reports/afd5911c-76be-4517-a0b6-08eecc0768c5/original"
+        },
+        "intake": {}
+      },
+      "decision_history": {
+        "scope": "report_job",
+        "job_id": "9c08f453-476f-45eb-88be-6bcf4b77f758",
+        "proposals": [
+          {
+            "id": "07e09ad5-ac6c-4bef-b838-74400ac38491",
+            "observation_id": "0f693a3c-1a05-4a23-ac52-a85bbfcee475",
+            "revision": 1,
+            "state": "pending",
+            "chosen_activity_id": "5a4355b4-fe19-4bef-b04e-af07fd1a9e23",
+            "effects": {
+              "event_type": "actual_progress",
+              "quantity_semantics": "none",
+              "reported_percent": "50",
+              "effective_date": "2026-10-19"
+            },
+            "warnings": [],
+            "candidates": [
+              {
+                "candidate_id": "5a4355b4-fe19-4bef-b04e-af07fd1a9e23",
+                "external_id": "SUP-GF-04",
+                "activity_name": "Slab Reinforcement - GF",
+                "area": "GF",
+                "work_type": "rebar_installation",
+                "is_leaf": true,
+                "asset_tags": [],
+                "wbs": "GT10BLDG.2.1",
+                "discipline": "structural",
+                "aliases": null,
+                "measurement_basis": "quantity_ratio",
+                "planned_quantity": "3000.0000",
+                "unit": "kg",
+                "planned_start": "2026-12-22",
+                "planned_finish": "2026-12-25",
+                "retrieval_rank": null,
+                "retrieval_score": null
+              }
+            ]
+          }
+        ],
+        "events": [],
+        "decisions": []
+      },
+      "id": "07e09ad5-ac6c-4bef-b838-74400ac38491",
+      "observation_id": "0f693a3c-1a05-4a23-ac52-a85bbfcee475",
+      "revision": 1,
+      "current_activity_revision": 1,
+      "current_lifecycle_state": {
+        "actual_start": null,
+        "actual_start_time": null,
+        "actual_start_precision": null,
+        "actual_finish": null,
+        "actual_finish_time": null,
+        "actual_finish_precision": null,
+        "status": null
+      },
+      "candidates": [
+        {
+          "id": "5a4355b4-fe19-4bef-b04e-af07fd1a9e23",
+          "name": "Slab Reinforcement - GF",
+          "area": "GF",
+          "work_type": "rebar_installation",
+          "tags": [],
+          "rank": null
+        }
+      ],
+      "chosen_activity_id": "5a4355b4-fe19-4bef-b04e-af07fd1a9e23",
+      "chosen_activity_measurement_basis": "quantity_ratio",
+      "mapping_state": "suggested",
+      "match_strength": "review",
+      "review_state": "pending",
+      "warnings": [],
+      "proposed_effects": {
+        "event_type": "actual_progress",
+        "quantity_semantics": "none",
+        "reported_percent": "50",
+        "effective_date": "2026-10-19"
+      },
+      "missing_information": [
+        "The reported date (2026-10-19) precedes the planned start date (2026-12-22), but the activity identity remains a clear match based on description and location."
+      ],
+      "selection_explanation": "The observation report explicitly mentions 'slab reinforcement in ground floor' at 50% completion, which directly matches the activity name 'Slab Reinforcement - GF', the area 'GF', and the work type 'rebar_installation' of the candidate.",
+      "observation": {
+        "summary": "slab reinforcement in ground floor is 50% done",
+        "quantity": null,
+        "unit": null,
+        "work_type": "rebar_installation",
+        "area": "ground floor",
+        "tags": [],
+        "event_type": "actual_progress"
+      },
+      "evidence": [
+        {
+          "quote": "slab reinforcement in ground floor is 50% done",
+          "locator": "paragraph:1",
+          "fragment_id": "d58a9f9d-f930-48d5-bbc5-4199b6add73a"
+        },
+        {
+          "quote": "date is 19th oct 2026",
+          "locator": "paragraph:1",
+          "fragment_id": "d58a9f9d-f930-48d5-bbc5-4199b6add73a"
+        }
+      ]
+    }
+  ],
+  "matched_activity": "SUP-GF-04",
+  "verification": "ready_for_review; 50% preserved; no inferred quantity; pending human review"
+}

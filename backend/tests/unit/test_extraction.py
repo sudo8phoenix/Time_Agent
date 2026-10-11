@@ -82,7 +82,10 @@ def test_relative_date_requires_trusted_report_date():
     item = observation("On 2026-09-21, erected 3 spools on line 24-XX in AREA-A.",
                         work_date="2026-09-21", date_basis="relative_resolved")
     untrusted = extract_batch(batch(fragment()), lambda **_: {"observations": [item]})
-    assert untrusted.observations == ()
+    assert len(untrusted.observations) == 1
+    assert untrusted.observations[0].work_date is None
+    assert untrusted.observations[0].date_basis == DateBasis.unknown
+    assert untrusted.observations[0].warnings
     trusted_batch = BatchInput("batch-trusted", (fragment(),), date(2026, 9, 21), True)
     trusted = extract_batch(trusted_batch, lambda **_: {"observations": [item]})
     assert trusted.observations[0].date_basis == DateBasis.relative_resolved
@@ -132,3 +135,42 @@ def test_extract_fragments_preserves_batch_metadata_and_empty_fragments_are_skip
                                 report_date=date(2026, 9, 21), report_date_trusted=True)
     assert len(results) == 1
     assert "Trusted report date: 2026-09-21" in calls[0]
+
+
+@pytest.mark.parametrize("inferred", ["0.5", "50"])
+def test_source_percentage_does_not_become_unitless_quantity(inferred):
+    text = "slab reinforcement in ground floor is 50% done . date is 19th oct 2026"
+    item = observation(text, quantity=inferred, work_date="2026-10-19", quantity_kind="cumulative")
+    item.update(unit=None, raw_unit=None, reported_percent=50)
+    result = extract_batch(batch(fragment(text)), lambda **_: {"observations": [item]})
+    kept = result.observations[0]
+    assert kept.reported_percent == 50
+    assert kept.quantity is None and kept.quantity_kind.value == "none"
+    assert kept.warnings
+
+
+def test_percentage_repair_requires_exact_source_support():
+    item = observation("invented 50%", quantity="0.5", quantity_kind="cumulative")
+    item.update(unit=None, raw_unit=None, reported_percent=50)
+    with pytest.raises(ExtractionError):
+        extract_batch(batch(fragment("slab reinforcement ongoing")), lambda **_: {"observations": [item]})
+
+
+def test_percentage_with_measured_quantity_keeps_both():
+    text = "50% done, 500 kg installed in total"
+    item = observation(text, quantity="500", quantity_kind="cumulative")
+    item.update(unit="kg", raw_unit="kg", reported_percent=50)
+    result = extract_batch(batch(fragment(text)), lambda **_: {"observations": [item]})
+    assert result.observations[0].quantity == 500
+    assert result.observations[0].reported_percent == 50
+
+
+def test_distinct_reported_percentages_are_not_deduplicated():
+    text = "50% done. 60% done."
+    items = []
+    for percent in [50, 60]:
+        item = observation(f"{percent}% done.", quantity=None, quantity_kind="none", summary="Slab progress")
+        item.update(unit=None, raw_unit=None, reported_percent=percent)
+        items.append(item)
+    result = extract_batch(batch(fragment(text)), lambda **_: {"observations": items})
+    assert [item.reported_percent for item in result.observations] == [50, 60]

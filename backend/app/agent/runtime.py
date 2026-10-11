@@ -176,6 +176,8 @@ def _model_callable(model_name: str | None = None) -> Callable[..., Any]:
     adapter = OllamaChatAdapter(
         settings.ollama_base_url,
         model_name or settings.ollama_model,
+        timeout=settings.report_model_timeout_seconds,
+        max_retries=0,
         bearer_token=(
             settings.ollama_api_key.get_secret_value() if settings.ollama_api_key else None
         ),

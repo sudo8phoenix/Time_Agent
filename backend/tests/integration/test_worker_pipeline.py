@@ -45,6 +45,15 @@ def _job(db):
 def _obs(fragment):
     return Extracted.model_validate({"discipline":"piping","work_type":"pipe_spool_erection","event_type":"actual_progress","observed_status":"completed","area":"A","asset_tags":[],"explicit_activity_id":None,"work_date":None,"date_basis":"unknown","quantity":"2","quantity_kind":"delta","unit":"spool","raw_unit":None,"reported_percent":None,"actual_start":None,"actual_finish":None,"blocker":None,"summary":"Installed 2 spools","evidence":[{"fields":["quantity"],"fragment_id":str(fragment.id),"quote":"Installed 2 spools"}],"warnings":[]})
 
+def test_pipeline_all_rejected_extractions_are_visible_failure(db):
+    from types import SimpleNamespace
+    job, _, _ = _job(db)
+    rejected = SimpleNamespace(observations=(), errors=("invalid evidence",), metadata=None)
+    result = process_job(db, job, extraction_call=lambda _: [rejected])
+    assert result["state"] == "failed"
+    assert result["error_code"] == "EXTRACTION_ITEMS_REJECTED"
+    assert db.query(Observation).filter(Observation.job_id == job.id).count() == 0
+
 def test_pipeline_persists_traceable_proposal_and_is_idempotent(db):
     job, fragment, activity = _job(db); calls=[]
     def extract(_): calls.append(1); return [_obs(fragment)]

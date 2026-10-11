@@ -71,6 +71,8 @@ def process_job(db: Session, job: Job, *, model_call: Callable[..., Any] | None 
         adapter = OllamaChatAdapter(
             config.ollama_base_url,
             pinned_model,
+            timeout=config.report_model_timeout_seconds,
+            max_retries=0,
             bearer_token=(config.ollama_api_key.get_secret_value() if config.ollama_api_key else None),
         )
         model_call = adapter.chat
@@ -102,6 +104,10 @@ def process_job(db: Session, job: Job, *, model_call: Callable[..., Any] | None 
             results = extract_fragments(frag_inputs, checked_model_call, report_date=report.report_date if report else None,
                                         report_date_trusted=bool(report and report.report_date and report.report_date_evidence), **kwargs)
         observations = list(deduplicate_results(results)) if results and hasattr(results[0], "observations") else list(results)
+        if not observations and any(getattr(result, "errors", ()) for result in results):
+            return {"stage": "extraction", "state": "failed", "extracted_count": 0,
+                    "proposal_count": 0, "error_code": "EXTRACTION_ITEMS_REJECTED",
+                    "error_message": "The model returned observations, but none passed source evidence or date validation. Review the report date and retry."}
         for result in results:
             metadata = getattr(result, "metadata", None)
             if metadata:

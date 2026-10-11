@@ -8,17 +8,20 @@ def test_graph_model_factory_honors_job_pinned_model(monkeypatch):
     seen = {}
 
     class Adapter:
-        def __init__(self, base_url, model, *, bearer_token):
-            seen.update(base_url=base_url, model=model, bearer_token=bearer_token)
+        def __init__(self, base_url, model, *, bearer_token, timeout, max_retries):
+            seen.update(base_url=base_url, model=model, bearer_token=bearer_token,
+                        timeout=timeout, max_retries=max_retries)
 
         def chat(self, **kwargs):
             return kwargs
 
     monkeypatch.setattr(runtime_module, "get_settings", lambda: SimpleNamespace(
-        ollama_base_url="http://ollama", ollama_model="current-model", ollama_api_key=None))
+        ollama_base_url="http://ollama", ollama_model="current-model", ollama_api_key=None,
+        report_model_timeout_seconds=360))
     monkeypatch.setattr(ollama_module, "OllamaChatAdapter", Adapter)
 
     model_call = runtime_module._model_callable("pinned-model")
 
-    assert seen == {"base_url": "http://ollama", "model": "pinned-model", "bearer_token": None}
+    assert seen == {"base_url": "http://ollama", "model": "pinned-model", "bearer_token": None,
+                    "timeout": 360, "max_retries": 0}
     assert model_call(messages=[]) == {"messages": []}

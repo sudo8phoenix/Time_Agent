@@ -1,0 +1,6 @@
+activity_id,activity_name,wbs_path,discipline,work_type,area,asset_tags,is_leaf,measurement_basis,planned_quantity,unit,planned_start,planned_finish,baseline_date,baseline_quantity,actual_start,actual_finish,aliases
+SUP-GF-01,Column Reinforcement - GF,GT10BLDG.2.1,structural,rebar_installation,GF,,true,quantity_ratio,1000,kg,2026-12-11,2026-12-15,2026-10-01,0,,,
+SUP-GF-02,Column Concreting - GF,GT10BLDG.2.1,structural,concrete_pour,GF,,true,quantity_ratio,20,m3,2026-12-16,2026-12-16,2026-10-01,0,,,
+SUP-GF-03,Slab Shuttering - GF,GT10BLDG.2.1,structural,formwork,GF,,true,quantity_ratio,200,m2,2026-12-18,2026-12-23,2026-10-01,0,,,
+SUP-GF-04,Slab Reinforcement - GF,GT10BLDG.2.1,structural,rebar_installation,GF,,true,quantity_ratio,3000,kg,2026-12-22,2026-12-25,2026-10-01,0,,,
+SUP-GF-05,Slab Concreting - GF,GT10BLDG.2.1,structural,concrete_pour,GF,,true,quantity_ratio,50,m3,2026-12-28,2026-12-28,2026-10-01,0,,,

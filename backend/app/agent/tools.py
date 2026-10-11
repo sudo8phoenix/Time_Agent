@@ -422,6 +422,8 @@ class AgentTools:
                     )
                 if getattr(result, "errors", ()):
                     warnings.append(AgentWarning(code="EXTRACTION_ITEMS_REJECTED", message="Some unsupported extraction items were rejected."))
+            if not valid and warnings:
+                raise AgentToolError("AGENT_TOOL_FAILED", "All extracted observations failed source evidence or date validation.", stage="extraction", retryable=True)
             self._model_metadata = model_metadata
             self._observations = {key: value for key, value in zip(observation_keys(len(valid)), valid, strict=True)}
             return ExtractionToolResult(observations=valid, model_metadata=model_metadata, errors=errors, warnings=warnings)

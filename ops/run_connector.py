@@ -2,6 +2,7 @@
 import argparse
 import sys
 import time
+from uuid import UUID
 from pathlib import Path
 sys.path.insert(0, str(Path(__file__).resolve().parents[1] / "backend"))
 from app.db.session import session_factory
@@ -13,10 +14,11 @@ def main():
     parser = argparse.ArgumentParser(description="MOCK PMIS — prototype outbox worker")
     parser.add_argument("--url", default="http://127.0.0.1:8091")
     parser.add_argument("--once", action="store_true")
+    parser.add_argument("--project-id", type=UUID, help="Deliver only this project's snapshots")
     args = parser.parse_args()
     connector = MockPMISConnector(args.url)
     while True:
-        worked = run_once(session_factory, connector)
+        worked = run_once(session_factory, connector, project_id=args.project_id)
         if args.once:
             return
         if not worked:

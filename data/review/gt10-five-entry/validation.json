@@ -1,0 +1,67 @@
+{
+  "source_file": "/Users/cyrilsabugeorge/Documents/python_project/data/GT10BLDG-P6-Schedule/exports/GT10BLDG_v1_P6_export.xlsx",
+  "source_sha256": "b84946cc8c279e879979ed174539357b92ac6cb3011562d30a44e4cce2913953",
+  "source_sheet": "TASK",
+  "source_rows": {
+    "SUP-GF-01": 139,
+    "SUP-GF-02": 6,
+    "SUP-GF-03": 7,
+    "SUP-GF-04": 15,
+    "SUP-GF-05": 14
+  },
+  "activity_count": 5,
+  "schedule_sha256": "a2c19a68a7e24acfa8cac093575e1969d61bc0af86e5b0b82347f6768bf8b462",
+  "parser_errors": [],
+  "mapping": {
+    "discipline": "structural: classified from names",
+    "work_type": "classified from names",
+    "area": "GF: derived from activity names",
+    "measurement_basis": "quantity_ratio: user-authorized synthetic test enrichment",
+    "baseline_date": "2026-10-01: project data date from source README, not an asserted quantity baseline",
+    "planned_dates": "source dates preserved; times available in source-activities.csv"
+  },
+  "imported": true,
+  "app_started_or_restarted": true,
+  "quantity_origin": "user-authorized synthetic test enrichment; not GT10 source quantities",
+  "synthetic_quantity_enrichment": {
+    "SUP-GF-01": {
+      "measurement_basis": "quantity_ratio",
+      "planned_quantity": "1000",
+      "unit": "kg",
+      "baseline_quantity": "0",
+      "test_cumulative_actual_quantity": "200"
+    },
+    "SUP-GF-02": {
+      "measurement_basis": "quantity_ratio",
+      "planned_quantity": "20",
+      "unit": "m3",
+      "baseline_quantity": "0",
+      "test_cumulative_actual_quantity": "4"
+    },
+    "SUP-GF-03": {
+      "measurement_basis": "quantity_ratio",
+      "planned_quantity": "200",
+      "unit": "m2",
+      "baseline_quantity": "0",
+      "test_cumulative_actual_quantity": "40"
+    },
+    "SUP-GF-04": {
+      "measurement_basis": "quantity_ratio",
+      "planned_quantity": "3000",
+      "unit": "kg",
+      "baseline_quantity": "0",
+      "test_cumulative_actual_quantity": "600"
+    },
+    "SUP-GF-05": {
+      "measurement_basis": "quantity_ratio",
+      "planned_quantity": "50",
+      "unit": "m3",
+      "baseline_quantity": "0",
+      "test_cumulative_actual_quantity": "10"
+    }
+  },
+  "project_id": "a57e01e5-9e4b-4bac-a9a9-7596abb996db",
+  "schedule_version": 1,
+  "approved_events": 5,
+  "verified_receiver_deliveries": 5
+}
