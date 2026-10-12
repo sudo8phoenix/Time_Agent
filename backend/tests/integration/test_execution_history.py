@@ -294,13 +294,13 @@ def test_new_read_endpoints_require_session_and_project_membership(secured_clien
     assert client.get(f"/api/v1/projects/{owned}/history?limit=201").status_code == 422
 
 
-def test_blocker_flows_through_fixture_pipeline_to_history_without_quantity(db_pair):
+def test_blocker_flows_through_graph_to_history_without_quantity(db_pair):
     from uuid import uuid4
     from sqlalchemy import select
     from app.db.models import ProjectMembership
-    from app.jobs.pipeline import process_job
     from app.schemas.observation import Observation as Extracted
     from backend.tests.integration.test_worker_pipeline import _job, _obs
+    from backend.tests.graph_support import extraction_result, retrieval_for_activity, run_graph, select_first_candidate
 
     with db_pair() as db:
         job, fragment, activity = _job(db)
@@ -326,19 +326,11 @@ def test_blocker_flows_through_fixture_pipeline_to_history_without_quantity(db_p
             ],
         )
         extracted = Extracted.model_validate(fields)
-        result = process_job(
-            db,
-            job,
-            extraction_call=lambda _: [extracted],
-            retrieve_call=lambda *_: [activity],
-            selection_call=lambda *_: {
-                "candidate_id": str(activity.id),
-                "mapping_state": "suggested",
-                "match_strength": "review",
-                "explanation": "Developer fixture",
-                "candidates": [],
-                "missing_information": [],
-            },
+        result = run_graph(
+            db, job, model_callable=lambda **_: None,
+            extraction_service=lambda inputs, model, **kwargs: extraction_result([extracted]),
+            retrieval_service=retrieval_for_activity(activity.id),
+            selection_service=select_first_candidate,
         )
         assert result["proposal_count"] == 1
         proposal = db.scalar(select(Proposal).join(Observation).where(Observation.job_id == job.id))

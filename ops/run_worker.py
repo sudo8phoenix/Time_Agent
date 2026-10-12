@@ -9,10 +9,20 @@ from pathlib import Path
 sys.path.insert(0, str(Path(__file__).resolve().parents[1] / "backend"))
 
 from app.db.session import session_factory  # noqa: E402
-from app.jobs.pipeline import process_job  # noqa: E402
+from app.agent.runtime import process_job_with_graph  # noqa: E402
 from app.jobs.service import heartbeat  # noqa: E402
 from app.jobs.worker import run_loop, run_once  # noqa: E402
 from app.settings import get_settings  # noqa: E402
+
+
+def process_claimed_job(db, job, *, token, should_stop, heartbeat_callback):
+    """Run every claimed report through the durable LangGraph workflow."""
+    settings = get_settings()
+    return process_job_with_graph(
+        db, job, token=token, session_factory=session_factory,
+        database_url=settings.database_url, should_stop=should_stop,
+        heartbeat_callback=heartbeat_callback,
+    )
 
 
 def main() -> int:
@@ -31,24 +41,11 @@ def main() -> int:
 
     signal.signal(signal.SIGINT, stop)
     signal.signal(signal.SIGTERM, stop)
-    settings = get_settings()
+    get_settings()
 
     def pipeline(db, job, *, token, should_stop, heartbeat_callback):
-        execution_mode = (job.config_snapshot or {}).get("execution_mode") or settings.agent_execution_mode
-        if execution_mode == "graph":
-            from app.agent.runtime import process_job_with_graph
-
-            return process_job_with_graph(
-                db,
-                job,
-                token=token,
-                session_factory=session_factory,
-                database_url=settings.database_url,
-                should_stop=should_stop,
-                heartbeat_callback=heartbeat_callback,
-            )
-        return process_job(db, job, lease_token=token, should_stop=should_stop,
-                           heartbeat_callback=heartbeat_callback)
+        return process_claimed_job(db, job, token=token, should_stop=should_stop,
+                                   heartbeat_callback=heartbeat_callback)
 
     def beat(job, token):
         with session_factory() as db:

@@ -3,7 +3,6 @@
 Never restores over an existing database. Leaves the restored database for inspection.
 """
 import argparse
-import hashlib
 import json
 from pathlib import Path
 import re
@@ -23,8 +22,10 @@ def sha(path):
 
 RECOVERY_TABLES = {"agent_runs", "conversations", "conversation_turns", "integration_outbox",
                    "activity_states", "progress_events", "observations", "proposals",
-                   "audit_events", "jobs"}
-RECOVERY_PRIMARY_KEYS = {"activity_states": "activity_id"}
+                   "audit_events", "jobs", "agent_steps", "agent_tool_calls",
+                   "schedule_source_metadata"}
+RECOVERY_PRIMARY_KEYS = {"activity_states": "activity_id", "schedule_source_metadata": "schedule_version_id"}
+CHECKPOINT_TABLES = {"checkpoints", "checkpoint_blobs", "checkpoint_writes"}
 
 
 def recovery_digest(lines):
@@ -69,7 +70,13 @@ def main():
         ("schedule_source_metadata", "schedule_version_id", manifest["native_metadata_ids"]),
         ("files", "id", [entry["id"] for entry in manifest["files"]]),
     ]:
-        result = docker("psql", "-U", "progress", "-d", args.database, "-Atc", f"SELECT {column} FROM {table} ORDER BY {column}", capture_output=True, text=True)
+        query = (
+            "SELECT DISTINCT f.id FROM fragments f "
+            "JOIN observations o ON o.fragment_id = f.id "
+            "JOIN progress_events e ON e.observation_id = o.id ORDER BY f.id"
+            if table == "fragments" else f"SELECT {column} FROM {table} ORDER BY {column}"
+        )
+        result = docker("psql", "-U", "progress", "-d", args.database, "-Atc", query, capture_output=True, text=True)
         if sorted(result.stdout.splitlines()) != sorted(expected):
             raise SystemExit(f"Restored {table} differs from backup manifest")
     for table, expected in manifest.get("recovery_rows", {}).items():
@@ -84,9 +91,19 @@ def main():
             raise SystemExit(f"Restored {table} differs from backup manifest")
         if recovery_digest(lines) != expected["sha256"]:
             raise SystemExit(f"Restored {table} content differs from backup manifest")
+    for table, expected in manifest.get("checkpoint_rows", {}).items():
+        if table not in CHECKPOINT_TABLES:
+            raise SystemExit("Backup manifest contains an unsupported checkpoint table")
+        result = docker("psql", "-U", "progress", "-d", args.database, "-Atc",
+                        f"SELECT row_to_json(t)::text FROM {table} t ORDER BY row_to_json(t)::text",
+                        capture_output=True, text=True)
+        lines = result.stdout.splitlines()
+        if len(lines) != expected["count"] or recovery_digest(lines) != expected["sha256"]:
+            raise SystemExit(f"Restored {table} checkpoints differ from backup manifest")
     print(json.dumps({"database": args.database, "uploads": str(destination), "verified": True,
                       "approved_events": len(manifest["approved_event_ids"]), "originals": len(manifest["files"]),
-                      "recovery_rows": {name: len(row["ids"]) for name, row in manifest.get("recovery_rows", {}).items()}}))
+                      "recovery_rows": {name: len(row["ids"]) for name, row in manifest.get("recovery_rows", {}).items()},
+                      "checkpoint_rows": {name: row["count"] for name, row in manifest.get("checkpoint_rows", {}).items()}}))
 
 
 if __name__ == "__main__":

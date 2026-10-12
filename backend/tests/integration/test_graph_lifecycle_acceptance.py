@@ -1,4 +1,4 @@
-"""Fixture-only parity checks for quantity-free lifecycle extraction and review.
+"""Graph-only acceptance for quantity-free lifecycle extraction and review.
 
 These deterministic injected services exercise the persistence and approval
 paths. They do not measure live model accuracy.
@@ -27,7 +27,6 @@ from app.db.models import (
     User,
 )
 from app.db.session import engine
-from app.jobs.pipeline import process_job
 from app.llm.extract import ExtractionMetadata, ExtractionResult
 from app.schemas.events import Endpoint, LifecycleEffect, LifecycleKind, LifecycleScope
 from app.schemas.matching import Candidate
@@ -62,8 +61,7 @@ def _candidate(activity):
         wbs=activity.wbs,
         discipline=activity.discipline,
         aliases=None,
-        # Keep fixture fields identical across ORM-backed legacy and
-        # graph-backed SimpleNamespace candidates.
+        # Keep fixture candidate fields deterministic for the graph adapter.
         measurement_basis="unsupported",
         planned_quantity=None,
         unit=None,
@@ -75,7 +73,7 @@ def _candidate(activity):
 
 
 def _services(activity_id, precision):
-    """Build identical injected extraction, retrieval and selection fixtures."""
+    """Build deterministic injected extraction, retrieval and selection fixtures."""
     def extraction(inputs, _model_call=None, **_kwargs):
         observations = []
         for index, item in enumerate(inputs):
@@ -162,51 +160,9 @@ def _services(activity_id, precision):
     return extraction, retrieval, selection
 
 
-def _first_difference(left, right, path="root"):
-    if type(left) is not type(right):
-        return path, left, right
-    if isinstance(left, dict):
-        if left.keys() != right.keys():
-            return f"{path}.keys", sorted(left.keys()), sorted(right.keys())
-        for key in left:
-            difference = _first_difference(left[key], right[key], f"{path}.{key}")
-            if difference:
-                return difference
-        return None
-    if isinstance(left, list):
-        if len(left) != len(right):
-            return f"{path}.length", len(left), len(right)
-        for index, (left_item, right_item) in enumerate(zip(left, right, strict=True)):
-            difference = _first_difference(left_item, right_item, f"{path}[{index}]")
-            if difference:
-                return difference
-        return None
-    if isinstance(left, tuple):
-        if len(left) != len(right):
-            return f"{path}.length", len(left), len(right)
-        for index, (left_item, right_item) in enumerate(zip(left, right, strict=True)):
-            difference = _first_difference(left_item, right_item, f"{path}[{index}]")
-            if difference:
-                return difference
-        return None
-    if left != right:
-        return path, left, right
-    return None
-
-
-def _normalize_ids(value, aliases):
-    if isinstance(value, dict):
-        return {key: _normalize_ids(item, aliases) for key, item in value.items()}
-    if isinstance(value, list):
-        return [_normalize_ids(item, aliases) for item in value]
-    if isinstance(value, str):
-        return aliases.get(value, value)
-    return value
-
-
-def _case(factory, *, mode, precision):
+def _case(factory, *, precision):
     token = uuid4().hex
-    project = Project(name=f"lifecycle-parity-{mode}-{precision}-{uuid4().hex}", timezone="UTC")
+    project = Project(name=f"lifecycle-graph-{precision}-{uuid4().hex}", timezone="UTC")
     with factory.begin() as db:
         db.add(project)
         db.flush()
@@ -253,7 +209,7 @@ def _case(factory, *, mode, precision):
             lease_expires_at=datetime.now(timezone.utc) + timedelta(minutes=5),
             heartbeat_at=datetime.now(timezone.utc),
         )
-        reviewer = User(username=f"lifecycle-parity-{uuid4().hex}", password_hash="unused", role="reviewer")
+        reviewer = User(username=f"lifecycle-graph-{uuid4().hex}", password_hash="unused", role="reviewer")
         db.add_all([*fragments, job, reviewer])
         db.flush()
         db.add(ProjectMembership(project_id=project.id, user_id=reviewer.id))
@@ -268,70 +224,50 @@ def _case(factory, *, mode, precision):
             tuple(fragment.id for fragment in fragments),
         )
 
-    extraction, retrieval, selection = _services(ids[2], precision)
-    if mode == "legacy":
-        with factory() as db:
-            job = db.get(Job, ids[4])
-            result = process_job(
-                db,
-                job,
-                extraction_call=extraction,
-                retrieve_call=retrieval,
-                selection_call=selection,
-            )
-            db.commit()
-    else:
-        from langgraph.checkpoint.memory import MemorySaver
-        from app.agent.runtime import process_job_with_graph
+    from langgraph.checkpoint.memory import MemorySaver
+    from app.agent.runtime import process_job_with_graph
 
-        with factory() as db:
-            job = db.get(Job, ids[4])
-            result = process_job_with_graph(
-                db,
-                job,
-                token=token,
-                session_factory=factory,
-                model_callable=lambda **_kwargs: (_ for _ in ()).throw(AssertionError("fixture services must not call a model")),
-                extraction_service=extraction,
-                retrieval_service=retrieval,
-                selection_service=selection,
-                checkpointer=MemorySaver(),
-            )
-    graph_run = None
-    graph_steps = []
-    if mode == "graph":
-        with factory() as db:
-            graph_run = db.query(AgentRun).filter(AgentRun.job_id == ids[4]).one()
-            graph_steps = list(db.query(AgentStep).filter(
-                AgentStep.run_id == graph_run.id
-            ).order_by(AgentStep.ordinal))
-        step_details = [
-            {
-                "node": step.node,
-                "state": step.state,
-                "error_code": step.error_code,
-                "error_message": step.error_message,
-                "summary": step.sanitized_summary,
-            }
-            for step in graph_steps
-        ]
-        diagnostic = (
-            f"graph result={result}; run state={graph_run.state}; "
-            f"error_code={graph_run.error_code}; error_message={graph_run.error_message}; "
-            f"steps={step_details}"
+    extraction, retrieval, selection = _services(ids[2], precision)
+    with factory() as db:
+        job = db.get(Job, ids[4])
+        result = process_job_with_graph(
+            db,
+            job,
+            token=token,
+            session_factory=factory,
+            model_callable=lambda **_kwargs: (_ for _ in ()).throw(
+                AssertionError("fixture services must not call a model")
+            ),
+            extraction_service=extraction,
+            retrieval_service=retrieval,
+            selection_service=selection,
+            checkpointer=MemorySaver(),
         )
-    else:
-        diagnostic = f"legacy result={result}"
+    with factory() as db:
+        graph_run = db.query(AgentRun).filter(AgentRun.job_id == ids[4]).one()
+        graph_steps = list(db.query(AgentStep).filter(
+            AgentStep.run_id == graph_run.id
+        ).order_by(AgentStep.ordinal))
+    step_details = [
+        {"node": step.node, "state": step.state, "error_code": step.error_code,
+         "error_message": step.error_message, "summary": step.sanitized_summary}
+        for step in graph_steps
+    ]
+    diagnostic = (
+        f"graph result={result}; run state={graph_run.state}; "
+        f"error_code={graph_run.error_code}; error_message={graph_run.error_message}; "
+        f"steps={step_details}"
+    )
     assert result["state"] == "ready_for_review", diagnostic
     assert result["extracted_count"] == result["proposal_count"] == 2, diagnostic
-    if mode == "graph":
-        expected_steps = [
-            "load_context", "extract", "validate_extraction", "retrieve",
-            "select", "validate_selection", "persist", "finalize",
-        ]
-        assert [step.node for step in graph_steps] == expected_steps, diagnostic
-        assert graph_run.state == "ready_for_review", diagnostic
-        assert graph_run.error_code is None and graph_run.error_message is None, diagnostic
+    expected_steps = [
+        "load_context", "extract", "validate_extraction", "retrieve",
+        "select", "validate_selection", "persist", "finalize",
+    ]
+    assert [step.node for step in graph_steps] == expected_steps, diagnostic
+    assert all(step.state == "succeeded" for step in graph_steps), diagnostic
+    assert graph_run.state == "ready_for_review", diagnostic
+    assert graph_run.error_code is None and graph_run.error_message is None, diagnostic
 
     with factory() as db:
         # Persisted observation ordinals retain source order; use that instead
@@ -340,40 +276,36 @@ def _case(factory, *, mode, precision):
             Observation, Observation.id == Proposal.observation_id
         ).filter(Proposal.project_id == ids[0]).order_by(Observation.ordinal))
         assert len(proposals) == 2
-        normalized = []
-        id_aliases = {
-            str(ids[0]): "<project>",
-            str(ids[1]): "<schedule>",
-            str(ids[2]): "<activity>",
-            str(ids[3]): "<report>",
-            str(ids[4]): "<job>",
-            str(ids[5]): "<reviewer>",
-            str(ids[6][0]): "<fragment:1>",
-            str(ids[6][1]): "<fragment:2>",
-        }
+        persisted = []
         for index, proposal in enumerate(proposals, 1):
             observation = db.get(Observation, proposal.observation_id)
-            id_aliases[str(observation.id)] = f"<observation:{index}>"
-            id_aliases[str(proposal.id)] = f"<proposal:{index}>"
             provenance = observation.field_evidence["provenance"]
+            expected_kind = "actual_start" if index == 1 else "actual_finish"
+            expected_day = "2026-09-01" if index == 1 else "2026-09-03"
+            expected_time = ("08:15:00" if index == 1 else "17:45:00") if precision == "minute" else None
+            endpoint = observation.fields["lifecycle_effects"][0]["endpoint"]
             assert observation.fields["quantity"] is None
-            assert observation.fields["lifecycle_effects"][0]["endpoint"]["precision"] == precision
+            assert observation.fields["event_type"] == expected_kind
+            assert endpoint["local_date"] == expected_day
+            assert endpoint["local_time"] == expected_time
+            assert endpoint["precision"] == precision
+            assert endpoint["timezone"] == "Asia/Kolkata"
             assert provenance["version"] == "proposal-provenance-v1"
             assert provenance["validation"]["status"] == "requires_authorized_review"
             assert provenance["evidence"] == observation.fields["evidence"]
             assert provenance["original_fields"] == observation.fields
             assert provenance["original_selection"]["candidate_id"] == str(ids[2])
-            assert proposal.proposed_effects["event_type"] in {"actual_start", "actual_finish"}
+            assert proposal.proposed_effects["event_type"] == expected_kind
+            assert proposal.proposed_effects["effective_date"] == expected_day
+            assert proposal.proposed_effects["endpoint"]["local_time"] == expected_time
+            assert provenance["evidence"][0]["quote"] == fragments[index - 1].normalised_text
             assert "quantity" not in proposal.proposed_effects
-            normalized.append({
+            persisted.append({
                 "effects": proposal.proposed_effects,
                 "original_fields": provenance["original_fields"],
                 "original_selection": provenance["original_selection"],
                 "evidence": provenance["evidence"],
-                "confidence": {
-                    stage: {key: value for key, value in details.items() if key != "version"}
-                    for stage, details in provenance["confidence"].items()
-                },
+                "confidence": provenance["confidence"],
             })
         proposal_ids = [item.id for item in proposals]
         for index, proposal_id in enumerate(proposal_ids):
@@ -382,7 +314,7 @@ def _case(factory, *, mode, precision):
                 ApprovalRequest(
                     expected_proposal_revision=1,
                     expected_activity_revision=index,
-                    idempotency_key=f"{mode}-{precision}-{index}-{uuid4().hex}",
+                    idempotency_key=f"graph-{precision}-{index}-{uuid4().hex}",
                 ),
                 db.get(User, ids[5]),
                 db,
@@ -407,17 +339,12 @@ def _case(factory, *, mode, precision):
         }
         assert all(proposal.review_state == "approved" for proposal in proposals)
         assert all(event.approved_values["event_type"] in {"actual_start", "actual_finish"} for event in events)
-    return _normalize_ids(normalized, id_aliases), final_state
+    return persisted, final_state
 
 
 @pytest.mark.parametrize("precision", ["date", "minute"])
-def test_legacy_and_graph_lifecycle_paths_have_equal_reviewed_effects(transaction_factory, precision):
-    legacy = _case(transaction_factory, mode="legacy", precision=precision)
-    graph = _case(transaction_factory, mode="graph", precision=precision)
-
-    difference = _first_difference(legacy, graph)
-    assert difference is None, f"legacy/graph parity differs at {difference}"
-    effects, final = legacy
+def test_graph_lifecycle_proposals_apply_date_and_minute_effects_after_approval(transaction_factory, precision):
+    effects, final = _case(transaction_factory, precision=precision)
     assert [item["effects"]["event_type"] for item in effects] == ["actual_start", "actual_finish"]
     assert final == {
         "actual_start": "2026-09-01",

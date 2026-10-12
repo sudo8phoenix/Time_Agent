@@ -62,7 +62,7 @@ for (const width of [320, 768, 1024, 1440]) {
 test("recovers a stale CSRF token and reopens a job after refresh", async ({ page }) => {
   let token = "old-csrf", rejected = false, submissions = 0;
   const project = { id: "one", name: "Project one", timezone: "UTC", active_schedule_version_id: "schedule" };
-  const job = { job_id: "job-1", project_id: "one", state: "ready_for_review", stage: "persist", proposal_count: 0, proposal_ids: [] };
+  const job = { job_id: "job-1", project_id: "one", state: "ready_for_review", stage: "persist", proposal_count: 0, proposal_ids: [], agent_run_available: false };
   await page.route("**/api/v1/**", async route => {
     const request = route.request(), path = new URL(request.url()).pathname.replace("/api/v1", "");
     if (path === "/auth/me") return route.fulfill({ json: { id: "user", username: "reviewer", role: "reviewer", csrf_token: token } });

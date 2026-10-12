@@ -92,8 +92,7 @@ def test_source_grounded_clock_zone_repair_only():
         extract_batch(batch, lambda **_: {"observations": [raw]})
 
 
-def test_both_worker_modes_share_lifecycle_builder():
-    from app.jobs.pipeline import _effects as legacy_effects
+def test_graph_uses_shared_lifecycle_effect_builder():
     from app.agent.runtime import _effects as graph_effects
     obs = observation(effects=[{
         "kind": "actual_start", "scope": "whole_activity",
@@ -101,7 +100,7 @@ def test_both_worker_modes_share_lifecycle_builder():
                      "precision": "minute", "basis": "report_context", "raw_expression": "at 08:30"},
         "evidence": [{"fields": ["kind"], "fragment_id": "f1",
                       "quote": "Started excavation at F-01 at 08:30"}]}])
-    assert legacy_effects(obs) == graph_effects(obs) == build_effects(obs)
+    assert graph_effects(obs) == build_effects(obs)
 
 
 def test_source_stated_clock_repairs_incomplete_minute_endpoint():

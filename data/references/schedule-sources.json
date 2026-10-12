@@ -27,11 +27,21 @@
       "retrieval_date": "unknown_user_supplied",
       "audit_date": "2026-10-09",
       "role": "initial_development_snapshot",
-      "license": "MIT indicated on GitHub; exact LICENSE text not locally retained",
-      "license_text_retained": false,
-      "upstream_byte_identity_verified": false,
+      "license": "MIT",
+      "license_text_retained": true,
+      "upstream_byte_identity_verified": true,
       "owner_data": false,
-      "paired_report_gold": false
+      "paired_report_gold": false,
+      "license_text_path": "data/references/licenses/GT10-MIT.txt",
+      "license_sha256": "e9d0e6c0666a540af93165fef00ab7cb461b405237f67d3ee52ce2413b63125f",
+      "license_source_url": "https://raw.githubusercontent.com/SionRani/GT10BLDG-P6-Schedule/d7eff9bb75e8d56634ea93e435d9746ad1b15b22/LICENSE",
+      "license_retrieved_at": "2026-10-12",
+      "upstream_revision": "d7eff9bb75e8d56634ea93e435d9746ad1b15b22",
+      "upstream_archive_url": "https://raw.githubusercontent.com/SionRani/GT10BLDG-P6-Schedule/d7eff9bb75e8d56634ea93e435d9746ad1b15b22/GT10BLDG-P6-Schedule.zip",
+      "upstream_archive_sha256": "0ec793405c03f31126985cdf13d874dfa5954596ec5fd89015880d4c63f7980e",
+      "upstream_archive_member": "GT10BLDG-P6-Schedule/exports/GT10BLDG_v1_P6_export.xlsx",
+      "upstream_member_sha256": "b84946cc8c279e879979ed174539357b92ac6cb3011562d30a44e4cce2913953",
+      "upstream_verified_at": "2026-10-12"
     },
     {
       "source": "gt10",
@@ -42,11 +52,21 @@
       "retrieval_date": "unknown_user_supplied",
       "audit_date": "2026-10-09",
       "role": "reconciliation_only",
-      "license": "MIT indicated on GitHub; exact LICENSE text not locally retained",
-      "license_text_retained": false,
-      "upstream_byte_identity_verified": false,
+      "license": "MIT",
+      "license_text_retained": true,
+      "upstream_byte_identity_verified": true,
       "owner_data": false,
-      "paired_report_gold": false
+      "paired_report_gold": false,
+      "license_text_path": "data/references/licenses/GT10-MIT.txt",
+      "license_sha256": "e9d0e6c0666a540af93165fef00ab7cb461b405237f67d3ee52ce2413b63125f",
+      "license_source_url": "https://raw.githubusercontent.com/SionRani/GT10BLDG-P6-Schedule/d7eff9bb75e8d56634ea93e435d9746ad1b15b22/LICENSE",
+      "license_retrieved_at": "2026-10-12",
+      "upstream_revision": "d7eff9bb75e8d56634ea93e435d9746ad1b15b22",
+      "upstream_archive_url": "https://raw.githubusercontent.com/SionRani/GT10BLDG-P6-Schedule/d7eff9bb75e8d56634ea93e435d9746ad1b15b22/GT10BLDG-P6-Schedule.zip",
+      "upstream_archive_sha256": "0ec793405c03f31126985cdf13d874dfa5954596ec5fd89015880d4c63f7980e",
+      "upstream_archive_member": "GT10BLDG-P6-Schedule/source/GT10BLDG_input_activities_relationships.xlsx",
+      "upstream_member_sha256": "598e2fcfa2bae290284cb6ca9f4eaff164ce149b4269099b7e763bc2e4ea5951",
+      "upstream_verified_at": "2026-10-12"
     }
   ],
   "gt10_unresolved": [
@@ -58,5 +78,5 @@
     "WBS differences",
     "native XER missing"
   ],
-  "distribution_gate": "GT10 exact LICENSE text must be retained before redistribution"
+  "distribution_gate": "Retain MIT copyright/license notice with GT10 derivatives; Cambridge attribution/license review remains required."
 }

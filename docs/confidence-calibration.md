@@ -1,6 +1,6 @@
 # Confidence and calibration contract
 
-A01 records `proposal-provenance-v1` in observation JSON for legacy jobs, graph jobs and confirmed conversations. Reviewer corrections record their parent observation/event. No migration or backfill is required. Extraction and linking estimates are separate objects with score, method, version and validation status. Current estimators return `score: null`, `method: not_estimated`, `validation_status: unavailable`. Match strength, retrieval rank and source-quote presence are not calibrated probabilities.
+A01 records `proposal-provenance-v1` in observation JSON for report jobs and confirmed conversations. Reviewer corrections record their parent observation/event. No migration or backfill is required. Extraction and linking estimates are separate objects with score, method, version and validation status. Current estimators return `score: null`, `method: not_estimated`, `validation_status: unavailable`. Match strength, retrieval rank and source-quote presence are not calibrated probabilities.
 
 The proposal GET response includes `provenance` and `decision_history`. History is explicitly scoped to the report job: all atomic observations, proposal revisions, accepted events, corrections/retractions, and review audit records with actor, timestamp, reason and before/after values. Original observations and candidate decisions remain stored. New review actions use application UTC timestamps to distinguish multiple actions in the same PostgreSQL transaction. Historic proposal reads permit a superseded schedule; mutation paths retain active/pinned schedule checks and project authorization. Legacy proposals explicitly report incomplete capture. Missing model identity/config metadata from injected callables is unknown, never invented. Confidence metadata is visible in the review screen.
 
@@ -38,3 +38,8 @@ Thresholds only inform review priority. Low-confidence, ambiguous or conflicting
 ## Current evidence gate
 
 D04's reports are developer-authored synthetic development cases awaiting independent review. D05's group manifests are provisional and unfrozen. Current confidence scores are unavailable. Therefore A02 cannot produce defensible operational threshold choices yet. `evaluation/results/calibration-v1-pending.json` records this status and dependency hashes. Unit fixtures test the tool's behavior, including simulated review attestations, and are never submitted as actual independently reviewed calibration evidence.
+
+
+## Runtime history note (2026-10-12)
+
+The current report processor is LangGraph-only. Earlier proposal records may have been produced by the former pipeline and retain their original provenance and meaning; no historical record is rewritten by the runtime removal. The review, calibration, frozen-split, and independent-evaluation gates described here remain unchanged.

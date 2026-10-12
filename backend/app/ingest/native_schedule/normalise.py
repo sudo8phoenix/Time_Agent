@@ -84,4 +84,5 @@ def normalise_schedule(
         wbs=preview.wbs,
         relationships=preview.relationships,
         issues=preview.issues,
+        source_metadata=preview.source_metadata,
     )

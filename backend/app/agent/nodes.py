@@ -95,7 +95,11 @@ def _merge(state: AgentState, updates: dict[str, Any]) -> dict[str, Any]:
             "next_action": "fail",
             "terminal_state": "failed",
         }
-    return result
+    # Persist only JSON primitives and arrays/maps. The validated state remains
+    # the source of truth for selected updates and legacy serializers never see
+    # newly emitted Pydantic or Enum instances.
+    json_state = merged.model_dump(mode="json", warnings=False)
+    return {key: json_state[key] for key in result}
 
 
 def _nodes(tools: Any, policy: Any) -> dict[str, Callable[[AgentState], dict[str, Any]]]:

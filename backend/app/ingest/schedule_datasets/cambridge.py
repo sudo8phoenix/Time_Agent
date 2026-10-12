@@ -82,6 +82,8 @@ def read_cambridge(path: str | Path, *, project_id: str | None = None) -> Iterat
     for pid, source in _projects(Path(path)):
         if project_id is not None and pid != project_id:
             continue
+        if not isinstance(source, dict):
+            raise ValueError(f"invalid project object in {pid}")
         activities = source.get("Activities", {})
         if not isinstance(activities, dict):
             raise ValueError(f"invalid Activities in {pid}")
@@ -89,15 +91,18 @@ def read_cambridge(path: str | Path, *, project_id: str | None = None) -> Iterat
         rows = []
         for task_id, raw in activities.items():
             locator = f"$.Projects[{json.dumps(pid)}].Activities[{json.dumps(task_id)}]"
+            if not isinstance(raw, dict):
+                raise ValueError(f"invalid task object at {locator}")
             if str(raw.get("Task_ID")) != task_id:
                 issues.append({"code": "task_id_mismatch", "locator": locator})
             relations = raw.get("Activity_Relationships", {})
-            if relations == "null":
+            if relations is None or relations == "null":
                 relations = {}
             elif not isinstance(relations, dict):
-                issues.append({"code": "invalid_relationship_container", "locator": locator})
-                relations = {}
+                raise ValueError(f"invalid relationship container at {locator}")
             for rel_id, rel in relations.items():
+                if not isinstance(rel, dict):
+                    raise ValueError(f"invalid relationship object at {locator}[{rel_id!r}]")
                 pred = str(rel.get("Predecessor_ID"))
                 if pred not in activities:
                     issues.append({"code": "external_or_unresolved_predecessor", "locator": locator,
@@ -105,9 +110,12 @@ def read_cambridge(path: str | Path, *, project_id: str | None = None) -> Iterat
             rows.append({"identity": ["cambridge", pid, task_id], "locator": locator,
                          "raw": raw, "relationships": relations,
                          "timestamp_basis": "source_string_timezone_unspecified"})
+        wbs = source.get("Work_Breakdown_Structure", {})
+        if not isinstance(wbs, (dict, list)):
+            raise ValueError(f"invalid Work_Breakdown_Structure in {pid}")
         yield {"source": "cambridge", "project_id": pid, "project_metadata":
                {key: value for key, value in source.items() if key not in {"Activities", "Work_Breakdown_Structure"}},
-               "wbs": source.get("Work_Breakdown_Structure", {}), "activities": rows,
+               "wbs": wbs, "activities": rows,
                "issues": issues, "review_status": "unreviewed"}
 
 

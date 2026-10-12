@@ -1,5 +1,6 @@
 PYTHON ?= python3.12
 VENV ?= .venv
+PORT ?= 8000
 PIP = $(VENV)/bin/pip
 PYTEST = $(VENV)/bin/pytest
 TEST_DATABASE_URL ?= postgresql+psycopg://progress:progress@127.0.0.1:5432/progress_test
@@ -18,7 +19,7 @@ migrate:
 seed-demo:
 	PYTHONPATH=backend $(VENV)/bin/python ops/seed_demo.py
 dev-api:
-	PYTHONPATH=backend $(VENV)/bin/uvicorn app.main:app --host 127.0.0.1 --port 8000 --reload
+	PYTHONPATH=backend $(VENV)/bin/uvicorn app.main:app --host 127.0.0.1 --port $(PORT) --reload
 dev-web:
 	cd frontend && npm run dev
 worker:
@@ -36,7 +37,7 @@ evaluate:
 build-web:
 	cd frontend && npm run build
 serve:
-	PYTHONPATH=backend $(VENV)/bin/uvicorn app.main:app --host 127.0.0.1 --port 8000
+	PYTHONPATH=backend $(VENV)/bin/uvicorn app.main:app --host 127.0.0.1 --port $(PORT)
 doctor:
 	PYTHONPATH=backend $(VENV)/bin/python ops/doctor.py
 remote-check:

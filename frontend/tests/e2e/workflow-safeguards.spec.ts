@@ -19,7 +19,7 @@ async function base(page: import("@playwright/test").Page, handler: (route: impo
 test("pending submission locks inputs and project navigation", async ({ page }) => {
   let release: (() => void) | undefined;
   await base(page, async (route, path) => {
-    if (path.endsWith("/reports")) { await new Promise<void>(resolve => { release = resolve; }); return route.fulfill({ status: 202, json: { job_id: "job", project_id: "one", state: "ready_for_review", proposal_count: 0, proposal_ids: [] } }); }
+    if (path.endsWith("/reports")) { await new Promise<void>(resolve => { release = resolve; }); return route.fulfill({ status: 202, json: { job_id: "job", project_id: "one", state: "ready_for_review", proposal_count: 0, proposal_ids: [], agent_run_available: false } }); }
     throw new Error(path);
   });
   await page.goto("/"); await page.getByLabel("Paste report text").fill("Original report");
@@ -55,9 +55,9 @@ test("durable history paginates and queue supports percentage revision", async (
   await base(page, async (route, path) => {
     if (path === "/jobs") {
       const params = new URL(route.request().url()).searchParams;
-      return route.fulfill({ json: { items: [{ job_id: "job", project_id: "one", state: "ready_for_review", report_name: params.get("offset") === "25" ? "Older report" : "Daily report", created_at: "2026-10-09T09:00:00Z", pending_count: 1, proposal_count: 1 }], next_offset: params.get("offset") === "25" ? null : 25 } });
+      return route.fulfill({ json: { items: [{ job_id: "job", project_id: "one", state: "ready_for_review", agent_run_available: false, report_name: params.get("offset") === "25" ? "Older report" : "Daily report", created_at: "2026-10-09T09:00:00Z", pending_count: 1, proposal_count: 1 }], next_offset: params.get("offset") === "25" ? null : 25 } });
     }
-    if (path === "/jobs/job") return route.fulfill({ json: { job_id: "job", project_id: "one", state: "ready_for_review", proposal_ids: ["p1"], proposal_count: 1 } });
+    if (path === "/jobs/job") return route.fulfill({ json: { job_id: "job", project_id: "one", state: "ready_for_review", proposal_ids: ["p1"], proposal_count: 1, agent_run_available: false } });
     if (path === "/proposals/p1") return route.fulfill({ json: { ...proposal, revision, proposed_effects: effects } });
     if (path === "/proposals/p1/revise") { const body = route.request().postDataJSON(); expect(body.field_changes.proposed_effects.reported_percent).toBe("50"); revision++; effects = { ...effects, reported_percent: "50" }; return route.fulfill({ json: { ...proposal, revision, proposed_effects: effects } }); }
     throw new Error(path);
@@ -122,7 +122,7 @@ for (const width of [320, 768, 1024, 1440]) {
   test(`workspace fits ${width}px`, async ({ page }) => {
     await page.setViewportSize({ width, height: 900 });
     await base(page, async (route, path) => {
-      if (path === "/jobs") return route.fulfill({ json: { items: [{ job_id: "job", project_id: "one", report_name: "Daily progress report for the northern utility installation", state: "ready_for_review", pending_count: 2, created_at: "2026-10-09T09:00:00Z" }], next_offset: null } });
+      if (path === "/jobs") return route.fulfill({ json: { items: [{ job_id: "job", project_id: "one", report_name: "Daily progress report for the northern utility installation", state: "ready_for_review", agent_run_available: false, pending_count: 2, created_at: "2026-10-09T09:00:00Z" }], next_offset: null } });
       throw new Error(path);
     });
     await page.goto("/");

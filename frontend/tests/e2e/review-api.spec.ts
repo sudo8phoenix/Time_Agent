@@ -19,7 +19,7 @@ for (const width of [390, 1440]) {
     proposals.get("p1")!.warnings = ["Date needs confirmation"];
     let queue = ["p1", "p2"];
     const mutations: string[] = [];
-    const job = () => ({ job_id: "job-1", project_id: project.id, state: "ready_for_review", stage: "persist", proposal_count: 2, proposal_ids: queue });
+    const job = () => ({ job_id: "job-1", project_id: project.id, state: "ready_for_review", stage: "persist", proposal_count: 2, proposal_ids: queue, agent_run_available: false });
     await page.route("**/api/v1/**", async route => {
       const request = route.request();
       const path = new URL(request.url()).pathname.replace("/api/v1", "");
@@ -78,7 +78,7 @@ for (const width of [390, 1440]) {
     await expect(page.getByRole("button", { name: "Approve update" })).toBeDisabled();
     await expect(page.getByText("A measured quantity is required for a progress update.")).toBeVisible();
     await expect(page.getByText("A measured unit is required for a progress update.")).toBeVisible();
-    await expect(page.getByText(/Submit an amended report with the quantity/)).toBeVisible();
+    await expect(page.getByText(/Include a measured amount and unit/)).toBeVisible();
     await page.getByRole("button", { name: "Reject", exact: true }).click();
     await expect(page.getByRole("alert")).toHaveText("Add a reason before rejecting.");
     expect(mutations).toEqual([]);

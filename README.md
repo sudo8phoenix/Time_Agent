@@ -13,25 +13,25 @@ The application is intended to run on a laptop with FastAPI, PostgreSQL, and a R
 ## What it does
 
 - Imports CSV and native schedule formats through provenance-preserving staging and activation flows.
-- Accepts authenticated daily reports and processes them through a bounded extraction and matching pipeline.
+- Accepts authenticated daily reports and processes them through a bounded LangGraph extraction and matching workflow.
 - Stores observations, evidence references, schedule candidates, and proposed progress changes for review.
 - Supports corrections, approval, progress history, lifecycle events, conflict handling, and safe CSV export.
-- Offers a legacy pipeline and a gated LangGraph runtime with PostgreSQL checkpoints, leases, resume support, sanitized traces, and idempotent persistence.
+- Processes reports through the bounded LangGraph runtime with PostgreSQL checkpoints, leases, resume support, sanitized traces, and idempotent persistence.
 - Restricts model configuration to server-side settings; the browser cannot select arbitrary endpoints, prompts, tools, or checkpoints.
 - Keeps ambiguous or unsupported evidence from silently changing the ledger.
 
 ## Current status
 
-The current working tree implements quantity-free lifecycle events, text conversations, planner resolution, flexible report intake, precision-aware history/durations, automatic **MOCK PMIS — prototype** delivery, and audited report reanalysis. The default execution mode remains `legacy`; graph rollout stays gated.
+The current report-processing runtime uses the bounded LangGraph worker with PostgreSQL checkpoints and sanitized run status. The October 12 local smoke and browser-to-worker run each produced a pending proposal and zero approved events. These are bounded workflow checks, not an evaluation of model quality. Earlier dated records below document the pre-removal runtime architecture.
 
-Fresh verification and exact runtime/source identifiers are recorded in [`docs/release.md`](docs/release.md). Changes are uncommitted, so the recorded base commit alone does not reproduce this working tree. Tests use isolated databases and explicitly synthetic/injected-model fixtures.
+The graph-only local prototype was verified on 2026-10-12. Current post-removal checks are recorded in [`docs/handoffs/graph-only-runtime.md`](docs/handoffs/graph-only-runtime.md) and [`docs/release.md`](docs/release.md). A live browser-to-running-API/worker/model graph job and a literal subprocess-kill checkpoint-resume test passed before the processor cleanup; they are bounded workflow evidence, not an unseen evaluation or lifecycle/duration acceptance.
 
-Independent label review, frozen evaluation splits, calibrated thresholds and a real unseen UI-to-export model run remain pending. The owner sample package is `not_received`. Public Cambridge/GT10 schedules and synthetic reports are development inputs, not owner-package or independently reviewed field truth. See [`docs/release.md`](docs/release.md) for current validation and remaining release gates.
+Independent human label review, adjudication/calibration, frozen evaluation splits and a full unseen UI-to-export model evaluation remain pending. The owner sample package is `not_received`. Public Cambridge/GT10 schedules and synthetic reports are development inputs; a technical source-backed review does not constitute planner approval or field truth. See [`docs/release.md`](docs/release.md) for current validation and remaining gates.
 
 ## Architecture
 
 ```text
-report API → PostgreSQL job + lease → legacy or bounded graph worker
+report API → PostgreSQL job + lease → bounded LangGraph worker
                                       ├─ load context
                                       ├─ extract observations
                                       ├─ validate evidence
@@ -96,7 +96,7 @@ make serve
 make worker
 ```
 
-Open <http://127.0.0.1:8000>. The default worker uses the accepted legacy pipeline. Keep `AGENT_EXECUTION_MODE=legacy` until the graph parity, security, rollback, and live-model gates are complete.
+Open <http://127.0.0.1:8000>. The report processor uses LangGraph; there is no runtime mode switch. See [`docs/local-run.md`](docs/local-run.md) for local ports, model setup, and recovery instructions.
 
 For the complete setup, private Ollama configuration, backup drill, and known limitations, read [`docs/local-run.md`](docs/local-run.md).
 
@@ -110,10 +110,9 @@ Copy `.env.example` to `.env`. The main settings are:
 | `OLLAMA_BASE_URL` | Loopback or private Ollama endpoint |
 | `OLLAMA_MODEL` | Exact server-side model tag |
 | `OLLAMA_API_KEY` | Optional server-side bearer token |
-| `AGENT_EXECUTION_MODE` | `legacy` by default; `graph` remains gated |
 | `SECRET_KEY` | Application signing key; never commit it |
 
-The browser cannot change model, endpoint, prompt, execution mode, checkpoint, or approval settings.
+The browser cannot change model, endpoint, prompt, checkpoints, or approval settings.
 
 ## Verification
 

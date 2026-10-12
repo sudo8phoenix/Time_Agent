@@ -40,7 +40,7 @@ test("fixture schedule import validates and stages a native source", async ({ pa
   await page.getByLabel("Measurement basis").selectOption("quantity_ratio");
   await page.getByLabel("Planned quantity").fill("12");
   await page.getByLabel("Unit").selectOption("spool");
-  await page.getByLabel("Baseline quantity").fill("0");
+  await page.getByLabel("Actual quantity at baseline").fill("0");
   await page.getByLabel("Find activity").fill("missing task");
   await expect(page.getByText("0 of 1 activities shown")).toBeVisible();
   await page.getByLabel("Find activity").fill("");

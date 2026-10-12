@@ -1,6 +1,6 @@
 # Implementation task state
 
-Current implementation status and remaining release gates are in [release.md](release.md). E01 recovery/reanalysis, E02 evaluation preparation and E03 documentation evidence are in the corresponding [handoffs](handoffs/). E02 independent live validation and full E03 release acceptance remain pending.
+Current implementation status and remaining release gates are in [release.md](release.md). E01 recovery/reanalysis, E02 evaluation preparation and E03 documentation evidence are in the corresponding [handoffs](handoffs/). The October 11 GT10 five-entry workflow and October 12 one-case graph smoke are bounded workflow evidence; neither completes E02 independent unseen evaluation or lifecycle/duration acceptance. The source-backed technical review is a separate development-data suggestion set, not human review or adjudication. Independent labels, calibration and owner-data gates remain pending.
 
 The W-series below is the historical execution record for the application. The user-facing checklist remains at `progress-agent-plan/TASK_BOARD.md` and is updated when a task has passed its acceptance evidence.
 
@@ -11,10 +11,10 @@ The W-series below is the historical execution record for the application. The u
 | W-02 | unit validated | builder agent | W-01 interface | generated OpenAPI comparison |
 | W-03 | 60/300 expansion validated; human review pending | builder agent | W-02 interface | user review of seed, expanded and native-linked labels |
 | W-04 | complete | builder agent | W-02 interface | expiry/revocation/roles/CSRF/cross-project acceptance passed |
-| W-08 | live Gemma readiness and structured JSON smoke passed; benchmark pending | builder agent | private endpoint/model | representative latency and throughput benchmark |
+| W-08 | private endpoint and exact model readiness/smoke passed; benchmark pending | builder agent | private endpoint/model | representative latency and throughput benchmark |
 | W-05 | complete | builder agent | W-03/W-04 interfaces | CSV and activation safety integrated with native flows |
 | W-06 | complete | builder agent | W-04/W-05 interfaces | PostgreSQL constraint rollback and file cleanup passed |
-| W-07 | runtime complete; live model pending | builder agent | W-04/W-06 interfaces | run CLI worker against friend-hosted Ollama |
+| W-07 | complete; report processing now graph-only | builder agent | W-04/W-06 interfaces | accepted 11 Oct quantity workflow and 12 Oct normal graph-worker run; see runtime supersession note below |
 | W-09 | extraction fixtures and one Gemma smoke validated; real-model evaluation pending | builder agent | W-03/W-06/W-08 interfaces | 20 seed-case results from an actual local model |
 | W-10 | persisted hybrid retrieval validated; live model pending | builder agent | W-02/W-03/W-05 interfaces | provision pinned local embedding weights and evaluate reviewed labels |
 | W-11 | deterministic and persistence integration plus one Gemma selection smoke validated | builder agent | W-09/W-10 interfaces | live-model selection evaluation |
@@ -34,19 +34,22 @@ The W-series below is the historical execution record for the application. The u
 | W-28 | production UI build validated; browser walkthrough pending | builder agent | W-27, W-14 | real browser import/mapping/activation walkthrough |
 | W-29 | integrity complete; human review pending | builder agent | W-25, W-03/W-21 | review the 40 native-linked synthetic labels |
 | W-30 | backend accepted; browser pending | orchestrator | W-23–W-28, W-10; W-29 paired cases | 7 real parser/API/DB/retrieval cases passed; browser walkthrough pending |
-| O-04 | active; persistence/runtime accepted, rollout still disabled | lead orchestrator | W-31–W-36 acceptance evidence | complete W-37/W-38/W-39; keep graph mode disabled |
+| O-04 | complete for the accepted local graph prototype; processor subsequently made graph-only | lead orchestrator | W-31–W-39 acceptance evidence | release gates and independent evaluation remain with O-03 |
 | W-31 | complete | Luna low-reasoning builder; accepted by O-04 | O-04 compatibility shortlist | LangGraph 1.2.12/checkpointer 3.1.2 locked; memory and PostgreSQL 16.6 resume pass |
 | W-32 | complete | builder agent; accepted by O-04 | W-31 | strict schemas, three trace tables and migration `0008_agent_runs`; 11 unit + 9 PostgreSQL tests pass |
 | W-33 | complete | Luna low-reasoning builder; accepted by O-04 | W-31 | 21 strict state/context/policy tests and Ruff pass; W-34 unblocked |
 | W-34 | complete | Luna low-reasoning builder; accepted by O-04 | W-33 | 19 typed-tool cases cover metadata and safe retry classification; W-35 accepted |
 | W-35 | complete | Luna low-reasoning builder; accepted by O-04 | W-31/W-33/W-34 | exact 11-node/edge manifest, 8 route/limit/atomicity tests and Ruff pass; consumed by accepted W-36 runtime |
 | W-36 | complete | O-04 integration | W-32/W-35/W-07 | PostgreSQL saver, provenance rehydration, leases/heartbeats, idempotent finalization, sanitized telemetry and exact pruning; 10 focused cases pass |
+| W-37 | complete | O-04 integration | W-32/W-36 | authenticated, membership-scoped, read-only public status; 9 PostgreSQL endpoint cases passed |
+| W-38 | complete; status UI now uses graph-run availability | builder + O-04 integration | W-37 | bounded public status UI; historical jobs without traces hide the section; current browser suite recorded in graph-only handoff |
+| W-39 | complete for local prototype | O-04 + graph acceptance | W-31–W-38 | 231 unit, 124 integration, 45 browser; live path, SIGKILL resume and backup/restore accepted; historical rollback evidence superseded; no unseen quality or lifecycle/duration claim |
 
 ## Native-import assignment rules
 
 Use `progress-agent-plan/06_NATIVE_SCHEDULE_IMPORT.md` (contract v1.1) and W-21–W-30 cards in the implementation plan. Paste the user's exact worker prompt into each assignment; specify prerequisite files/revisions and only the card's writable paths. No more than three concurrent workers, no overlapping shared-file ownership. O-02 supplies dependency pins, actual parser field-accessor examples and API payloads before assigning dependent low-reasoning builders.
 
-The native-import implementation is integrated and its four-format backend acceptance passes. Future W-18 evaluation consumes W-29 after human review; W-20 still requires live browser and model evidence. The planning viewer now derives counts dynamically and includes contract v1.2/native-import material.
+The native-import implementation is integrated and its four-format backend acceptance passes. Future W-18 evaluation consumes W-29 after human review; W-20 still requires live browser and model evidence. The planning viewer derives counts dynamically and includes contract v1.2/native-import material; rebuild it after this status change with `node ../progress-agent-plan/web/build.mjs` from the application repository root. Its generated `index.html` is outside this documentation assignment.
 
 ## Completed evidence
 
@@ -85,3 +88,11 @@ The native-import implementation is integrated and its four-format backend accep
 - W-29 integrity (2026-09-23): 40 native-linked synthetic observations preserve real P6 source IDs/Microsoft UIDs, exact case allocation, source hashes and 24/8/8 family splits. Human review remains pending.
 - W-14/W-15/W-17/W-28 frontend integration (2026-09-23): production build and source-contract checks pass for real logout, full proposal queue, correction/warning resolution, retry, CSV/native import, source-project selection and explicit activation. Browser visual evidence remains pending because no browser surface was available.
 - G-07 (2026-09-23): backup and restore were verified against a separate database containing one approved event and one linked source evidence fragment. The restored database was left separate for inspection.
+- 2026-10-12 graph rollout evidence: 231 unit tests, 124 PostgreSQL integration tests, 45 fixture/review-api browser tests, frontend typecheck/build/contracts, and six-input native parsing plus malformed-input rejection passed. A source-backed review recorded 21 quality records and 16 label suggestions without changing originals or claiming human approval. The Cambridge project 5060 row screen supports only its bounded subset; global Cambridge aggregates remain unverified at row level.
+- 2026-10-12 W-37/W-38: authenticated status endpoint and responsive status UI are accepted; known legacy jobs produce no status request. See [W-37](handoffs/W-37.md) and [W-38](handoffs/W-38.md).
+- 2026-10-12 W-39: deterministic parity/failure cases passed; recovery/restore hashes matched 2 agent runs, 2 steps, 2 tool calls, 4 checkpoints (19 blobs/33 writes), 2 approved events and 1 preserved original. Restored interrupted graph resumed without re-extraction; literal SIGKILL resumed the same checkpoint without repeating extraction and left one run, observation and proposal with zero progress. Explicit rollback-child snapshot tests passed. The live smoke took 179.396 seconds. The separate browser→API→worker→Gemma run reached review with one pending proposal, zero approved events, 8 successful steps and no repair; root inspected responsive ready screenshots. W-39/G-13–G-18 accepted for the local prototype only; independent quality and data gates remain open.
+
+
+## Runtime supersession (2026-10-12)
+
+The dated W-35/W-36/W-39 evidence below records the architecture and tests at those dates, including the former processor and its rollback behavior. The application has since removed the alternate processor, execution-mode switch, and rollback override; LangGraph is now the only report-processing path. Historical rows are retained as dated evidence, not instructions for current operation. Current graph-only API/UI behavior and verification are recorded in [the graph-only runtime handoff](handoffs/graph-only-runtime.md). This change does not close independent label review, calibration, frozen-split, owner-data, unseen quality, or lifecycle/duration gates.

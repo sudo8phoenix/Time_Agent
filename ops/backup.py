@@ -15,7 +15,7 @@ from datetime import datetime, timezone
 from sqlalchemy import select, text
 from sqlalchemy.engine import make_url
 
-from app.db.models import (ActivityState, AgentRun, AuditEvent, Conversation, ConversationTurn,
+from app.db.models import (ActivityState, AgentRun, AgentStep, AgentToolCall, AuditEvent, Conversation, ConversationTurn,
                            FileRecord, Fragment, IntegrationOutbox, Observation, ProgressEvent,
                            Job, Proposal, ScheduleSourceMetadata)
 from app.db.session import session_factory
@@ -28,12 +28,32 @@ def sha(path):
 
 
 RECOVERY_TABLES = {
-    "agent_runs": AgentRun, "conversations": Conversation,
+    "agent_runs": AgentRun, "agent_steps": AgentStep, "agent_tool_calls": AgentToolCall,
+    "schedule_source_metadata": ScheduleSourceMetadata, "conversations": Conversation,
     "conversation_turns": ConversationTurn, "integration_outbox": IntegrationOutbox,
     "activity_states": ActivityState, "progress_events": ProgressEvent,
     "observations": Observation, "proposals": Proposal, "audit_events": AuditEvent,
     "jobs": Job,
 }
+
+CHECKPOINT_TABLES = ("checkpoints", "checkpoint_blobs", "checkpoint_writes")
+
+
+def checkpoint_manifest(db):
+    """Hash complete checkpoint rows without exposing checkpoint contents."""
+    result = {}
+    for table in CHECKPOINT_TABLES:
+        digest = hashlib.sha256()
+        count = 0
+        rows = db.execute(text(
+            f"SELECT row_to_json(t)::text FROM {table} t ORDER BY row_to_json(t)::text"
+        )).scalars()
+        for raw in rows:
+            digest.update(json.dumps(json.loads(raw), sort_keys=True, separators=(",", ":")).encode())
+            digest.update(b"\n")
+            count += 1
+        result[table] = {"count": count, "sha256": digest.hexdigest()}
+    return result
 
 
 def table_digest(db, model):
@@ -74,6 +94,7 @@ def main():
         recovery_rows = {table: {"ids": [str(value) for value in db.scalars(select(getattr(model, model.__mapper__.primary_key[0].name)))],
                                  "sha256": table_digest(db, model)}
                          for table, model in RECOVERY_TABLES.items()}
+        checkpoint_rows = checkpoint_manifest(db)
         files = []
         for record in records:
             source = (upload_root / record.storage_key).resolve()
@@ -94,6 +115,7 @@ def main():
         subprocess.run(["docker", "compose", "exec", "-T", "db", "pg_dump", "-U", username, "-d", database, "-Fc"], stdout=handle, check=True)
     os.chmod(dump, 0o600)
     manifest = {"created_at": datetime.now(timezone.utc).isoformat(), "database_sha256": sha(dump),
+                "checkpoint_rows": checkpoint_rows,
                 "files": files, "approved_event_ids": events,
                 "approved_evidence_fragment_ids": evidence, "native_metadata_ids": native,
                 "recovery_rows": recovery_rows}

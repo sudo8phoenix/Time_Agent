@@ -1,5 +1,6 @@
 """Validated runtime configuration."""
 from functools import lru_cache
+from typing import Literal
 from pydantic import Field, SecretStr, ValidationError
 from pydantic_settings import BaseSettings, SettingsConfigDict
 
@@ -16,7 +17,7 @@ class Settings(BaseSettings):
     secret_key: str = Field(default="development-only-change-me", min_length=16)
     frontend_dist: str = "frontend/dist"
     upload_dir: str = "uploads"
-    agent_execution_mode: str = Field(default="legacy", pattern="^(legacy|graph)$")
+    agent_execution_mode: Literal["graph"] = "graph"
 
     model_config = SettingsConfigDict(env_file=".env", env_prefix="", extra="ignore")
 

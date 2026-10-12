@@ -30,7 +30,6 @@ from app.jobs.worker import WorkerShutdown
 from app.llm.ollama import LLMResult
 from app.agent.tools import AgentToolError
 from app.schemas.observation import Observation as ObservationSchema
-from app.jobs.pipeline import process_job
 from app.settings import get_settings
 from app.llm.extract import FragmentInput, extract_fragments
 from ops.prune_agent_checkpoints import prune
@@ -265,7 +264,7 @@ def test_postgres_graph_happy_path_has_sanitized_trace(runtime_fixture):
         ).where(Observation.job_id == runtime_fixture.job_id)) == 0
 
 
-def test_legacy_and_graph_lifecycle_proposals_have_matching_effects():
+def test_graph_lifecycle_proposal_persists_endpoint_effects_without_approval_write():
     fixture = RuntimeFixture(lifecycle=True)
     try:
         with session_factory() as db:
@@ -281,50 +280,17 @@ def test_legacy_and_graph_lifecycle_proposals_have_matching_effects():
                 run = db.scalar(select(AgentRun).where(AgentRun.job_id == fixture.job_id))
                 details = [(step.node, step.sanitized_summary) for step in run.steps]
             pytest.fail(f"lifecycle graph extraction yielded no observation: {result}; {details}")
-        with session_factory.begin() as db:
+        with session_factory() as db:
             graph_proposal = db.scalar(select(Proposal).join(
                 Observation, Observation.id == Proposal.observation_id
             ).where(Observation.job_id == fixture.job_id))
-            graph_effects = graph_proposal.proposed_effects
-
-            report = Report(project_id=fixture.project_id, content_hash=uuid4().hex,
-                            report_date=date(2026, 9, 24), report_date_evidence="header")
-            db.add(report)
-            db.flush()
-            fragment = Fragment(report_id=report.id, ordinal=1, locator="paragraph:1",
-                                original_text="Started on 2026-09-24.",
-                                normalised_text="Started on 2026-09-24.")
-            job = Job(project_id=fixture.project_id, report_id=report.id,
-                      schedule_version_id=fixture.schedule_id)
-            db.add_all([fragment, job])
-            db.flush()
-            payload = fixture.lifecycle_observation.model_dump(mode="python")
-            for evidence in payload["evidence"]:
-                evidence["fragment_id"] = str(fragment.id)
-            for effect in payload["lifecycle_effects"]:
-                for evidence in effect["evidence"]:
-                    evidence["fragment_id"] = str(fragment.id)
-            observation = ObservationSchema.model_validate(payload)
-            activity = db.get(Activity, fixture.activity_id)
-            process_job(
-                db, job, extraction_call=lambda _fragments: [observation],
-                retrieve_call=lambda *_args: [activity],
-                selection_call=lambda *_args: {
-                    "candidate_id": str(activity.id), "mapping_state": "suggested",
-                    "match_strength": "review", "candidates": [],
-                    "explanation": "fixture selection", "reason_codes": [],
-                    "missing_information": [], "warnings": [],
-                },
-            )
-            legacy_proposal = db.scalar(select(Proposal).join(
-                Observation, Observation.id == Proposal.observation_id
-            ).where(Observation.job_id == job.id))
-            legacy_effects = json.loads(json.dumps(legacy_proposal.proposed_effects))
-            graph_effects = json.loads(json.dumps(graph_effects))
-            for effects in (legacy_effects, graph_effects):
-                for evidence in effects["evidence"]:
-                    evidence["fragment_id"] = "<source-fragment>"
-            assert legacy_effects == graph_effects
+            effects = graph_proposal.proposed_effects
+            assert effects["event_type"] == "actual_start"
+            assert effects["effective_date"] == "2026-09-24"
+            assert effects["evidence"][0]["quote"] == "Started on 2026-09-24."
+            assert db.scalar(select(func.count()).select_from(ProgressEvent).join(
+                Observation, ProgressEvent.observation_id == Observation.id
+            ).where(Observation.job_id == fixture.job_id)) == 0
     finally:
         fixture.cleanup()
 

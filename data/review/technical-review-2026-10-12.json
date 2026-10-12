@@ -1,0 +1,3507 @@
+{
+  "schema_version": 1,
+  "review_kind": "reproducible_technical_review_suggestions_not_independent_approval",
+  "review_date": "2026-10-12",
+  "reviewer_id": null,
+  "adjudication_status": "pending_independent_human_review",
+  "method": "Read queued source records, each report and proposed label, and GT10 input/export workbook rows via backend.app.ingest.schedule_datasets.gt10_xlsx.read_gt10. Record source row locators and preserve originals. Suggestions are non-authoritative.",
+  "source_manifest": [
+    {
+      "path": "site-progress-agent/data/review/schedule-quality-review.jsonl",
+      "sha256": "110b826d81262330ae89f36895cfb59cec18aa16ccd44953855bba164d030fe8",
+      "bytes": 10211
+    },
+    {
+      "path": "site-progress-agent/data/synthetic/v2/reports.jsonl",
+      "sha256": "eee2955b5f89e7ac00a76ee46c8d0b1d3ef6c392a4bec580d7a1a7ce521dd8b6",
+      "bytes": 4283
+    },
+    {
+      "path": "site-progress-agent/data/synthetic/v2/proposed-labels.jsonl",
+      "sha256": "0690d1561891c0f9802405e0ebe63a82c0cdff4dee4612f05e3975d2ff661471",
+      "bytes": 9204
+    },
+    {
+      "path": "data/GT10BLDG-P6-Schedule/source/GT10BLDG_input_activities_relationships.xlsx",
+      "sha256": "598e2fcfa2bae290284cb6ca9f4eaff164ce149b4269099b7e763bc2e4ea5951",
+      "bytes": 28295
+    },
+    {
+      "path": "data/GT10BLDG-P6-Schedule/exports/GT10BLDG_v1_P6_export.xlsx",
+      "sha256": "b84946cc8c279e879979ed174539357b92ac6cb3011562d30a44e4cce2913953",
+      "bytes": 24645
+    },
+    {
+      "path": "site-progress-agent/data/synthetic/v2/check_splits.py",
+      "sha256": "f29e16fc8a76bb88377f032350a19d381a40bbb2df3532ad9452154dabe7cca0",
+      "bytes": 2346
+    },
+    {
+      "path": "site-progress-agent/docs/d01-d05-completion-audit-2026-10-10.md",
+      "sha256": "734c4dd06983469cf7c9b65d61642a33027e7685d406691132520045f73447cd",
+      "bytes": 5095
+    },
+    {
+      "path": "site-progress-agent/ops/review_development_data.py",
+      "sha256": "feb28f5269ada3596f752b5d0fab2930b44f0931acc7f58a5aebb1a7a72a2fb9",
+      "bytes": 17526
+    },
+    {
+      "path": "site-progress-agent/data/review/cambridge-5060-technical-screen.json",
+      "sha256": "6b284dd2003bad7060bb6fc5bda5f7e51c911736b17eb532728b69622eff662b",
+      "bytes": 690457
+    }
+  ],
+  "gt10_workbooks": {
+    "input": {
+      "task_count": 140,
+      "relationship_count": 176,
+      "path": "data/GT10BLDG-P6-Schedule/source/GT10BLDG_input_activities_relationships.xlsx"
+    },
+    "export": {
+      "task_count": 140,
+      "relationship_count": 176,
+      "path": "data/GT10BLDG-P6-Schedule/exports/GT10BLDG_v1_P6_export.xlsx"
+    }
+  },
+  "schedule_quality_review": {
+    "source_count": 21,
+    "finding_count": 21,
+    "findings": [
+      {
+        "source_record": {
+          "decision": "pending_independent_review",
+          "evidence": "input ACTIVITES identifies SUP-F8-06 as F8; adjacent floor codes distinguish F8/F9",
+          "field": "task_name",
+          "locator": "TASK!A43:D43",
+          "old_value": "De-shuttering - F9",
+          "project_id": "GT10BLDG",
+          "proposed_value": "De-shuttering - F8",
+          "reason": "Do not match by erroneous name before review",
+          "review_date": null,
+          "reviewer_id": null,
+          "source": "gt10"
+        },
+        "queue_locator": "schedule-quality-review.jsonl:1",
+        "technical_disposition": "identity_supported_name_conflict_unresolved",
+        "source_evidence": [
+          {
+            "file": "data/GT10BLDG-P6-Schedule/source/GT10BLDG_input_activities_relationships.xlsx",
+            "locator": "ACTIVITES!65",
+            "cells": {
+              "Activity ID": "SUP-F8-06",
+              "Activity Name": "De-shuttering - F8",
+              "WBS Code": "3.9",
+              "Original Duration": 2,
+              "Activity Type": "Task Dependent",
+              "Calendar": "6-Day Week"
+            }
+          },
+          {
+            "file": "data/GT10BLDG-P6-Schedule/exports/GT10BLDG_v1_P6_export.xlsx",
+            "locator": "TASK!43",
+            "cells": {
+              "task_code": "SUP-F8-06",
+              "status_code": "Not Started",
+              "wbs_id": "GT10BLDG.2.1",
+              "task_name": "De-shuttering - F9",
+              "start_date": {
+                "raw": "2027-09-17 08:00:00",
+                "cell_type": "datetime",
+                "precision": "source_datetime",
+                "timezone_basis": "unspecified"
+              },
+              "end_date": {
+                "raw": "2027-09-20 16:00:00",
+                "cell_type": "datetime",
+                "precision": "source_datetime",
+                "timezone_basis": "unspecified"
+              },
+              "resource_list": null,
+              "delete_record_flag": null
+            }
+          }
+        ],
+        "suggestion": "Keep SUP-F8-06 as the stable identity; quarantine the exported display name from matching until planner confirms/corrects it. Do not relabel the task by name alone."
+      },
+      {
+        "source_record": {
+          "decision": "pending_independent_review",
+          "evidence": "Input RELATIONSHIP and export TASKPRED disagree; known issues mention FF/FS and F10 plaster lag",
+          "field": "relationship_type/lag",
+          "locator": "MAS-F1-01->MEP-F1-02",
+          "old_value": {
+            "lag": "0",
+            "type": "FS",
+            "unit_header": "lag_hr_cnt"
+          },
+          "project_id": "GT10BLDG",
+          "proposed_value": {
+            "lag": 0,
+            "type": "SS",
+            "unit": "unknown"
+          },
+          "reason": "Planner must resolve type and lag unit; no override applied",
+          "review_date": null,
+          "reviewer_id": null,
+          "source": "gt10"
+        },
+        "queue_locator": "schedule-quality-review.jsonl:2",
+        "technical_disposition": "source_versions_disagree_planner_decision_required",
+        "source_evidence": [
+          {
+            "file": "data/GT10BLDG-P6-Schedule/source/GT10BLDG_input_activities_relationships.xlsx",
+            "locator": "RELATIONSHIP!103",
+            "cells": {
+              "Predecessor Activity ID": "MAS-F1-01",
+              "Successor Activity ID": "MEP-F1-02",
+              "Relationship Type": "SS",
+              "Lag": 0
+            }
+          },
+          {
+            "file": "data/GT10BLDG-P6-Schedule/exports/GT10BLDG_v1_P6_export.xlsx",
+            "locator": "TASKPRED!111",
+            "cells": {
+              "pred_task_id": "MAS-F1-01",
+              "task_id": "MEP-F1-02",
+              "pred_type": "FS",
+              "PREDTASK__status_code": "Not Started",
+              "TASK__status_code": "Not Started",
+              "pred_proj_id": "GT10BLDG",
+              "proj_id": "GT10BLDG",
+              "PREDTASK__PROJWBS__wbs_full_name": "GT10BLDG.3 Masonry & Plastering",
+              "TASK__PROJWBS__wbs_full_name": "GT10BLDG.4.2 Plumbing",
+              "PREDTASK__task_name": "Block Work - F1",
+              "TASK__task_name": "Plumbing Rough-in - F1",
+              "lag_hr_cnt": "0",
+              "PREDTASK__rsrc_id": null,
+              "TASK__rsrc_id": null,
+              "delete_record_flag": null
+            }
+          }
+        ],
+        "suggestion": "Exclude this relationship from dependency-quality claims until a planner selects a source version and resolves relationship semantics and lag units. Input has Relationship Type/Lag; export has pred_type/lag_hr_cnt, whose unit meaning must be verified. Do not infer a corrected value."
+      },
+      {
+        "source_record": {
+          "decision": "pending_independent_review",
+          "evidence": "Input RELATIONSHIP and export TASKPRED disagree; known issues mention FF/FS and F10 plaster lag",
+          "field": "relationship_type/lag",
+          "locator": "MAS-F10-01->MAS-F10-02",
+          "old_value": {
+            "lag": "0",
+            "type": "FS",
+            "unit_header": "lag_hr_cnt"
+          },
+          "project_id": "GT10BLDG",
+          "proposed_value": {
+            "lag": 3,
+            "type": "FS",
+            "unit": "unknown"
+          },
+          "reason": "Planner must resolve type and lag unit; no override applied",
+          "review_date": null,
+          "reviewer_id": null,
+          "source": "gt10"
+        },
+        "queue_locator": "schedule-quality-review.jsonl:3",
+        "technical_disposition": "source_versions_disagree_planner_decision_required",
+        "source_evidence": [
+          {
+            "file": "data/GT10BLDG-P6-Schedule/source/GT10BLDG_input_activities_relationships.xlsx",
+            "locator": "RELATIONSHIP!98",
+            "cells": {
+              "Predecessor Activity ID": "MAS-F10-01",
+              "Successor Activity ID": "MAS-F10-02",
+              "Relationship Type": "FS",
+              "Lag": 3
+            }
+          },
+          {
+            "file": "data/GT10BLDG-P6-Schedule/exports/GT10BLDG_v1_P6_export.xlsx",
+            "locator": "TASKPRED!81",
+            "cells": {
+              "pred_task_id": "MAS-F10-01",
+              "task_id": "MAS-F10-02",
+              "pred_type": "FS",
+              "PREDTASK__status_code": "Not Started",
+              "TASK__status_code": "Not Started",
+              "pred_proj_id": "GT10BLDG",
+              "proj_id": "GT10BLDG",
+              "PREDTASK__PROJWBS__wbs_full_name": "GT10BLDG.3 Masonry & Plastering",
+              "TASK__PROJWBS__wbs_full_name": "GT10BLDG.3 Masonry & Plastering",
+              "PREDTASK__task_name": "Block Work - F10",
+              "TASK__task_name": "Internal Plastering - F10",
+              "lag_hr_cnt": "0",
+              "PREDTASK__rsrc_id": null,
+              "TASK__rsrc_id": null,
+              "delete_record_flag": null
+            }
+          }
+        ],
+        "suggestion": "Exclude this relationship from dependency-quality claims until a planner selects a source version and resolves relationship semantics and lag units. Input has Relationship Type/Lag; export has pred_type/lag_hr_cnt, whose unit meaning must be verified. Do not infer a corrected value."
+      },
+      {
+        "source_record": {
+          "decision": "pending_independent_review",
+          "evidence": "Input RELATIONSHIP and export TASKPRED disagree; known issues mention FF/FS and F10 plaster lag",
+          "field": "relationship_type/lag",
+          "locator": "MAS-F10-01->MEP-F10-02",
+          "old_value": {
+            "lag": "0",
+            "type": "FS",
+            "unit_header": "lag_hr_cnt"
+          },
+          "project_id": "GT10BLDG",
+          "proposed_value": {
+            "lag": 0,
+            "type": "SS",
+            "unit": "unknown"
+          },
+          "reason": "Planner must resolve type and lag unit; no override applied",
+          "review_date": null,
+          "reviewer_id": null,
+          "source": "gt10"
+        },
+        "queue_locator": "schedule-quality-review.jsonl:4",
+        "technical_disposition": "source_versions_disagree_planner_decision_required",
+        "source_evidence": [
+          {
+            "file": "data/GT10BLDG-P6-Schedule/source/GT10BLDG_input_activities_relationships.xlsx",
+            "locator": "RELATIONSHIP!121",
+            "cells": {
+              "Predecessor Activity ID": "MAS-F10-01",
+              "Successor Activity ID": "MEP-F10-02",
+              "Relationship Type": "SS",
+              "Lag": 0
+            }
+          },
+          {
+            "file": "data/GT10BLDG-P6-Schedule/exports/GT10BLDG_v1_P6_export.xlsx",
+            "locator": "TASKPRED!112",
+            "cells": {
+              "pred_task_id": "MAS-F10-01",
+              "task_id": "MEP-F10-02",
+              "pred_type": "FS",
+              "PREDTASK__status_code": "Not Started",
+              "TASK__status_code": "Not Started",
+              "pred_proj_id": "GT10BLDG",
+              "proj_id": "GT10BLDG",
+              "PREDTASK__PROJWBS__wbs_full_name": "GT10BLDG.3 Masonry & Plastering",
+              "TASK__PROJWBS__wbs_full_name": "GT10BLDG.4.2 Plumbing",
+              "PREDTASK__task_name": "Block Work - F10",
+              "TASK__task_name": "Plumbing Rough-in - F10",
+              "lag_hr_cnt": "0",
+              "PREDTASK__rsrc_id": null,
+              "TASK__rsrc_id": null,
+              "delete_record_flag": null
+            }
+          }
+        ],
+        "suggestion": "Exclude this relationship from dependency-quality claims until a planner selects a source version and resolves relationship semantics and lag units. Input has Relationship Type/Lag; export has pred_type/lag_hr_cnt, whose unit meaning must be verified. Do not infer a corrected value."
+      },
+      {
+        "source_record": {
+          "decision": "pending_independent_review",
+          "evidence": "Input RELATIONSHIP and export TASKPRED disagree; known issues mention FF/FS and F10 plaster lag",
+          "field": "relationship_type/lag",
+          "locator": "MAS-F2-01->MEP-F2-02",
+          "old_value": {
+            "lag": "0",
+            "type": "FS",
+            "unit_header": "lag_hr_cnt"
+          },
+          "project_id": "GT10BLDG",
+          "proposed_value": {
+            "lag": 0,
+            "type": "SS",
+            "unit": "unknown"
+          },
+          "reason": "Planner must resolve type and lag unit; no override applied",
+          "review_date": null,
+          "reviewer_id": null,
+          "source": "gt10"
+        },
+        "queue_locator": "schedule-quality-review.jsonl:5",
+        "technical_disposition": "source_versions_disagree_planner_decision_required",
+        "source_evidence": [
+          {
+            "file": "data/GT10BLDG-P6-Schedule/source/GT10BLDG_input_activities_relationships.xlsx",
+            "locator": "RELATIONSHIP!105",
+            "cells": {
+              "Predecessor Activity ID": "MAS-F2-01",
+              "Successor Activity ID": "MEP-F2-02",
+              "Relationship Type": "SS",
+              "Lag": 0
+            }
+          },
+          {
+            "file": "data/GT10BLDG-P6-Schedule/exports/GT10BLDG_v1_P6_export.xlsx",
+            "locator": "TASKPRED!113",
+            "cells": {
+              "pred_task_id": "MAS-F2-01",
+              "task_id": "MEP-F2-02",
+              "pred_type": "FS",
+              "PREDTASK__status_code": "Not Started",
+              "TASK__status_code": "Not Started",
+              "pred_proj_id": "GT10BLDG",
+              "proj_id": "GT10BLDG",
+              "PREDTASK__PROJWBS__wbs_full_name": "GT10BLDG.3 Masonry & Plastering",
+              "TASK__PROJWBS__wbs_full_name": "GT10BLDG.4.2 Plumbing",
+              "PREDTASK__task_name": "Block Work - F2",
+              "TASK__task_name": "Plumbing Rough-in - F2",
+              "lag_hr_cnt": "0",
+              "PREDTASK__rsrc_id": null,
+              "TASK__rsrc_id": null,
+              "delete_record_flag": null
+            }
+          }
+        ],
+        "suggestion": "Exclude this relationship from dependency-quality claims until a planner selects a source version and resolves relationship semantics and lag units. Input has Relationship Type/Lag; export has pred_type/lag_hr_cnt, whose unit meaning must be verified. Do not infer a corrected value."
+      },
+      {
+        "source_record": {
+          "decision": "pending_independent_review",
+          "evidence": "Input RELATIONSHIP and export TASKPRED disagree; known issues mention FF/FS and F10 plaster lag",
+          "field": "relationship_type/lag",
+          "locator": "MAS-F3-01->MEP-F3-02",
+          "old_value": {
+            "lag": "0",
+            "type": "FS",
+            "unit_header": "lag_hr_cnt"
+          },
+          "project_id": "GT10BLDG",
+          "proposed_value": {
+            "lag": 0,
+            "type": "SS",
+            "unit": "unknown"
+          },
+          "reason": "Planner must resolve type and lag unit; no override applied",
+          "review_date": null,
+          "reviewer_id": null,
+          "source": "gt10"
+        },
+        "queue_locator": "schedule-quality-review.jsonl:6",
+        "technical_disposition": "source_versions_disagree_planner_decision_required",
+        "source_evidence": [
+          {
+            "file": "data/GT10BLDG-P6-Schedule/source/GT10BLDG_input_activities_relationships.xlsx",
+            "locator": "RELATIONSHIP!107",
+            "cells": {
+              "Predecessor Activity ID": "MAS-F3-01",
+              "Successor Activity ID": "MEP-F3-02",
+              "Relationship Type": "SS",
+              "Lag": 0
+            }
+          },
+          {
+            "file": "data/GT10BLDG-P6-Schedule/exports/GT10BLDG_v1_P6_export.xlsx",
+            "locator": "TASKPRED!114",
+            "cells": {
+              "pred_task_id": "MAS-F3-01",
+              "task_id": "MEP-F3-02",
+              "pred_type": "FS",
+              "PREDTASK__status_code": "Not Started",
+              "TASK__status_code": "Not Started",
+              "pred_proj_id": "GT10BLDG",
+              "proj_id": "GT10BLDG",
+              "PREDTASK__PROJWBS__wbs_full_name": "GT10BLDG.3 Masonry & Plastering",
+              "TASK__PROJWBS__wbs_full_name": "GT10BLDG.4.2 Plumbing",
+              "PREDTASK__task_name": "Block Work - F3",
+              "TASK__task_name": "Plumbing Rough-in - F3",
+              "lag_hr_cnt": "0",
+              "PREDTASK__rsrc_id": null,
+              "TASK__rsrc_id": null,
+              "delete_record_flag": null
+            }
+          }
+        ],
+        "suggestion": "Exclude this relationship from dependency-quality claims until a planner selects a source version and resolves relationship semantics and lag units. Input has Relationship Type/Lag; export has pred_type/lag_hr_cnt, whose unit meaning must be verified. Do not infer a corrected value."
+      },
+      {
+        "source_record": {
+          "decision": "pending_independent_review",
+          "evidence": "Input RELATIONSHIP and export TASKPRED disagree; known issues mention FF/FS and F10 plaster lag",
+          "field": "relationship_type/lag",
+          "locator": "MAS-F4-01->MEP-F4-02",
+          "old_value": {
+            "lag": "0",
+            "type": "FS",
+            "unit_header": "lag_hr_cnt"
+          },
+          "project_id": "GT10BLDG",
+          "proposed_value": {
+            "lag": 0,
+            "type": "SS",
+            "unit": "unknown"
+          },
+          "reason": "Planner must resolve type and lag unit; no override applied",
+          "review_date": null,
+          "reviewer_id": null,
+          "source": "gt10"
+        },
+        "queue_locator": "schedule-quality-review.jsonl:7",
+        "technical_disposition": "source_versions_disagree_planner_decision_required",
+        "source_evidence": [
+          {
+            "file": "data/GT10BLDG-P6-Schedule/source/GT10BLDG_input_activities_relationships.xlsx",
+            "locator": "RELATIONSHIP!109",
+            "cells": {
+              "Predecessor Activity ID": "MAS-F4-01",
+              "Successor Activity ID": "MEP-F4-02",
+              "Relationship Type": "SS",
+              "Lag": 0
+            }
+          },
+          {
+            "file": "data/GT10BLDG-P6-Schedule/exports/GT10BLDG_v1_P6_export.xlsx",
+            "locator": "TASKPRED!115",
+            "cells": {
+              "pred_task_id": "MAS-F4-01",
+              "task_id": "MEP-F4-02",
+              "pred_type": "FS",
+              "PREDTASK__status_code": "Not Started",
+              "TASK__status_code": "Not Started",
+              "pred_proj_id": "GT10BLDG",
+              "proj_id": "GT10BLDG",
+              "PREDTASK__PROJWBS__wbs_full_name": "GT10BLDG.3 Masonry & Plastering",
+              "TASK__PROJWBS__wbs_full_name": "GT10BLDG.4.2 Plumbing",
+              "PREDTASK__task_name": "Block Work - F4",
+              "TASK__task_name": "Plumbing Rough-in - F4",
+              "lag_hr_cnt": "0",
+              "PREDTASK__rsrc_id": null,
+              "TASK__rsrc_id": null,
+              "delete_record_flag": null
+            }
+          }
+        ],
+        "suggestion": "Exclude this relationship from dependency-quality claims until a planner selects a source version and resolves relationship semantics and lag units. Input has Relationship Type/Lag; export has pred_type/lag_hr_cnt, whose unit meaning must be verified. Do not infer a corrected value."
+      },
+      {
+        "source_record": {
+          "decision": "pending_independent_review",
+          "evidence": "Input RELATIONSHIP and export TASKPRED disagree; known issues mention FF/FS and F10 plaster lag",
+          "field": "relationship_type/lag",
+          "locator": "MAS-F5-01->MEP-F5-02",
+          "old_value": {
+            "lag": "0",
+            "type": "FS",
+            "unit_header": "lag_hr_cnt"
+          },
+          "project_id": "GT10BLDG",
+          "proposed_value": {
+            "lag": 0,
+            "type": "SS",
+            "unit": "unknown"
+          },
+          "reason": "Planner must resolve type and lag unit; no override applied",
+          "review_date": null,
+          "reviewer_id": null,
+          "source": "gt10"
+        },
+        "queue_locator": "schedule-quality-review.jsonl:8",
+        "technical_disposition": "source_versions_disagree_planner_decision_required",
+        "source_evidence": [
+          {
+            "file": "data/GT10BLDG-P6-Schedule/source/GT10BLDG_input_activities_relationships.xlsx",
+            "locator": "RELATIONSHIP!111",
+            "cells": {
+              "Predecessor Activity ID": "MAS-F5-01",
+              "Successor Activity ID": "MEP-F5-02",
+              "Relationship Type": "SS",
+              "Lag": 0
+            }
+          },
+          {
+            "file": "data/GT10BLDG-P6-Schedule/exports/GT10BLDG_v1_P6_export.xlsx",
+            "locator": "TASKPRED!116",
+            "cells": {
+              "pred_task_id": "MAS-F5-01",
+              "task_id": "MEP-F5-02",
+              "pred_type": "FS",
+              "PREDTASK__status_code": "Not Started",
+              "TASK__status_code": "Not Started",
+              "pred_proj_id": "GT10BLDG",
+              "proj_id": "GT10BLDG",
+              "PREDTASK__PROJWBS__wbs_full_name": "GT10BLDG.3 Masonry & Plastering",
+              "TASK__PROJWBS__wbs_full_name": "GT10BLDG.4.2 Plumbing",
+              "PREDTASK__task_name": "Block Work - F5",
+              "TASK__task_name": "Plumbing Rough-in - F5",
+              "lag_hr_cnt": "0",
+              "PREDTASK__rsrc_id": null,
+              "TASK__rsrc_id": null,
+              "delete_record_flag": null
+            }
+          }
+        ],
+        "suggestion": "Exclude this relationship from dependency-quality claims until a planner selects a source version and resolves relationship semantics and lag units. Input has Relationship Type/Lag; export has pred_type/lag_hr_cnt, whose unit meaning must be verified. Do not infer a corrected value."
+      },
+      {
+        "source_record": {
+          "decision": "pending_independent_review",
+          "evidence": "Input RELATIONSHIP and export TASKPRED disagree; known issues mention FF/FS and F10 plaster lag",
+          "field": "relationship_type/lag",
+          "locator": "MAS-F6-01->MEP-F6-02",
+          "old_value": {
+            "lag": "0",
+            "type": "FS",
+            "unit_header": "lag_hr_cnt"
+          },
+          "project_id": "GT10BLDG",
+          "proposed_value": {
+            "lag": 0,
+            "type": "SS",
+            "unit": "unknown"
+          },
+          "reason": "Planner must resolve type and lag unit; no override applied",
+          "review_date": null,
+          "reviewer_id": null,
+          "source": "gt10"
+        },
+        "queue_locator": "schedule-quality-review.jsonl:9",
+        "technical_disposition": "source_versions_disagree_planner_decision_required",
+        "source_evidence": [
+          {
+            "file": "data/GT10BLDG-P6-Schedule/source/GT10BLDG_input_activities_relationships.xlsx",
+            "locator": "RELATIONSHIP!113",
+            "cells": {
+              "Predecessor Activity ID": "MAS-F6-01",
+              "Successor Activity ID": "MEP-F6-02",
+              "Relationship Type": "SS",
+              "Lag": 0
+            }
+          },
+          {
+            "file": "data/GT10BLDG-P6-Schedule/exports/GT10BLDG_v1_P6_export.xlsx",
+            "locator": "TASKPRED!117",
+            "cells": {
+              "pred_task_id": "MAS-F6-01",
+              "task_id": "MEP-F6-02",
+              "pred_type": "FS",
+              "PREDTASK__status_code": "Not Started",
+              "TASK__status_code": "Not Started",
+              "pred_proj_id": "GT10BLDG",
+              "proj_id": "GT10BLDG",
+              "PREDTASK__PROJWBS__wbs_full_name": "GT10BLDG.3 Masonry & Plastering",
+              "TASK__PROJWBS__wbs_full_name": "GT10BLDG.4.2 Plumbing",
+              "PREDTASK__task_name": "Block Work - F6",
+              "TASK__task_name": "Plumbing Rough-in - F6",
+              "lag_hr_cnt": "0",
+              "PREDTASK__rsrc_id": null,
+              "TASK__rsrc_id": null,
+              "delete_record_flag": null
+            }
+          }
+        ],
+        "suggestion": "Exclude this relationship from dependency-quality claims until a planner selects a source version and resolves relationship semantics and lag units. Input has Relationship Type/Lag; export has pred_type/lag_hr_cnt, whose unit meaning must be verified. Do not infer a corrected value."
+      },
+      {
+        "source_record": {
+          "decision": "pending_independent_review",
+          "evidence": "Input RELATIONSHIP and export TASKPRED disagree; known issues mention FF/FS and F10 plaster lag",
+          "field": "relationship_type/lag",
+          "locator": "MAS-F7-01->MEP-F7-02",
+          "old_value": {
+            "lag": "0",
+            "type": "FS",
+            "unit_header": "lag_hr_cnt"
+          },
+          "project_id": "GT10BLDG",
+          "proposed_value": {
+            "lag": 0,
+            "type": "SS",
+            "unit": "unknown"
+          },
+          "reason": "Planner must resolve type and lag unit; no override applied",
+          "review_date": null,
+          "reviewer_id": null,
+          "source": "gt10"
+        },
+        "queue_locator": "schedule-quality-review.jsonl:10",
+        "technical_disposition": "source_versions_disagree_planner_decision_required",
+        "source_evidence": [
+          {
+            "file": "data/GT10BLDG-P6-Schedule/source/GT10BLDG_input_activities_relationships.xlsx",
+            "locator": "RELATIONSHIP!115",
+            "cells": {
+              "Predecessor Activity ID": "MAS-F7-01",
+              "Successor Activity ID": "MEP-F7-02",
+              "Relationship Type": "SS",
+              "Lag": 0
+            }
+          },
+          {
+            "file": "data/GT10BLDG-P6-Schedule/exports/GT10BLDG_v1_P6_export.xlsx",
+            "locator": "TASKPRED!118",
+            "cells": {
+              "pred_task_id": "MAS-F7-01",
+              "task_id": "MEP-F7-02",
+              "pred_type": "FS",
+              "PREDTASK__status_code": "Not Started",
+              "TASK__status_code": "Not Started",
+              "pred_proj_id": "GT10BLDG",
+              "proj_id": "GT10BLDG",
+              "PREDTASK__PROJWBS__wbs_full_name": "GT10BLDG.3 Masonry & Plastering",
+              "TASK__PROJWBS__wbs_full_name": "GT10BLDG.4.2 Plumbing",
+              "PREDTASK__task_name": "Block Work - F7",
+              "TASK__task_name": "Plumbing Rough-in - F7",
+              "lag_hr_cnt": "0",
+              "PREDTASK__rsrc_id": null,
+              "TASK__rsrc_id": null,
+              "delete_record_flag": null
+            }
+          }
+        ],
+        "suggestion": "Exclude this relationship from dependency-quality claims until a planner selects a source version and resolves relationship semantics and lag units. Input has Relationship Type/Lag; export has pred_type/lag_hr_cnt, whose unit meaning must be verified. Do not infer a corrected value."
+      },
+      {
+        "source_record": {
+          "decision": "pending_independent_review",
+          "evidence": "Input RELATIONSHIP and export TASKPRED disagree; known issues mention FF/FS and F10 plaster lag",
+          "field": "relationship_type/lag",
+          "locator": "MAS-F8-01->MEP-F8-02",
+          "old_value": {
+            "lag": "0",
+            "type": "FS",
+            "unit_header": "lag_hr_cnt"
+          },
+          "project_id": "GT10BLDG",
+          "proposed_value": {
+            "lag": 0,
+            "type": "SS",
+            "unit": "unknown"
+          },
+          "reason": "Planner must resolve type and lag unit; no override applied",
+          "review_date": null,
+          "reviewer_id": null,
+          "source": "gt10"
+        },
+        "queue_locator": "schedule-quality-review.jsonl:11",
+        "technical_disposition": "source_versions_disagree_planner_decision_required",
+        "source_evidence": [
+          {
+            "file": "data/GT10BLDG-P6-Schedule/source/GT10BLDG_input_activities_relationships.xlsx",
+            "locator": "RELATIONSHIP!117",
+            "cells": {
+              "Predecessor Activity ID": "MAS-F8-01",
+              "Successor Activity ID": "MEP-F8-02",
+              "Relationship Type": "SS",
+              "Lag": 0
+            }
+          },
+          {
+            "file": "data/GT10BLDG-P6-Schedule/exports/GT10BLDG_v1_P6_export.xlsx",
+            "locator": "TASKPRED!119",
+            "cells": {
+              "pred_task_id": "MAS-F8-01",
+              "task_id": "MEP-F8-02",
+              "pred_type": "FS",
+              "PREDTASK__status_code": "Not Started",
+              "TASK__status_code": "Not Started",
+              "pred_proj_id": "GT10BLDG",
+              "proj_id": "GT10BLDG",
+              "PREDTASK__PROJWBS__wbs_full_name": "GT10BLDG.3 Masonry & Plastering",
+              "TASK__PROJWBS__wbs_full_name": "GT10BLDG.4.2 Plumbing",
+              "PREDTASK__task_name": "Block Work - F8",
+              "TASK__task_name": "Plumbing Rough-in - F8",
+              "lag_hr_cnt": "0",
+              "PREDTASK__rsrc_id": null,
+              "TASK__rsrc_id": null,
+              "delete_record_flag": null
+            }
+          }
+        ],
+        "suggestion": "Exclude this relationship from dependency-quality claims until a planner selects a source version and resolves relationship semantics and lag units. Input has Relationship Type/Lag; export has pred_type/lag_hr_cnt, whose unit meaning must be verified. Do not infer a corrected value."
+      },
+      {
+        "source_record": {
+          "decision": "pending_independent_review",
+          "evidence": "Input RELATIONSHIP and export TASKPRED disagree; known issues mention FF/FS and F10 plaster lag",
+          "field": "relationship_type/lag",
+          "locator": "MAS-F9-01->MEP-F9-02",
+          "old_value": {
+            "lag": "0",
+            "type": "FS",
+            "unit_header": "lag_hr_cnt"
+          },
+          "project_id": "GT10BLDG",
+          "proposed_value": {
+            "lag": 0,
+            "type": "SS",
+            "unit": "unknown"
+          },
+          "reason": "Planner must resolve type and lag unit; no override applied",
+          "review_date": null,
+          "reviewer_id": null,
+          "source": "gt10"
+        },
+        "queue_locator": "schedule-quality-review.jsonl:12",
+        "technical_disposition": "source_versions_disagree_planner_decision_required",
+        "source_evidence": [
+          {
+            "file": "data/GT10BLDG-P6-Schedule/source/GT10BLDG_input_activities_relationships.xlsx",
+            "locator": "RELATIONSHIP!119",
+            "cells": {
+              "Predecessor Activity ID": "MAS-F9-01",
+              "Successor Activity ID": "MEP-F9-02",
+              "Relationship Type": "SS",
+              "Lag": 0
+            }
+          },
+          {
+            "file": "data/GT10BLDG-P6-Schedule/exports/GT10BLDG_v1_P6_export.xlsx",
+            "locator": "TASKPRED!120",
+            "cells": {
+              "pred_task_id": "MAS-F9-01",
+              "task_id": "MEP-F9-02",
+              "pred_type": "FS",
+              "PREDTASK__status_code": "Not Started",
+              "TASK__status_code": "Not Started",
+              "pred_proj_id": "GT10BLDG",
+              "proj_id": "GT10BLDG",
+              "PREDTASK__PROJWBS__wbs_full_name": "GT10BLDG.3 Masonry & Plastering",
+              "TASK__PROJWBS__wbs_full_name": "GT10BLDG.4.2 Plumbing",
+              "PREDTASK__task_name": "Block Work - F9",
+              "TASK__task_name": "Plumbing Rough-in - F9",
+              "lag_hr_cnt": "0",
+              "PREDTASK__rsrc_id": null,
+              "TASK__rsrc_id": null,
+              "delete_record_flag": null
+            }
+          }
+        ],
+        "suggestion": "Exclude this relationship from dependency-quality claims until a planner selects a source version and resolves relationship semantics and lag units. Input has Relationship Type/Lag; export has pred_type/lag_hr_cnt, whose unit meaning must be verified. Do not infer a corrected value."
+      },
+      {
+        "source_record": {
+          "decision": "pending_independent_review",
+          "evidence": "Input RELATIONSHIP and export TASKPRED disagree; known issues mention FF/FS and F10 plaster lag",
+          "field": "relationship_type/lag",
+          "locator": "MAS-GF-01->MEP-GF-02",
+          "old_value": {
+            "lag": "0",
+            "type": "FS",
+            "unit_header": "lag_hr_cnt"
+          },
+          "project_id": "GT10BLDG",
+          "proposed_value": {
+            "lag": 0,
+            "type": "SS",
+            "unit": "unknown"
+          },
+          "reason": "Planner must resolve type and lag unit; no override applied",
+          "review_date": null,
+          "reviewer_id": null,
+          "source": "gt10"
+        },
+        "queue_locator": "schedule-quality-review.jsonl:13",
+        "technical_disposition": "source_versions_disagree_planner_decision_required",
+        "source_evidence": [
+          {
+            "file": "data/GT10BLDG-P6-Schedule/source/GT10BLDG_input_activities_relationships.xlsx",
+            "locator": "RELATIONSHIP!101",
+            "cells": {
+              "Predecessor Activity ID": "MAS-GF-01",
+              "Successor Activity ID": "MEP-GF-02",
+              "Relationship Type": "SS",
+              "Lag": 0
+            }
+          },
+          {
+            "file": "data/GT10BLDG-P6-Schedule/exports/GT10BLDG_v1_P6_export.xlsx",
+            "locator": "TASKPRED!121",
+            "cells": {
+              "pred_task_id": "MAS-GF-01",
+              "task_id": "MEP-GF-02",
+              "pred_type": "FS",
+              "PREDTASK__status_code": "Not Started",
+              "TASK__status_code": "Not Started",
+              "pred_proj_id": "GT10BLDG",
+              "proj_id": "GT10BLDG",
+              "PREDTASK__PROJWBS__wbs_full_name": "GT10BLDG.3 Masonry & Plastering",
+              "TASK__PROJWBS__wbs_full_name": "GT10BLDG.4.2 Plumbing",
+              "PREDTASK__task_name": "Block Work - GF",
+              "TASK__task_name": "Plumbing Rough-in - GF",
+              "lag_hr_cnt": "0",
+              "PREDTASK__rsrc_id": null,
+              "TASK__rsrc_id": null,
+              "delete_record_flag": null
+            }
+          }
+        ],
+        "suggestion": "Exclude this relationship from dependency-quality claims until a planner selects a source version and resolves relationship semantics and lag units. Input has Relationship Type/Lag; export has pred_type/lag_hr_cnt, whose unit meaning must be verified. Do not infer a corrected value."
+      },
+      {
+        "source_record": {
+          "decision": "pending_independent_review",
+          "evidence": "Input RELATIONSHIP and export TASKPRED disagree; known issues mention FF/FS and F10 plaster lag",
+          "field": "relationship_type/lag",
+          "locator": "PRE-020->PRE-030",
+          "old_value": {
+            "lag": "0",
+            "type": "FS",
+            "unit_header": "lag_hr_cnt"
+          },
+          "project_id": "GT10BLDG",
+          "proposed_value": {
+            "lag": 0,
+            "type": "SS",
+            "unit": "unknown"
+          },
+          "reason": "Planner must resolve type and lag unit; no override applied",
+          "review_date": null,
+          "reviewer_id": null,
+          "source": "gt10"
+        },
+        "queue_locator": "schedule-quality-review.jsonl:14",
+        "technical_disposition": "source_versions_disagree_planner_decision_required",
+        "source_evidence": [
+          {
+            "file": "data/GT10BLDG-P6-Schedule/source/GT10BLDG_input_activities_relationships.xlsx",
+            "locator": "RELATIONSHIP!3",
+            "cells": {
+              "Predecessor Activity ID": "PRE-020",
+              "Successor Activity ID": "PRE-030",
+              "Relationship Type": "SS",
+              "Lag": 0
+            }
+          },
+          {
+            "file": "data/GT10BLDG-P6-Schedule/exports/GT10BLDG_v1_P6_export.xlsx",
+            "locator": "TASKPRED!6",
+            "cells": {
+              "pred_task_id": "PRE-020",
+              "task_id": "PRE-030",
+              "pred_type": "FS",
+              "PREDTASK__status_code": "Not Started",
+              "TASK__status_code": "Not Started",
+              "pred_proj_id": "GT10BLDG",
+              "proj_id": "GT10BLDG",
+              "PREDTASK__PROJWBS__wbs_full_name": "GT10BLDG.1 Preliminary & Mobilization",
+              "TASK__PROJWBS__wbs_full_name": "GT10BLDG.1 Preliminary & Mobilization",
+              "PREDTASK__task_name": "Mobilization of Labor/Equipment",
+              "TASK__task_name": "Temporary Site Office & Fencing",
+              "lag_hr_cnt": "0",
+              "PREDTASK__rsrc_id": null,
+              "TASK__rsrc_id": null,
+              "delete_record_flag": null
+            }
+          }
+        ],
+        "suggestion": "Exclude this relationship from dependency-quality claims until a planner selects a source version and resolves relationship semantics and lag units. Input has Relationship Type/Lag; export has pred_type/lag_hr_cnt, whose unit meaning must be verified. Do not infer a corrected value."
+      },
+      {
+        "source_record": {
+          "decision": "pending_independent_review",
+          "evidence": "Input RELATIONSHIP and export TASKPRED disagree; known issues mention FF/FS and F10 plaster lag",
+          "field": "relationship_type/lag",
+          "locator": "SUP-F9-06->SUP-F10-01",
+          "old_value": {
+            "lag": "0",
+            "type": "FF",
+            "unit_header": "lag_hr_cnt"
+          },
+          "project_id": "GT10BLDG",
+          "proposed_value": {
+            "lag": 0,
+            "type": "FS",
+            "unit": "unknown"
+          },
+          "reason": "Planner must resolve type and lag unit; no override applied",
+          "review_date": null,
+          "reviewer_id": null,
+          "source": "gt10"
+        },
+        "queue_locator": "schedule-quality-review.jsonl:15",
+        "technical_disposition": "source_versions_disagree_planner_decision_required",
+        "source_evidence": [
+          {
+            "file": "data/GT10BLDG-P6-Schedule/source/GT10BLDG_input_activities_relationships.xlsx",
+            "locator": "RELATIONSHIP!71",
+            "cells": {
+              "Predecessor Activity ID": "SUP-F9-06",
+              "Successor Activity ID": "SUP-F10-01",
+              "Relationship Type": "FS",
+              "Lag": 0
+            }
+          },
+          {
+            "file": "data/GT10BLDG-P6-Schedule/exports/GT10BLDG_v1_P6_export.xlsx",
+            "locator": "TASKPRED!77",
+            "cells": {
+              "pred_task_id": "SUP-F9-06",
+              "task_id": "SUP-F10-01",
+              "pred_type": "FF",
+              "PREDTASK__status_code": "Not Started",
+              "TASK__status_code": "Not Started",
+              "pred_proj_id": "GT10BLDG",
+              "proj_id": "GT10BLDG",
+              "PREDTASK__PROJWBS__wbs_full_name": "GT10BLDG.2.1 Excavation, Footing, GF to F10 Structure",
+              "TASK__PROJWBS__wbs_full_name": "GT10BLDG.2.1 Excavation, Footing, GF to F10 Structure",
+              "PREDTASK__task_name": "De-shuttering - F9",
+              "TASK__task_name": "Column Reinforcement - F10",
+              "lag_hr_cnt": "0",
+              "PREDTASK__rsrc_id": null,
+              "TASK__rsrc_id": null,
+              "delete_record_flag": null
+            }
+          }
+        ],
+        "suggestion": "Exclude this relationship from dependency-quality claims until a planner selects a source version and resolves relationship semantics and lag units. Input has Relationship Type/Lag; export has pred_type/lag_hr_cnt, whose unit meaning must be verified. Do not infer a corrected value."
+      },
+      {
+        "source_record": {
+          "decision": "provisional_quarantine",
+          "evidence": "cambridge-profile.json and dataset-audit-2026-10-09.md",
+          "field": "planned_finish_before_start",
+          "locator": "audit profile aggregate",
+          "old_value": 1022,
+          "project_id": null,
+          "proposed_value": null,
+          "reason": "Quarantine affected field from trusted labels or duration calculations pending row-level planner review",
+          "review_date": null,
+          "reviewer_id": null,
+          "source": "cambridge"
+        },
+        "queue_locator": "schedule-quality-review.jsonl:16",
+        "technical_disposition": "aggregate_only_cannot_validate_rows",
+        "source_evidence": [
+          {
+            "file": "../data/schedule-audit-2026-10-09/cambridge-profile.json",
+            "locator": "aggregate profile only",
+            "value": 1022
+          },
+          {
+            "file": "docs/d01-d05-completion-audit-2026-10-10.md",
+            "locator": "D03/D02 audit statements",
+            "note": "row-level review remains required"
+          }
+        ],
+        "supplemental_subset_evidence": [],
+        "suggestion": "Keep global aggregate field out of trusted labels/duration claims pending row-level review and planner decision. Any project 5060 screen evidence is bounded to that derived subset and does not identify rows behind global counts. Redacted-description evidence is related to, but not identical with, the queued redacted-identifiers field. No source rows are corrected by this review."
+      },
+      {
+        "source_record": {
+          "decision": "provisional_quarantine",
+          "evidence": "cambridge-profile.json and dataset-audit-2026-10-09.md",
+          "field": "actual_after_status_date",
+          "locator": "audit profile aggregate",
+          "old_value": 235,
+          "project_id": null,
+          "proposed_value": null,
+          "reason": "Quarantine affected field from trusted labels or duration calculations pending row-level planner review",
+          "review_date": null,
+          "reviewer_id": null,
+          "source": "cambridge"
+        },
+        "queue_locator": "schedule-quality-review.jsonl:17",
+        "technical_disposition": "aggregate_only_cannot_validate_rows",
+        "source_evidence": [
+          {
+            "file": "../data/schedule-audit-2026-10-09/cambridge-profile.json",
+            "locator": "aggregate profile only",
+            "value": 235
+          },
+          {
+            "file": "docs/d01-d05-completion-audit-2026-10-10.md",
+            "locator": "D03/D02 audit statements",
+            "note": "row-level review remains required"
+          }
+        ],
+        "supplemental_subset_evidence": [
+          {
+            "file": "data/review/cambridge-5060-technical-screen.json",
+            "locator": "project 5060 bounded technical screen",
+            "snapshot_sha256": "4ef91f4cb9d60c4e586608035e4358ebfcb2be2562174499c449f00eac16ae21",
+            "matched_flag": "actual_after_status_date",
+            "rows": [
+              {
+                "task_id": "520958",
+                "locator": "$.Projects[\"5060\"].Activities[\"520958\"]",
+                "flags": [
+                  "actual_after_status_date"
+                ],
+                "external_predecessors": []
+              },
+              {
+                "task_id": "522282",
+                "locator": "$.Projects[\"5060\"].Activities[\"522282\"]",
+                "flags": [
+                  "actual_after_status_date"
+                ],
+                "external_predecessors": []
+              },
+              {
+                "task_id": "522288",
+                "locator": "$.Projects[\"5060\"].Activities[\"522288\"]",
+                "flags": [
+                  "actual_after_status_date"
+                ],
+                "external_predecessors": []
+              },
+              {
+                "task_id": "522289",
+                "locator": "$.Projects[\"5060\"].Activities[\"522289\"]",
+                "flags": [
+                  "actual_after_status_date"
+                ],
+                "external_predecessors": []
+              },
+              {
+                "task_id": "522296",
+                "locator": "$.Projects[\"5060\"].Activities[\"522296\"]",
+                "flags": [
+                  "actual_after_status_date"
+                ],
+                "external_predecessors": []
+              }
+            ],
+            "field_equivalence": "same_flag_name"
+          }
+        ],
+        "suggestion": "Keep global aggregate field out of trusted labels/duration claims pending row-level review and planner decision. Any project 5060 screen evidence is bounded to that derived subset and does not identify rows behind global counts. Redacted-description evidence is related to, but not identical with, the queued redacted-identifiers field. No source rows are corrected by this review."
+      },
+      {
+        "source_record": {
+          "decision": "provisional_quarantine",
+          "evidence": "cambridge-profile.json and dataset-audit-2026-10-09.md",
+          "field": "redacted_identifiers",
+          "locator": "audit profile aggregate",
+          "old_value": 123045,
+          "project_id": null,
+          "proposed_value": null,
+          "reason": "Quarantine affected field from trusted labels or duration calculations pending row-level planner review",
+          "review_date": null,
+          "reviewer_id": null,
+          "source": "cambridge"
+        },
+        "queue_locator": "schedule-quality-review.jsonl:18",
+        "technical_disposition": "aggregate_only_cannot_validate_rows",
+        "source_evidence": [
+          {
+            "file": "../data/schedule-audit-2026-10-09/cambridge-profile.json",
+            "locator": "aggregate profile only",
+            "value": 123045
+          },
+          {
+            "file": "docs/d01-d05-completion-audit-2026-10-10.md",
+            "locator": "D03/D02 audit statements",
+            "note": "row-level review remains required"
+          }
+        ],
+        "supplemental_subset_evidence": [
+          {
+            "file": "data/review/cambridge-5060-technical-screen.json",
+            "locator": "project 5060 bounded technical screen",
+            "snapshot_sha256": "4ef91f4cb9d60c4e586608035e4358ebfcb2be2562174499c449f00eac16ae21",
+            "matched_flag": "redacted_activity_description",
+            "rows": [
+              {
+                "task_id": "520851",
+                "locator": "$.Projects[\"5060\"].Activities[\"520851\"]",
+                "flags": [
+                  "redacted_activity_description"
+                ],
+                "external_predecessors": []
+              },
+              {
+                "task_id": "520864",
+                "locator": "$.Projects[\"5060\"].Activities[\"520864\"]",
+                "flags": [
+                  "redacted_activity_description",
+                  "external_or_unresolved_predecessor"
+                ],
+                "external_predecessors": [
+                  "520847"
+                ]
+              },
+              {
+                "task_id": "520870",
+                "locator": "$.Projects[\"5060\"].Activities[\"520870\"]",
+                "flags": [
+                  "redacted_activity_description"
+                ],
+                "external_predecessors": []
+              },
+              {
+                "task_id": "520890",
+                "locator": "$.Projects[\"5060\"].Activities[\"520890\"]",
+                "flags": [
+                  "redacted_activity_description"
+                ],
+                "external_predecessors": []
+              },
+              {
+                "task_id": "520910",
+                "locator": "$.Projects[\"5060\"].Activities[\"520910\"]",
+                "flags": [
+                  "redacted_activity_description"
+                ],
+                "external_predecessors": []
+              },
+              {
+                "task_id": "520917",
+                "locator": "$.Projects[\"5060\"].Activities[\"520917\"]",
+                "flags": [
+                  "redacted_activity_description"
+                ],
+                "external_predecessors": []
+              },
+              {
+                "task_id": "520924",
+                "locator": "$.Projects[\"5060\"].Activities[\"520924\"]",
+                "flags": [
+                  "redacted_activity_description"
+                ],
+                "external_predecessors": []
+              },
+              {
+                "task_id": "520944",
+                "locator": "$.Projects[\"5060\"].Activities[\"520944\"]",
+                "flags": [
+                  "redacted_activity_description"
+                ],
+                "external_predecessors": []
+              },
+              {
+                "task_id": "520945",
+                "locator": "$.Projects[\"5060\"].Activities[\"520945\"]",
+                "flags": [
+                  "redacted_activity_description"
+                ],
+                "external_predecessors": []
+              },
+              {
+                "task_id": "520946",
+                "locator": "$.Projects[\"5060\"].Activities[\"520946\"]",
+                "flags": [
+                  "redacted_activity_description"
+                ],
+                "external_predecessors": []
+              },
+              {
+                "task_id": "520947",
+                "locator": "$.Projects[\"5060\"].Activities[\"520947\"]",
+                "flags": [
+                  "redacted_activity_description"
+                ],
+                "external_predecessors": []
+              },
+              {
+                "task_id": "520970",
+                "locator": "$.Projects[\"5060\"].Activities[\"520970\"]",
+                "flags": [
+                  "redacted_activity_description"
+                ],
+                "external_predecessors": []
+              },
+              {
+                "task_id": "520972",
+                "locator": "$.Projects[\"5060\"].Activities[\"520972\"]",
+                "flags": [
+                  "redacted_activity_description"
+                ],
+                "external_predecessors": []
+              },
+              {
+                "task_id": "521004",
+                "locator": "$.Projects[\"5060\"].Activities[\"521004\"]",
+                "flags": [
+                  "redacted_activity_description"
+                ],
+                "external_predecessors": []
+              },
+              {
+                "task_id": "521008",
+                "locator": "$.Projects[\"5060\"].Activities[\"521008\"]",
+                "flags": [
+                  "redacted_activity_description"
+                ],
+                "external_predecessors": []
+              },
+              {
+                "task_id": "521012",
+                "locator": "$.Projects[\"5060\"].Activities[\"521012\"]",
+                "flags": [
+                  "redacted_activity_description"
+                ],
+                "external_predecessors": []
+              },
+              {
+                "task_id": "521016",
+                "locator": "$.Projects[\"5060\"].Activities[\"521016\"]",
+                "flags": [
+                  "redacted_activity_description"
+                ],
+                "external_predecessors": []
+              },
+              {
+                "task_id": "521019",
+                "locator": "$.Projects[\"5060\"].Activities[\"521019\"]",
+                "flags": [
+                  "redacted_activity_description"
+                ],
+                "external_predecessors": []
+              },
+              {
+                "task_id": "521020",
+                "locator": "$.Projects[\"5060\"].Activities[\"521020\"]",
+                "flags": [
+                  "redacted_activity_description"
+                ],
+                "external_predecessors": []
+              },
+              {
+                "task_id": "521039",
+                "locator": "$.Projects[\"5060\"].Activities[\"521039\"]",
+                "flags": [
+                  "redacted_activity_description"
+                ],
+                "external_predecessors": []
+              },
+              {
+                "task_id": "521055",
+                "locator": "$.Projects[\"5060\"].Activities[\"521055\"]",
+                "flags": [
+                  "redacted_activity_description"
+                ],
+                "external_predecessors": []
+              },
+              {
+                "task_id": "521070",
+                "locator": "$.Projects[\"5060\"].Activities[\"521070\"]",
+                "flags": [
+                  "redacted_activity_description"
+                ],
+                "external_predecessors": []
+              },
+              {
+                "task_id": "521100",
+                "locator": "$.Projects[\"5060\"].Activities[\"521100\"]",
+                "flags": [
+                  "redacted_activity_description"
+                ],
+                "external_predecessors": []
+              },
+              {
+                "task_id": "521106",
+                "locator": "$.Projects[\"5060\"].Activities[\"521106\"]",
+                "flags": [
+                  "redacted_activity_description"
+                ],
+                "external_predecessors": []
+              },
+              {
+                "task_id": "521110",
+                "locator": "$.Projects[\"5060\"].Activities[\"521110\"]",
+                "flags": [
+                  "redacted_activity_description"
+                ],
+                "external_predecessors": []
+              },
+              {
+                "task_id": "521112",
+                "locator": "$.Projects[\"5060\"].Activities[\"521112\"]",
+                "flags": [
+                  "redacted_activity_description"
+                ],
+                "external_predecessors": []
+              },
+              {
+                "task_id": "521113",
+                "locator": "$.Projects[\"5060\"].Activities[\"521113\"]",
+                "flags": [
+                  "redacted_activity_description"
+                ],
+                "external_predecessors": []
+              },
+              {
+                "task_id": "521114",
+                "locator": "$.Projects[\"5060\"].Activities[\"521114\"]",
+                "flags": [
+                  "redacted_activity_description"
+                ],
+                "external_predecessors": []
+              },
+              {
+                "task_id": "521127",
+                "locator": "$.Projects[\"5060\"].Activities[\"521127\"]",
+                "flags": [
+                  "redacted_activity_description"
+                ],
+                "external_predecessors": []
+              },
+              {
+                "task_id": "521128",
+                "locator": "$.Projects[\"5060\"].Activities[\"521128\"]",
+                "flags": [
+                  "redacted_activity_description"
+                ],
+                "external_predecessors": []
+              },
+              {
+                "task_id": "521148",
+                "locator": "$.Projects[\"5060\"].Activities[\"521148\"]",
+                "flags": [
+                  "redacted_activity_description"
+                ],
+                "external_predecessors": []
+              },
+              {
+                "task_id": "521156",
+                "locator": "$.Projects[\"5060\"].Activities[\"521156\"]",
+                "flags": [
+                  "redacted_activity_description"
+                ],
+                "external_predecessors": []
+              },
+              {
+                "task_id": "521163",
+                "locator": "$.Projects[\"5060\"].Activities[\"521163\"]",
+                "flags": [
+                  "redacted_activity_description"
+                ],
+                "external_predecessors": []
+              },
+              {
+                "task_id": "521166",
+                "locator": "$.Projects[\"5060\"].Activities[\"521166\"]",
+                "flags": [
+                  "redacted_activity_description"
+                ],
+                "external_predecessors": []
+              },
+              {
+                "task_id": "521168",
+                "locator": "$.Projects[\"5060\"].Activities[\"521168\"]",
+                "flags": [
+                  "redacted_activity_description"
+                ],
+                "external_predecessors": []
+              },
+              {
+                "task_id": "521169",
+                "locator": "$.Projects[\"5060\"].Activities[\"521169\"]",
+                "flags": [
+                  "redacted_activity_description"
+                ],
+                "external_predecessors": []
+              },
+              {
+                "task_id": "521195",
+                "locator": "$.Projects[\"5060\"].Activities[\"521195\"]",
+                "flags": [
+                  "redacted_activity_description"
+                ],
+                "external_predecessors": []
+              },
+              {
+                "task_id": "521197",
+                "locator": "$.Projects[\"5060\"].Activities[\"521197\"]",
+                "flags": [
+                  "redacted_activity_description"
+                ],
+                "external_predecessors": []
+              },
+              {
+                "task_id": "521202",
+                "locator": "$.Projects[\"5060\"].Activities[\"521202\"]",
+                "flags": [
+                  "redacted_activity_description"
+                ],
+                "external_predecessors": []
+              },
+              {
+                "task_id": "521203",
+                "locator": "$.Projects[\"5060\"].Activities[\"521203\"]",
+                "flags": [
+                  "redacted_activity_description"
+                ],
+                "external_predecessors": []
+              },
+              {
+                "task_id": "521206",
+                "locator": "$.Projects[\"5060\"].Activities[\"521206\"]",
+                "flags": [
+                  "redacted_activity_description"
+                ],
+                "external_predecessors": []
+              },
+              {
+                "task_id": "521207",
+                "locator": "$.Projects[\"5060\"].Activities[\"521207\"]",
+                "flags": [
+                  "redacted_activity_description"
+                ],
+                "external_predecessors": []
+              },
+              {
+                "task_id": "521208",
+                "locator": "$.Projects[\"5060\"].Activities[\"521208\"]",
+                "flags": [
+                  "redacted_activity_description"
+                ],
+                "external_predecessors": []
+              },
+              {
+                "task_id": "521209",
+                "locator": "$.Projects[\"5060\"].Activities[\"521209\"]",
+                "flags": [
+                  "redacted_activity_description"
+                ],
+                "external_predecessors": []
+              },
+              {
+                "task_id": "521217",
+                "locator": "$.Projects[\"5060\"].Activities[\"521217\"]",
+                "flags": [
+                  "redacted_activity_description"
+                ],
+                "external_predecessors": []
+              },
+              {
+                "task_id": "521224",
+                "locator": "$.Projects[\"5060\"].Activities[\"521224\"]",
+                "flags": [
+                  "redacted_activity_description"
+                ],
+                "external_predecessors": []
+              },
+              {
+                "task_id": "521234",
+                "locator": "$.Projects[\"5060\"].Activities[\"521234\"]",
+                "flags": [
+                  "redacted_activity_description"
+                ],
+                "external_predecessors": []
+              },
+              {
+                "task_id": "521236",
+                "locator": "$.Projects[\"5060\"].Activities[\"521236\"]",
+                "flags": [
+                  "redacted_activity_description"
+                ],
+                "external_predecessors": []
+              },
+              {
+                "task_id": "521251",
+                "locator": "$.Projects[\"5060\"].Activities[\"521251\"]",
+                "flags": [
+                  "redacted_activity_description"
+                ],
+                "external_predecessors": []
+              },
+              {
+                "task_id": "521252",
+                "locator": "$.Projects[\"5060\"].Activities[\"521252\"]",
+                "flags": [
+                  "redacted_activity_description"
+                ],
+                "external_predecessors": []
+              },
+              {
+                "task_id": "521253",
+                "locator": "$.Projects[\"5060\"].Activities[\"521253\"]",
+                "flags": [
+                  "redacted_activity_description"
+                ],
+                "external_predecessors": []
+              },
+              {
+                "task_id": "521269",
+                "locator": "$.Projects[\"5060\"].Activities[\"521269\"]",
+                "flags": [
+                  "redacted_activity_description"
+                ],
+                "external_predecessors": []
+              },
+              {
+                "task_id": "521270",
+                "locator": "$.Projects[\"5060\"].Activities[\"521270\"]",
+                "flags": [
+                  "redacted_activity_description"
+                ],
+                "external_predecessors": []
+              },
+              {
+                "task_id": "521274",
+                "locator": "$.Projects[\"5060\"].Activities[\"521274\"]",
+                "flags": [
+                  "redacted_activity_description"
+                ],
+                "external_predecessors": []
+              },
+              {
+                "task_id": "521280",
+                "locator": "$.Projects[\"5060\"].Activities[\"521280\"]",
+                "flags": [
+                  "redacted_activity_description"
+                ],
+                "external_predecessors": []
+              },
+              {
+                "task_id": "521290",
+                "locator": "$.Projects[\"5060\"].Activities[\"521290\"]",
+                "flags": [
+                  "redacted_activity_description"
+                ],
+                "external_predecessors": []
+              },
+              {
+                "task_id": "521298",
+                "locator": "$.Projects[\"5060\"].Activities[\"521298\"]",
+                "flags": [
+                  "redacted_activity_description"
+                ],
+                "external_predecessors": []
+              },
+              {
+                "task_id": "521303",
+                "locator": "$.Projects[\"5060\"].Activities[\"521303\"]",
+                "flags": [
+                  "redacted_activity_description"
+                ],
+                "external_predecessors": []
+              },
+              {
+                "task_id": "521304",
+                "locator": "$.Projects[\"5060\"].Activities[\"521304\"]",
+                "flags": [
+                  "redacted_activity_description"
+                ],
+                "external_predecessors": []
+              },
+              {
+                "task_id": "521319",
+                "locator": "$.Projects[\"5060\"].Activities[\"521319\"]",
+                "flags": [
+                  "redacted_activity_description"
+                ],
+                "external_predecessors": []
+              },
+              {
+                "task_id": "521320",
+                "locator": "$.Projects[\"5060\"].Activities[\"521320\"]",
+                "flags": [
+                  "redacted_activity_description"
+                ],
+                "external_predecessors": []
+              },
+              {
+                "task_id": "521321",
+                "locator": "$.Projects[\"5060\"].Activities[\"521321\"]",
+                "flags": [
+                  "redacted_activity_description"
+                ],
+                "external_predecessors": []
+              },
+              {
+                "task_id": "521331",
+                "locator": "$.Projects[\"5060\"].Activities[\"521331\"]",
+                "flags": [
+                  "redacted_activity_description"
+                ],
+                "external_predecessors": []
+              },
+              {
+                "task_id": "521332",
+                "locator": "$.Projects[\"5060\"].Activities[\"521332\"]",
+                "flags": [
+                  "redacted_activity_description"
+                ],
+                "external_predecessors": []
+              },
+              {
+                "task_id": "521336",
+                "locator": "$.Projects[\"5060\"].Activities[\"521336\"]",
+                "flags": [
+                  "redacted_activity_description"
+                ],
+                "external_predecessors": []
+              },
+              {
+                "task_id": "521337",
+                "locator": "$.Projects[\"5060\"].Activities[\"521337\"]",
+                "flags": [
+                  "redacted_activity_description"
+                ],
+                "external_predecessors": []
+              },
+              {
+                "task_id": "521345",
+                "locator": "$.Projects[\"5060\"].Activities[\"521345\"]",
+                "flags": [
+                  "redacted_activity_description"
+                ],
+                "external_predecessors": []
+              },
+              {
+                "task_id": "521346",
+                "locator": "$.Projects[\"5060\"].Activities[\"521346\"]",
+                "flags": [
+                  "redacted_activity_description"
+                ],
+                "external_predecessors": []
+              },
+              {
+                "task_id": "521351",
+                "locator": "$.Projects[\"5060\"].Activities[\"521351\"]",
+                "flags": [
+                  "redacted_activity_description"
+                ],
+                "external_predecessors": []
+              },
+              {
+                "task_id": "521352",
+                "locator": "$.Projects[\"5060\"].Activities[\"521352\"]",
+                "flags": [
+                  "redacted_activity_description"
+                ],
+                "external_predecessors": []
+              },
+              {
+                "task_id": "521357",
+                "locator": "$.Projects[\"5060\"].Activities[\"521357\"]",
+                "flags": [
+                  "redacted_activity_description"
+                ],
+                "external_predecessors": []
+              },
+              {
+                "task_id": "521361",
+                "locator": "$.Projects[\"5060\"].Activities[\"521361\"]",
+                "flags": [
+                  "redacted_activity_description"
+                ],
+                "external_predecessors": []
+              },
+              {
+                "task_id": "521364",
+                "locator": "$.Projects[\"5060\"].Activities[\"521364\"]",
+                "flags": [
+                  "redacted_activity_description"
+                ],
+                "external_predecessors": []
+              },
+              {
+                "task_id": "521371",
+                "locator": "$.Projects[\"5060\"].Activities[\"521371\"]",
+                "flags": [
+                  "redacted_activity_description"
+                ],
+                "external_predecessors": []
+              },
+              {
+                "task_id": "521372",
+                "locator": "$.Projects[\"5060\"].Activities[\"521372\"]",
+                "flags": [
+                  "redacted_activity_description"
+                ],
+                "external_predecessors": []
+              },
+              {
+                "task_id": "521379",
+                "locator": "$.Projects[\"5060\"].Activities[\"521379\"]",
+                "flags": [
+                  "redacted_activity_description"
+                ],
+                "external_predecessors": []
+              },
+              {
+                "task_id": "521419",
+                "locator": "$.Projects[\"5060\"].Activities[\"521419\"]",
+                "flags": [
+                  "redacted_activity_description"
+                ],
+                "external_predecessors": []
+              },
+              {
+                "task_id": "521423",
+                "locator": "$.Projects[\"5060\"].Activities[\"521423\"]",
+                "flags": [
+                  "redacted_activity_description"
+                ],
+                "external_predecessors": []
+              },
+              {
+                "task_id": "521427",
+                "locator": "$.Projects[\"5060\"].Activities[\"521427\"]",
+                "flags": [
+                  "redacted_activity_description"
+                ],
+                "external_predecessors": []
+              },
+              {
+                "task_id": "521436",
+                "locator": "$.Projects[\"5060\"].Activities[\"521436\"]",
+                "flags": [
+                  "redacted_activity_description"
+                ],
+                "external_predecessors": []
+              },
+              {
+                "task_id": "521456",
+                "locator": "$.Projects[\"5060\"].Activities[\"521456\"]",
+                "flags": [
+                  "redacted_activity_description"
+                ],
+                "external_predecessors": []
+              },
+              {
+                "task_id": "521457",
+                "locator": "$.Projects[\"5060\"].Activities[\"521457\"]",
+                "flags": [
+                  "redacted_activity_description"
+                ],
+                "external_predecessors": []
+              },
+              {
+                "task_id": "521466",
+                "locator": "$.Projects[\"5060\"].Activities[\"521466\"]",
+                "flags": [
+                  "redacted_activity_description"
+                ],
+                "external_predecessors": []
+              },
+              {
+                "task_id": "521489",
+                "locator": "$.Projects[\"5060\"].Activities[\"521489\"]",
+                "flags": [
+                  "redacted_activity_description"
+                ],
+                "external_predecessors": []
+              },
+              {
+                "task_id": "521491",
+                "locator": "$.Projects[\"5060\"].Activities[\"521491\"]",
+                "flags": [
+                  "redacted_activity_description"
+                ],
+                "external_predecessors": []
+              },
+              {
+                "task_id": "521493",
+                "locator": "$.Projects[\"5060\"].Activities[\"521493\"]",
+                "flags": [
+                  "redacted_activity_description"
+                ],
+                "external_predecessors": []
+              },
+              {
+                "task_id": "521495",
+                "locator": "$.Projects[\"5060\"].Activities[\"521495\"]",
+                "flags": [
+                  "redacted_activity_description"
+                ],
+                "external_predecessors": []
+              },
+              {
+                "task_id": "521536",
+                "locator": "$.Projects[\"5060\"].Activities[\"521536\"]",
+                "flags": [
+                  "redacted_activity_description"
+                ],
+                "external_predecessors": []
+              },
+              {
+                "task_id": "521538",
+                "locator": "$.Projects[\"5060\"].Activities[\"521538\"]",
+                "flags": [
+                  "redacted_activity_description"
+                ],
+                "external_predecessors": []
+              },
+              {
+                "task_id": "521539",
+                "locator": "$.Projects[\"5060\"].Activities[\"521539\"]",
+                "flags": [
+                  "redacted_activity_description"
+                ],
+                "external_predecessors": []
+              },
+              {
+                "task_id": "521540",
+                "locator": "$.Projects[\"5060\"].Activities[\"521540\"]",
+                "flags": [
+                  "redacted_activity_description"
+                ],
+                "external_predecessors": []
+              },
+              {
+                "task_id": "521541",
+                "locator": "$.Projects[\"5060\"].Activities[\"521541\"]",
+                "flags": [
+                  "redacted_activity_description"
+                ],
+                "external_predecessors": []
+              },
+              {
+                "task_id": "521549",
+                "locator": "$.Projects[\"5060\"].Activities[\"521549\"]",
+                "flags": [
+                  "redacted_activity_description"
+                ],
+                "external_predecessors": []
+              },
+              {
+                "task_id": "521550",
+                "locator": "$.Projects[\"5060\"].Activities[\"521550\"]",
+                "flags": [
+                  "redacted_activity_description"
+                ],
+                "external_predecessors": []
+              },
+              {
+                "task_id": "521551",
+                "locator": "$.Projects[\"5060\"].Activities[\"521551\"]",
+                "flags": [
+                  "redacted_activity_description"
+                ],
+                "external_predecessors": []
+              },
+              {
+                "task_id": "521552",
+                "locator": "$.Projects[\"5060\"].Activities[\"521552\"]",
+                "flags": [
+                  "redacted_activity_description"
+                ],
+                "external_predecessors": []
+              },
+              {
+                "task_id": "521553",
+                "locator": "$.Projects[\"5060\"].Activities[\"521553\"]",
+                "flags": [
+                  "redacted_activity_description"
+                ],
+                "external_predecessors": []
+              },
+              {
+                "task_id": "521554",
+                "locator": "$.Projects[\"5060\"].Activities[\"521554\"]",
+                "flags": [
+                  "redacted_activity_description"
+                ],
+                "external_predecessors": []
+              },
+              {
+                "task_id": "521555",
+                "locator": "$.Projects[\"5060\"].Activities[\"521555\"]",
+                "flags": [
+                  "redacted_activity_description"
+                ],
+                "external_predecessors": []
+              },
+              {
+                "task_id": "521556",
+                "locator": "$.Projects[\"5060\"].Activities[\"521556\"]",
+                "flags": [
+                  "redacted_activity_description"
+                ],
+                "external_predecessors": []
+              },
+              {
+                "task_id": "521557",
+                "locator": "$.Projects[\"5060\"].Activities[\"521557\"]",
+                "flags": [
+                  "redacted_activity_description"
+                ],
+                "external_predecessors": []
+              },
+              {
+                "task_id": "521563",
+                "locator": "$.Projects[\"5060\"].Activities[\"521563\"]",
+                "flags": [
+                  "redacted_activity_description"
+                ],
+                "external_predecessors": []
+              },
+              {
+                "task_id": "521564",
+                "locator": "$.Projects[\"5060\"].Activities[\"521564\"]",
+                "flags": [
+                  "redacted_activity_description"
+                ],
+                "external_predecessors": []
+              },
+              {
+                "task_id": "521565",
+                "locator": "$.Projects[\"5060\"].Activities[\"521565\"]",
+                "flags": [
+                  "redacted_activity_description"
+                ],
+                "external_predecessors": []
+              },
+              {
+                "task_id": "521567",
+                "locator": "$.Projects[\"5060\"].Activities[\"521567\"]",
+                "flags": [
+                  "redacted_activity_description"
+                ],
+                "external_predecessors": []
+              },
+              {
+                "task_id": "521585",
+                "locator": "$.Projects[\"5060\"].Activities[\"521585\"]",
+                "flags": [
+                  "redacted_activity_description"
+                ],
+                "external_predecessors": []
+              },
+              {
+                "task_id": "521588",
+                "locator": "$.Projects[\"5060\"].Activities[\"521588\"]",
+                "flags": [
+                  "redacted_activity_description"
+                ],
+                "external_predecessors": []
+              },
+              {
+                "task_id": "521589",
+                "locator": "$.Projects[\"5060\"].Activities[\"521589\"]",
+                "flags": [
+                  "redacted_activity_description"
+                ],
+                "external_predecessors": []
+              },
+              {
+                "task_id": "521605",
+                "locator": "$.Projects[\"5060\"].Activities[\"521605\"]",
+                "flags": [
+                  "redacted_activity_description"
+                ],
+                "external_predecessors": []
+              },
+              {
+                "task_id": "521612",
+                "locator": "$.Projects[\"5060\"].Activities[\"521612\"]",
+                "flags": [
+                  "redacted_activity_description"
+                ],
+                "external_predecessors": []
+              },
+              {
+                "task_id": "521652",
+                "locator": "$.Projects[\"5060\"].Activities[\"521652\"]",
+                "flags": [
+                  "redacted_activity_description"
+                ],
+                "external_predecessors": []
+              },
+              {
+                "task_id": "521661",
+                "locator": "$.Projects[\"5060\"].Activities[\"521661\"]",
+                "flags": [
+                  "redacted_activity_description"
+                ],
+                "external_predecessors": []
+              },
+              {
+                "task_id": "521663",
+                "locator": "$.Projects[\"5060\"].Activities[\"521663\"]",
+                "flags": [
+                  "redacted_activity_description"
+                ],
+                "external_predecessors": []
+              },
+              {
+                "task_id": "521667",
+                "locator": "$.Projects[\"5060\"].Activities[\"521667\"]",
+                "flags": [
+                  "redacted_activity_description"
+                ],
+                "external_predecessors": []
+              },
+              {
+                "task_id": "521674",
+                "locator": "$.Projects[\"5060\"].Activities[\"521674\"]",
+                "flags": [
+                  "redacted_activity_description"
+                ],
+                "external_predecessors": []
+              },
+              {
+                "task_id": "521684",
+                "locator": "$.Projects[\"5060\"].Activities[\"521684\"]",
+                "flags": [
+                  "redacted_activity_description"
+                ],
+                "external_predecessors": []
+              },
+              {
+                "task_id": "521727",
+                "locator": "$.Projects[\"5060\"].Activities[\"521727\"]",
+                "flags": [
+                  "redacted_activity_description"
+                ],
+                "external_predecessors": []
+              },
+              {
+                "task_id": "521730",
+                "locator": "$.Projects[\"5060\"].Activities[\"521730\"]",
+                "flags": [
+                  "redacted_activity_description"
+                ],
+                "external_predecessors": []
+              },
+              {
+                "task_id": "521735",
+                "locator": "$.Projects[\"5060\"].Activities[\"521735\"]",
+                "flags": [
+                  "redacted_activity_description"
+                ],
+                "external_predecessors": []
+              },
+              {
+                "task_id": "521737",
+                "locator": "$.Projects[\"5060\"].Activities[\"521737\"]",
+                "flags": [
+                  "redacted_activity_description"
+                ],
+                "external_predecessors": []
+              },
+              {
+                "task_id": "521751",
+                "locator": "$.Projects[\"5060\"].Activities[\"521751\"]",
+                "flags": [
+                  "redacted_activity_description"
+                ],
+                "external_predecessors": []
+              },
+              {
+                "task_id": "521752",
+                "locator": "$.Projects[\"5060\"].Activities[\"521752\"]",
+                "flags": [
+                  "redacted_activity_description"
+                ],
+                "external_predecessors": []
+              },
+              {
+                "task_id": "521759",
+                "locator": "$.Projects[\"5060\"].Activities[\"521759\"]",
+                "flags": [
+                  "redacted_activity_description"
+                ],
+                "external_predecessors": []
+              },
+              {
+                "task_id": "521763",
+                "locator": "$.Projects[\"5060\"].Activities[\"521763\"]",
+                "flags": [
+                  "redacted_activity_description"
+                ],
+                "external_predecessors": []
+              },
+              {
+                "task_id": "521765",
+                "locator": "$.Projects[\"5060\"].Activities[\"521765\"]",
+                "flags": [
+                  "redacted_activity_description"
+                ],
+                "external_predecessors": []
+              },
+              {
+                "task_id": "521768",
+                "locator": "$.Projects[\"5060\"].Activities[\"521768\"]",
+                "flags": [
+                  "redacted_activity_description"
+                ],
+                "external_predecessors": []
+              },
+              {
+                "task_id": "521769",
+                "locator": "$.Projects[\"5060\"].Activities[\"521769\"]",
+                "flags": [
+                  "redacted_activity_description"
+                ],
+                "external_predecessors": []
+              },
+              {
+                "task_id": "521770",
+                "locator": "$.Projects[\"5060\"].Activities[\"521770\"]",
+                "flags": [
+                  "redacted_activity_description"
+                ],
+                "external_predecessors": []
+              },
+              {
+                "task_id": "521771",
+                "locator": "$.Projects[\"5060\"].Activities[\"521771\"]",
+                "flags": [
+                  "redacted_activity_description"
+                ],
+                "external_predecessors": []
+              },
+              {
+                "task_id": "521772",
+                "locator": "$.Projects[\"5060\"].Activities[\"521772\"]",
+                "flags": [
+                  "redacted_activity_description"
+                ],
+                "external_predecessors": []
+              },
+              {
+                "task_id": "521773",
+                "locator": "$.Projects[\"5060\"].Activities[\"521773\"]",
+                "flags": [
+                  "redacted_activity_description"
+                ],
+                "external_predecessors": []
+              },
+              {
+                "task_id": "521776",
+                "locator": "$.Projects[\"5060\"].Activities[\"521776\"]",
+                "flags": [
+                  "redacted_activity_description"
+                ],
+                "external_predecessors": []
+              },
+              {
+                "task_id": "521777",
+                "locator": "$.Projects[\"5060\"].Activities[\"521777\"]",
+                "flags": [
+                  "redacted_activity_description"
+                ],
+                "external_predecessors": []
+              },
+              {
+                "task_id": "521778",
+                "locator": "$.Projects[\"5060\"].Activities[\"521778\"]",
+                "flags": [
+                  "redacted_activity_description"
+                ],
+                "external_predecessors": []
+              },
+              {
+                "task_id": "521787",
+                "locator": "$.Projects[\"5060\"].Activities[\"521787\"]",
+                "flags": [
+                  "redacted_activity_description"
+                ],
+                "external_predecessors": []
+              },
+              {
+                "task_id": "521800",
+                "locator": "$.Projects[\"5060\"].Activities[\"521800\"]",
+                "flags": [
+                  "redacted_activity_description"
+                ],
+                "external_predecessors": []
+              },
+              {
+                "task_id": "521804",
+                "locator": "$.Projects[\"5060\"].Activities[\"521804\"]",
+                "flags": [
+                  "redacted_activity_description"
+                ],
+                "external_predecessors": []
+              },
+              {
+                "task_id": "521861",
+                "locator": "$.Projects[\"5060\"].Activities[\"521861\"]",
+                "flags": [
+                  "redacted_activity_description"
+                ],
+                "external_predecessors": []
+              },
+              {
+                "task_id": "521880",
+                "locator": "$.Projects[\"5060\"].Activities[\"521880\"]",
+                "flags": [
+                  "redacted_activity_description"
+                ],
+                "external_predecessors": []
+              },
+              {
+                "task_id": "521888",
+                "locator": "$.Projects[\"5060\"].Activities[\"521888\"]",
+                "flags": [
+                  "redacted_activity_description"
+                ],
+                "external_predecessors": []
+              },
+              {
+                "task_id": "521889",
+                "locator": "$.Projects[\"5060\"].Activities[\"521889\"]",
+                "flags": [
+                  "redacted_activity_description"
+                ],
+                "external_predecessors": []
+              },
+              {
+                "task_id": "521891",
+                "locator": "$.Projects[\"5060\"].Activities[\"521891\"]",
+                "flags": [
+                  "redacted_activity_description"
+                ],
+                "external_predecessors": []
+              },
+              {
+                "task_id": "521905",
+                "locator": "$.Projects[\"5060\"].Activities[\"521905\"]",
+                "flags": [
+                  "redacted_activity_description"
+                ],
+                "external_predecessors": []
+              },
+              {
+                "task_id": "521910",
+                "locator": "$.Projects[\"5060\"].Activities[\"521910\"]",
+                "flags": [
+                  "redacted_activity_description"
+                ],
+                "external_predecessors": []
+              },
+              {
+                "task_id": "521982",
+                "locator": "$.Projects[\"5060\"].Activities[\"521982\"]",
+                "flags": [
+                  "redacted_activity_description"
+                ],
+                "external_predecessors": []
+              },
+              {
+                "task_id": "521983",
+                "locator": "$.Projects[\"5060\"].Activities[\"521983\"]",
+                "flags": [
+                  "redacted_activity_description"
+                ],
+                "external_predecessors": []
+              },
+              {
+                "task_id": "521985",
+                "locator": "$.Projects[\"5060\"].Activities[\"521985\"]",
+                "flags": [
+                  "redacted_activity_description"
+                ],
+                "external_predecessors": []
+              },
+              {
+                "task_id": "522046",
+                "locator": "$.Projects[\"5060\"].Activities[\"522046\"]",
+                "flags": [
+                  "redacted_activity_description"
+                ],
+                "external_predecessors": []
+              },
+              {
+                "task_id": "522049",
+                "locator": "$.Projects[\"5060\"].Activities[\"522049\"]",
+                "flags": [
+                  "redacted_activity_description"
+                ],
+                "external_predecessors": []
+              },
+              {
+                "task_id": "522054",
+                "locator": "$.Projects[\"5060\"].Activities[\"522054\"]",
+                "flags": [
+                  "redacted_activity_description"
+                ],
+                "external_predecessors": []
+              },
+              {
+                "task_id": "522056",
+                "locator": "$.Projects[\"5060\"].Activities[\"522056\"]",
+                "flags": [
+                  "redacted_activity_description"
+                ],
+                "external_predecessors": []
+              },
+              {
+                "task_id": "522061",
+                "locator": "$.Projects[\"5060\"].Activities[\"522061\"]",
+                "flags": [
+                  "redacted_activity_description"
+                ],
+                "external_predecessors": []
+              },
+              {
+                "task_id": "522065",
+                "locator": "$.Projects[\"5060\"].Activities[\"522065\"]",
+                "flags": [
+                  "redacted_activity_description"
+                ],
+                "external_predecessors": []
+              },
+              {
+                "task_id": "522066",
+                "locator": "$.Projects[\"5060\"].Activities[\"522066\"]",
+                "flags": [
+                  "redacted_activity_description"
+                ],
+                "external_predecessors": []
+              },
+              {
+                "task_id": "522068",
+                "locator": "$.Projects[\"5060\"].Activities[\"522068\"]",
+                "flags": [
+                  "redacted_activity_description"
+                ],
+                "external_predecessors": []
+              },
+              {
+                "task_id": "522097",
+                "locator": "$.Projects[\"5060\"].Activities[\"522097\"]",
+                "flags": [
+                  "redacted_activity_description"
+                ],
+                "external_predecessors": []
+              },
+              {
+                "task_id": "522100",
+                "locator": "$.Projects[\"5060\"].Activities[\"522100\"]",
+                "flags": [
+                  "redacted_activity_description"
+                ],
+                "external_predecessors": []
+              },
+              {
+                "task_id": "522104",
+                "locator": "$.Projects[\"5060\"].Activities[\"522104\"]",
+                "flags": [
+                  "redacted_activity_description"
+                ],
+                "external_predecessors": []
+              },
+              {
+                "task_id": "522105",
+                "locator": "$.Projects[\"5060\"].Activities[\"522105\"]",
+                "flags": [
+                  "redacted_activity_description"
+                ],
+                "external_predecessors": []
+              },
+              {
+                "task_id": "522106",
+                "locator": "$.Projects[\"5060\"].Activities[\"522106\"]",
+                "flags": [
+                  "redacted_activity_description"
+                ],
+                "external_predecessors": []
+              },
+              {
+                "task_id": "522110",
+                "locator": "$.Projects[\"5060\"].Activities[\"522110\"]",
+                "flags": [
+                  "redacted_activity_description"
+                ],
+                "external_predecessors": []
+              },
+              {
+                "task_id": "522117",
+                "locator": "$.Projects[\"5060\"].Activities[\"522117\"]",
+                "flags": [
+                  "redacted_activity_description"
+                ],
+                "external_predecessors": []
+              },
+              {
+                "task_id": "522118",
+                "locator": "$.Projects[\"5060\"].Activities[\"522118\"]",
+                "flags": [
+                  "redacted_activity_description"
+                ],
+                "external_predecessors": []
+              },
+              {
+                "task_id": "522119",
+                "locator": "$.Projects[\"5060\"].Activities[\"522119\"]",
+                "flags": [
+                  "redacted_activity_description"
+                ],
+                "external_predecessors": []
+              },
+              {
+                "task_id": "522120",
+                "locator": "$.Projects[\"5060\"].Activities[\"522120\"]",
+                "flags": [
+                  "redacted_activity_description"
+                ],
+                "external_predecessors": []
+              },
+              {
+                "task_id": "522122",
+                "locator": "$.Projects[\"5060\"].Activities[\"522122\"]",
+                "flags": [
+                  "redacted_activity_description"
+                ],
+                "external_predecessors": []
+              },
+              {
+                "task_id": "522130",
+                "locator": "$.Projects[\"5060\"].Activities[\"522130\"]",
+                "flags": [
+                  "redacted_activity_description"
+                ],
+                "external_predecessors": []
+              },
+              {
+                "task_id": "522131",
+                "locator": "$.Projects[\"5060\"].Activities[\"522131\"]",
+                "flags": [
+                  "redacted_activity_description"
+                ],
+                "external_predecessors": []
+              },
+              {
+                "task_id": "522132",
+                "locator": "$.Projects[\"5060\"].Activities[\"522132\"]",
+                "flags": [
+                  "redacted_activity_description"
+                ],
+                "external_predecessors": []
+              },
+              {
+                "task_id": "522133",
+                "locator": "$.Projects[\"5060\"].Activities[\"522133\"]",
+                "flags": [
+                  "redacted_activity_description"
+                ],
+                "external_predecessors": []
+              },
+              {
+                "task_id": "522134",
+                "locator": "$.Projects[\"5060\"].Activities[\"522134\"]",
+                "flags": [
+                  "redacted_activity_description"
+                ],
+                "external_predecessors": []
+              },
+              {
+                "task_id": "522135",
+                "locator": "$.Projects[\"5060\"].Activities[\"522135\"]",
+                "flags": [
+                  "redacted_activity_description"
+                ],
+                "external_predecessors": []
+              },
+              {
+                "task_id": "522142",
+                "locator": "$.Projects[\"5060\"].Activities[\"522142\"]",
+                "flags": [
+                  "redacted_activity_description"
+                ],
+                "external_predecessors": []
+              },
+              {
+                "task_id": "522148",
+                "locator": "$.Projects[\"5060\"].Activities[\"522148\"]",
+                "flags": [
+                  "redacted_activity_description"
+                ],
+                "external_predecessors": []
+              },
+              {
+                "task_id": "522153",
+                "locator": "$.Projects[\"5060\"].Activities[\"522153\"]",
+                "flags": [
+                  "redacted_activity_description"
+                ],
+                "external_predecessors": []
+              },
+              {
+                "task_id": "522165",
+                "locator": "$.Projects[\"5060\"].Activities[\"522165\"]",
+                "flags": [
+                  "redacted_activity_description"
+                ],
+                "external_predecessors": []
+              },
+              {
+                "task_id": "522183",
+                "locator": "$.Projects[\"5060\"].Activities[\"522183\"]",
+                "flags": [
+                  "redacted_activity_description"
+                ],
+                "external_predecessors": []
+              },
+              {
+                "task_id": "522233",
+                "locator": "$.Projects[\"5060\"].Activities[\"522233\"]",
+                "flags": [
+                  "redacted_activity_description"
+                ],
+                "external_predecessors": []
+              },
+              {
+                "task_id": "522234",
+                "locator": "$.Projects[\"5060\"].Activities[\"522234\"]",
+                "flags": [
+                  "redacted_activity_description"
+                ],
+                "external_predecessors": []
+              },
+              {
+                "task_id": "522235",
+                "locator": "$.Projects[\"5060\"].Activities[\"522235\"]",
+                "flags": [
+                  "redacted_activity_description"
+                ],
+                "external_predecessors": []
+              },
+              {
+                "task_id": "522236",
+                "locator": "$.Projects[\"5060\"].Activities[\"522236\"]",
+                "flags": [
+                  "redacted_activity_description"
+                ],
+                "external_predecessors": []
+              }
+            ],
+            "field_equivalence": "related_screen_signal_only"
+          }
+        ],
+        "suggestion": "Keep global aggregate field out of trusted labels/duration claims pending row-level review and planner decision. Any project 5060 screen evidence is bounded to that derived subset and does not identify rows behind global counts. Redacted-description evidence is related to, but not identical with, the queued redacted-identifiers field. No source rows are corrected by this review."
+      },
+      {
+        "source_record": {
+          "decision": "provisional_quarantine",
+          "evidence": "cambridge-profile.json and dataset-audit-2026-10-09.md",
+          "field": "calendar_missing_or_unverified",
+          "locator": "audit profile aggregate",
+          "old_value": 7795,
+          "project_id": null,
+          "proposed_value": null,
+          "reason": "Quarantine affected field from trusted labels or duration calculations pending row-level planner review",
+          "review_date": null,
+          "reviewer_id": null,
+          "source": "cambridge"
+        },
+        "queue_locator": "schedule-quality-review.jsonl:19",
+        "technical_disposition": "aggregate_only_cannot_validate_rows",
+        "source_evidence": [
+          {
+            "file": "../data/schedule-audit-2026-10-09/cambridge-profile.json",
+            "locator": "aggregate profile only",
+            "value": 7795
+          },
+          {
+            "file": "docs/d01-d05-completion-audit-2026-10-10.md",
+            "locator": "D03/D02 audit statements",
+            "note": "row-level review remains required"
+          }
+        ],
+        "supplemental_subset_evidence": [],
+        "suggestion": "Keep global aggregate field out of trusted labels/duration claims pending row-level review and planner decision. Any project 5060 screen evidence is bounded to that derived subset and does not identify rows behind global counts. Redacted-description evidence is related to, but not identical with, the queued redacted-identifiers field. No source rows are corrected by this review."
+      },
+      {
+        "source_record": {
+          "decision": "provisional_quarantine",
+          "evidence": "cambridge-profile.json and dataset-audit-2026-10-09.md",
+          "field": "invalid_weather_fields",
+          "locator": "audit profile aggregate",
+          "old_value": 346110,
+          "project_id": null,
+          "proposed_value": null,
+          "reason": "Quarantine affected field from trusted labels or duration calculations pending row-level planner review",
+          "review_date": null,
+          "reviewer_id": null,
+          "source": "cambridge"
+        },
+        "queue_locator": "schedule-quality-review.jsonl:20",
+        "technical_disposition": "aggregate_only_cannot_validate_rows",
+        "source_evidence": [
+          {
+            "file": "../data/schedule-audit-2026-10-09/cambridge-profile.json",
+            "locator": "aggregate profile only",
+            "value": 346110
+          },
+          {
+            "file": "docs/d01-d05-completion-audit-2026-10-10.md",
+            "locator": "D03/D02 audit statements",
+            "note": "row-level review remains required"
+          }
+        ],
+        "supplemental_subset_evidence": [],
+        "suggestion": "Keep global aggregate field out of trusted labels/duration claims pending row-level review and planner decision. Any project 5060 screen evidence is bounded to that derived subset and does not identify rows behind global counts. Redacted-description evidence is related to, but not identical with, the queued redacted-identifiers field. No source rows are corrected by this review."
+      },
+      {
+        "source_record": {
+          "decision": "provisional_quarantine",
+          "evidence": "cambridge-profile.json and dataset-audit-2026-10-09.md",
+          "field": "external_or_unresolved_predecessor",
+          "locator": "audit profile aggregate",
+          "old_value": 17631,
+          "project_id": null,
+          "proposed_value": null,
+          "reason": "Quarantine affected field from trusted labels or duration calculations pending row-level planner review",
+          "review_date": null,
+          "reviewer_id": null,
+          "source": "cambridge"
+        },
+        "queue_locator": "schedule-quality-review.jsonl:21",
+        "technical_disposition": "aggregate_only_cannot_validate_rows",
+        "source_evidence": [
+          {
+            "file": "../data/schedule-audit-2026-10-09/cambridge-profile.json",
+            "locator": "aggregate profile only",
+            "value": 17631
+          },
+          {
+            "file": "docs/d01-d05-completion-audit-2026-10-10.md",
+            "locator": "D03/D02 audit statements",
+            "note": "row-level review remains required"
+          }
+        ],
+        "supplemental_subset_evidence": [
+          {
+            "file": "data/review/cambridge-5060-technical-screen.json",
+            "locator": "project 5060 bounded technical screen",
+            "snapshot_sha256": "4ef91f4cb9d60c4e586608035e4358ebfcb2be2562174499c449f00eac16ae21",
+            "matched_flag": "external_or_unresolved_predecessor",
+            "rows": [
+              {
+                "task_id": "520848",
+                "locator": "$.Projects[\"5060\"].Activities[\"520848\"]",
+                "flags": [
+                  "external_or_unresolved_predecessor"
+                ],
+                "external_predecessors": [
+                  "520847"
+                ]
+              },
+              {
+                "task_id": "520864",
+                "locator": "$.Projects[\"5060\"].Activities[\"520864\"]",
+                "flags": [
+                  "redacted_activity_description",
+                  "external_or_unresolved_predecessor"
+                ],
+                "external_predecessors": [
+                  "520847"
+                ]
+              },
+              {
+                "task_id": "521018",
+                "locator": "$.Projects[\"5060\"].Activities[\"521018\"]",
+                "flags": [
+                  "external_or_unresolved_predecessor"
+                ],
+                "external_predecessors": [
+                  "520847"
+                ]
+              }
+            ],
+            "field_equivalence": "same_flag_name"
+          }
+        ],
+        "suggestion": "Keep global aggregate field out of trusted labels/duration claims pending row-level review and planner decision. Any project 5060 screen evidence is bounded to that derived subset and does not identify rows behind global counts. Redacted-description evidence is related to, but not identical with, the queued redacted-identifiers field. No source rows are corrected by this review."
+      }
+    ]
+  },
+  "development_labels": {
+    "report_count": 16,
+    "label_count": 16,
+    "findings": [
+      {
+        "report_id": "gt10-dev-001",
+        "report_locator": "reports.jsonl:1",
+        "label_locator": "proposed-labels.jsonl:1",
+        "report_text": "Started excavation for foundation at 08:30 on 12 October 2026.",
+        "original_label": {
+          "correction_of": null,
+          "duplicate_of": null,
+          "evidence_span": "Started excavation for foundation at 08:30 on 12 October 2026.",
+          "expected_state_change": "review_required",
+          "label_status": "ai_proposed_unreviewed",
+          "missing_essential": null,
+          "precision": "minute",
+          "proposed_activity_id": "SUB-010",
+          "proposed_event_kind": "start",
+          "proposed_value": "2026-10-12T08:30",
+          "report_id": "gt10-dev-001",
+          "review_date": null,
+          "reviewer_id": null,
+          "scenario_family": "start_timed",
+          "scope": "whole_activity",
+          "second_review_required": false,
+          "timezone_basis": "unspecified"
+        },
+        "suggested_label": [
+          {
+            "event_kind": "start",
+            "activity_id": "SUB-010",
+            "value": "2026-10-12T08:30",
+            "precision": "minute",
+            "scope": "whole_activity",
+            "evidence_span": "Started excavation for foundation at 08:30 on 12 October 2026.",
+            "application_status": "pending_independent_review",
+            "target_evidence": [
+              {
+                "file": "data/GT10BLDG-P6-Schedule/source/GT10BLDG_input_activities_relationships.xlsx",
+                "locator": "ACTIVITES!5",
+                "activity_id": "SUB-010",
+                "activity_name": "Excavation for Foundation"
+              },
+              {
+                "file": "data/GT10BLDG-P6-Schedule/exports/GT10BLDG_v1_P6_export.xlsx",
+                "locator": "TASK!3",
+                "activity_id": "SUB-010",
+                "activity_name": "Excavation for Foundation"
+              }
+            ]
+          }
+        ],
+        "technical_disposition": "event_text_and_schedule_target_supported",
+        "reason": "The event and date/time are explicit; both GT10 workbooks contain SUB-010, Excavation for Foundation. These authored examples remain synthetic candidates, not field truth."
+      },
+      {
+        "report_id": "gt10-dev-002",
+        "report_locator": "reports.jsonl:2",
+        "label_locator": "proposed-labels.jsonl:2",
+        "report_text": "Finished excavation for foundation at 16:15 on 14 October 2026.",
+        "original_label": {
+          "correction_of": null,
+          "duplicate_of": null,
+          "evidence_span": "Finished excavation for foundation at 16:15 on 14 October 2026.",
+          "expected_state_change": "review_required",
+          "label_status": "ai_proposed_unreviewed",
+          "missing_essential": null,
+          "precision": "minute",
+          "proposed_activity_id": "SUB-010",
+          "proposed_event_kind": "finish",
+          "proposed_value": "2026-10-14T16:15",
+          "report_id": "gt10-dev-002",
+          "review_date": null,
+          "reviewer_id": null,
+          "scenario_family": "finish_timed",
+          "scope": "whole_activity",
+          "second_review_required": false,
+          "timezone_basis": "unspecified"
+        },
+        "suggested_label": [
+          {
+            "event_kind": "finish",
+            "activity_id": "SUB-010",
+            "value": "2026-10-14T16:15",
+            "precision": "minute",
+            "scope": "whole_activity",
+            "evidence_span": "Finished excavation for foundation at 16:15 on 14 October 2026.",
+            "application_status": "pending_independent_review",
+            "target_evidence": [
+              {
+                "file": "data/GT10BLDG-P6-Schedule/source/GT10BLDG_input_activities_relationships.xlsx",
+                "locator": "ACTIVITES!5",
+                "activity_id": "SUB-010",
+                "activity_name": "Excavation for Foundation"
+              },
+              {
+                "file": "data/GT10BLDG-P6-Schedule/exports/GT10BLDG_v1_P6_export.xlsx",
+                "locator": "TASK!3",
+                "activity_id": "SUB-010",
+                "activity_name": "Excavation for Foundation"
+              }
+            ]
+          }
+        ],
+        "technical_disposition": "event_text_and_schedule_target_supported",
+        "reason": "The event and date/time are explicit; both GT10 workbooks contain SUB-010, Excavation for Foundation. These authored examples remain synthetic candidates, not field truth."
+      },
+      {
+        "report_id": "gt10-dev-003",
+        "report_locator": "reports.jsonl:3",
+        "label_locator": "proposed-labels.jsonl:3",
+        "report_text": "Excavation for foundation started on 12 October 2026.",
+        "original_label": {
+          "correction_of": null,
+          "duplicate_of": null,
+          "evidence_span": "Excavation for foundation started on 12 October 2026.",
+          "expected_state_change": "review_required",
+          "label_status": "ai_proposed_unreviewed",
+          "missing_essential": null,
+          "precision": "date",
+          "proposed_activity_id": "SUB-010",
+          "proposed_event_kind": "start",
+          "proposed_value": "2026-10-12",
+          "report_id": "gt10-dev-003",
+          "review_date": null,
+          "reviewer_id": null,
+          "scenario_family": "start_date_only",
+          "scope": "whole_activity",
+          "second_review_required": false,
+          "timezone_basis": "unspecified"
+        },
+        "suggested_label": [
+          {
+            "event_kind": "start",
+            "activity_id": "SUB-010",
+            "value": "2026-10-12",
+            "precision": "date",
+            "scope": "whole_activity",
+            "evidence_span": "Excavation for foundation started on 12 October 2026.",
+            "application_status": "pending_independent_review",
+            "target_evidence": [
+              {
+                "file": "data/GT10BLDG-P6-Schedule/source/GT10BLDG_input_activities_relationships.xlsx",
+                "locator": "ACTIVITES!5",
+                "activity_id": "SUB-010",
+                "activity_name": "Excavation for Foundation"
+              },
+              {
+                "file": "data/GT10BLDG-P6-Schedule/exports/GT10BLDG_v1_P6_export.xlsx",
+                "locator": "TASK!3",
+                "activity_id": "SUB-010",
+                "activity_name": "Excavation for Foundation"
+              }
+            ]
+          }
+        ],
+        "technical_disposition": "event_text_and_schedule_target_supported",
+        "reason": "The event and date/time are explicit; both GT10 workbooks contain SUB-010, Excavation for Foundation. These authored examples remain synthetic candidates, not field truth."
+      },
+      {
+        "report_id": "gt10-dev-004",
+        "report_locator": "reports.jsonl:4",
+        "label_locator": "proposed-labels.jsonl:4",
+        "report_text": "Excavation for foundation started around the morning shift.",
+        "original_label": {
+          "correction_of": null,
+          "duplicate_of": null,
+          "evidence_span": "Excavation for foundation started around the morning shift.",
+          "expected_state_change": "review_required",
+          "label_status": "ai_proposed_unreviewed",
+          "missing_essential": "exact date",
+          "precision": "unknown",
+          "proposed_activity_id": "SUB-010",
+          "proposed_event_kind": "start",
+          "proposed_value": null,
+          "report_id": "gt10-dev-004",
+          "review_date": null,
+          "reviewer_id": null,
+          "scenario_family": "ambiguous_time",
+          "scope": "whole_activity",
+          "second_review_required": true,
+          "timezone_basis": "unspecified"
+        },
+        "suggested_label": [
+          {
+            "event_kind": "start",
+            "activity_id": "SUB-010",
+            "value": null,
+            "precision": "unknown",
+            "scope": "whole_activity",
+            "evidence_span": "Excavation for foundation started around the morning shift.",
+            "application_status": "blocked_missing_date_and_exact_time",
+            "target_evidence": [
+              {
+                "file": "data/GT10BLDG-P6-Schedule/source/GT10BLDG_input_activities_relationships.xlsx",
+                "locator": "ACTIVITES!5",
+                "activity_id": "SUB-010",
+                "activity_name": "Excavation for Foundation"
+              },
+              {
+                "file": "data/GT10BLDG-P6-Schedule/exports/GT10BLDG_v1_P6_export.xlsx",
+                "locator": "TASK!3",
+                "activity_id": "SUB-010",
+                "activity_name": "Excavation for Foundation"
+              }
+            ]
+          }
+        ],
+        "technical_disposition": "start_reported_date_time_missing",
+        "reason": "The text reports foundation excavation starting, but gives only approximate morning shift with no date or clock time. Preserve the start candidate; block application and request date/time."
+      },
+      {
+        "report_id": "gt10-dev-005",
+        "report_locator": "reports.jsonl:5",
+        "label_locator": "proposed-labels.jsonl:5",
+        "report_text": "De-shuttering started at 08:30 on 12 October 2026.",
+        "original_label": {
+          "correction_of": null,
+          "duplicate_of": null,
+          "evidence_span": "De-shuttering started at 08:30 on 12 October 2026.",
+          "expected_state_change": "review_required",
+          "label_status": "ai_proposed_unreviewed",
+          "missing_essential": "floor/activity identity",
+          "precision": "minute",
+          "proposed_activity_id": null,
+          "proposed_event_kind": "start",
+          "proposed_value": "2026-10-12T08:30",
+          "report_id": "gt10-dev-005",
+          "review_date": null,
+          "reviewer_id": null,
+          "scenario_family": "missing_location",
+          "scope": "unresolved",
+          "second_review_required": true,
+          "timezone_basis": "unspecified"
+        },
+        "suggested_label": [
+          {
+            "event_kind": "start",
+            "activity_id": null,
+            "value": "2026-10-12T08:30",
+            "precision": "minute",
+            "scope": "unresolved",
+            "evidence_span": "De-shuttering started at 08:30 on 12 October 2026.",
+            "application_status": "blocked_missing_floor_activity_identity"
+          }
+        ],
+        "technical_disposition": "start_reported_activity_mapping_ambiguous",
+        "reason": "The text states a start at the exact minute, but omits floor. Multiple floor-specific de-shuttering tasks prevent a supported target assignment; preserve candidate and block application."
+      },
+      {
+        "report_id": "gt10-dev-006",
+        "report_locator": "reports.jsonl:6",
+        "label_locator": "proposed-labels.jsonl:6",
+        "report_text": "We will start excavation for foundation tomorrow.",
+        "original_label": {
+          "correction_of": null,
+          "duplicate_of": null,
+          "evidence_span": "We will start excavation for foundation tomorrow.",
+          "expected_state_change": "none",
+          "label_status": "ai_proposed_unreviewed",
+          "missing_essential": null,
+          "precision": "unknown",
+          "proposed_activity_id": null,
+          "proposed_event_kind": "none",
+          "proposed_value": null,
+          "report_id": "gt10-dev-006",
+          "review_date": null,
+          "reviewer_id": null,
+          "scenario_family": "future",
+          "scope": "unresolved",
+          "second_review_required": false,
+          "timezone_basis": "unspecified"
+        },
+        "suggested_label": [
+          {
+            "event_kind": "none",
+            "activity_id": null,
+            "value": null,
+            "precision": "unknown",
+            "scope": "unresolved",
+            "evidence_span": "We will start excavation for foundation tomorrow.",
+            "application_status": "no_actual_event_reported"
+          }
+        ],
+        "technical_disposition": "future_intent_no_actual_event",
+        "reason": "Future intent does not report actual work; do not create a start event."
+      },
+      {
+        "report_id": "gt10-dev-007",
+        "report_locator": "reports.jsonl:7",
+        "label_locator": "proposed-labels.jsonl:7",
+        "report_text": "Excavation for foundation has not started.",
+        "original_label": {
+          "correction_of": null,
+          "duplicate_of": null,
+          "evidence_span": "Excavation for foundation has not started.",
+          "expected_state_change": "none",
+          "label_status": "ai_proposed_unreviewed",
+          "missing_essential": null,
+          "precision": "unknown",
+          "proposed_activity_id": null,
+          "proposed_event_kind": "none",
+          "proposed_value": null,
+          "report_id": "gt10-dev-007",
+          "review_date": null,
+          "reviewer_id": null,
+          "scenario_family": "negated",
+          "scope": "unresolved",
+          "second_review_required": false,
+          "timezone_basis": "unspecified"
+        },
+        "suggested_label": [
+          {
+            "event_kind": "none",
+            "activity_id": "SUB-010",
+            "value": null,
+            "precision": "unknown",
+            "scope": "unresolved",
+            "evidence_span": "Excavation for foundation has not started.",
+            "application_status": "no_actual_event_reported",
+            "target_evidence": [
+              {
+                "file": "data/GT10BLDG-P6-Schedule/source/GT10BLDG_input_activities_relationships.xlsx",
+                "locator": "ACTIVITES!5",
+                "activity_id": "SUB-010",
+                "activity_name": "Excavation for Foundation"
+              },
+              {
+                "file": "data/GT10BLDG-P6-Schedule/exports/GT10BLDG_v1_P6_export.xlsx",
+                "locator": "TASK!3",
+                "activity_id": "SUB-010",
+                "activity_name": "Excavation for Foundation"
+              }
+            ]
+          }
+        ],
+        "technical_disposition": "explicit_negation_no_actual_event",
+        "reason": "The text states excavation has not started. Record no start event; the named activity maps to SUB-010 in both workbooks."
+      },
+      {
+        "report_id": "gt10-dev-008",
+        "report_locator": "reports.jsonl:8",
+        "label_locator": "proposed-labels.jsonl:8",
+        "report_text": "Started excavation for foundation and anti-termite treatment on 12 October 2026.",
+        "original_label": {
+          "correction_of": null,
+          "duplicate_of": null,
+          "evidence_span": "Started excavation for foundation and anti-termite treatment on 12 October 2026.",
+          "expected_state_change": "review_required",
+          "label_status": "ai_proposed_unreviewed",
+          "missing_essential": "separate event evidence",
+          "precision": "date",
+          "proposed_activity_id": null,
+          "proposed_event_kind": "multiple",
+          "proposed_value": "2026-10-12",
+          "report_id": "gt10-dev-008",
+          "review_date": null,
+          "reviewer_id": null,
+          "scenario_family": "multiple",
+          "scope": "unresolved",
+          "second_review_required": false,
+          "timezone_basis": "unspecified"
+        },
+        "suggested_label": [
+          {
+            "event_kind": "start",
+            "activity_id": "SUB-010",
+            "value": "2026-10-12",
+            "precision": "date",
+            "scope": "whole_activity",
+            "evidence_span": "Started excavation for foundation and anti-termite treatment on 12 October 2026.",
+            "application_status": "pending_independent_review",
+            "target_evidence": [
+              {
+                "file": "data/GT10BLDG-P6-Schedule/source/GT10BLDG_input_activities_relationships.xlsx",
+                "locator": "ACTIVITES!5",
+                "activity_id": "SUB-010",
+                "activity_name": "Excavation for Foundation"
+              },
+              {
+                "file": "data/GT10BLDG-P6-Schedule/exports/GT10BLDG_v1_P6_export.xlsx",
+                "locator": "TASK!3",
+                "activity_id": "SUB-010",
+                "activity_name": "Excavation for Foundation"
+              }
+            ]
+          },
+          {
+            "event_kind": "start",
+            "activity_id": "SUB-020",
+            "value": "2026-10-12",
+            "precision": "date",
+            "scope": "whole_activity",
+            "evidence_span": "Started excavation for foundation and anti-termite treatment on 12 October 2026.",
+            "application_status": "pending_independent_review",
+            "target_evidence": [
+              {
+                "file": "data/GT10BLDG-P6-Schedule/source/GT10BLDG_input_activities_relationships.xlsx",
+                "locator": "ACTIVITES!6",
+                "activity_id": "SUB-020",
+                "activity_name": "Anti-termite Treatment"
+              },
+              {
+                "file": "data/GT10BLDG-P6-Schedule/exports/GT10BLDG_v1_P6_export.xlsx",
+                "locator": "TASK!4",
+                "activity_id": "SUB-020",
+                "activity_name": "Anti-termite Treatment"
+              }
+            ]
+          }
+        ],
+        "technical_disposition": "split_into_two_atomic_source_supported_targets",
+        "reason": "The report asserts starts for two named activities on one date. Both SUB-010 Excavation for Foundation and SUB-020 Anti-termite Treatment exist in both workbooks."
+      },
+      {
+        "report_id": "gt10-dev-009",
+        "report_locator": "reports.jsonl:9",
+        "label_locator": "proposed-labels.jsonl:9",
+        "report_text": "Started excavation for foundation at 08:30 on 12 October 2026.",
+        "original_label": {
+          "correction_of": null,
+          "duplicate_of": "gt10-dev-001",
+          "evidence_span": "Started excavation for foundation at 08:30 on 12 October 2026.",
+          "expected_state_change": "review_required",
+          "label_status": "ai_proposed_unreviewed",
+          "missing_essential": null,
+          "precision": "minute",
+          "proposed_activity_id": "SUB-010",
+          "proposed_event_kind": "start",
+          "proposed_value": "2026-10-12T08:30",
+          "report_id": "gt10-dev-009",
+          "review_date": null,
+          "reviewer_id": null,
+          "scenario_family": "duplicate",
+          "scope": "whole_activity",
+          "second_review_required": false,
+          "timezone_basis": "unspecified"
+        },
+        "suggested_label": [
+          {
+            "event_kind": "duplicate",
+            "activity_id": "SUB-010",
+            "value": null,
+            "precision": "unknown",
+            "scope": "unresolved",
+            "evidence_span": "Started excavation for foundation at 08:30 on 12 October 2026.",
+            "application_status": "blocked_duplicate_of_gt10-dev-001",
+            "target_evidence": [
+              {
+                "file": "data/GT10BLDG-P6-Schedule/source/GT10BLDG_input_activities_relationships.xlsx",
+                "locator": "ACTIVITES!5",
+                "activity_id": "SUB-010",
+                "activity_name": "Excavation for Foundation"
+              },
+              {
+                "file": "data/GT10BLDG-P6-Schedule/exports/GT10BLDG_v1_P6_export.xlsx",
+                "locator": "TASK!3",
+                "activity_id": "SUB-010",
+                "activity_name": "Excavation for Foundation"
+              }
+            ]
+          }
+        ],
+        "technical_disposition": "duplicate_candidate_exact_text",
+        "reason": "The text exactly matches gt10-dev-001. Preserve duplicate lineage and do not count a second event."
+      },
+      {
+        "report_id": "gt10-dev-010",
+        "report_locator": "reports.jsonl:10",
+        "label_locator": "proposed-labels.jsonl:10",
+        "report_text": "Correction: excavation for foundation started at 09:30 on 12 October 2026.",
+        "original_label": {
+          "correction_of": "gt10-dev-001",
+          "duplicate_of": null,
+          "evidence_span": "Correction: excavation for foundation started at 09:30 on 12 October 2026.",
+          "expected_state_change": "review_required",
+          "label_status": "ai_proposed_unreviewed",
+          "missing_essential": "original event reference",
+          "precision": "minute",
+          "proposed_activity_id": "SUB-010",
+          "proposed_event_kind": "correction",
+          "proposed_value": "2026-10-12T09:30",
+          "report_id": "gt10-dev-010",
+          "review_date": null,
+          "reviewer_id": null,
+          "scenario_family": "correction",
+          "scope": "whole_activity",
+          "second_review_required": true,
+          "timezone_basis": "unspecified"
+        },
+        "suggested_label": [
+          {
+            "event_kind": "correction",
+            "activity_id": "SUB-010",
+            "value": "2026-10-12T09:30",
+            "precision": "minute",
+            "scope": "whole_activity",
+            "evidence_span": "Correction: excavation for foundation started at 09:30 on 12 October 2026.",
+            "application_status": "blocked_unverified_original_event_link",
+            "target_evidence": [
+              {
+                "file": "data/GT10BLDG-P6-Schedule/source/GT10BLDG_input_activities_relationships.xlsx",
+                "locator": "ACTIVITES!5",
+                "activity_id": "SUB-010",
+                "activity_name": "Excavation for Foundation"
+              },
+              {
+                "file": "data/GT10BLDG-P6-Schedule/exports/GT10BLDG_v1_P6_export.xlsx",
+                "locator": "TASK!3",
+                "activity_id": "SUB-010",
+                "activity_name": "Excavation for Foundation"
+              }
+            ]
+          }
+        ],
+        "technical_disposition": "correction_original_reference_unverified",
+        "reason": "Correction and corrected time are explicit. Scenario metadata links report 001, but the text has no report/event ID; preserve candidate and block application until that link is verified."
+      },
+      {
+        "report_id": "gt10-dev-011",
+        "report_locator": "reports.jsonl:11",
+        "label_locator": "proposed-labels.jsonl:11",
+        "report_text": "Finished excavation for foundation at 16:15 on 14 October 2026.",
+        "original_label": {
+          "correction_of": null,
+          "duplicate_of": null,
+          "evidence_span": "Finished excavation for foundation at 16:15 on 14 October 2026.",
+          "expected_state_change": "review_required",
+          "label_status": "ai_proposed_unreviewed",
+          "missing_essential": "start event required for state",
+          "precision": "minute",
+          "proposed_activity_id": "SUB-010",
+          "proposed_event_kind": "finish",
+          "proposed_value": "2026-10-14T16:15",
+          "report_id": "gt10-dev-011",
+          "review_date": null,
+          "reviewer_id": null,
+          "scenario_family": "reordered_finish",
+          "scope": "whole_activity",
+          "second_review_required": true,
+          "timezone_basis": "unspecified"
+        },
+        "suggested_label": [
+          {
+            "event_kind": "finish",
+            "activity_id": "SUB-010",
+            "value": "2026-10-14T16:15",
+            "precision": "minute",
+            "scope": "whole_activity",
+            "evidence_span": "Finished excavation for foundation at 16:15 on 14 October 2026.",
+            "application_status": "blocked_start_prerequisite",
+            "target_evidence": [
+              {
+                "file": "data/GT10BLDG-P6-Schedule/source/GT10BLDG_input_activities_relationships.xlsx",
+                "locator": "ACTIVITES!5",
+                "activity_id": "SUB-010",
+                "activity_name": "Excavation for Foundation"
+              },
+              {
+                "file": "data/GT10BLDG-P6-Schedule/exports/GT10BLDG_v1_P6_export.xlsx",
+                "locator": "TASK!3",
+                "activity_id": "SUB-010",
+                "activity_name": "Excavation for Foundation"
+              }
+            ]
+          }
+        ],
+        "technical_disposition": "finish_reported_start_prerequisite_unavailable",
+        "reason": "Finish time and target are supported, but no accepted prior start exists. Preserve candidate and block its state transition."
+      },
+      {
+        "report_id": "gt10-dev-012",
+        "report_locator": "reports.jsonl:12",
+        "label_locator": "proposed-labels.jsonl:12",
+        "report_text": "Finished excavation for foundation at 07:00 on 11 October 2026, before its reported start.",
+        "original_label": {
+          "correction_of": null,
+          "duplicate_of": null,
+          "evidence_span": "Finished excavation for foundation at 07:00 on 11 October 2026, before its reported start.",
+          "expected_state_change": "review_required",
+          "label_status": "ai_proposed_unreviewed",
+          "missing_essential": "conflict review",
+          "precision": "minute",
+          "proposed_activity_id": "SUB-010",
+          "proposed_event_kind": "finish",
+          "proposed_value": "2026-10-11T07:00",
+          "report_id": "gt10-dev-012",
+          "review_date": null,
+          "reviewer_id": null,
+          "scenario_family": "impossible_chronology",
+          "scope": "whole_activity",
+          "second_review_required": true,
+          "timezone_basis": "unspecified"
+        },
+        "suggested_label": [
+          {
+            "event_kind": "finish",
+            "activity_id": "SUB-010",
+            "value": "2026-10-11T07:00",
+            "precision": "minute",
+            "scope": "whole_activity",
+            "evidence_span": "Finished excavation for foundation at 07:00 on 11 October 2026, before its reported start.",
+            "application_status": "blocked_chronology_conflict",
+            "target_evidence": [
+              {
+                "file": "data/GT10BLDG-P6-Schedule/source/GT10BLDG_input_activities_relationships.xlsx",
+                "locator": "ACTIVITES!5",
+                "activity_id": "SUB-010",
+                "activity_name": "Excavation for Foundation"
+              },
+              {
+                "file": "data/GT10BLDG-P6-Schedule/exports/GT10BLDG_v1_P6_export.xlsx",
+                "locator": "TASK!3",
+                "activity_id": "SUB-010",
+                "activity_name": "Excavation for Foundation"
+              }
+            ]
+          }
+        ],
+        "technical_disposition": "chronology_conflict_explicit",
+        "reason": "Text reports this finish before its reported start. Preserve the conflict candidate but block normal application pending chronology resolution."
+      },
+      {
+        "report_id": "gt10-dev-013",
+        "report_locator": "reports.jsonl:13",
+        "label_locator": "proposed-labels.jsonl:13",
+        "report_text": "Finished slab shuttering on F8 at 16:00 on 12 October 2027.",
+        "original_label": {
+          "correction_of": null,
+          "duplicate_of": null,
+          "evidence_span": "Finished slab shuttering on F8 at 16:00 on 12 October 2027.",
+          "expected_state_change": "review_required",
+          "label_status": "ai_proposed_unreviewed",
+          "missing_essential": "parent scope review",
+          "precision": "minute",
+          "proposed_activity_id": "SUP-F8-03",
+          "proposed_event_kind": "finish",
+          "proposed_value": "2027-10-12T16:00",
+          "report_id": "gt10-dev-013",
+          "review_date": null,
+          "reviewer_id": null,
+          "scenario_family": "subactivity",
+          "scope": "unresolved",
+          "second_review_required": true,
+          "timezone_basis": "unspecified"
+        },
+        "suggested_label": [
+          {
+            "event_kind": "finish",
+            "activity_id": "SUP-F8-03",
+            "value": "2027-10-12T16:00",
+            "precision": "minute",
+            "scope": "unresolved",
+            "evidence_span": "Finished slab shuttering on F8 at 16:00 on 12 October 2027.",
+            "application_status": "blocked_scope_policy_decision",
+            "target_evidence": [
+              {
+                "file": "data/GT10BLDG-P6-Schedule/source/GT10BLDG_input_activities_relationships.xlsx",
+                "locator": "ACTIVITES!62",
+                "activity_id": "SUP-F8-03",
+                "activity_name": "Slab Shuttering - F8"
+              },
+              {
+                "file": "data/GT10BLDG-P6-Schedule/exports/GT10BLDG_v1_P6_export.xlsx",
+                "locator": "TASK!54",
+                "activity_id": "SUP-F8-03",
+                "activity_name": "Slab Shuttering - F8"
+              }
+            ]
+          }
+        ],
+        "technical_disposition": "subactivity_scope_policy_unresolved",
+        "reason": "Both workbooks contain SUP-F8-03, Slab Shuttering - F8. Preserve finish candidate; whole/subactivity scope and parent propagation require planner policy."
+      },
+      {
+        "report_id": "gt10-dev-014",
+        "report_locator": "reports.jsonl:14",
+        "label_locator": "proposed-labels.jsonl:14",
+        "report_text": "Finished tower crane inspection at 15:00 on 12 October 2026.",
+        "original_label": {
+          "correction_of": null,
+          "duplicate_of": null,
+          "evidence_span": "Finished tower crane inspection at 15:00 on 12 October 2026.",
+          "expected_state_change": "review_required",
+          "label_status": "ai_proposed_unreviewed",
+          "missing_essential": "unmatched work",
+          "precision": "minute",
+          "proposed_activity_id": null,
+          "proposed_event_kind": "finish",
+          "proposed_value": "2026-10-12T15:00",
+          "report_id": "gt10-dev-014",
+          "review_date": null,
+          "reviewer_id": null,
+          "scenario_family": "unknown_activity",
+          "scope": "unresolved",
+          "second_review_required": true,
+          "timezone_basis": "unspecified"
+        },
+        "suggested_label": [
+          {
+            "event_kind": "finish",
+            "activity_id": null,
+            "value": "2026-10-12T15:00",
+            "precision": "minute",
+            "scope": "unresolved",
+            "evidence_span": "Finished tower crane inspection at 15:00 on 12 October 2026.",
+            "application_status": "blocked_unmatched_schedule_activity"
+          }
+        ],
+        "technical_disposition": "unmatched_asset_activity",
+        "reason": "The report explicitly states a finish time for tower crane inspection; no matching task was identified in either workbook. Preserve candidate and block application pending mapping."
+      },
+      {
+        "report_id": "gt10-dev-015",
+        "report_locator": "reports.jsonl:15",
+        "label_locator": "proposed-labels.jsonl:15",
+        "report_text": "Excavation for foundation stopped because access was blocked on 12 October 2026.",
+        "original_label": {
+          "correction_of": null,
+          "duplicate_of": null,
+          "evidence_span": "Excavation for foundation stopped because access was blocked on 12 October 2026.",
+          "expected_state_change": "review_required",
+          "label_status": "ai_proposed_unreviewed",
+          "missing_essential": null,
+          "precision": "date",
+          "proposed_activity_id": "SUB-010",
+          "proposed_event_kind": "blocker",
+          "proposed_value": "2026-10-12",
+          "report_id": "gt10-dev-015",
+          "review_date": null,
+          "reviewer_id": null,
+          "scenario_family": "blocker",
+          "scope": "whole_activity",
+          "second_review_required": false,
+          "timezone_basis": "unspecified"
+        },
+        "suggested_label": [
+          {
+            "event_kind": "blocker",
+            "activity_id": "SUB-010",
+            "value": "2026-10-12",
+            "precision": "date",
+            "scope": "whole_activity",
+            "evidence_span": "Excavation for foundation stopped because access was blocked on 12 October 2026.",
+            "application_status": "pending_blocker_taxonomy_review",
+            "target_evidence": [
+              {
+                "file": "data/GT10BLDG-P6-Schedule/source/GT10BLDG_input_activities_relationships.xlsx",
+                "locator": "ACTIVITES!5",
+                "activity_id": "SUB-010",
+                "activity_name": "Excavation for Foundation"
+              },
+              {
+                "file": "data/GT10BLDG-P6-Schedule/exports/GT10BLDG_v1_P6_export.xlsx",
+                "locator": "TASK!3",
+                "activity_id": "SUB-010",
+                "activity_name": "Excavation for Foundation"
+              }
+            ]
+          }
+        ],
+        "technical_disposition": "blocker_only_no_start_finish",
+        "reason": "The text reports blocked access and stopped excavation, not a start/finish. Preserve a dated blocker candidate for source-supported SUB-010; blocker taxonomy needs review."
+      },
+      {
+        "report_id": "gt10-dev-016",
+        "report_locator": "reports.jsonl:16",
+        "label_locator": "proposed-labels.jsonl:16",
+        "report_text": "Started excavation at fictional asset F-01 at 08:30 on 12 October 2026.",
+        "original_label": {
+          "correction_of": null,
+          "duplicate_of": null,
+          "evidence_span": "Started excavation at fictional asset F-01 at 08:30 on 12 October 2026.",
+          "expected_state_change": "review_required",
+          "label_status": "ai_proposed_unreviewed",
+          "missing_essential": "F-01 mapping is fictional and not in GT10 source",
+          "precision": "minute",
+          "proposed_activity_id": null,
+          "proposed_event_kind": "start",
+          "proposed_value": "2026-10-12T08:30",
+          "report_id": "gt10-dev-016",
+          "review_date": null,
+          "reviewer_id": null,
+          "scenario_family": "fictional_asset",
+          "scope": "unresolved",
+          "second_review_required": false,
+          "timezone_basis": "unspecified"
+        },
+        "suggested_label": [
+          {
+            "event_kind": "start",
+            "activity_id": null,
+            "value": "2026-10-12T08:30",
+            "precision": "minute",
+            "scope": "unresolved",
+            "evidence_span": "Started excavation at fictional asset F-01 at 08:30 on 12 October 2026.",
+            "application_status": "blocked_fictional_asset_unmapped"
+          }
+        ],
+        "technical_disposition": "fictional_asset_target_unresolved",
+        "reason": "The text reports a start at the stated minute/date but calls F-01 fictional. Preserve event candidate; do not map it to another task and block application pending a valid target."
+      }
+    ]
+  },
+  "cambridge_scope_limit": "The six global Cambridge quality records cite aggregate profile counts. A separate technical screen of derived project 5060 lists 1,496 activity rows and flags five actual-after-status-date rows, three unresolved predecessor rows, and 181 redacted activity descriptions. These subset findings do not reconstruct the global aggregates or constitute planner acceptance; redacted descriptions are related to but not identical with the queued redacted-identifiers field.",
+  "independent_gates": [
+    "independent planner disposition for GT10 identity/relationships and any Cambridge subset",
+    "independent first and required second label reviews plus adjudication using real reviewer identities",
+    "human-approved correction overlay and derived hashes",
+    "reviewed physical-project/scenario split groups and frozen validation/holdout inventories",
+    "owner package remains not received"
+  ],
+  "outputs_are_not_gold": true
+}

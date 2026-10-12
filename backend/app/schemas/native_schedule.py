@@ -11,7 +11,7 @@ from .common import StrictModel
 
 RelationType = Literal["FS", "SS", "FF", "SF"]
 Severity = Literal["error", "warning"]
-SourceFormat = Literal["p6_xer", "p6_xml", "msp_xml", "msp_mpp", "gt10_xlsx"]
+SourceFormat = Literal["p6_xer", "p6_xml", "msp_xml", "msp_mpp", "gt10_xlsx", "cambridge_json"]
 
 
 def _decimal_string(value: str | None) -> str | None:
@@ -99,6 +99,12 @@ class SchedulePreview(StrictModel):
     wbs: list[SourceWbs]
     relationships: list[SourceRelation]
     issues: list[ImportIssue]
+    source_metadata: dict[str, Any] = Field(default_factory=dict)
+
+    @field_validator("source_metadata")
+    @classmethod
+    def finite_source_metadata(cls, value: dict[str, Any]) -> dict[str, Any]:
+        return _json_finite(value)
 
 
 class TaskOverride(StrictModel):
@@ -135,3 +141,9 @@ class NormalisedSchedule(StrictModel):
     wbs: list[SourceWbs]
     relationships: list[SourceRelation]
     issues: list[ImportIssue]
+    source_metadata: dict[str, Any] = Field(default_factory=dict)
+
+    @field_validator("source_metadata")
+    @classmethod
+    def finite_source_metadata(cls, value: dict[str, Any]) -> dict[str, Any]:
+        return _json_finite(value)

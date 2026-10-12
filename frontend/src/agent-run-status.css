@@ -1,0 +1,37 @@
+.agent-run-status {
+  min-width: 0;
+  margin-top: 28px;
+  padding-top: 22px;
+  border-top: 1px solid var(--line);
+}
+
+.agent-run-status__heading {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 16px;
+}
+
+.agent-run-status__heading .eyebrow { margin: 0 0 6px; }
+.agent-run-status__heading h3 { margin: 0; font-size: 17px; }
+.agent-run-status__badge { flex: none; padding: 6px 9px; border: 1px solid #456352; border-radius: 4px; color: var(--accent); font-size: 11px; }
+.agent-run-status__badge--failed,.agent-run-status__badge--stale { border-color: #824e42; color: var(--danger); }
+.agent-run-status__stage { margin: 16px 0; color: var(--ink); font-size: 14px; font-weight: 600; }
+.agent-run-status__terminal-copy,.agent-run-status__message { color: var(--muted); font-size: 12px; line-height: 1.6; }
+.agent-run-status__message .secondary { margin-top: 6px; }
+.agent-run-status__counters { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 1px; margin: 18px 0; background: var(--line); border: 1px solid var(--line); }
+.agent-run-status__counters > div { min-width: 0; display: grid; gap: 5px; padding: 12px; background: #112019; }
+.agent-run-status__counters dt { color: var(--muted); font-size: 10px; line-height: 1.4; }
+.agent-run-status__counters dd { margin: 0; color: var(--accent); font: 500 16px 'DM Mono', monospace; }
+.agent-run-status__steps { list-style: none; margin: 0; padding: 0; border-top: 1px solid var(--line); }
+.agent-run-status__step { display: grid; grid-template-columns: minmax(0, 1fr) auto; gap: 4px 14px; padding: 12px 0; border-bottom: 1px solid var(--line); }
+.agent-run-status__step-label { min-width: 0; color: var(--ink); font-size: 12px; overflow-wrap: anywhere; }
+.agent-run-status__step-state { color: var(--muted); font-size: 11px; text-align: right; }
+.agent-run-status__step--running .agent-run-status__step-state { color: var(--accent); }
+.agent-run-status__step--failed .agent-run-status__step-state { color: var(--danger); }
+.agent-run-status__step-meta { grid-column: 1 / -1; color: var(--muted); font: 10px 'DM Mono', monospace; }
+
+@media (max-width: 560px) {
+  .agent-run-status__counters { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+  .agent-run-status__step { gap: 5px 8px; }
+}

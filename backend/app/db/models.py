@@ -503,6 +503,7 @@ class ScheduleSourceMetadata(Base):
     task_metadata: Mapped[dict] = mapped_column(JSON, default=dict)
     wbs: Mapped[list] = mapped_column(JSON, default=list)
     relationships: Mapped[list] = mapped_column(JSON, default=list)
+    source_metadata: Mapped[dict] = mapped_column(JSON, default=dict)
 
 
 class AuditEvent(Base):

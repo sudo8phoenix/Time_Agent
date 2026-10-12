@@ -18,10 +18,10 @@ from app.db.models import (Activity, ActivityState, Fragment, Job, Observation, 
 from app.db.session import engine
 from app.ingest import reports
 from app.ingest.report_mapping import MappingSpec, mapped_rows
-from app.jobs.pipeline import process_job
 from app.jobs.service import enqueue_job
 from app.schemas.observation import Observation as Extracted
 from backend.tests.unit.test_report_mapping import xlsx
+from backend.tests.graph_support import extraction_result, run_graph, retrieval_for_activity, select_first_candidate
 
 FIXTURES = Path(__file__).parents[3] / 'data/synthetic/v2/intake'
 
@@ -81,11 +81,9 @@ def accepted_start(db, project, user, activity, report):
                 'endpoint': {'local_date': '2026-10-09', 'local_time': '08:30:00', 'precision': 'minute',
                              'basis': 'explicit', 'raw_expression': '2026-10-09 08:30'},
                 'evidence': [{'fields': ['endpoint'], 'fragment_id': str(fragment.id), 'quote': quote}]}]})]
-    def select_activity(*_):
-        return {'candidate_id': str(activity.id), 'mapping_state': 'suggested', 'match_strength': 'review',
-                'explanation': 'Fixture evidence', 'candidates': [], 'missing_information': []}
-    result = process_job(db, job, extraction_call=extract, selection_call=select_activity,
-                         retrieve_call=lambda *_: [activity])
+    result = run_graph(db, job, model_callable=lambda **_: None,
+        extraction_service=lambda inputs, model, **kwargs: extraction_result(extract(inputs)),
+        retrieval_service=retrieval_for_activity(activity.id), selection_service=select_first_candidate)
     assert result['proposal_count'] == 1
     proposal = db.scalar(select(Proposal).join(Observation).where(Observation.job_id == job.id))
     assert db.get(ActivityState, activity.id).actual_start is None
@@ -130,7 +128,8 @@ def test_pdf_and_scan_transcription_through_acceptance(intake, scan):
     report, _ = reports.ingest_report(db, project, raw, filename='scan.pdf' if scan else 'diary.pdf', uploader_id=user.id)
     if scan:
         job, _ = enqueue_job(db, project, report)
-        assert process_job(db, job)['state'] == 'needs_transcription'
+        assert job.state == 'needs_transcription'
+        assert db.query(Fragment).filter(Fragment.report_id == report.id, Fragment.ocr_status == 'NEEDS_TRANSCRIPTION').count() == 1
         body = Transcription(pages={1: 'Started excavation at F-01 on 2026-10-09 at 08:30.'})
         result = transcribe(report.id, body, project, db, user)
         retry = transcribe(report.id, body, project, db, user)

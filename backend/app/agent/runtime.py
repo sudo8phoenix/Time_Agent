@@ -28,10 +28,12 @@ from ..db.models import (
     Observation as DBObservation,
     Project,
     Proposal as DBProposal,
+    Report,
 )
 from ..jobs.service import publish_stage
 from ..llm.extract import extract_fragments
 from .schedule_decision import select_activity, shortlist_activities
+from .checkpoint import make_checkpoint_serializer
 from ..settings import get_settings
 from .context import AgentRuntimeContext
 from .graph import build_report_analysis_graph
@@ -89,6 +91,9 @@ def _checkpoint_scope(database_url: str, checkpointer: Any | None) -> Iterator[A
         return
     # setup() is deliberately absent: Alembic/deployment owns saver DDL.
     with PostgresSaver.from_conn_string(_checkpoint_url(database_url)) as saver:
+        # Configure before graph access, independent of module import order or
+        # LANGGRAPH_STRICT_MSGPACK environment handling in LangGraph.
+        saver.serde = make_checkpoint_serializer()
         yield saver
 
 
@@ -453,6 +458,28 @@ def process_job_with_graph(
     clock: Callable[[], datetime] = _now,
 ) -> dict[str, Any]:
     """Create or durably resume the single graph run owned by ``token``."""
+    report = db.get(Report, job.report_id)
+    unreadable_fragment = db.scalar(select(Fragment.id).where(
+        Fragment.report_id == job.report_id,
+        Fragment.ocr_status == "NEEDS_TRANSCRIPTION",
+    ).limit(1))
+    if (report is not None and "NEEDS_TRANSCRIPTION:" in (report.parsing_warnings or "")) or unreadable_fragment:
+        # Intake prerequisites precede graph analysis. A claimed unreadable
+        # report must remain visibly blocked without calling a model or
+        # creating a misleading successful empty run.
+        published = publish_stage(
+            db, job.id, token, stage="parse", state="needs_transcription",
+            extracted_count=0, proposal_count=0,
+            error_code="NEEDS_TRANSCRIPTION",
+            error_message="Attach a reviewed transcription for each unreadable page.",
+        )
+        db.commit()
+        return {
+            "stage": published.stage, "state": published.state,
+            "extracted_count": 0, "proposal_count": 0,
+            "error_code": published.error_code,
+            "error_message": published.error_message, "published": True,
+        }
     try:
         run = _create_or_load_run(db, job, clock=clock)
     except AgentRuntimeError as exc:
@@ -477,6 +504,7 @@ def process_job_with_graph(
         )
     db.commit()  # saver and telemetry sessions must see the run record
     if run.state == "ready_for_review":
+        db.refresh(job)  # finalization committed counts in an independent session
         return {
             "stage": "persist", "state": "ready_for_review",
             "extracted_count": job.extracted_count, "proposal_count": job.proposal_count,
@@ -535,7 +563,7 @@ def process_job_with_graph(
                 graph_input = None
             else:
                 next_nodes = ("load_context",)
-                graph_input = initial
+                graph_input = initial.model_dump(mode="json", warnings=False)
 
             # A synchronous saver failure after the domain transaction can
             # leave the last readable checkpoint with no scheduled task even

@@ -109,6 +109,7 @@ def stage_import(db: Session, record: ScheduleImport, mapping: ReviewedScheduleM
                 },
                 wbs=[value.model_dump(mode="json") for value in normalised.wbs],
                 relationships=[value.model_dump(mode="json") for value in normalised.relationships],
+                source_metadata=normalised.source_metadata,
             )
         )
     record.reviewed_mapping = mapping.model_dump(mode="json")

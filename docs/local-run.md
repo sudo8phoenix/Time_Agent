@@ -1,6 +1,6 @@
 # Local runbook
 
-This profile runs the application and PostgreSQL on this Mac. Ollama may run on a friend's laptop through a private Tailscale connection; public hosting is intentionally deferred.
+This profile runs the application and PostgreSQL on this Mac. Ollama may run on a friend's laptop through a private Tailscale connection; public hosting is intentionally deferred. Report processing uses the LangGraph worker. This local checkout is running on port 8001; the separate project on port 8000 is untouched.
 
 ## One-time setup
 
@@ -55,9 +55,15 @@ make serve
 make worker
 ```
 
-Open `http://127.0.0.1:8000`. The API serves the already-built frontend from `frontend/dist`; rerun `make build-web` after frontend changes.
+The API serves the already-built frontend from `frontend/dist`; rerun `make build-web` after frontend changes. The ordinary `make serve` command uses port 8000. For a second local instance, run `make serve PORT=8001` and open `http://127.0.0.1:8001`.
 
-The worker is deliberately single-process for the laptop profile. Stop it with Ctrl-C; durable jobs may be reclaimed after their lease expires.
+The worker is deliberately single-process for the laptop profile. Stop it with Ctrl-C; durable graph jobs may be reclaimed after their lease expires and resumed from checkpoint.
+
+## Report processing and recovery
+
+The report processor uses the bounded LangGraph workflow. There is no selectable alternate processor or runtime-mode setting. `.env` contains server-side model settings; do not copy the private endpoint or credentials into reports or browser settings. The local database was migrated to `0015_schedule_source_metadata` after a backup at `/private/tmp/time-agent-before-graph-20261012`. The live browser-to-API/worker/model run and one-observation smoke are recorded in [release evidence](release.md); each produced a pending proposal and no approved progress update. The local API and worker are running on port 8001. These are bounded workflow checks, not an unseen quality evaluation.
+
+To recover from an interrupted worker, stop or restart the worker and allow its lease to expire; the durable graph run resumes from its PostgreSQL checkpoint. For database recovery, use the separate restore verification procedure below. Do not delete run traces, checkpoints, proposals, or requested snapshots as part of recovery. Earlier dated W-39 verification records describe a rollback path that has since been removed; that path is not available in the current runtime.
 
 Report model calls allow one bounded request with `REPORT_MODEL_TIMEOUT_SECONDS`
 (default 360 seconds, configurable from 30 to 900). A reachable model inventory
@@ -82,7 +88,7 @@ make native-smoke
 cd frontend && npm run build && node tests/frontend-contracts.test.mjs
 ```
 
-`make doctor` is expected to fail the model-endpoint item until the friend's endpoint and exact model tag are configured.
+`make doctor` checks the model endpoint and exact model tag configured for this local profile.
 
 ## Backup and restore drill
 
@@ -97,9 +103,8 @@ Restore verification refuses to replace an existing database and leaves the sepa
 
 ## Still requires a person
 
-- Supply and verify the friend's private Ollama URL and exact model tag.
-- Review the W-03 and W-29 proposed labels before they become evaluation truth.
-- Perform the browser walkthrough and demo rehearsal on the actual laptops/network.
+- Independently review and adjudicate W-03/W-29 and the technical review suggestions before they become evaluation truth.
+- Rehearse the demo on the intended laptop/network and record its conditions.
 - Decide on hosting later; no public exposure is part of this runbook.
 
 ## Audited reanalysis and prototype connector

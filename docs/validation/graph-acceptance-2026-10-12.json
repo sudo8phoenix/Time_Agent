@@ -1,0 +1,128 @@
+{
+  "recorded_at": "2026-10-12T11:21:19.153333+00:00",
+  "status": "accepted_local_prototype_graph_enabled",
+  "base_commit": "ec9567dd0766ef0b4ca337e679d08442dfced88e",
+  "working_tree_has_uncommitted_changes": true,
+  "execution_mode": "graph",
+  "app_url": "http://127.0.0.1:8001",
+  "migration_head": "0015_schedule_source_metadata",
+  "checks": {
+    "unit": {
+      "passed": 231
+    },
+    "postgres_integration": {
+      "passed": 124
+    },
+    "browser_fixtures": {
+      "passed": 45
+    },
+    "frontend_typecheck": "passed",
+    "frontend_build": "passed",
+    "frontend_contracts": "passed",
+    "native_parser": {
+      "required_passed": 6,
+      "malformed_rejected": 1
+    },
+    "actual_browser_to_live_model": "passed",
+    "actual_sigkill_checkpoint_resume": "passed",
+    "legacy_rollback_with_preserved_requested_snapshot": "passed",
+    "checkpoint_serializer_constructor_rejection": "passed",
+    "backup_restore_content_hashes": "passed",
+    "restored_graph_resume_without_reextraction": "passed"
+  },
+  "live_model": {
+    "ok": true,
+    "runtime": "0.40.0",
+    "model": "gemma4:12b",
+    "installed": true,
+    "model_digest": "6114515d63c17436a7c0417d82820ac65ad643e2806c5a3c89cb62846436ed0b",
+    "model_metadata": {
+      "family": "gemma4",
+      "parameter_size": "11.9B",
+      "quantization_level": "Q4_K_M"
+    }
+  },
+  "live_smoke": {
+    "path": "docs/validation/graph-live-smoke-2026-10-12.json",
+    "elapsed_seconds": 179.396,
+    "pending_proposals": 1,
+    "approved_events": 0
+  },
+  "running_app_browser": {
+    "path": "docs/validation/graph-browser-live-2026-10-12.json",
+    "job_id": "80d12b86-a2fa-41a5-8971-99de3b2fe699",
+    "project_id": "a061ad38-0c67-4e89-8067-0a28a5593ec1",
+    "execution_mode": "graph",
+    "pending_proposals": 1,
+    "approved_events": 0,
+    "viewports": [
+      390,
+      1440
+    ],
+    "temporary_reviewer_deactivated": true
+  },
+  "backup_restore": {
+    "source_database": "progress_recovery_graph_20261012",
+    "restored_database": "progress_restore_graph_verified_20261012",
+    "backup_directory": "/private/tmp/graph-recovery-20261012/backup",
+    "restored_uploads": "/private/tmp/graph-recovery-20261012/verified-restored-uploads",
+    "recovery_rows": {
+      "agent_runs": 2,
+      "agent_steps": 2,
+      "agent_tool_calls": 2,
+      "schedule_source_metadata": 0,
+      "conversations": 1,
+      "conversation_turns": 1,
+      "integration_outbox": 1,
+      "activity_states": 1,
+      "progress_events": 2,
+      "observations": 2,
+      "proposals": 2,
+      "audit_events": 0,
+      "jobs": 4
+    },
+    "checkpoint_rows": {
+      "checkpoints": {
+        "count": 4,
+        "sha256": "ee6a25554ae774b1dfba8947a02bd8b779f5d220cf820688d31b4c9f8efb1ba1"
+      },
+      "checkpoint_blobs": {
+        "count": 19,
+        "sha256": "e0ea963f31569acf8d68be56434af3985249d503e1a52a0b02a2b5da1781599b"
+      },
+      "checkpoint_writes": {
+        "count": 33,
+        "sha256": "facefe249678a69f62f63ff72cf80a9e83915661a5a96db374aacd26600597e5"
+      }
+    },
+    "restored_resume": {
+      "runs": 1,
+      "observations": 1,
+      "proposals": 1,
+      "repeated_extraction": false
+    },
+    "first_attempt": "approved-fragment subset check failed; query fixed before successful separate restore"
+  },
+  "deployment": {
+    "predeployment_backup": "/private/tmp/time-agent-before-graph-20261012",
+    "runtime_process_record": "/private/tmp/time-agent-graph-runtime/processes.json",
+    "other_project_port_8000": "untouched"
+  },
+  "data_review": {
+    "technical_quality_records": 21,
+    "development_label_cases": 16,
+    "original_labels_modified": false,
+    "cambridge_subset_activities": 1496,
+    "independent_human_acceptance": "pending",
+    "frozen_evaluation_splits": false
+  },
+  "remaining_gates": [
+    "independent planner and label acceptance",
+    "frozen unseen validation and holdout data",
+    "calibrated confidence thresholds",
+    "full unseen model quality and latency evaluation",
+    "owner-package validation",
+    "immutable release packaging"
+  ],
+  "accuracy_benchmark": false
+}

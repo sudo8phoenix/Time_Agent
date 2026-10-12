@@ -10,6 +10,7 @@ from .api.endpoints.schedules import router as schedules_router
 from .api.endpoints.report_intake import router as report_intake_router
 from .api.endpoints.reports import router as reports_router
 from .api.endpoints.jobs import router as jobs_router
+from .api.endpoints.agent_runs import router as agent_runs_router
 from .api.endpoints.review import router as review_router
 from .api.endpoints.progress import router as progress_router
 from .api.endpoints.schedule_imports import router as schedule_imports_router
@@ -23,6 +24,7 @@ app.include_router(schedules_router, prefix="/api/v1")
 app.include_router(report_intake_router, prefix="/api/v1")
 app.include_router(reports_router, prefix="/api/v1")
 app.include_router(jobs_router, prefix="/api/v1")
+app.include_router(agent_runs_router, prefix="/api/v1")
 app.include_router(review_router, prefix="/api/v1")
 app.include_router(progress_router, prefix="/api/v1")
 app.include_router(schedule_imports_router, prefix="/api/v1")
