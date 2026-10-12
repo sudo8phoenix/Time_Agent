@@ -76,7 +76,7 @@ removes the unsupported dates and lifecycle effects. It cannot apply progress
 until the reviewer resolves the date. If all items fail evidence validation, the
 job reports an extraction failure instead of an empty successful review.
 
-Hybrid retrieval uses the optional local `sentence-transformers/all-MiniLM-L6-v2` adapter only when its pinned runtime and weights have already been provisioned on this Mac. It never downloads weights while processing a job. Until those assets are installed, the worker reports the limitation and safely uses lexical retrieval; do not describe that fallback as a measured hybrid-model result.
+Candidate discovery uses the configured model to shortlist rows from the pinned schedule through `backend/app/agent/schedule_decision.py`, then selects or abstains from the supplied candidates. It traverses leaf activities in batches of up to 48 and retains at most eight candidates. The current worker does not use the former hybrid/lexical embedding retrieval path. Historical W-10 evidence describes the earlier implementation.
 
 ## Checks
 
@@ -109,7 +109,7 @@ Restore verification refuses to replace an existing database and leaves the sepa
 
 ## Audited reanalysis and prototype connector
 
-For a terminal report job, an authorized reviewer can open **Report reanalysis**, enter a reason, and create a linked run. Normal resubmission of identical report/date/mapping inputs reuses the base job. Reanalysis preserves prior decisions and cannot apply already accepted source work again; use the accepted event's correction controls to change it. The API is `POST /api/v1/projects/{project_id}/reports/{report_id}/reanalysis` with `reason` and `idempotency_key`. `GET .../reports/{report_id}/runs` lists run lineage. The worker uses the snapshotted model/mode; arbitrary browser configuration overrides are rejected. Migration `0014` downgrade refuses while child runs exist.
+For a terminal report job, an authorized reviewer can open **Report reanalysis**, enter a reason, and create a linked run. Normal resubmission of identical report/date/mapping inputs reuses the base job. Reanalysis preserves prior decisions and cannot apply already accepted source work again; use the accepted event's correction controls to change it. The API is `POST /api/v1/projects/{project_id}/reports/{report_id}/reanalysis` with `reason` and `idempotency_key`. `GET .../reports/{report_id}/runs` lists run lineage. The worker uses the snapshotted model and the only supported LangGraph runtime; historical execution-mode metadata cannot switch processors. Arbitrary browser configuration overrides are rejected. Migration `0014` downgrade refuses while child runs exist.
 
 Run the explicitly labelled local mock receiver and connector in separate terminals:
 
@@ -127,3 +127,14 @@ Choose a writable persistent receiver database path before starting it. The outb
 Backup/restore now verifies content hashes for lifecycle state/events, report-job lineage, conversations, graph records and outbox payloads. Use a new restore database and upload directory. The synthetic recovery fixture script refuses nonlocal/non-`progress_recovery_*` databases; see [release evidence](release.md) for the completed isolated drill.
 
 The E02 capture utility stores operator-supplied observations and can emit prediction JSONL. It does not drive or attest a real browser/model workflow. Keep reference labels out of observed capture files and score only after saving and hashing predictions. Independent review, split freeze and target agreement are prerequisites to an unseen evaluation claim.
+
+## Reproduce the compact model benchmark
+
+The [60-case Gemma record](../evaluation/RESULTS.md#gemma-4-12b-quality-evaluation--12-october-2026) and [evaluation guide](../evaluation/README.md) describe its fixed inputs, corrected table locators, draft prompt, failures and reruns. The additional Gemma scorer and captures remain local and are not included in this documentation-only publication. In the original evaluation workspace, scoring saved captures does not contact Ollama:
+
+```sh
+.venv/bin/python -m evaluation.summarize_gemma \
+  --capture-dir evaluation/results/gemma4-12b-2026-10-12/combined-after-retry
+```
+
+Live generation is a separate explicit command in that guide. The benchmark's 300-second timeout differs from the report worker's default 360 seconds. A reachable inventory is readiness evidence only; a request interrupted by a host crash must remain in the original record, with replacement captures and denominators identified.

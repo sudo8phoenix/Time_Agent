@@ -1,5 +1,7 @@
 # W-10-FIX handoff
 
+> Historical implementation evidence. Current operation uses LangGraph only and model-led schedule shortlisting; earlier legacy routing, rollback and embedding retrieval descriptions below are superseded. See [current runtime](graph-only-runtime.md), [release status](../release.md) and [Gemma quality results](../../evaluation/RESULTS.md).
+
 - Task ID: W-10-FIX
 - Changed files: `backend/app/retrieval/index.py`, `backend/tests/unit/test_retrieval.py`.
 - Behaviour: an exact eligible leaf `explicit_activity_id` is retained even when

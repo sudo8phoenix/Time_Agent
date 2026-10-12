@@ -1300,6 +1300,66 @@
         }
       }
     },
+    "/api/v1/jobs/{job_id}/agent-run": {
+      "get": {
+        "tags": [
+          "agent-runs"
+        ],
+        "summary": "Agent Run Status",
+        "description": "Return sanitized trace status for a graph run owned by this project member.",
+        "operationId": "agent_run_status_api_v1_jobs__job_id__agent_run_get",
+        "parameters": [
+          {
+            "name": "job_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid",
+              "title": "Job Id"
+            }
+          },
+          {
+            "name": "progress_session",
+            "in": "cookie",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "Progress Session"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/AgentRunStatus"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
     "/api/v1/proposals/{proposal_id}": {
       "get": {
         "tags": [
@@ -4063,6 +4123,255 @@
         "type": "object",
         "title": "ActivationRequest"
       },
+      "AgentCounters": {
+        "properties": {
+          "node_executions": {
+            "type": "integer",
+            "maximum": 16.0,
+            "minimum": 0.0,
+            "title": "Node Executions"
+          },
+          "extraction_calls": {
+            "type": "integer",
+            "maximum": 2.0,
+            "minimum": 0.0,
+            "title": "Extraction Calls"
+          },
+          "selection_calls": {
+            "type": "integer",
+            "maximum": 400.0,
+            "minimum": 0.0,
+            "title": "Selection Calls"
+          },
+          "corrective_retries": {
+            "type": "integer",
+            "maximum": 2.0,
+            "minimum": 0.0,
+            "title": "Corrective Retries"
+          }
+        },
+        "additionalProperties": false,
+        "type": "object",
+        "required": [
+          "node_executions",
+          "extraction_calls",
+          "selection_calls",
+          "corrective_retries"
+        ],
+        "title": "AgentCounters"
+      },
+      "AgentNode": {
+        "type": "string",
+        "enum": [
+          "load_context",
+          "extract",
+          "validate_extraction",
+          "repair_extraction",
+          "retrieve",
+          "select",
+          "validate_selection",
+          "repair_selection",
+          "persist",
+          "finalize",
+          "record_failure"
+        ],
+        "title": "AgentNode"
+      },
+      "AgentRunState": {
+        "type": "string",
+        "enum": [
+          "created",
+          "running",
+          "ready_for_review",
+          "failed",
+          "stale",
+          "cancelled"
+        ],
+        "title": "AgentRunState"
+      },
+      "AgentRunStatus": {
+        "properties": {
+          "id": {
+            "type": "string",
+            "format": "uuid",
+            "title": "Id"
+          },
+          "job_id": {
+            "type": "string",
+            "format": "uuid",
+            "title": "Job Id"
+          },
+          "graph_version": {
+            "type": "string",
+            "maxLength": 100,
+            "minLength": 1,
+            "title": "Graph Version"
+          },
+          "framework_version": {
+            "type": "string",
+            "maxLength": 100,
+            "minLength": 1,
+            "title": "Framework Version"
+          },
+          "state": {
+            "$ref": "#/components/schemas/AgentRunState"
+          },
+          "current_stage": {
+            "anyOf": [
+              {
+                "$ref": "#/components/schemas/PublicAgentStage"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "counters": {
+            "$ref": "#/components/schemas/AgentCounters"
+          },
+          "steps": {
+            "items": {
+              "$ref": "#/components/schemas/AgentStepStatus"
+            },
+            "type": "array",
+            "maxItems": 16,
+            "title": "Steps"
+          },
+          "error_code": {
+            "anyOf": [
+              {
+                "type": "string",
+                "maxLength": 100,
+                "minLength": 1
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Error Code"
+          },
+          "error_message": {
+            "anyOf": [
+              {
+                "type": "string",
+                "maxLength": 1000,
+                "minLength": 1
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Error Message"
+          },
+          "started_at": {
+            "type": "string",
+            "format": "date-time",
+            "title": "Started At"
+          },
+          "updated_at": {
+            "type": "string",
+            "format": "date-time",
+            "title": "Updated At"
+          },
+          "completed_at": {
+            "anyOf": [
+              {
+                "type": "string",
+                "format": "date-time"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Completed At"
+          }
+        },
+        "additionalProperties": false,
+        "type": "object",
+        "required": [
+          "id",
+          "job_id",
+          "graph_version",
+          "framework_version",
+          "state",
+          "current_stage",
+          "counters",
+          "steps",
+          "started_at",
+          "updated_at",
+          "completed_at"
+        ],
+        "title": "AgentRunStatus",
+        "description": "Canonical read-only response; internal trace/checkpoint fields are absent by design."
+      },
+      "AgentStepStatus": {
+        "properties": {
+          "ordinal": {
+            "type": "integer",
+            "minimum": 1.0,
+            "title": "Ordinal"
+          },
+          "node": {
+            "$ref": "#/components/schemas/AgentNode"
+          },
+          "label": {
+            "$ref": "#/components/schemas/PublicAgentStage"
+          },
+          "state": {
+            "$ref": "#/components/schemas/AgentTraceState"
+          },
+          "attempt": {
+            "type": "integer",
+            "minimum": 1.0,
+            "title": "Attempt"
+          },
+          "duration_ms": {
+            "anyOf": [
+              {
+                "type": "integer",
+                "minimum": 0.0
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Duration Ms"
+          },
+          "error_code": {
+            "anyOf": [
+              {
+                "type": "string",
+                "maxLength": 100,
+                "minLength": 1
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Error Code"
+          }
+        },
+        "additionalProperties": false,
+        "type": "object",
+        "required": [
+          "ordinal",
+          "node",
+          "label",
+          "state",
+          "attempt"
+        ],
+        "title": "AgentStepStatus"
+      },
+      "AgentTraceState": {
+        "type": "string",
+        "enum": [
+          "running",
+          "succeeded",
+          "failed",
+          "skipped"
+        ],
+        "title": "AgentTraceState"
+      },
       "AliasApproval": {
         "properties": {
           "expected_revision": {
@@ -4675,6 +4984,22 @@
           "columns"
         ],
         "title": "MappingSpec"
+      },
+      "PublicAgentStage": {
+        "type": "string",
+        "enum": [
+          "Loading context",
+          "Extracting observations",
+          "Validating evidence",
+          "Retrieving schedule candidates",
+          "Selecting supported matches",
+          "Validating proposals",
+          "Saving for review",
+          "Ready for review",
+          "Failed",
+          "Stale"
+        ],
+        "title": "PublicAgentStage"
       },
       "ReanalysisRequest": {
         "properties": {

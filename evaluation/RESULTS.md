@@ -44,7 +44,7 @@ achieved by this documentation; measured values must come from saved runs.
 | Thinking         | disabled (`think: false`)                                          |
 | Output token cap | 200 (`num_predict`)                                                |
 | Temperature      | 0.0 (deterministic)                                                  |
-| Host             | Tailscale private —`abdullahs-macbook-pro.tail40fcbd.ts.net`      |
+| Host             | Tailscale private — `abdullahs-macbook-pro.tail40fcbd.ts.net`      |
 | Ollama runtime   | 0.34.3                                                               |
 | Config SHA-256   | `798a81f80cbf45726b19f9b59196aa5b04f415e6887b5b19c0605683e2ba3244` |
 
@@ -122,7 +122,7 @@ achieved by this documentation; measured values must come from saved runs.
 
 ## Gemma 4 12B connection smoke — 8 October 2026
 
-The private Ollama endpoint reported runtime `0.40.0` and exact installed model `gemma4:12b` with digest `6114515d63c17436a7c0417d82820ac65ad643e2806c5a3c89cb62846436ed0b0d`. A schema-constrained JSON call passed; its saved record is `evaluation/results/gemma4-12b-smoke.json` (4,621 ms model call).
+The private Ollama endpoint reported runtime `0.40.0` and exact installed model `gemma4:12b` with digest `6114515d63c17436a7c0417d82820ac65ad643e2806c5a3c89cb62846436ed0b`. A schema-constrained JSON call passed; its saved record is `evaluation/results/gemma4-12b-smoke.json` (4,621 ms model call).
 
 One live report sample produced two validated observations: three installed spools as actual progress, and tomorrow's two planned welds as planned work with no progress quantity. The extraction call took roughly 100 seconds. A live selection sample initially abstained despite a matching area, work type, and asset tag. Prompt `selection-v3` then returned the correct supplied candidate and evidence fragment on the same sample. These are compatibility checks, not held-out accuracy results. Representative latency, assembled pipeline metrics, and independent label review remain pending.
 
@@ -153,8 +153,8 @@ ambiguous cases. It is an existing evaluation set previously used with Qwen.
 | ----------------------------------- | -------------------------------------------------------------------- |
 | Model                               | `gemma4:12b`, 11.9B, Q4_K_M                                        |
 | Digest                              | `6114515d63c17436a7c0417d82820ac65ad643e2806c5a3c89cb62846436ed0b` |
-| Runtime                             | Ollama`0.40.0`                                                     |
-| Endpoint                            | Owner-supplied private Ollama host`100.111.103.28:11434`           |
+| Runtime                             | Ollama `0.40.0`                                                     |
+| Endpoint                            | Owner-supplied private Ollama host `100.111.103.28:11434`           |
 | Temperature / thinking              | `0` / `false`                                                    |
 | Context / output cap                | `8192` / `1536` tokens                                           |
 | Request timeout / automatic retries | 300 seconds / zero                                                   |
@@ -174,7 +174,7 @@ results. No request failures remain in the combined capture.
 | Metric                                                                                      | Correct / applicable | Score  |
 | ------------------------------------------------------------------------------------------- | -------------------- | ------ |
 | Activity selection, matchable cases                                                         | 44 / 45              | 97.8%  |
-| Precision across**all** selected activities, including unmatched cases                | 44 / 49              | 89.8%  |
+| Precision across **all** selected activities, including unmatched cases                | 44 / 49              | 89.8%  |
 | Safe abstention, unmatched cases                                                            | 10 / 15              | 66.7%  |
 | Event type                                                                                  | 53 / 60              | 88.3%  |
 | Quantity, non-null labels                                                                   | 36 / 36              | 100.0% |
@@ -256,17 +256,19 @@ not support a fair model ranking.
 
 ### Saved evidence and reproduction
 
-Evidence directory: [`results/gemma4-12b-2026-10-12/`](results/gemma4-12b-2026-10-12/).
+The following captures and evaluation scripts are retained in the original local workspace. They are not included in this documentation-only publication; paths below identify local files, rather than GitHub downloads. The scoring command requires those local scripts and captures.
 
-- [`combined-after-retry/scored.json`](results/gemma4-12b-2026-10-12/combined-after-retry/scored.json): current 60-case scores and per-case differences.
-- [`combined-after-retry/predictions.jsonl`](results/gemma4-12b-2026-10-12/combined-after-retry/predictions.jsonl), [`calls.jsonl`](results/gemma4-12b-2026-10-12/combined-after-retry/calls.jsonl) and [`config.json`](results/gemma4-12b-2026-10-12/combined-after-retry/config.json): combined captures, per-row source, timings and source-file SHA-256 hashes.
-- [`retry-batches-five-six/`](results/gemma4-12b-2026-10-12/retry-batches-five-six/): new raw responses, predictions, call hashes, timings, configuration and frozen runner.
-- [`comparison-batch-six.json`](results/gemma4-12b-2026-10-12/retry-batches-five-six/comparison-batch-six.json): identical prompt/settings hashes and no changed scored fields across ten repeated cases.
-- [`compact/`](results/gemma4-12b-2026-10-12/compact/): preserved first attempt, including the fifth-batch timeout and original preliminary scores.
-- [`provenance.json`](results/gemma4-12b-2026-10-12/provenance.json): commit, source/dataset hashes and completed retry status.
-- [`input-corrections.json`](results/gemma4-12b-2026-10-12/input-corrections.json): twelve table-locator corrections.
-- [`production-diagnostic.json`](results/gemma4-12b-2026-10-12/production-diagnostic.json): separate incomplete production measurement.
-- [`preliminary-RESULTS.md`](results/gemma4-12b-2026-10-12/preliminary-RESULTS.md): report before the rerun.
+Evidence directory: `results/gemma4-12b-2026-10-12/`.
+
+- `results/gemma4-12b-2026-10-12/combined-after-retry/scored.json`: current 60-case scores and per-case differences.
+- `results/gemma4-12b-2026-10-12/combined-after-retry/predictions.jsonl`, `results/gemma4-12b-2026-10-12/combined-after-retry/calls.jsonl` and `results/gemma4-12b-2026-10-12/combined-after-retry/config.json`: combined captures, per-row source, timings and source-file SHA-256 hashes.
+- `results/gemma4-12b-2026-10-12/retry-batches-five-six/`: new raw responses, predictions, call hashes, timings, configuration and frozen runner.
+- `results/gemma4-12b-2026-10-12/retry-batches-five-six/comparison-batch-six.json`: identical prompt/settings hashes and no changed scored fields across ten repeated cases.
+- `results/gemma4-12b-2026-10-12/compact/`: preserved first attempt, including the fifth-batch timeout and original preliminary scores.
+- `results/gemma4-12b-2026-10-12/provenance.json`: commit, source/dataset hashes and completed retry status.
+- `results/gemma4-12b-2026-10-12/input-corrections.json`: twelve table-locator corrections.
+- `results/gemma4-12b-2026-10-12/production-diagnostic.json`: separate incomplete production measurement.
+- `results/gemma4-12b-2026-10-12/preliminary-RESULTS.md`: report before the rerun.
 
 ```bash
 # Score the saved combined 60-case capture without calling the model:

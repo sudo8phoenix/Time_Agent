@@ -43,3 +43,7 @@ D04's reports are developer-authored synthetic development cases awaiting indepe
 ## Runtime history note (2026-10-12)
 
 The current report processor is LangGraph-only. Earlier proposal records may have been produced by the former pipeline and retain their original provenance and meaning; no historical record is rewritten by the runtime removal. The review, calibration, frozen-split, and independent-evaluation gates described here remain unchanged.
+
+## Compact benchmark does not establish calibration
+
+The [12 October Gemma results](../evaluation/RESULTS.md) report observed field/link counts under a draft prompt, including five unmatched false matches. The labels are synthetic and not independently adjudicated, and no calibrated confidence estimates were captured. These results do not supply eligible A02 inputs or establish thresholds for automatic approval.

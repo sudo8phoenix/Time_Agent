@@ -28,6 +28,8 @@ The graph-only local prototype was verified on 2026-10-12. Current post-removal 
 
 Independent human label review, adjudication/calibration, frozen evaluation splits and a full unseen UI-to-export model evaluation remain pending. The owner sample package is `not_received`. Public Cambridge/GT10 schedules and synthetic reports are development inputs; a technical source-backed review does not constitute planner approval or field truth. See [`docs/release.md`](docs/release.md) for current validation and remaining gates.
 
+The [Gemma quality evaluation](evaluation/RESULTS.md#gemma-4-12b-quality-evaluation--12-october-2026) covers 60 existing synthetic cases: 44/45 matchable activities and 36/36 stated quantities were correct, but five of 15 unmatched inputs were falsely selected (all-selection precision 89.8%, safe abstention 66.7%). This compact full-schedule benchmark is separate from the production graph flow; it supports human-reviewed use, not automatic approval or an independent release claim.
+
 ## Architecture
 
 ```text
@@ -141,6 +143,8 @@ make restore-verify ARGS="/absolute/backup-directory --database progress_restore
 Do not commit `.env`, model credentials, uploaded reports, model weights, PostgreSQL volumes, or generated build artifacts. Report text is treated as untrusted input. Source evidence stays in application records and is not copied into public agent telemetry. Human approval is required before progress changes. Restore verification uses a separate database and refuses to replace an existing one.
 
 ## Documentation
+
+See the [documentation index](docs/README.md) for current guides, dated evidence and the reconciliation audit.
 
 - [`docs/local-run.md`](docs/local-run.md) — laptop setup, Ollama configuration, checks, and backup drill
 - [`docs/release.md`](docs/release.md) — verified evidence and remaining release gates

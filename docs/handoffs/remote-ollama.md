@@ -1,5 +1,7 @@
 # Remote Ollama readiness handoff
 
+> Historical implementation evidence. Current operation uses LangGraph only and model-led schedule shortlisting; earlier legacy routing, rollback and embedding retrieval descriptions below are superseded. See [current runtime](graph-only-runtime.md), [release status](../release.md) and [Gemma quality results](../../evaluation/RESULTS.md).
+
 The adapter accepts HTTPS Tailscale Serve URLs (with default port 443) and Tailscale IPv4 CGNAT addresses in `100.64.0.0/10`. It rejects public destinations, validates all DNS results, sends optional bearer auth only in the Authorization header, and returns generic transport errors that do not include credentials. Chat requests use the §8 generation settings including output/context caps and `think=false`. The new read-only `ops/remote_ollama_check.py` reports runtime, installed tag, digest and selected model metadata without exposing the endpoint or token.
 
 No remote service was contacted and no local service/model was provisioned. The local Ollama daemon started during the preceding abandoned provisioning task has been stopped; the configured `qwen3.5:4b` download did not complete or start after its approval request was interrupted. There is no live endpoint or benchmark result because the friend’s Tailscale URL and model tag have not yet been supplied.

@@ -79,3 +79,9 @@
 - Accept local telemetry/pruning boundaries: traces contain sanitized counts/hashes/stable codes only; pruning is explicit-age, dry-run by default, exact-thread and transactional, and never removes retryable failed/stale runs or application/domain records.
 - Evidence: 150 unit tests, 49 isolated-PostgreSQL integration tests, 10 focused W-36 runtime cases, clean `0009 → 0008 → 0009`, contiguous saver ledger 0–9 and valid thread indexes. These are deterministic/injected-model results, not a live Ollama quality claim.
 - Graph mode remains disabled. W-37/W-38 and every W-39 parity, security, backup/restore, rollback and private-Ollama gate remain mandatory before an enablement decision.
+
+## Current runtime and evidence amendment — 12 October 2026
+
+LangGraph is the only report-processing runtime; legacy routing and rollback choices in the September records above are historical. Candidate discovery and selection use the configured model with the pinned schedule, implemented in `backend/app/agent/schedule_decision.py`. Current operation is documented in [local-run.md](local-run.md) and [the graph-only handoff](handoffs/graph-only-runtime.md).
+
+The 12 October compact Gemma benchmark now has saved outputs for all 60 existing synthetic held-out cases after batches five and six were rerun. Activity choice was 44/45 (97.8%), quantity accuracy 36/36 (100%), precision across all selected activities 44/49 (89.8%), and unmatched-case safe abstention 10/15 (66.7%). Five unmatched fragments were falsely selected. This benchmark supplies the full schedule and does not complete independently reviewed, frozen-split UI-to-export acceptance. The [saved results](../evaluation/RESULTS.md) are exploratory evidence, and the independent acceptance gates in [release.md](release.md) remain open.

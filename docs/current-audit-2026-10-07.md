@@ -1,5 +1,7 @@
 # Current implementation audit — 7 October 2026
 
+> Dated evidence: the runtime descriptions below refer to the implementation at the time of this record. For current graph-only operation and later compact model measurements, see [release status](release.md) and [documentation index](README.md).
+
 ## What works now
 
 - The report intake parser accepts pasted text, TXT, DOCX, text PDFs and structured XLSX. It preserves source fragments and locators. Image-only PDFs need transcription; OCR is not implemented.

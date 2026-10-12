@@ -1,5 +1,7 @@
 # Runtime completion handoff
 
+> Historical implementation evidence. Current operation uses LangGraph only and model-led schedule shortlisting; earlier legacy routing, rollback and embedding retrieval descriptions below are superseded. See [current runtime](graph-only-runtime.md), [release status](../release.md) and [Gemma quality results](../../evaluation/RESULTS.md).
+
 The worker now has a real CLI at `python ops/run_worker.py` (or `--once`) and runs the database pipeline through the configured local Ollama adapter. Claims are committed before model work, leases renew from an independent database session during slow model calls, ownership is checked before each call and before publishing, and SIGINT/SIGTERM stop polling and release a shutdown-interrupted job for retry. Extraction and candidate selection use the same configured Ollama model. Trusted report date context is supplied only when the report date has recorded evidence. Existing observations make retries idempotent.
 
 `ops/model_smoke.py --run` remains an explicit real request; it refuses to call Ollama without the flag. No benchmark was run: Ollama 0.23.2 is installed but no server was reachable at `127.0.0.1:11434`, so installed model names/digests could not be inspected. The CLI reported `Operation not permitted` for that connection. No weights were downloaded.

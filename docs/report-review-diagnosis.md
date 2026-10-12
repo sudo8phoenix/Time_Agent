@@ -1,5 +1,7 @@
 # Report processing and review diagnosis
 
+> Dated evidence: the runtime descriptions below refer to the implementation at the time of this record. For current graph-only operation and later compact model measurements, see [release status](release.md) and [documentation index](README.md).
+
 Investigated on 2026-09-25 using the source, recent local PostgreSQL records,
 typed extraction and adapter tests, PostgreSQL integration tests, and browser tests.
 

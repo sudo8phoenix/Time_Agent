@@ -2,6 +2,8 @@
 
 Current implementation status and remaining release gates are in [release.md](release.md). E01 recovery/reanalysis, E02 evaluation preparation and E03 documentation evidence are in the corresponding [handoffs](handoffs/). The October 11 GT10 five-entry workflow and October 12 one-case graph smoke are bounded workflow evidence; neither completes E02 independent unseen evaluation or lifecycle/duration acceptance. The source-backed technical review is a separate development-data suggestion set, not human review or adjudication. Independent labels, calibration and owner-data gates remain pending.
 
+The 12 October compact Gemma benchmark now has saved outputs for all 60 existing synthetic held-out cases after batches five and six were rerun. Activity choice was 44/45 (97.8%), quantity accuracy 36/36 (100%), precision across all selected activities 44/49 (89.8%), and unmatched-case safe abstention 10/15 (66.7%). Five unmatched fragments were falsely selected. This benchmark supplies the full schedule and does not complete independently reviewed, frozen-split UI-to-export acceptance. See [saved results](../evaluation/RESULTS.md).
+
 The W-series below is the historical execution record for the application. The user-facing checklist remains at `progress-agent-plan/TASK_BOARD.md` and is updated when a task has passed its acceptance evidence.
 
 | Task | Status | Owner | Dependencies | Next acceptance evidence |
@@ -11,19 +13,19 @@ The W-series below is the historical execution record for the application. The u
 | W-02 | unit validated | builder agent | W-01 interface | generated OpenAPI comparison |
 | W-03 | 60/300 expansion validated; human review pending | builder agent | W-02 interface | user review of seed, expanded and native-linked labels |
 | W-04 | complete | builder agent | W-02 interface | expiry/revocation/roles/CSRF/cross-project acceptance passed |
-| W-08 | private endpoint and exact model readiness/smoke passed; benchmark pending | builder agent | private endpoint/model | representative latency and throughput benchmark |
+| W-08 | readiness and compact Gemma batch timing measured | builder agent | private endpoint/model | production throughput and representative per-report latency remain unmeasured |
 | W-05 | complete | builder agent | W-03/W-04 interfaces | CSV and activation safety integrated with native flows |
 | W-06 | complete | builder agent | W-04/W-05 interfaces | PostgreSQL constraint rollback and file cleanup passed |
 | W-07 | complete; report processing now graph-only | builder agent | W-04/W-06 interfaces | accepted 11 Oct quantity workflow and 12 Oct normal graph-worker run; see runtime supersession note below |
-| W-09 | extraction fixtures and one Gemma smoke validated; real-model evaluation pending | builder agent | W-03/W-06/W-08 interfaces | 20 seed-case results from an actual local model |
-| W-10 | persisted hybrid retrieval validated; live model pending | builder agent | W-02/W-03/W-05 interfaces | provision pinned local embedding weights and evaluate reviewed labels |
-| W-11 | deterministic and persistence integration plus one Gemma selection smoke validated | builder agent | W-09/W-10 interfaces | live-model selection evaluation |
+| W-09 | extraction fixtures and 60-case compact Gemma field scores recorded | builder agent | W-03/W-06/W-08 interfaces | independently reviewed production extraction evaluation remains pending |
+| W-10 | historical hybrid retrieval; superseded by model shortlist | builder agent | W-02/W-03/W-05 interfaces | current model-shortlist Recall@8 remains unmeasured |
+| W-11 | fixture integration and compact full-schedule selection measured | builder agent | W-09/W-10 interfaces | five unmatched false matches recorded; production reviewed-label evaluation pending |
 | W-12 | unit validated | builder agent | W-02/W-03/W-04 interfaces | database-backed approval integration |
 | W-13 | complete | builder agent | W-07/W-11/W-12 interfaces | real two-session race and correction/supersession passed |
 | W-14 | build/API contract validated | builder agent | W-01/W-02 interfaces | browser walkthrough with provisioned demo account |
 | W-15 | build/API contract validated | builder agent | W-13/W-14 interfaces | browser walkthrough of review/revise/reject/approve |
 | W-17 | PostgreSQL/API/export validated | builder agent | W-12/W-13/W-14 interfaces | browser walkthrough of approved progress and CSV download |
-| W-18 | implementation complete; real evaluation blocked | builder agent | W-03/W-09/W-10/W-11/W-12 interfaces | saved predictions from real local model |
+| W-18 | real-model compact evaluation recorded; independent acceptance pending | builder agent | W-03/W-09/W-10/W-11/W-12 interfaces | saved 60-case predictions available; frozen reviewed UI-to-export evaluation still required |
 | W-21 | complete | builder agent | O-02, W-02 | required hash/provenance fixtures include real MPP |
 | W-22 | complete | builder agent | W-21, W-01 | all required bounded MPXJ smoke fixtures pass |
 | W-23 | complete | builder agent | W-21/W-22 | XER, PMXML and multi-project selection pass |

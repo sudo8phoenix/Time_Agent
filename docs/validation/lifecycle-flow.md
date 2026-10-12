@@ -1,5 +1,7 @@
 # L04–L06 lifecycle validation — 10 October 2026
 
+> Dated evidence: the runtime descriptions below refer to the implementation at the time of this record. For current graph-only operation and later compact model measurements, see [release status](../release.md) and [documentation index](../README.md).
+
 ## Development fixture and isolated environment
 
 The live browser flow used a synthetic one-row canonical CSV activity `F-01-EXC` (Excavation at Foundation F-01, unsupported numeric measurement basis), synthetic text reports, and a separate migrated PostgreSQL database `progress_lifecycle_l04_test`. No production or user schedule was migrated. The real API, browser, legacy worker, private Ollama model, review endpoint, progress endpoint, and CSV export were used. The live Playwright suite does not intercept APIs.

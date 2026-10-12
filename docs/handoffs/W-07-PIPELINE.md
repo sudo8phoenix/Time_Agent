@@ -1,5 +1,7 @@
 # W-07-PIPELINE handoff
 
+> Historical implementation evidence. Current operation uses LangGraph only and model-led schedule shortlisting; earlier legacy routing, rollback and embedding retrieval descriptions below are superseded. See [current runtime](graph-only-runtime.md), [release status](../release.md) and [Gemma quality results](../../evaluation/RESULTS.md).
+
 Implemented `process_job(db, job, *, model_call=None, extraction_call=None, selection_call=None, retrieve_call=None, **kwargs)` in `backend/app/jobs/pipeline.py`.
 
 It reads persisted fragments and the job's pinned schedule version, persists observations and pending proposals atomically, preserves evidence and source fragment IDs, stores extraction metadata, handles no-fragment jobs safely, and returns persisted counts on retry. It does not create progress events, mutate activity state, or approve proposals.

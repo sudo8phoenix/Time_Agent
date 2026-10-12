@@ -17,3 +17,7 @@ These targets are a draft prepared before any new E02 held-out outcomes. They ar
 Report p50/p95/max/counts, all failure counts, source format/discipline strata, project-macro and activity/event-micro scores, reviewer corrections and review burden. Small denominators require disclosure; do not claim a target passed from a single smoke case. Report wall submission-to-update separately from system stages, human wait and retry delays. Final reviewer-corrected state must not be substituted for initial-model accuracy.
 
 Pending agreement: named owner/reviewer, timestamp, approved targets hash, frozen model/config and split/label hashes. No agreement is inferred from this document or from elapsed time.
+
+## Evidence boundary after the compact Gemma benchmark
+
+The [12 October results](../evaluation/RESULTS.md) contain exploratory measurements on an existing synthetic set. They do not establish these targets: labels are unreviewed, no actual candidate shortlist is scored, atomic labels and UI-to-export timestamps are absent, and the draft prompt uses inconsistent unit conventions. The target table is retained as an unapproved draft; it has not been retuned to the observed results. Any future independent unseen evaluation needs a newly documented target agreement and reviewed frozen data.
