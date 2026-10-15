@@ -1,5 +1,7 @@
 """Two-turn text start becomes a review proposal without changing activity state."""
 import re
+import pytest
+from types import SimpleNamespace
 from datetime import date
 from decimal import Decimal
 from uuid import uuid4
@@ -17,7 +19,18 @@ from app.schemas.conversation import ConversationEdit
 from datetime import time
 
 
-def test_missing_date_then_confirmed_start_stays_pending_review():
+@pytest.mark.parametrize("hierarchy_enabled", [False, True])
+def test_missing_date_then_confirmed_start_stays_pending_review(monkeypatch, hierarchy_enabled):
+    import app.conversation.service as conversation_service
+    monkeypatch.setattr(conversation_service, "get_settings",
+                        lambda: SimpleNamespace(agent_hierarchy_enabled=hierarchy_enabled,
+                                               conversation_model_timeout_seconds=300))
+    extraction_calls = []
+    original_extract = conversation_service.extract_source
+    def observe_extraction(request, model_call):
+        extraction_calls.append(request)
+        return original_extract(request, model_call)
+    monkeypatch.setattr(conversation_service, "extract_source", observe_extraction)
     engine = create_engine("sqlite:///:memory:")
     Base.metadata.create_all(engine)
     with Session(engine, expire_on_commit=False) as db:
@@ -67,6 +80,10 @@ def test_missing_date_then_confirmed_start_stays_pending_review():
             raise AssertionError("exact quoted area should skip model schedule decisions")
 
         analyze(db, conversation, model_call=model_call)
+        assert len(extraction_calls) == int(hierarchy_enabled)
+        if hierarchy_enabled:
+            assert conversation.draft["hierarchy_waiting"]["stage"] == "awaiting_confirmation"
+            assert conversation.draft["hierarchy_waiting"]["schedule_version_id"] == str(schedule.id)
         assert conversation.pending_question is None
         assert len(payload(db, conversation)["events"]) == 1
         assert payload(db, conversation)["events"][0]["selection"]["reason_codes"] == ["EXACT_AREA_WORK_TYPE"]
@@ -85,6 +102,9 @@ def test_missing_date_then_confirmed_start_stays_pending_review():
         assert corrected["events"][0]["effect"]["subactivity_key"] is None
         assert corrected["events"][0]["effect"]["endpoint"]["precision"] == "minute"
         confirm(db, conversation, user, None)
+        report_count = len(db.scalars(select(Proposal)).all())
+        confirm(db, conversation, user, None)
+        assert len(db.scalars(select(Proposal)).all()) == report_count
         db.flush()
         assert conversation.status == "pending_review"
         assert db.get(Job, conversation.job_id).state == "ready_for_review"
@@ -99,3 +119,34 @@ def test_missing_date_then_confirmed_start_stays_pending_review():
         db.flush()
         assert db.get(ActivityState, activity.id).actual_start == date(2026, 10, 9)
         assert payload(db, conversation)["status"] == "accepted"
+
+
+def test_stale_schedule_clears_conversation_draft_before_reanalysis(monkeypatch):
+    import app.conversation.service as conversation_service
+    monkeypatch.setattr(conversation_service, "get_settings",
+                        lambda: SimpleNamespace(agent_hierarchy_enabled=True,
+                                               conversation_model_timeout_seconds=300))
+    engine = create_engine("sqlite:///:memory:")
+    Base.metadata.create_all(engine)
+    with Session(engine, expire_on_commit=False) as db:
+        user = User(username="stale-user", password_hash="unused", role="viewer")
+        project = Project(name="Stale fixture", timezone="Asia/Kolkata")
+        schedule = ScheduleVersion(project=project, version_number=1,
+                                   content_sha256=uuid4().hex, state="active")
+        db.add_all([user, project, schedule])
+        db.flush()
+        project.active_schedule_version_id = schedule.id
+        conversation = Conversation(project_id=project.id, creator_id=user.id,
+                                    schedule_version_id=schedule.id, revision=0,
+                                    draft={"events": [{"activity_id": "old"}],
+                                           "hierarchy_waiting": {"stage": "analysis"}})
+        db.add(conversation)
+        db.flush()
+        add_turn(db, conversation, "user", "Started the work", user.id)
+        project.active_schedule_version_id = uuid4()
+        analyze(db, conversation, model_call=lambda **_: (_ for _ in ()).throw(
+            AssertionError("stale pinned schedule must stop analysis")))
+        assert "events" not in conversation.draft
+        assert "hierarchy_waiting" not in conversation.draft
+        assert conversation.draft["stale_schedule"] is True
+        assert conversation.pending_question == "retry"

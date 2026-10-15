@@ -135,7 +135,9 @@ def test_each_native_format_real_parser_maps_stages_activates_and_retrieves(
     result = shortlist_activities(
         {"summary": activity.name, "explicit_activity_id": expected_external_id},
         version_id, activities,
-        model_call=lambda **_: {"candidate_ids": [str(activity.id)]},
+        model_call=lambda **request: {"candidate_ids": [str(activity.id)]
+            if any(row["id"] == str(activity.id)
+                   for row in request["user"]["schedule_activities"]) else []},
     )
     assert result and result[0].external_id == expected_external_id
     assert all(candidate.is_leaf for candidate in result)

@@ -20,11 +20,11 @@ def sha(path):
         return hashlib.file_digest(handle, "sha256").hexdigest()
 
 
-RECOVERY_TABLES = {"agent_runs", "conversations", "conversation_turns", "integration_outbox",
+RECOVERY_TABLES = {"hosted_provider_admission", "agent_tasks", "conversation_tasks", "conversation_task_calls", "agent_runs", "conversations", "conversation_turns", "integration_outbox",
                    "activity_states", "progress_events", "observations", "proposals",
                    "audit_events", "jobs", "agent_steps", "agent_tool_calls",
                    "schedule_source_metadata"}
-RECOVERY_PRIMARY_KEYS = {"activity_states": "activity_id", "schedule_source_metadata": "schedule_version_id"}
+RECOVERY_PRIMARY_KEYS = {"hosted_provider_admission": "provider", "activity_states": "activity_id", "schedule_source_metadata": "schedule_version_id"}
 CHECKPOINT_TABLES = {"checkpoints", "checkpoint_blobs", "checkpoint_writes"}
 
 

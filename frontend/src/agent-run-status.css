@@ -30,8 +30,21 @@
 .agent-run-status__step--running .agent-run-status__step-state { color: var(--accent); }
 .agent-run-status__step--failed .agent-run-status__step-state { color: var(--danger); }
 .agent-run-status__step-meta { grid-column: 1 / -1; color: var(--muted); font: 10px 'DM Mono', monospace; }
+.agent-run-status__hierarchy-usage { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 1px; margin: 0 0 18px; background: var(--line); border: 1px solid var(--line); }
+.agent-run-status__hierarchy-usage > div { min-width: 0; display: grid; gap: 5px; padding: 10px 12px; background: #112019; }
+.agent-run-status__hierarchy-usage dt { color: var(--muted); font-size: 10px; line-height: 1.4; }
+.agent-run-status__hierarchy-usage dd { margin: 0; color: var(--ink); font: 11px 'DM Mono', monospace; }
+.agent-run-status__subheading { margin: 20px 0 8px; color: var(--muted); font-size: 11px; font-weight: 600; letter-spacing: .04em; text-transform: uppercase; }
+.agent-run-status__tasks { list-style: none; margin: 0 0 18px; padding: 0; border-top: 1px solid var(--line); }
+.agent-run-status__task { display: grid; grid-template-columns: minmax(0, 1fr) auto; gap: 4px 12px; padding: 10px 8px 10px calc(8px + var(--task-depth, 0) * 18px); border-bottom: 1px solid var(--line); }
+.agent-run-status__task-role { min-width: 0; color: var(--ink); font-size: 12px; text-transform: capitalize; overflow-wrap: anywhere; }
+.agent-run-status__task-state { color: var(--muted); font-size: 11px; text-align: right; text-transform: capitalize; }
+.agent-run-status__task--running .agent-run-status__task-state { color: var(--accent); }
+.agent-run-status__task--failed .agent-run-status__task-state { color: var(--danger); }
+.agent-run-status__task-meta { grid-column: 1 / -1; color: var(--muted); font: 10px 'DM Mono', monospace; }
 
 @media (max-width: 560px) {
   .agent-run-status__counters { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+  .agent-run-status__hierarchy-usage { grid-template-columns: repeat(2, minmax(0, 1fr)); }
   .agent-run-status__step { gap: 5px 8px; }
 }

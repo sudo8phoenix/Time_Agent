@@ -1,0 +1,76 @@
+"""Groq structured chat using the existing injectable model interface."""
+import json
+import math
+import time
+from collections.abc import Mapping
+from .ollama import (LLMResult, OllamaConfigurationError,
+                     OllamaResponseError, OllamaTransportError, _hash)
+
+
+def _validate_schema(value, schema):
+    """Enforce the requested JSON schema locally, independent of provider claims."""
+    from .openrouter import _matches_schema
+    if not _matches_schema(value, schema):
+        raise OllamaResponseError("Groq response did not match the requested schema")
+
+
+class GroqChatAdapter:
+    def __init__(self, model, *, bearer_token, timeout=120, max_retries=0, transport=None):
+        if not bearer_token or any(c in bearer_token for c in "\r\n"):
+            raise OllamaConfigurationError("A valid GROQ_API_KEY is required")
+        if (not model.strip() or not math.isfinite(timeout) or not 0 < timeout <= 900
+                or max_retries not in (0, 1)):
+            raise OllamaConfigurationError("Invalid Groq model, timeout or retries")
+        self.model, self.timeout, self.max_retries = model, timeout, max_retries
+        self._token = bearer_token
+        self._transport = transport or self._http_transport
+
+    @staticmethod
+    def _http_transport(method, url, payload, timeout, headers):
+        from .hosted import request
+        return request("groq", method, url, payload, timeout, headers)
+
+    def chat(self, *, system, user, schema, settings=None, metadata=True):
+        if isinstance(user, Mapping):
+            user = json.dumps(user, ensure_ascii=False, default=str)
+        options = {"temperature": 0.0, "num_predict": 1536}
+        options.update(settings or {})
+        try:
+            output = int(options["num_predict"])
+        except (ValueError, TypeError) as exc:
+            raise OllamaConfigurationError("num_predict must be positive") from exc
+        if output <= 0:
+            raise OllamaConfigurationError("num_predict must be positive")
+        payload = {"model": self.model, "messages": [
+            {"role": "system", "content": system}, {"role": "user", "content": user}],
+            "temperature": options["temperature"], "max_completion_tokens": min(output, 1536),
+            "stream": False, "response_format": {"type": "json_schema", "json_schema": {
+                "name": "response", "strict": False, "schema": schema}}}
+        if self.model.startswith("openai/gpt-oss-"):
+            payload["reasoning_effort"] = "low"
+        started = time.monotonic()
+        for attempt in range(self.max_retries + 1):
+            try:
+                status, body = self._transport("POST", "https://api.groq.com/openai/v1/chat/completions",
+                    payload, self.timeout, {"Authorization": f"Bearer {self._token}"})
+            except (TimeoutError, OSError, ValueError) as exc:
+                if attempt < self.max_retries:
+                    continue
+                raise OllamaTransportError("Groq request timed out or failed") from exc
+            if status >= 500 and attempt < self.max_retries:
+                continue
+            from .hosted import raise_for_status
+            raise_for_status("groq", status)
+            try:
+                choice = body["choices"][0]
+                if choice.get("finish_reason") != "stop":
+                    raise OllamaResponseError("Groq response was incomplete")
+                value = json.loads(choice["message"]["content"])
+                if not isinstance(value, dict):
+                    raise ValueError("Expected object")
+                _validate_schema(value, schema)
+            except (KeyError, IndexError, TypeError, ValueError) as exc:
+                raise OllamaResponseError("Groq returned an invalid JSON response") from exc
+            return LLMResult(value, body.get("model", self.model), None, "groq",
+                int((time.monotonic() - started) * 1000), _hash(payload),
+                _hash({"system": system, "user": user}))

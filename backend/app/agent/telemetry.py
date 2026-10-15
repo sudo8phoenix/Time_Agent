@@ -121,6 +121,8 @@ class TelemetryRecorder:
         self.run_id = run_id
         self._clock = clock
         self.active_step_id: UUID | None = None
+        self.task_id_provider = lambda: None
+        self.step_task_provider = lambda node: None
 
     def reconcile_checkpoint(self, next_nodes: tuple[str, ...], state: AgentState) -> None:
         """Repair telemetry left between a durable node checkpoint and trace commit."""
@@ -210,6 +212,9 @@ class TelemetryRecorder:
             step.duration_ms = _duration_ms(step.started_at, now)
             step.output_hash = _state_hash(state)
             step.sanitized_summary = _step_summary(state)
+            task_id = self.step_task_provider(step.node)
+            if task_id:
+                step.sanitized_summary = {**step.sanitized_summary, "task_id": str(task_id)}
             run.counters = state.counters.model_dump(mode="json")
             metadata = state.model_metadata.model_dump(mode="json")
             run.model_metadata = {
@@ -223,9 +228,9 @@ class TelemetryRecorder:
                 )
                 if metadata[key]
             }
-            run.config_metadata = (
+            run.config_metadata = {**(run.config_metadata or {}), **(
                 {"settings_hash": metadata["settings_hash"]} if metadata["settings_hash"] else {}
-            )
+            )}
             run.updated_at = now
         self.active_step_id = None
 
@@ -257,7 +262,9 @@ class TelemetryRecorder:
                 tool_name=name,
                 attempt=attempt,
                 state="running",
-                sanitized_input_summary=_bounded_summary(_tool_input_summary(name, args)),
+                sanitized_input_summary=_bounded_summary({**_tool_input_summary(name, args), **(
+                    {"task_id": str(self.task_id_provider())} if self.task_id_provider() else {}
+                )}),
                 sanitized_output_summary={},
                 started_at=started,
             )

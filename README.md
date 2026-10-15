@@ -170,3 +170,15 @@ No license has been declared for this repository. Add an explicit license before
 ## Acknowledgements
 
 Time Agent uses FastAPI, Pydantic, SQLAlchemy, Alembic, PostgreSQL, React, Vite, Ollama, LangGraph, and open-source Python and Java tooling.
+
+### Groq model provider
+
+Set `LLM_PROVIDER=groq`, `GROQ_API_KEY`, and `GROQ_MODEL=openai/gpt-oss-20b` in `.env`, then restart the backend and worker. Both report analysis and conversation use this provider. Report text and model context are sent to Groq. Use `LLM_PROVIDER=ollama` to return to the configured Ollama model.
+
+The adapter uses Groq JSON schema output with application schema and evidence validation. Existing reanalysis jobs retain their saved provider/model; legacy jobs with a saved model use Ollama. No Groq SDK is required.
+
+Run `.venv/bin/python ops/compare_model_latency.py` to compare three synthetic extraction requests per provider. This makes live API calls and reports elapsed time and validation failures without exposing credentials.
+
+The [hierarchical runtime rollout guide](docs/multi-agent-runtime.md) documents the disabled-by-default v2 report hierarchy, shared conversation specialists, provider roles, durable task traces, verification and rollback. Existing v1 runs retain their stored runtime version.
+
+New conversations created with the hierarchy enabled use durable worker analysis; see [conversation operation and rollback](docs/durable-conversations.md). Apply migration `0017_conversation_tasks` before using the updated worker. Both rollout flags remain disabled by default.

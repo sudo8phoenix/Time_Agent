@@ -4,6 +4,7 @@ from __future__ import annotations
 from contextlib import contextmanager
 from datetime import datetime, timezone
 from importlib.metadata import version
+from functools import partial
 import os
 from typing import Any, Callable, Iterator
 from urllib.parse import urlparse
@@ -23,6 +24,7 @@ from ..db.models import (
     Activity,
     ActivityState,
     AgentRun,
+    AgentTask,
     Fragment,
     Job,
     Observation as DBObservation,
@@ -32,6 +34,7 @@ from ..db.models import (
 )
 from ..jobs.service import publish_stage
 from ..llm.extract import extract_fragments
+from ..prompts.extraction_v1 import PROMPT_VERSION, LEGACY_PROMPT_VERSION, V11_PROMPT_VERSION, get_extraction_prompt
 from .schedule_decision import select_activity, shortlist_activities
 from .checkpoint import make_checkpoint_serializer
 from ..settings import get_settings
@@ -46,6 +49,8 @@ from .state import (
     ValidationErrorRecord,
     create_initial_state,
     validate_identity_transition,
+    create_hierarchical_state,
+    parse_agent_state,
 )
 from .telemetry import TelemetryRecorder, TelemetryTools
 from .tools import AgentToolError, AgentTools, PersistenceResult
@@ -101,11 +106,34 @@ def _create_or_load_run(db: Session, job: Job, *, clock: Callable[[], datetime])
     run = db.scalar(select(AgentRun).where(AgentRun.job_id == job.id).with_for_update())
     if run is None:
         run_id = uuid4()
+        settings = get_settings()
+        configuration = {}
+        if settings.agent_hierarchy_enabled:
+            from ..llm.provider import role_provider_config
+            snapshot = job.config_snapshot or {}
+            baseline_provider = snapshot.get("provider") or ("ollama" if snapshot.get("model") else settings.llm_provider)
+            configuration = {
+                "roles": {role: {
+                    "provider": assignment.provider or baseline_provider,
+                    "model": assignment.model or (snapshot.get("model") if not assignment.provider or assignment.provider == baseline_provider else None) or (
+                        settings.groq_model if (assignment.provider or baseline_provider) == "groq"
+                        else settings.openrouter_model if (assignment.provider or baseline_provider) == "openrouter"
+                        else settings.ollama_model),
+                    "key_slot": assignment.key_slot,
+                } for role, assignment in role_provider_config(settings).items()},
+                "model_assisted": settings.orchestrator_model_assisted,
+            }
+        extraction_version = (job.config_snapshot or {}).get("extraction_prompt_version") or PROMPT_VERSION
+        try:
+            get_extraction_prompt(extraction_version)
+        except ValueError:
+            raise AgentRuntimeError("AGENT_CHECKPOINT_INCOMPATIBLE") from None
+        configuration["extraction_prompt_version"] = extraction_version
         run = AgentRun(
             id=run_id,
             job_id=job.id,
-            graph_version=GRAPH_VERSION,
-            state_schema_version=STATE_SCHEMA_VERSION,
+            graph_version="report-analysis-v2" if get_settings().agent_hierarchy_enabled else GRAPH_VERSION,
+            state_schema_version="agent-state-v2" if get_settings().agent_hierarchy_enabled else STATE_SCHEMA_VERSION,
             framework_version=FRAMEWORK_VERSION,
             thread_id=str(run_id),
             execution_mode="graph",
@@ -119,7 +147,7 @@ def _create_or_load_run(db: Session, job: Job, *, clock: Callable[[], datetime])
             },
             model_metadata={},
             prompt_metadata={},
-            config_metadata={},
+            config_metadata=configuration,
             started_at=clock(),
         )
         db.add(run)
@@ -128,8 +156,9 @@ def _create_or_load_run(db: Session, job: Job, *, clock: Callable[[], datetime])
         except IntegrityError as exc:
             raise AgentRuntimeError("AGENT_RUN_CONFLICT") from exc
     if (
-        run.graph_version != GRAPH_VERSION
-        or run.state_schema_version != STATE_SCHEMA_VERSION
+        (run.graph_version, run.state_schema_version) not in {
+            (GRAPH_VERSION, STATE_SCHEMA_VERSION), ("report-analysis-v2", "agent-state-v2")
+        }
         or run.framework_version != FRAMEWORK_VERSION
         or run.thread_id != str(run.id)
         or run.execution_mode != "graph"
@@ -174,20 +203,11 @@ def _ensure_active(
             raise AgentRuntimeError("SCHEDULE_VERSION_STALE")
 
 
-def _model_callable(model_name: str | None = None) -> Callable[..., Any]:
-    from ..llm.ollama import OllamaChatAdapter
-
+def _model_callable(model_name: str | None = None, provider: str | None = None, *, role=None) -> Callable[..., Any]:
+    from ..llm.provider import create_adapter
     settings = get_settings()
-    adapter = OllamaChatAdapter(
-        settings.ollama_base_url,
-        model_name or settings.ollama_model,
-        timeout=settings.report_model_timeout_seconds,
-        max_retries=0,
-        bearer_token=(
-            settings.ollama_api_key.get_secret_value() if settings.ollama_api_key else None
-        ),
-    )
-    return adapter.chat
+    return create_adapter(settings, model_name=model_name, provider=provider,
+                          timeout=settings.report_model_timeout_seconds, role=role).chat
 
 
 def _json(value: Any) -> Any:
@@ -404,6 +424,15 @@ def _finalize(session_factory, job_id: UUID, token: str, run_id: UUID, state: Ag
             terminal = "stale"
             error_code = published.error_code or "SCHEDULE_VERSION_STALE"
             error_message = published.error_message or SAFE_ERRORS["SCHEDULE_VERSION_STALE"]
+        if run.graph_version == "report-analysis-v2" and error_code != "AGENT_CHECKPOINT_FAILED":
+            for task in db.scalars(select(AgentTask).where(
+                AgentTask.run_id == run.id, AgentTask.status == "running"
+            )):
+                task.status = "succeeded" if terminal == "ready_for_review" else "failed"
+                task.outcome = "completed" if terminal == "ready_for_review" else (
+                    "stale" if terminal == "stale" else "failed")
+                task.error_code = error_code if terminal != "ready_for_review" else None
+                task.finished_at = now
         run.state = terminal
         run.current_node = "finalize" if terminal == "ready_for_review" else "record_failure"
         run.counters = state.counters.model_dump(mode="json")
@@ -510,22 +539,63 @@ def process_job_with_graph(
             "extracted_count": job.extracted_count, "proposal_count": job.proposal_count,
             "published": job.state == "ready_for_review",
         }
-    initial = create_initial_state(
+    hierarchical = run.graph_version == "report-analysis-v2"
+    state_factory = create_hierarchical_state if hierarchical else create_initial_state
+    initial = state_factory(
         run_id=str(run.id),
         job_id=str(job.id),
         project_id=str(job.project_id),
         report_id=str(job.report_id),
         schedule_version_id=str(job.schedule_version_id),
     )
+    hierarchy_execution = None
+    model_dispatch = model_callable
+    if not hierarchical and model_dispatch is None:
+        model_dispatch = _model_callable((job.config_snapshot or {}).get("model"),
+            (job.config_snapshot or {}).get("provider") or ("ollama" if (job.config_snapshot or {}).get("model") else None))
+    if hierarchical:
+        from .hierarchy import HierarchyExecution
+        from ..llm.provider import create_adapter
+        settings = get_settings()
+        role_snapshot = (run.config_metadata or {}).get("roles", {})
+        pinned_settings = settings.model_copy(update={
+            f"{role}_{field}": value for role, assignment in role_snapshot.items()
+            for field, value in assignment.items()
+        })
+        def active():
+            _ensure_active(session_factory, job.id, token, job_for_heartbeat=job,
+                heartbeat_callback=heartbeat_callback, should_stop=should_stop, clock=clock)
+        planner = None
+        if (run.config_metadata or {}).get("model_assisted", False):
+            from .planner import PlannerConfigurationError, create_planner
+            try:
+                planner = create_planner(pinned_settings, timeout=settings.report_model_timeout_seconds)
+            except PlannerConfigurationError as exc:
+                raise AgentRuntimeError("AGENT_PLANNER_CONFIGURATION") from exc
+        hierarchy_execution = HierarchyExecution(session_factory, initial,
+            ensure_active=active, planner=planner, clock=clock)
+        models = {role: model_callable or create_adapter(pinned_settings,
+            timeout=settings.report_model_timeout_seconds, role=role).chat
+            for role in ("extraction", "selection")}
+        model_dispatch = hierarchy_execution.model(models)
     context = AgentRuntimeContext(
         session_factory=session_factory,
         lease_token=token,
-        model_callable=model_callable or _model_callable((job.config_snapshot or {}).get("model")),
+        model_callable=model_dispatch,
         embedder=embedder,
         heartbeat_callback=heartbeat_callback or (lambda *_: True),
         shutdown_callback=should_stop or (lambda: False),
         clock=clock,
     )
+    if extraction_service is extract_fragments:
+        pinned_prompt = (run.config_metadata or {}).get("extraction_prompt_version") or LEGACY_PROMPT_VERSION
+        extraction_service = partial(extract_fragments, prompt_version=pinned_prompt)
+    # Keep historical matching requests stable for checkpoint/journal recovery.
+    if (run.config_metadata or {}).get("extraction_prompt_version") == V11_PROMPT_VERSION:
+        if retrieval_service is shortlist_activities:
+            retrieval_service = partial(shortlist_activities, associate_delivery=True, model_call=model_dispatch)
+        if selection_service is select_activity:
+            selection_service = partial(select_activity, associate_delivery=True)
     base_tools = AgentTools(
         context,
         extraction_service=extraction_service,
@@ -536,6 +606,12 @@ def process_job_with_graph(
         ),
     )
     recorder = TelemetryRecorder(session_factory, run.id, clock=clock)
+    if hierarchy_execution:
+        recorder.task_id_provider = lambda: (
+            hierarchy_execution.active_task.task_id if hierarchy_execution.active_task else None)
+        recorder.step_task_provider = lambda node: next((
+            envelope.task_id for envelope in hierarchy_execution.envelopes.values()
+            if envelope.agent_role.value == {"persist": "review", "finalize": "root", "record_failure": "root"}.get(node, node)), None)
     tools = TelemetryTools(base_tools, recorder)
     config = {"configurable": {"thread_id": str(run.id)}}
     current = initial
@@ -546,14 +622,18 @@ def process_job_with_graph(
             heartbeat_callback=heartbeat_callback, should_stop=should_stop, clock=clock,
         )
         with _checkpoint_scope(database_url or get_settings().database_url, checkpointer) as saver:
-            graph = build_report_analysis_graph(saver, tools)
+            if hierarchical:
+                from .hierarchy import build_hierarchical_report_graph
+                graph = build_hierarchical_report_graph(saver, tools, hierarchy_execution)
+            else:
+                graph = build_report_analysis_graph(saver, tools)
             try:
                 snapshot = graph.get_state(config)
             except Exception as exc:
                 raise AgentRuntimeError("AGENT_CHECKPOINT_FAILED") from exc
             if snapshot.values:
                 try:
-                    current = AgentState.model_validate(snapshot.values)
+                    current = parse_agent_state(snapshot.values)
                     validate_identity_transition(initial, current)
                     tools.rehydrate_provenance(current)
                 except (AgentStateError, AgentToolError, ValueError) as exc:
@@ -562,7 +642,7 @@ def process_job_with_graph(
                 recorder.reconcile_checkpoint(next_nodes, current)
                 graph_input = None
             else:
-                next_nodes = ("load_context",)
+                next_nodes = ("intake",) if hierarchical else ("load_context",)
                 graph_input = initial.model_dump(mode="json", warnings=False)
 
             # A synchronous saver failure after the domain transaction can
@@ -571,12 +651,21 @@ def process_job_with_graph(
             # lease, re-run only the idempotent persistence verifier and the
             # state-only finalizer; never repeat extraction or selection.
             if (
-                not next_nodes
+                (not next_nodes or (hierarchical and next_nodes == ("review",)))
                 and current.terminal_state is None
                 and current.next_action == "persist"
             ):
                 recorder.begin_step("persist", current)
-                tools.persist_review_proposals(current)
+                if hierarchy_execution:
+                    from .contracts import AgentRole
+                    hierarchy_execution.reserve("supervisor_transitions", 12)
+                    hierarchy_execution.reserve("tool_calls", 1010)
+                    review_task = hierarchy_execution.envelope(AgentRole.REVIEW, hierarchy_execution.root)
+                    hierarchy_execution.run(review_task, lambda: tools.persist_review_proposals(current),
+                        hierarchy_execution.fingerprint({"role": "review", "run": current.run_id}))
+                else:
+                    tools.persist_review_proposals(current)
+                next_nodes = ()
                 counters = current.counters.model_dump(mode="python")
                 counters["node_executions"] += 1
                 current = current.model_copy(update={
@@ -608,16 +697,21 @@ def process_job_with_graph(
                         recorder.begin_step(expected, current)
                         try:
                             event = next(events)
+                        except AgentRuntimeError:
+                            raise
                         except StopIteration as exc:
                             raise AgentRuntimeError("AGENT_CHECKPOINT_FAILED") from exc
                         except Exception as exc:
+                            from ..jobs.worker import WorkerShutdown
+                            if isinstance(exc, WorkerShutdown):
+                                raise
                             raise AgentRuntimeError("AGENT_CHECKPOINT_FAILED") from exc
                         node, _update = next(iter(event.items()))
                         if node != expected or len(event) != 1:
                             raise AgentRuntimeError("AGENT_CHECKPOINT_INCOMPATIBLE")
                         try:
                             snapshot = graph.get_state(config)
-                            resumed = AgentState.model_validate(snapshot.values)
+                            resumed = parse_agent_state(snapshot.values)
                             validate_identity_transition(current, resumed)
                         except Exception as exc:
                             raise AgentRuntimeError("AGENT_CHECKPOINT_FAILED") from exc
@@ -633,6 +727,10 @@ def process_job_with_graph(
                     events.close()
             if current.terminal_state not in {"ready_for_review", "failed", "stale", "cancelled"}:
                 raise AgentRuntimeError("AGENT_CHECKPOINT_INCOMPATIBLE")
+        if hierarchy_execution:
+            hierarchy_execution.finish(hierarchy_execution.root, error=(
+                AgentToolError("AGENT_TOOL_FAILED", "Run failed safely.")
+                if current.terminal_state != "ready_for_review" else None))
         return _finalize(session_factory, job.id, token, run.id, current)
     except AgentRuntimeError as exc:
         recorder.fail_step(exc.code, exc.safe_message)

@@ -26,7 +26,7 @@ from ..schemas.events import (
 )
 from ..schemas.matching import Candidate, Proposal
 from ..schemas.observation import Observation
-from .state import AgentCounters, AgentState, AgentWarning, ModelMetadata, ValidationErrorRecord
+from .state import AgentCounters, AgentState, HierarchicalAgentState, AgentWarning, ModelMetadata, ValidationErrorRecord
 
 
 # Exact historical application types only. LangGraph's safe built-ins remain
@@ -34,6 +34,7 @@ from .state import AgentCounters, AgentState, AgentWarning, ModelMetadata, Valid
 _LEGACY_TYPES = (
     AgentCounters,
     AgentState,
+    HierarchicalAgentState,
     AgentWarning,
     Candidate,
     DateBasis,

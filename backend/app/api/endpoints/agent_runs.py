@@ -9,15 +9,19 @@ from sqlalchemy.orm import Session
 
 from ...agent.policy import public_stage
 from ...agent.state import GRAPH_VERSION
-from ...db.models import AgentRun, AgentStep, User
+from ...db.models import AgentRun, AgentStep, AgentTask, User
 from ...db.session import get_session
 from ...schemas.agent import (
     AgentCounters,
     AgentNode,
     AgentRunResponse,
     AgentRunState,
+    AgentHierarchyUsage,
     AgentStepStatus,
     AgentTraceState,
+    AgentTaskOutcome,
+    AgentTaskRole,
+    AgentTaskStatus,
 )
 from ..dependencies import current_user
 from .jobs import _job_for_user
@@ -28,6 +32,7 @@ router = APIRouter(prefix="/jobs", tags=["agent-runs"])
 # assertions, so the API only returns these constants when they match exactly.
 _KNOWN_FRAMEWORK_VERSION = "langgraph-1.2.12/checkpoint-postgres-3.1.2"
 _UNKNOWN_VERSION = "unrecognized"
+_KNOWN_GRAPH_VERSIONS = frozenset({GRAPH_VERSION, "report-analysis-v2"})
 _MAX_COUNTERS = {
     "node_executions": 16,
     "extraction_calls": 2,
@@ -71,6 +76,42 @@ def _safe_counters(value: object) -> AgentCounters:
 
 def _safe_version(value: object, expected: str) -> str:
     return expected if value == expected else _UNKNOWN_VERSION
+
+
+def _safe_graph_version(value: object) -> str:
+    return value if isinstance(value, str) and value in _KNOWN_GRAPH_VERSIONS else _UNKNOWN_VERSION
+
+
+def _safe_tasks(rows: list[AgentTask]) -> list[AgentTaskStatus]:
+    result = []
+    for row in rows:
+        try:
+            role = AgentTaskRole(row.agent_role)
+            state = AgentTraceState(row.status)
+            outcome = AgentTaskOutcome(row.outcome) if row.outcome is not None else None
+            result.append(AgentTaskStatus(id=row.id, parent_task_id=row.parent_task_id,
+                role=role, status=state, attempt=row.attempt, outcome=outcome))
+        except (TypeError, ValueError):
+            # Task payloads and error text never cross the public boundary.
+            continue
+    return result
+
+
+def _safe_hierarchy_usage(value: object) -> AgentHierarchyUsage | None:
+    raw = value.get("hierarchy_usage") if isinstance(value, dict) else None
+    if raw is None:
+        return None
+    if not isinstance(raw, dict):
+        raise ValueError("hierarchy usage is invalid")
+    limits = {"delegations": 1300, "supervisor_transitions": 12,
+              "model_calls": 806, "tool_calls": 1010}
+    clean = {}
+    for name, limit in limits.items():
+        count = raw.get(name, 0)
+        if type(count) is not int or not 0 <= count <= limit:
+            raise ValueError("hierarchy usage is invalid")
+        clean[name] = count
+    return AgentHierarchyUsage.model_validate(clean)
 
 
 def _safe_steps(rows: list[AgentStep], run_state: str) -> list[AgentStepStatus]:
@@ -120,6 +161,12 @@ def agent_run_status(
         .where(AgentStep.run_id == run.id)
         .order_by(AgentStep.ordinal, AgentStep.id)
     ))
+    task_rows = list(db.scalars(
+        select(AgentTask)
+        .where(AgentTask.run_id == run.id)
+        .order_by(AgentTask.started_at, AgentTask.id)
+        .limit(1301)
+    ))
     state = AgentRunState(run.state)
     error_code = _safe_error_code(run.error_code) if state in {
         AgentRunState.failed, AgentRunState.stale, AgentRunState.cancelled
@@ -137,17 +184,20 @@ def agent_run_status(
     response.headers["Cache-Control"] = "no-store"
     try:
         counters = _safe_counters(run.counters)
+        hierarchy_usage = _safe_hierarchy_usage(run.config_metadata)
     except ValueError as exc:
         raise HTTPException(status_code=500, detail={"code": "AGENT_STATUS_INVALID"}) from exc
     return AgentRunResponse(
         id=run.id,
         job_id=run.job_id,
-        graph_version=_safe_version(run.graph_version, GRAPH_VERSION),
+        graph_version=_safe_graph_version(run.graph_version),
         framework_version=_safe_version(run.framework_version, _KNOWN_FRAMEWORK_VERSION),
         state=state,
         current_stage=current_stage,
         counters=counters,
         steps=_safe_steps(rows, state.value),
+        tasks=_safe_tasks(task_rows),
+        hierarchy_usage=hierarchy_usage,
         error_code=error_code,
         error_message=error_message,
         started_at=run.started_at,

@@ -1,4 +1,4 @@
-"""Run the durable PostgreSQL-backed report agent worker."""
+"""Run durable PostgreSQL-backed report and conversation analysis tasks."""
 from __future__ import annotations
 
 import argparse
@@ -13,6 +13,7 @@ from app.agent.runtime import process_job_with_graph  # noqa: E402
 from app.jobs.service import heartbeat  # noqa: E402
 from app.jobs.worker import run_loop, run_once  # noqa: E402
 from app.settings import get_settings  # noqa: E402
+from app.conversation.runtime import run_once as run_conversation_once  # noqa: E402
 
 
 def process_claimed_job(db, job, *, token, should_stop, heartbeat_callback):
@@ -26,7 +27,7 @@ def process_claimed_job(db, job, *, token, should_stop, heartbeat_callback):
 
 
 def main() -> int:
-    parser = argparse.ArgumentParser(description="Process durable report jobs with local Ollama")
+    parser = argparse.ArgumentParser(description="Process durable report and conversation analysis tasks")
     parser.add_argument("--once", action="store_true", help="claim and process at most one job")
     parser.add_argument("--poll-seconds", type=float, default=2.0)
     args = parser.parse_args()
@@ -57,10 +58,11 @@ def main() -> int:
         return stopping
     if args.once:
         with session_factory() as db:
-            return 0 if run_once(db, pipeline, should_stop=should_stop,
-                                 heartbeat_callback=beat) else 3
+            worked = run_once(db, pipeline, should_stop=should_stop, heartbeat_callback=beat)
+        return 0 if worked or run_conversation_once(session_factory, should_stop=should_stop) else 3
     run_loop(session_factory, pipeline, should_stop=should_stop,
-             poll_seconds=args.poll_seconds)
+             poll_seconds=args.poll_seconds,
+             additional_work=lambda: run_conversation_once(session_factory, should_stop=should_stop))
     return 0
 
 

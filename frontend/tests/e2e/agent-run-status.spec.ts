@@ -219,3 +219,30 @@ test("changing jobs prevents a late prior run response from appearing", async ({
   await page.waitForTimeout(150);
   await expect(page.getByText("Loading context", { exact: true })).toHaveCount(0);
 });
+
+for (const width of [390, 1440]) test(`v2 task lineage and budgets fit at ${width}px`, async ({ page }) => {
+  await page.setViewportSize({ width, height: 950 });
+  await page.route("**/api/v1/**", async route => {
+    const path = new URL(route.request().url()).pathname.replace("/api/v1", "");
+    if (path === `/jobs/${jobId}/agent-run`) return route.fulfill({ json: status("running", {
+      graph_version: "report-analysis-v2", current_stage: "Analyzing report",
+      tasks: [
+        { id: "root", parent_task_id: null, role: "root", status: "running", attempt: 1, outcome: null },
+        { id: "analysis", parent_task_id: "root", role: "analysis", status: "running", attempt: 1, outcome: null },
+        { id: "matching", parent_task_id: "analysis", role: "matching", status: "running", attempt: 1, outcome: null },
+        { id: "selection", parent_task_id: "matching", role: "selection", status: "succeeded", attempt: 2, outcome: "unresolved" },
+      ],
+      hierarchy_usage: { delegations: 4, supervisor_transitions: 2, model_calls: 3, tool_calls: 5 },
+    }) });
+    if (await baseApi(route, path)) return;
+    throw new Error(`Unexpected API request ${path}`);
+  });
+  await enterJob(page);
+  const hierarchy = page.getByRole("list", { name: "Agent task hierarchy" });
+  await expect(hierarchy).toBeVisible();
+  await expect(hierarchy.getByText("Selection", { exact: true })).toBeVisible();
+  await expect(hierarchy.getByText("Unresolved", { exact: true })).toBeVisible();
+  await expect(hierarchy.getByText("Attempt 2")).toBeVisible();
+  await expect(page.getByLabel("Hierarchy budget usage")).toContainText("3 / 806");
+  expect(await page.evaluate(() => document.documentElement.scrollWidth <= innerWidth)).toBe(true);
+});

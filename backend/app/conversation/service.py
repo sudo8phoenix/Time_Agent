@@ -11,10 +11,11 @@ from sqlalchemy import select
 from sqlalchemy.orm import Session
 
 from ..agent.schedule_decision import candidate_for_activity, shortlist_activities, select_activity, has_location_conflict
+from ..agent.specialists import ExtractionInput, SelectionInput, extract_source, select_source
 from ..db.models import (Activity, Conversation, ConversationTurn, Fragment, Job,
                          Observation as StoredObservation, Project, Proposal, Report, User)
 from ..llm.extract import FragmentInput, extract_fragments, deduplicate_results
-from ..llm.ollama import OllamaChatAdapter
+from ..llm.provider import create_adapter
 from ..progress.effects import build_effects
 from ..schemas.observation import Observation
 from ..schemas.matching import Proposal as SelectionProposal
@@ -46,10 +47,15 @@ def add_turn(db: Session, conversation: Conversation, role: str, text: str, acto
 
 def _model_call():
     settings = get_settings()
-    adapter = OllamaChatAdapter(settings.ollama_base_url, settings.ollama_model,
-                                timeout=settings.conversation_model_timeout_seconds, max_retries=0,
-                                bearer_token=settings.ollama_api_key.get_secret_value() if settings.ollama_api_key else None)
+    adapter = create_adapter(settings, timeout=settings.conversation_model_timeout_seconds,
+                             role="extraction" if settings.agent_hierarchy_enabled else None)
     return adapter.chat
+
+
+def _selection_model_call():
+    settings = get_settings()
+    return create_adapter(settings, timeout=settings.conversation_model_timeout_seconds,
+                          role="selection" if settings.agent_hierarchy_enabled else None).chat
 
 
 def _date_from_answer(text: str) -> date | None:
@@ -110,10 +116,31 @@ def _quoted_exact_candidates(observation: Observation, activities: list[Activity
     return matches if len(matches) == 1 else None
 
 
-def analyze(db: Session, conversation: Conversation, *, model_call=None) -> None:
+def analyze(db: Session, conversation: Conversation, *, model_call=None,
+            selection_call_override=None, hierarchy_enabled=None, extraction_prompt_version=None) -> None:
     """Recompute draft cards from immutable user turns. Failed model calls leave turns retryable."""
+    settings = get_settings()
+    hierarchical = settings.agent_hierarchy_enabled if hierarchy_enabled is None else hierarchy_enabled
     history = [row for row in turns(db, conversation) if row.role == "user"]
     draft = dict(conversation.draft or {})
+    if conversation.job_id:
+        # Confirmation already handed this conversation off to the review queue.
+        # Re-analysis must never create another report/job/proposal set.
+        return
+    project = db.get(Project, conversation.project_id)
+    if not project or project.active_schedule_version_id != conversation.schedule_version_id:
+        draft.pop("events", None)
+        draft.pop("hierarchy_waiting", None)
+        draft["stale_schedule"] = True
+        conversation.draft = draft
+        conversation.pending_question = "retry"
+        return
+    draft.pop("stale_schedule", None)
+    if hierarchical:
+        draft["hierarchy_waiting"] = {
+            "stage": "awaiting_clarification", "schedule_version_id": str(conversation.schedule_version_id),
+            "source_turn_ids": [str(row.id) for row in history],
+        }
     report_date = date.fromisoformat(draft["report_date"]) if draft.get("report_date") else None
     if conversation.pending_question == "date" and history and not report_date:
         answer = _date_from_answer(history[-1].text)
@@ -144,8 +171,16 @@ def analyze(db: Session, conversation: Conversation, *, model_call=None) -> None
         response = raw_call(**kwargs)
         call_trace.append(call_metadata(kwargs, response))
         return response
-    results = extract_fragments(fragments, call, report_date=report_date,
-                                report_date_trusted=bool(report_date))
+    if hierarchical:
+        results = extract_source(ExtractionInput(tuple(fragments), report_date, bool(report_date), extraction_prompt_version), call)
+        draft["hierarchy_waiting"] = {
+            "stage": "analysis",
+            "schedule_version_id": str(conversation.schedule_version_id),
+            "source_turn_ids": [str(row.id) for row in history],
+        }
+    else:
+        results = extract_fragments(fragments, call, report_date=report_date,
+                                    report_date_trusted=bool(report_date), prompt_version=extraction_prompt_version)
     draft["extraction_metadata"] = [vars(result.metadata) for result in results]
     draft["extraction_errors"] = [error for result in results for error in result.errors]
     all_observations = deduplicate_results(results)
@@ -154,27 +189,52 @@ def analyze(db: Session, conversation: Conversation, *, model_call=None) -> None
     if not observations:
         conversation.pending_question = None if all_observations else "work" if report_date else "date"
         draft["events"] = []
+        if hierarchical:
+            draft["hierarchy_waiting"] = {
+                "stage": "awaiting_clarification",
+                "schedule_version_id": str(conversation.schedule_version_id),
+                "source_turn_ids": [str(row.id) for row in history],
+            }
         conversation.draft = draft
         return
     activities = list(db.scalars(select(Activity).where(
         Activity.schedule_version_id == conversation.schedule_version_id,
-        Activity.is_leaf.is_(True))))
+        Activity.is_leaf.is_(True)).order_by(Activity.id)))
     from ..agent.project_aliases import with_project_aliases
     activities = with_project_aliases(db, conversation.project_id, activities)
     cards = []
     fragment_map = {item.fragment_id: item.text for item in fragments}
+    selection_call = selection_call_override or model_call or (_selection_model_call() if hierarchical else raw_call)
+    def selection_model_call(**kwargs):
+        from ..confidence.provenance import call_metadata
+        response = selection_call(**kwargs)
+        call_trace.append(call_metadata(kwargs, response))
+        return response
     for observation in observations:
         effect = build_effects(observation)
         if observation.event_type.value in {"actual_start", "actual_finish"} and not effect:
             conversation.pending_question = ("scope" if observation.event_type.value == "actual_finish" and
                                              (report_date or observation.work_date) else "date")
+            if hierarchical:
+                draft["hierarchy_waiting"] = {
+                    "stage": "awaiting_clarification",
+                    "schedule_version_id": str(conversation.schedule_version_id),
+                    "source_turn_ids": [str(row.id) for row in history],
+                }
             conversation.draft = draft
             return
+        shortlist_call = selection_model_call if hierarchical else call
         candidates = (_quoted_exact_candidates(observation, activities, fragment_map) or
                       shortlist_activities(observation, conversation.schedule_version_id,
-                                           activities, model_call=call))
-        decision = (_exact_selection(observation, candidates, fragment_map) or
-                    select_activity(observation, candidates, fragment_map, model_call=call))
+                                           activities, model_call=shortlist_call))
+        exact = _exact_selection(observation, candidates, fragment_map)
+        if exact:
+            decision = exact
+        elif hierarchical:
+            decision = select_source(SelectionInput(observation, tuple(candidates), fragment_map),
+                                     service=select_activity, model_call=selection_model_call)
+        else:
+            decision = select_activity(observation, candidates, fragment_map, model_call=call)
         cards.append({
             "observation": observation.model_dump(mode="json"),
             "effect": effect,
@@ -199,6 +259,15 @@ def analyze(db: Session, conversation: Conversation, *, model_call=None) -> None
         conversation.pending_question = "scope"
     else:
         conversation.pending_question = None
+    if hierarchical:
+        # This is a durable, lease-free waiting reference. Each new turn rebuilds
+        # extraction and matching from the complete immutable user history.
+        draft["hierarchy_waiting"] = {
+            "stage": "awaiting_clarification" if conversation.pending_question else "awaiting_confirmation",
+            "schedule_version_id": str(conversation.schedule_version_id),
+            "source_turn_ids": [str(row.id) for row in history],
+        }
+        conversation.draft = draft
 
 
 def payload(db: Session, conversation: Conversation) -> dict:
@@ -235,6 +304,9 @@ def payload(db: Session, conversation: Conversation) -> dict:
 
 
 def confirm(db: Session, conversation: Conversation, user: User, indexes: list[int] | None):
+    if conversation.job_id:
+        # The handoff is already durable; a retry returns the existing review state.
+        return
     cards = (conversation.draft or {}).get("events", [])
     selected = list(range(len(cards))) if indexes is None else indexes
     if not cards or not selected or len(set(selected)) != len(selected) or any(i < 0 or i >= len(cards) for i in selected):

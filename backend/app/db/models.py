@@ -283,6 +283,63 @@ class AgentRun(Base):
         passive_deletes=True,
         order_by="AgentStep.ordinal",
     )
+    tasks: Mapped[list["AgentTask"]] = relationship(
+        back_populates="run", cascade="all, delete-orphan", passive_deletes=True
+    )
+
+
+class AgentTask(Base):
+    """Durable, sanitized identity and outcome record for one delegated task."""
+
+    __tablename__ = "agent_tasks"
+    __table_args__ = (
+        UniqueConstraint("run_id", "parent_task_id", "agent_role", "attempt", "observation_key",
+                         name="uq_agent_tasks_identity"),
+        CheckConstraint("attempt >= 1", name="ck_agent_tasks_attempt_positive"),
+        CheckConstraint(
+            "status IN ('running', 'succeeded', 'failed', 'skipped')",
+            name="ck_agent_tasks_status",
+        ),
+        CheckConstraint(
+            "status = 'running' OR finished_at IS NOT NULL",
+            name="ck_agent_tasks_finished_state",
+        ),
+        Index("ix_agent_tasks_run_parent", "run_id", "parent_task_id"),
+        Index("ix_agent_tasks_run_role", "run_id", "agent_role"),
+    )
+
+    id: Mapped[UUID] = mapped_column(primary_key=True, default=uuid4)
+    run_id: Mapped[UUID] = mapped_column(
+        ForeignKey("agent_runs.id", ondelete="CASCADE"), nullable=False
+    )
+    parent_task_id: Mapped[UUID | None] = mapped_column(
+        ForeignKey("agent_tasks.id", ondelete="CASCADE"), nullable=True
+    )
+    agent_role: Mapped[str] = mapped_column(String(32), nullable=False)
+    project_id: Mapped[UUID] = mapped_column(ForeignKey("projects.id", ondelete="CASCADE"), nullable=False)
+    source_id: Mapped[UUID] = mapped_column(nullable=False)
+    schedule_version_id: Mapped[UUID] = mapped_column(
+        ForeignKey("schedule_versions.id", ondelete="CASCADE"), nullable=False
+    )
+    observation_key: Mapped[str | None] = mapped_column(String(100))
+    attempt: Mapped[int] = mapped_column(Integer, nullable=False)
+    contract_version: Mapped[str] = mapped_column(String(80), nullable=False)
+    input_fingerprint: Mapped[str] = mapped_column(String(64), nullable=False)
+    input_references: Mapped[list] = mapped_column(JSON, default=list, nullable=False)
+    output_references: Mapped[list] = mapped_column(JSON, default=list, nullable=False)
+    evidence_references: Mapped[list] = mapped_column(JSON, default=list, nullable=False)
+    warnings: Mapped[list] = mapped_column(JSON, default=list, nullable=False)
+    actual_usage: Mapped[dict] = mapped_column(JSON, default=dict, nullable=False)
+    safe_summary: Mapped[dict] = mapped_column(JSON, default=dict, nullable=False)
+    status: Mapped[str] = mapped_column(String(16), default="running", nullable=False)
+    outcome: Mapped[str | None] = mapped_column(String(32))
+    error_code: Mapped[str | None] = mapped_column(String(100))
+    started_at: Mapped[datetime] = mapped_column(
+        DateTime(timezone=True), server_default=func.now(), nullable=False
+    )
+    finished_at: Mapped[datetime | None] = mapped_column(DateTime(timezone=True))
+
+    run: Mapped[AgentRun] = relationship(back_populates="tasks")
 
 
 class AgentStep(Base):
@@ -590,3 +647,52 @@ class ReportMapping(Base):
     spec: Mapped[dict] = mapped_column(JSON)
     actor_id: Mapped[UUID] = mapped_column(ForeignKey("users.id"))
     created_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), server_default=func.now())
+
+
+class ConversationTask(Base):
+    """Private, versioned analysis journal; never exposed through agent trace APIs."""
+    __tablename__ = "conversation_tasks"
+    __table_args__ = (
+        UniqueConstraint("conversation_id", "input_revision"),
+        CheckConstraint("attempts >= 0 AND model_calls >= 0", name="ck_conversation_task_usage"),
+        CheckConstraint("state IN ('queued', 'running', 'succeeded', 'failed', 'stale', 'cancelled')",
+                        name="ck_conversation_task_state"),
+        Index("ix_conversation_tasks_pending", "state", "next_attempt_at"),
+    )
+    id: Mapped[UUID] = mapped_column(primary_key=True, default=uuid4)
+    conversation_id: Mapped[UUID] = mapped_column(ForeignKey("conversations.id", ondelete="CASCADE"))
+    schedule_version_id: Mapped[UUID] = mapped_column(ForeignKey("schedule_versions.id"))
+    input_revision: Mapped[int] = mapped_column(Integer)
+    version: Mapped[str] = mapped_column(String(40))
+    input_fingerprint: Mapped[str] = mapped_column(String(64))
+    config: Mapped[dict] = mapped_column(JSON)
+    state: Mapped[str] = mapped_column(String(16), default="queued")
+    attempts: Mapped[int] = mapped_column(Integer, default=0)
+    model_calls: Mapped[int] = mapped_column(Integer, default=0)
+    lease_token: Mapped[str | None] = mapped_column(String(64))
+    lease_expires_at: Mapped[datetime | None] = mapped_column(DateTime(timezone=True))
+    next_attempt_at: Mapped[datetime] = mapped_column(DateTime(timezone=True))
+    deadline_at: Mapped[datetime] = mapped_column(DateTime(timezone=True))
+    error_code: Mapped[str | None] = mapped_column(String(80))
+    created_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), server_default=func.now())
+
+
+class ConversationTaskCall(Base):
+    """Successful call checkpoints plus failed/in-flight reservations."""
+    __tablename__ = "conversation_task_calls"
+    __table_args__ = (UniqueConstraint("task_id", "ordinal"),)
+    id: Mapped[UUID] = mapped_column(primary_key=True, default=uuid4)
+    task_id: Mapped[UUID] = mapped_column(ForeignKey("conversation_tasks.id", ondelete="CASCADE"))
+    ordinal: Mapped[int] = mapped_column(Integer)
+    role: Mapped[str] = mapped_column(String(20))
+    input_fingerprint: Mapped[str] = mapped_column(String(64))
+    result: Mapped[dict | None] = mapped_column(JSON)
+
+
+class HostedProviderAdmission(Base):
+    """Private numeric quota state, shared across this deployment's workers."""
+    __tablename__ = "hosted_provider_admission"
+    provider: Mapped[str] = mapped_column(String(20), primary_key=True)
+    owner: Mapped[str | None] = mapped_column(String(36))
+    lease_expires_at: Mapped[datetime | None] = mapped_column(DateTime(timezone=True))
+    state: Mapped[dict] = mapped_column(JSON, nullable=False, default=dict)

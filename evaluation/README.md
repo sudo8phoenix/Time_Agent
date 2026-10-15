@@ -82,3 +82,34 @@ The genuine UI-to-export capture contract is described in [E02](../docs/handoffs
 Independent label adjudication, reviewed/frozen splits, target agreement and
 calibration remain separate gates. The [targets](../docs/evaluation-targets-draft.md)
 are an unapproved draft and have not been tuned to this compact benchmark.
+
+
+## Hierarchical report planner evaluation
+
+[The Super VL report evaluation](results/report-planner-super-vl-2026-10-15/REPORT.md) records the live independent report pair, exact-payload specialist replay fixtures, retained failures/retries, and rollout limitations. Discovery requests are byte bounded; the evaluation transport observes provider quota headers without credential rotation.
+
+To reproduce the controlled matrix with synthetic inputs and the isolated local database:
+
+```sh
+.venv/bin/python -m evaluation.report_planner_eval \
+  --output-dir evaluation/results/NEW_PLANNER_CAPTURE \
+  --dataset seed --replay-specialists --timeout 60
+```
+
+The baseline makes live Groq requests. Candidate specialist responses are replayed only for identical payload fingerprints; Super VL planner calls stay live. This checks orchestration parity and does not establish an independent specialist quality or latency ranking. Labels never enter model inputs. Every new run must use a new capture directory; failed first attempts remain evidence.
+
+## Report scoring and provider capacity — 16 October
+
+`report_scoring.py` adds versioned normalized quantity/effect safety, exact activity-set coverage and atomic-event metrics while retaining historical raw scores. `report-scoring-v3` uses the production reducer's documented unit conversions, so `0.5 t` and `500 kg` compare correctly without allowing mass/volume guesses. Planned/no-work/delivery quantities are tested against normalized non-progress behavior separately from literal source-quantity recall.
+
+`reviews/seed-source-review-2026-10-16.json` contains separate source-level technical notes, explicitly not human adjudication. Apply them to saved evidence without editing the original capture:
+
+```sh
+PYTHONPATH=backend .venv/bin/python -m evaluation.review_saved_reports \
+  --capture-dir evaluation/results/EXISTING_CAPTURE \
+  --output-dir evaluation/results/NEW_REVIEW
+```
+
+Add `--deterministic-planner` to `report_planner_eval` for v2 deterministic orchestration. These rows are named `v2_deterministic`; they do not consume OpenRouter planner quota. Report captures now retain sanitized ownership snapshots and use the production heartbeat primitive in an independent thread. Successful specialist replay still requires identical complete payloads; failed transport replay preserves its error type rather than inventing HTTP 599.
+
+See [provider capacity and policy](../docs/provider-capacity.md) for the bounded live probes, per-process admission guard, deterministic fault coverage, unchanged fallback identity and remaining deployment-level limits.

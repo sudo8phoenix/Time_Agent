@@ -7,6 +7,7 @@ from sqlalchemy import select
 from sqlalchemy.orm import Session
 
 from ...conversation.service import QUESTIONS, add_turn, analyze, confirm, payload
+from ...conversation.runtime import VERSION, durable, enqueue, retry_analysis
 from ...agent.schedule_decision import AgentDecisionError
 from ...llm.extract import ExtractionError
 from ...llm.ollama import OllamaError
@@ -16,6 +17,7 @@ from ...schemas.conversation import (ConversationDecision, ConversationEdit,
                                      ConversationMessage, ConversationView)
 from ...schemas.observation import Observation
 from ...progress.effects import build_effects
+from ...settings import get_settings
 from ..dependencies import current_user, project_access, require_csrf
 
 router = APIRouter(prefix="/projects/{project_id}/conversations", tags=["conversations"])
@@ -35,6 +37,8 @@ def _conversation(db: Session, project: Project, conversation_id: UUID, user: Us
 def _revision(row: Conversation, expected: int):
     if row.revision != expected:
         raise HTTPException(409, detail={"code": "STALE_CONVERSATION", "revision": row.revision})
+    if row.status == "analyzing":
+        raise HTTPException(409, detail={"code": "CONVERSATION_ANALYSIS_RUNNING"})
     if row.status != "draft":
         raise HTTPException(409, detail={"code": "CONVERSATION_ALREADY_SUBMITTED"})
 
@@ -55,7 +59,8 @@ def create_conversation(project: Project = Depends(project_access),
         raise HTTPException(409, detail={"code": "PROJECT_HAS_NO_ACTIVE_SCHEDULE"})
     row = Conversation(project_id=project.id, creator_id=user.id,
                        schedule_version_id=project.active_schedule_version_id,
-                       revision=0, status="draft", draft={})
+                       revision=0, status="draft", draft={"orchestration_version": VERSION}
+                       if get_settings().agent_hierarchy_enabled else {})
     db.add(row)
     db.flush()
     return payload(db, row)
@@ -80,6 +85,9 @@ def message(conversation_id: UUID, body: ConversationMessage,
     if body.report_date:
         draft["report_date"] = body.report_date.isoformat()
         row.draft = draft
+    if durable(row):
+        enqueue(db, row)
+        return payload(db, row)
     try:
         analyze(db, row)
     except (OllamaError, ExtractionError, AgentDecisionError, ValueError):
@@ -105,6 +113,9 @@ def retry(conversation_id: UUID, body: ConversationDecision,
     _revision(row, body.expected_revision)
     if project.active_schedule_version_id != row.schedule_version_id:
         raise HTTPException(409, detail={"code": "STALE_SCHEDULE"})
+    if durable(row):
+        retry_analysis(db, row)
+        return payload(db, row)
     try:
         analyze(db, row)
     except (OllamaError, ExtractionError, AgentDecisionError, ValueError):
@@ -122,6 +133,8 @@ def edit(conversation_id: UUID, body: ConversationEdit,
          db: Session = Depends(get_session)):
     row = _conversation(db, project, conversation_id, user, lock=True)
     _revision(row, body.expected_revision)
+    if project.active_schedule_version_id != row.schedule_version_id:
+        raise HTTPException(409, detail={"code": "STALE_SCHEDULE"})
     draft = dict(row.draft or {})
     cards = list(draft.get("events", []))
     if body.event_index >= len(cards):
@@ -234,7 +247,10 @@ def cancel(conversation_id: UUID, body: ConversationDecision,
            project: Project = Depends(project_access), user: User = Depends(require_csrf),
            db: Session = Depends(get_session)):
     row = _conversation(db, project, conversation_id, user, lock=True)
-    _revision(row, body.expected_revision)
+    if row.revision != body.expected_revision:
+        raise HTTPException(409, detail={"code": "STALE_CONVERSATION", "revision": row.revision})
+    if row.status not in {"draft", "analyzing"}:
+        raise HTTPException(409, detail={"code": "CONVERSATION_ALREADY_SUBMITTED"})
     row.status = "cancelled"
     row.revision += 1
     db.flush()

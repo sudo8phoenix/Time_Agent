@@ -26,6 +26,9 @@ class AgentTraceState(str, Enum):
 
 
 class AgentNode(str, Enum):
+    intake = "intake"
+    analysis = "analysis"
+    review = "review"
     load_context = "load_context"
     extract = "extract"
     validate_extraction = "validate_extraction"
@@ -41,6 +44,7 @@ class AgentNode(str, Enum):
 
 class PublicAgentStage(str, Enum):
     loading_context = "Loading context"
+    analyzing_report = "Analyzing report"
     extracting_observations = "Extracting observations"
     validating_evidence = "Validating evidence"
     retrieving_schedule_candidates = "Retrieving schedule candidates"
@@ -59,7 +63,47 @@ class AgentCounters(StrictModel):
     corrective_retries: int = Field(ge=0, le=2)
 
 
+class AgentTaskRole(str, Enum):
+    root = "root"
+    intake = "intake"
+    analysis = "analysis"
+    review = "review"
+    clarification = "clarification"
+    extraction = "extraction"
+    matching = "matching"
+    evidence = "evidence"
+    selection = "selection"
+
+
+class AgentTaskOutcome(str, Enum):
+    completed = "completed"
+    needs_clarification = "needs_clarification"
+    retryable_failure = "retryable_failure"
+    failed = "failed"
+    stale = "stale"
+    unresolved = "unresolved"
+
+
+class AgentTaskStatus(StrictModel):
+    id: UUID
+    parent_task_id: UUID | None = None
+    role: AgentTaskRole
+    status: AgentTraceState
+    attempt: int = Field(ge=1, le=100)
+    outcome: AgentTaskOutcome | None = None
+
+
+class AgentHierarchyUsage(StrictModel):
+    delegations: int = Field(ge=0, le=1300)
+    supervisor_transitions: int = Field(ge=0, le=12)
+    model_calls: int = Field(ge=0, le=806)
+    tool_calls: int = Field(ge=0, le=1010)
+
+
 _NODE_LABELS: dict[AgentNode, frozenset[PublicAgentStage]] = {
+    AgentNode.intake: frozenset({PublicAgentStage.loading_context}),
+    AgentNode.analysis: frozenset({PublicAgentStage.analyzing_report}),
+    AgentNode.review: frozenset({PublicAgentStage.saving_for_review}),
     AgentNode.load_context: frozenset({PublicAgentStage.loading_context}),
     AgentNode.extract: frozenset({PublicAgentStage.extracting_observations}),
     AgentNode.validate_extraction: frozenset({PublicAgentStage.validating_evidence}),
@@ -105,6 +149,8 @@ class AgentRunStatus(StrictModel):
     current_stage: PublicAgentStage | None
     counters: AgentCounters
     steps: list[AgentStepStatus] = Field(max_length=16)
+    tasks: list[AgentTaskStatus] = Field(default_factory=list, max_length=1301)
+    hierarchy_usage: AgentHierarchyUsage | None = None
     error_code: str | None = Field(default=None, min_length=1, max_length=100)
     error_message: str | None = Field(default=None, min_length=1, max_length=1000)
     started_at: datetime

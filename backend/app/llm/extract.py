@@ -10,14 +10,14 @@ import json
 import re
 from decimal import Decimal, InvalidOperation
 from dataclasses import dataclass
-from datetime import date
+from datetime import date, timedelta
 from typing import Any, Callable, Mapping, Sequence
 
 from pydantic import ValidationError
 
 from ..schemas.observation import Observation, ObservationBatch
 from ..schemas.common import EventType, DateBasis, QuantityKind
-from ..prompts.extraction_v1 import PROMPT_VERSION, SYSTEM_PROMPT
+from ..prompts.extraction_v1 import LEGACY_PROMPT_VERSION, V11_PROMPT_VERSION, get_extraction_prompt
 
 MAX_BATCH_CHARS = 12000
 MAX_FRAGMENTS = 8
@@ -97,10 +97,105 @@ def _context(batch: BatchInput) -> str:
     return header + "\n\n".join(f"[{f.fragment_id} | {f.locator}]\n{f.text}" for f in batch.fragments)
 
 
-def _resolve_relative(value: date | None, basis: DateBasis, batch: BatchInput) -> tuple[date | None, DateBasis]:
-    if value is not None:
-        return value, basis
-    return value, basis
+def _restore_non_actual_date(observation: Observation, batch: BatchInput) -> Observation:
+    """Restore one unambiguous relative day from validated quoted source only."""
+    if (observation.event_type not in {EventType.planned_work, EventType.material_delivery}
+            or observation.work_date is not None or observation.date_basis != DateBasis.unknown
+            or not batch.report_date_trusted or batch.report_date is None
+            or _conflicting_today_context(observation, batch)):
+        return observation
+    offsets = {"yesterday": -1, "today": 0, "tomorrow": 1}
+    chosen = []
+    for evidence in observation.evidence:
+        quote = evidence.quote
+        words = re.findall(r"\b(yesterday|today|tomorrow)\b", quote, re.I)
+        if not words:
+            continue
+        # Conflicting dates, alternatives, negation and loose historical phrasing
+        # need clarification rather than deterministic date inference.
+        if (re.search(r"\b(?:not|never|no|or|maybe|possibly|unclear|typo|before|after|until|since|by)\b", quote, re.I)
+                or re.search(r"\b\d{4}-\d{2}-\d{2}\b|\d[/-]\d|\b(?:Jan(?:uary)?|Feb(?:ruary)?|Mar(?:ch)?|Apr(?:il)?|May|Jun(?:e)?|Jul(?:y)?|Aug(?:ust)?|Sep(?:tember)?|Oct(?:ober)?|Nov(?:ember)?|Dec(?:ember)?)\b", quote, re.I)):
+            return observation
+        chosen.extend((offsets[word.lower()], evidence) for word in words)
+    if not chosen or len({offset for offset, _ in chosen}) != 1:
+        return observation
+    try:
+        resolved = batch.report_date + timedelta(days=chosen[0][0])
+    except OverflowError:
+        return observation
+    evidence = list(observation.evidence)
+    index = evidence.index(chosen[0][1])
+    if "work_date" not in evidence[index].fields and len(evidence[index].fields) < 30:
+        evidence[index] = evidence[index].model_copy(update={"fields": [*evidence[index].fields, "work_date"]})
+    return observation.model_copy(update={"work_date": resolved,
+        "date_basis": DateBasis.relative_resolved, "evidence": evidence})
+
+
+def _warn_missing_constraint(observations: list[Observation], batch: BatchInput, *, extended: bool = False) -> list[Observation]:
+    """Flag a clearly stated present/past stoppage with no blocker observation.
+
+    This is a conservative presence check, not semantic adjudication. It never
+    constructs a blocker, activity match, date or progress effect from a regex.
+    """
+    missing = set()
+    for fragment in batch.fragments:
+        clauses = re.split(r"[;\n.!?]", fragment.text)
+        explicit = False
+        for clause in clauses:
+            match = re.search(r"\b(?:stopped|halted|suspended|blocked|held)\s+(?:due to|because(?: of)?|by|for lack of)\b", clause, re.I)
+            if match and not re.search(r"\b(?:not|never|no|will|would|could|may|if|might)\b", clause[:match.start()], re.I):
+                explicit = True
+        if extended:
+            # A source-stated work stoppage need not put its cause after the verb.
+            for clause in clauses:
+                match = re.search(r"\b(?:work|testing|welding|fixing|erection|installation|painting|pouring)\s+(?:was |is |has been |had been )?(?:stopped|halted|suspended|blocked|held)\b", clause, re.I)
+                if match and not re.search(r"\b(?:not|never|no|will|would|could|may|if|might|whether|example|say|said|instruction)\b", clause, re.I):
+                    explicit = True
+            explicit = explicit or any(o.event_type != EventType.blocker and o.blocker and any(
+                e.fragment_id == fragment.fragment_id for e in o.evidence) for o in observations)
+        covered = any(o.event_type == EventType.blocker and any(
+            e.fragment_id == fragment.fragment_id for e in o.evidence) for o in observations)
+        if explicit and not covered:
+            missing.add(fragment.fragment_id)
+    warning = "Source-stated work constraint has no separate blocker observation; reviewer clarification required."
+    result = []
+    for observation in observations:
+        if any(e.fragment_id in missing for e in observation.evidence) and warning not in observation.warnings:
+            observation = observation.model_copy(update={"warnings": [*observation.warnings[:29], warning]})
+        result.append(observation)
+    return result
+
+
+def _repair_decorated_fragment_ids(observation: Observation, batch: BatchInput) -> Observation:
+    """Unwrap only an exact supplied header with an exact, unique body quote.
+
+    Never guess a source from its text or modify an evidence quote. A warning
+    preserves reviewer visibility of this model-format repair.
+    """
+    decorated = {}
+    for fragment in batch.fragments:
+        for key in (f"{fragment.fragment_id} | {fragment.locator}",
+                    f"[{fragment.fragment_id} | {fragment.locator}]"):
+            decorated[key] = fragment
+    canonical_ids = {fragment.fragment_id for fragment in batch.fragments}
+    changed = False
+    def repair(evidence):
+        nonlocal changed
+        if evidence.fragment_id in canonical_ids:
+            return evidence
+        fragment = decorated.get(evidence.fragment_id)
+        if fragment and fragment.text.count(evidence.quote) == 1:
+            changed = True
+            return evidence.model_copy(update={"fragment_id": fragment.fragment_id})
+        return evidence
+    evidence = [repair(e) for e in observation.evidence]
+    effects = [effect.model_copy(update={"evidence": [repair(e) for e in effect.evidence]})
+               for effect in observation.lifecycle_effects]
+    if not changed:
+        return observation
+    return observation.model_copy(update={"evidence": evidence, "lifecycle_effects": effects,
+        "warnings": [*observation.warnings[:29],
+            "Evidence fragment identifier restored from an exact supplied header; reviewer verification required."]})
 
 
 def _validate_evidence(observation: Observation, fragments: Sequence[FragmentInput]) -> None:
@@ -254,18 +349,39 @@ def _repair_source_stated_clock(raw: Any) -> Any:
     return repaired
 
 
+def _conflicting_today_context(observation: Observation, batch: BatchInput) -> bool:
+    """Check explicit present-day anchors, not arbitrary dates of historical work."""
+    fragment_ids = {e.fragment_id for e in observation.evidence}
+    anchors = {batch.report_date} if batch.report_date_trusted and batch.report_date else set()
+    pattern = r"\b(?:today(?:\s+is)?|(?:source|report)\s+(?:header|date))\s*[:=-]?\s*(\d{4}-\d{2}-\d{2})\b"
+    for fragment in batch.fragments:
+        if fragment.fragment_id not in fragment_ids:
+            continue
+        for raw in re.findall(pattern, fragment.text, flags=re.I):
+            try:
+                anchors.add(date.fromisoformat(raw))
+            except ValueError:
+                continue
+    return len(anchors) > 1
+
+
 def extract_batch(batch: BatchInput, model_call: ModelCall, *, model: str = "unknown",
                  model_digest: str | None = None, runtime: str | None = None,
-                 settings: Mapping[str, Any] | None = None) -> ExtractionResult:
+                 settings: Mapping[str, Any] | None = None,
+                 prompt_version: str | None = None) -> ExtractionResult:
     """Call an injected model, validate output/evidence, resolve supported dates, dedupe."""
+    try:
+        prompt_version, system_prompt = get_extraction_prompt(prompt_version)
+    except ValueError as exc:
+        raise ExtractionError(str(exc)) from None
     settings = dict(settings or {"temperature": 0.0})
     user = _context(batch)
-    prompt_hash = _hash({"system": SYSTEM_PROMPT, "user": user})
+    prompt_hash = _hash({"system": system_prompt, "user": user})
     settings_hash = _hash(settings)
     try:
-        raw = model_call(system=SYSTEM_PROMPT, user=user, schema=extraction_schema(), settings=settings)
+        raw = model_call(system=system_prompt, user=user, schema=extraction_schema(), settings=settings)
     except TypeError:
-        raw = model_call(SYSTEM_PROMPT, user, extraction_schema(), settings)
+        raw = model_call(system_prompt, user, extraction_schema(), settings)
     if hasattr(raw, "value"):
         model_digest = getattr(raw, "model_digest", model_digest)
         runtime = getattr(raw, "runtime", runtime)
@@ -281,10 +397,24 @@ def extract_batch(batch: BatchInput, model_call: ModelCall, *, model: str = "unk
     errors: list[str] = []
     for observation in parsed.observations:
         try:
+            if prompt_version == V11_PROMPT_VERSION:
+                observation = _repair_decorated_fragment_ids(observation, batch)
             _validate_evidence(observation, batch.fragments)
+            date_conflict = observation.date_basis == DateBasis.conflicting or _conflicting_today_context(observation, batch)
+            if date_conflict:
+                observation = observation.model_copy(update={
+                    "work_date": None, "date_basis": DateBasis.unknown,
+                    "actual_start": None, "actual_finish": None, "lifecycle_effects": [],
+                    "warnings": [*observation.warnings[:29],
+                        "Conflicting report/current-day dates require reviewer clarification."],
+                })
+            if prompt_version != LEGACY_PROMPT_VERSION and not date_conflict:
+                observation = _restore_non_actual_date(observation, batch)
             unsupported_context = (
                 observation.date_basis in {DateBasis.report_context, DateBasis.relative_resolved}
-                and not batch.report_date_trusted
+                and (not batch.report_date_trusted or (
+                    observation.date_basis == DateBasis.report_context and
+                    observation.work_date != batch.report_date))
             ) or any(
                 effect.endpoint.basis == "report_context"
                 and (not batch.report_date_trusted or effect.endpoint.local_date != batch.report_date)
@@ -321,7 +451,15 @@ def extract_batch(batch: BatchInput, model_call: ModelCall, *, model: str = "unk
                 accepted.append(observation)
         except ExtractionError as exc:
             errors.append(str(exc))
-    metadata = ExtractionMetadata(PROMPT_VERSION, prompt_hash, settings_hash, model, model_digest, runtime, batch.batch_id)
+    if prompt_version != LEGACY_PROMPT_VERSION:
+        accepted = _warn_missing_constraint(accepted, batch, extended=prompt_version == V11_PROMPT_VERSION)
+        if prompt_version == V11_PROMPT_VERSION and errors:
+            # A rejected sibling may be a separate constraint or activity. Prevent
+            # partial success from silently approving only the retained work.
+            accepted = [o.model_copy(update={"warnings": [*o.warnings[:29],
+                "Some source observations failed evidence validation; reviewer completeness check required."]})
+                for o in accepted]
+    metadata = ExtractionMetadata(prompt_version, prompt_hash, settings_hash, model, model_digest, runtime, batch.batch_id)
     return ExtractionResult(tuple(accepted), metadata, tuple(errors))
 
 

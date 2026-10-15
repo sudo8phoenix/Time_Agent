@@ -102,7 +102,8 @@ def run_once(db: Session, pipeline: Pipeline, *, should_stop: Callable[[], bool]
 
 
 def run_loop(session_factory: Callable[[], Session], pipeline: Pipeline, *,
-             should_stop: Callable[[], bool], poll_seconds: float = 2.0) -> None:
+             should_stop: Callable[[], bool], poll_seconds: float = 2.0,
+             additional_work: Callable[[], bool] | None = None) -> None:
     """Poll durably; heartbeat sessions stay independent from job processing."""
     import time
 
@@ -116,5 +117,7 @@ def run_loop(session_factory: Callable[[], Session], pipeline: Pipeline, *,
         with session_factory() as db:
             worked = run_once(db, pipeline, should_stop=should_stop,
                               heartbeat_callback=beat)
+        if additional_work and not should_stop():
+            worked = additional_work() or worked
         if not worked and not should_stop():
             time.sleep(poll_seconds)

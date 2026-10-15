@@ -386,10 +386,9 @@ class AgentTools:
         ) for key in ids]
         self._extraction_calls += 1
         try:
-            results = self._extract(
-                inputs, self._context.model_callable,
-                report_date=metadata.report_date, report_date_trusted=metadata.report_date_trusted,
-            )
+            from .specialists import ExtractionInput, extract_source
+            results = extract_source(ExtractionInput(tuple(inputs), metadata.report_date,
+                metadata.report_date_trusted), self._context.model_callable, service=self._extract)
         except ExtractionError:
             raise AgentToolError("AGENT_TOOL_FAILED", "Extraction output failed validation.", stage="extraction", retryable=True) from None
         except Exception:
@@ -544,10 +543,10 @@ class AgentTools:
                 })
             return value.value if hasattr(value, "value") else value
         try:
-            proposal = self._select(
-                obs, supplied, {key: self._fragments[key].text for key in ids},
-                model_call=selection_model, project_id=scope.project_id,
-            )
+            from .specialists import SelectionInput, select_source
+            proposal = select_source(SelectionInput(obs, tuple(supplied),
+                {key: self._fragments[key].text for key in ids}),
+                service=self._select, model_call=selection_model, project_id=scope.project_id)
         except AgentDecisionError:
             raise AgentToolError("AGENT_TOOL_FAILED", "Selection output failed validation.", stage="selection", retryable=True) from None
         except ValidationError:
@@ -589,13 +588,14 @@ class AgentTools:
             selection_payload = payload.get("selection_drafts")
             state_payload = dict(payload)
             state_payload["selection_drafts"] = {}
-            base_state = AgentState.model_validate(state_payload)
+            state_type = type(state) if isinstance(state, AgentState) else AgentState
+            base_state = state_type.model_validate(state_payload)
             if not isinstance(selection_payload, dict):
                 return invalid("selection", True, "Selection output is malformed.")
             if set(selection_payload) != set(observation_keys(len(base_state.observation_drafts))):
                 return invalid("state", False, "Agent state keys are inconsistent.")
             try:
-                state = AgentState.model_validate({**state_payload, "selection_drafts": selection_payload})
+                state = state_type.model_validate({**state_payload, "selection_drafts": selection_payload})
             except ValidationError:
                 return invalid("selection", True, "Selection output is malformed.")
             state = state if isinstance(state, AgentState) else base_state

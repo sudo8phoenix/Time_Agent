@@ -1,8 +1,9 @@
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useRef, useState, type CSSProperties } from "react";
 import {
   isTerminalAgentRun,
   parseAgentRunStatus,
   type AgentRunStatus as AgentRunStatusData,
+  type AgentTask,
   type RequestApi,
 } from "../api/agentRuns";
 import "../agent-run-status.css";
@@ -27,6 +28,24 @@ function stepStateLabel(state: string): string {
   if (state === "running") return "In progress";
   if (state === "failed") return "Needs attention";
   return "Skipped";
+}
+
+function taskDepth(task: AgentTask, tasks: AgentTask[]): number {
+  let depth = 0;
+  let parentId = task.parent_task_id;
+  const seen = new Set([task.id]);
+  while (parentId && depth < 3 && !seen.has(parentId)) {
+    seen.add(parentId);
+    const parent = tasks.find(item => item.id === parentId);
+    if (!parent) break;
+    depth += 1;
+    parentId = parent.parent_task_id;
+  }
+  return depth;
+}
+
+function readable(value: string): string {
+  return value.replaceAll("_", " ").replace(/\b\w/g, letter => letter.toUpperCase());
 }
 
 export function AgentRunStatus({ jobId, jobState, runAvailable, enabled = true, requestApi }: { jobId: string; jobState: string; runAvailable: boolean; enabled?: boolean; requestApi: RequestApi }) {
@@ -169,6 +188,22 @@ export function AgentRunStatus({ jobId, jobState, runAvailable, enabled = true, 
         <div><dt>Selection calls</dt><dd>{run.counters.selection_calls}</dd></div>
         <div><dt>Correction retries</dt><dd>{run.counters.corrective_retries}</dd></div>
       </dl>
+      {run.hierarchy_usage && <dl className="agent-run-status__hierarchy-usage" aria-label="Hierarchy budget usage">
+        <div><dt>Delegations</dt><dd>{run.hierarchy_usage.delegations} / 1300</dd></div>
+        <div><dt>Supervisor transitions</dt><dd>{run.hierarchy_usage.supervisor_transitions} / 12</dd></div>
+        <div><dt>Model calls</dt><dd>{run.hierarchy_usage.model_calls} / 806</dd></div>
+        <div><dt>Tool calls</dt><dd>{run.hierarchy_usage.tool_calls} / 1010</dd></div>
+      </dl>}
+      {run.tasks.length > 0 && <>
+        <h4 className="agent-run-status__subheading">Task hierarchy</h4>
+        <ol className="agent-run-status__tasks" aria-label="Agent task hierarchy">
+          {run.tasks.map(task => <li key={task.id} className={`agent-run-status__task agent-run-status__task--${task.status}`} style={{ "--task-depth": taskDepth(task, run.tasks) } as CSSProperties & { "--task-depth": number }}>
+            <span className="agent-run-status__task-role">{readable(task.role)}</span>
+            <span className="agent-run-status__task-state">{task.outcome ? readable(task.outcome) : stepStateLabel(task.status)}</span>
+            <span className="agent-run-status__task-meta">Attempt {task.attempt}</span>
+          </li>)}
+        </ol>
+      </>}
       {run.steps.length > 0 && <ol className="agent-run-status__steps" aria-label="Agent stages">
         {run.steps.map(step => <li className={`agent-run-status__step agent-run-status__step--${step.state}`} key={step.ordinal}>
           <span className="agent-run-status__step-label">{step.label}</span>

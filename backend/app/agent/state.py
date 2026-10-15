@@ -203,7 +203,7 @@ def encode_agent_state(state: AgentState) -> bytes:
     try:
         python_payload = state.model_dump(mode="python", warnings=False)
         _reject_nonfinite(python_payload)
-        AgentState.model_validate(python_payload)
+        type(state).model_validate(python_payload)
         payload = state.model_dump(mode="json", warnings=False)
         _reject_nonfinite(payload)
         encoded = json.dumps(payload, ensure_ascii=False, allow_nan=False, separators=(",", ":")).encode("utf-8")
@@ -228,7 +228,7 @@ def decode_agent_state(payload: bytes | str) -> AgentState:
     try:
         decoded = json.loads(raw, parse_constant=reject_constant)
         _reject_nonfinite(decoded)
-        return AgentState.model_validate(decoded)
+        return parse_agent_state(decoded)
     except AgentStateError:
         raise
     except (UnicodeDecodeError, json.JSONDecodeError, ValidationError, TypeError) as exc:
@@ -240,3 +240,23 @@ def validate_identity_transition(previous: AgentState, current: AgentState) -> N
     changed = [field for field in fields if getattr(previous, field) != getattr(current, field)]
     if changed:
         raise AgentStateError("AGENT_STATE_INVALID", f"immutable identity changed: {', '.join(changed)}")
+
+
+class HierarchicalAgentState(AgentState):
+    """Separate checkpoint identity; domain payload retains the frozen evidence contract."""
+
+    schema_version: Literal["agent-state-v2"]
+    graph_version: Literal["report-analysis-v2"]
+
+
+def parse_agent_state(payload: dict[str, Any]) -> AgentState:
+    version = payload.get("graph_version")
+    cls = HierarchicalAgentState if version == "report-analysis-v2" else AgentState
+    return cls.model_validate(payload)
+
+
+def create_hierarchical_state(**values: Any) -> HierarchicalAgentState:
+    legacy = create_initial_state(**values).model_dump(mode="python")
+    return HierarchicalAgentState.model_validate({
+        **legacy, "schema_version": "agent-state-v2", "graph_version": "report-analysis-v2",
+    })

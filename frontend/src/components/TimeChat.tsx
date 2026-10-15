@@ -52,6 +52,29 @@ export function TimeChat({ project, request, onReview, canReview, accountId }: {
     }).catch((reason: Error) => { if (active) setError(reason.message); }).finally(() => { if (active) setLoading(false); });
     return () => { active = false; };
   }, [project?.id, accountId]);
+  useEffect(() => {
+    if (!project || !conversation || conversation.status !== "analyzing") return;
+    let active = true;
+    let timer: ReturnType<typeof setTimeout>;
+    const projectId = project.id;
+    const conversationId = conversation.id;
+    const poll = async () => {
+      try {
+        const fresh = await request(`/projects/${projectId}/conversations/${conversationId}`) as Conversation;
+        if (!active) return;
+        setConversation(current => current?.id === conversationId ? fresh : current);
+        setRecent(items => items.map(item => item.id === fresh.id ? fresh : item));
+        setError("");
+        if (fresh.status !== "analyzing") return;
+      } catch {
+        if (!active) return;
+        setError("Could not refresh analysis status. Reconnecting automatically…");
+      }
+      if (active) timer = setTimeout(poll, 2000);
+    };
+    timer = setTimeout(poll, 1000);
+    return () => { active = false; clearTimeout(timer); };
+  }, [project?.id, conversation?.id, conversation?.status, accountId]);
   const perform = async (action: () => Promise<Conversation>) => {
     if (busy) return;
     setBusy(true); setError("");
@@ -98,7 +121,7 @@ export function TimeChat({ project, request, onReview, canReview, accountId }: {
             {card.selection.candidates.length > 0 && conversation.status === "draft" && <label>Change scheduled activity<select disabled={busy} value={card.activity_id || ""} onChange={event => decide("edit", { event_index: index, activity_id: event.target.value || null })}><option value="">Choose an activity</option>{card.selection.candidates.map(candidate => <option key={candidate.candidate_id} value={candidate.candidate_id}>{candidate.external_id} · {candidate.activity_name}</option>)}</select></label>}
             {conversation.status === "draft" && <EventCorrection key={`${conversation.id}:${conversation.revision}:${index}`} card={card} index={index} busy={busy} onSave={body => decide("edit", body)} />}
           </article>)}
-          {conversation.status === "draft" ? <><form className="time-chat-form" onSubmit={send} data-dirty={!!text.trim()}><label>Message<textarea rows={3} value={text} onChange={event => { setText(event.target.value); sessionStorage.setItem(storageKey, event.target.value); }} disabled={busy} placeholder="Started excavation at F-01 at 08:30" /></label><label>Known report date (optional)<input type="date" value={reportDate} onChange={event => setReportDate(event.target.value)} disabled={busy} /></label><button className="primary" disabled={busy || !text.trim()}>{busy ? "Working…" : "Send"}</button></form>
+          {conversation.status === "analyzing" ? <div className="time-chat-status"><p role="status">Analyzing your saved message. You can leave this page and return later.</p><button className="quiet-button" disabled={busy} onClick={() => decide("cancel", {})}>Cancel analysis</button></div> : conversation.status === "draft" ? <><form className="time-chat-form" onSubmit={send} data-dirty={!!text.trim()}><label>Message<textarea rows={3} value={text} onChange={event => { setText(event.target.value); sessionStorage.setItem(storageKey, event.target.value); }} disabled={busy} placeholder="Started excavation at F-01 at 08:30" /></label><label>Known report date (optional)<input type="date" value={reportDate} onChange={event => setReportDate(event.target.value)} disabled={busy} /></label><button className="primary" disabled={busy || !text.trim()}>{busy ? "Working…" : "Send"}</button></form>
             <div className="time-chat-actions"><button className="secondary" disabled={busy || !!conversation.pending_question || !conversation.events.length} onClick={() => decide("confirm", {})}>Confirm and send for review</button><button className="quiet-button" disabled={busy} onClick={() => decide("retry", {})}>Retry analysis</button><button className="quiet-button" disabled={busy} onClick={() => decide("cancel", {})}>Cancel</button></div></> : <p className="time-chat-status" role="status">{conversation.status === "accepted" ? "Accepted by a reviewer." : conversation.status === "pending_review" ? "Confirmed and awaiting reviewer acceptance." : conversation.status === "cancelled" ? "Conversation cancelled." : "Review decision recorded."} {canReview && conversation.job_id && <button className="text-button" onClick={() => onReview(conversation.job_id!)}>Open review job</button>}</p>}
         </>}
       </section></div>}

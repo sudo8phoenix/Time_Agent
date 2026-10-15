@@ -1,4 +1,4 @@
-from datetime import datetime, timezone
+from datetime import datetime, timedelta, timezone
 import json
 from uuid import uuid4
 
@@ -10,6 +10,7 @@ from sqlalchemy.orm import sessionmaker
 from app.db.models import (
     AgentRun,
     AgentStep,
+    AgentTask,
     Fragment,
     Job,
     Project,
@@ -152,7 +153,7 @@ def test_member_reads_strict_ordered_status_without_internal_fields(client, role
     assert response.status_code == 200, response.text
     payload = response.json()
     assert set(payload) == {"id", "job_id", "graph_version", "framework_version", "state",
-        "current_stage", "counters", "steps", "error_code", "error_message", "started_at",
+        "current_stage", "counters", "steps", "tasks", "hierarchy_usage", "error_code", "error_message", "started_at",
         "updated_at", "completed_at"}
     assert payload["id"] == str(seeded["run_id"])
     assert payload["current_stage"] == "Loading context"
@@ -162,7 +163,60 @@ def test_member_reads_strict_ordered_status_without_internal_fields(client, role
                for step in payload["steps"])
     assert payload["counters"] == {"node_executions": 3, "extraction_calls": 1,
         "selection_calls": 0, "corrective_retries": 0}
+    assert payload["tasks"] == []
+    assert payload["hierarchy_usage"] is None
     assert response.headers["cache-control"] == "no-store"
+    serialized = response.content.decode()
+    assert not any(secret in serialized for secret in SECRET_MARKERS)
+
+
+def test_v2_tasks_and_usage_are_sanitized_and_public(client):
+    browser, factory = client
+    seeded = _seed(factory, graph_version="report-analysis-v2")
+    db = factory()
+    run = db.get(AgentRun, seeded["run_id"])
+    run.current_node = "analysis"
+    run.config_metadata = {"hierarchy_usage": {"delegations": 2,
+        "supervisor_transitions": 3, "model_calls": 4, "tool_calls": 5},
+        "private_config": SECRET_MARKERS[0]}
+    now = datetime.now(timezone.utc)
+    run.updated_at = max(now, run.started_at)
+    root_id = uuid4()
+    child_id = uuid4()
+    common = {"run_id": run.id, "project_id": seeded["project_id"],
+        "source_id": run.job.report_id,
+        "schedule_version_id": run.job.schedule_version_id,
+        "contract_version": "agent-task-v1", "input_fingerprint": "c" * 64,
+        "input_references": [SECRET_MARKERS[3]], "output_references": [SECRET_MARKERS[4]],
+        "evidence_references": [], "warnings": ["AGENT_INTERNAL_ERROR"],
+        "actual_usage": {"model_calls": 1}, "safe_summary": {"status": "completed"},
+        "status": "succeeded", "outcome": "completed", "error_code": SECRET_MARKERS[1],
+        "started_at": now, "finished_at": now}
+    child_common = {**common, "started_at": now + timedelta(microseconds=1),
+        "finished_at": now + timedelta(microseconds=1)}
+    db.add_all([
+        AgentTask(id=root_id, parent_task_id=None, agent_role="root", attempt=1,
+            observation_key=None, **common),
+        AgentTask(id=child_id, parent_task_id=root_id, agent_role="analysis", attempt=1,
+            observation_key=None, **child_common),
+    ])
+    db.add(AgentStep(run_id=run.id, ordinal=3, node="analysis", attempt=1,
+        state="succeeded", started_at=now, finished_at=now, duration_ms=8))
+    db.commit()
+    db.close()
+    browser.post("/api/v1/auth/login", json={"username": _username(factory, seeded["user_id"]),
+                             "password": "test-password"})
+    response = browser.get(f"/api/v1/jobs/{seeded['job_id']}/agent-run")
+    assert response.status_code == 200, response.text
+    payload = response.json()
+    assert payload["graph_version"] == "report-analysis-v2"
+    assert payload["current_stage"] == "Analyzing report"
+    assert payload["steps"][-1]["label"] == "Analyzing report"
+    assert [(task["role"], task["parent_task_id"], task["attempt"], task["outcome"])
+            for task in payload["tasks"]] == [
+        ("root", None, 1, "completed"), ("analysis", str(root_id), 1, "completed")]
+    assert payload["hierarchy_usage"] == {"delegations": 2, "supervisor_transitions": 3,
+        "model_calls": 4, "tool_calls": 5}
     serialized = response.content.decode()
     assert not any(secret in serialized for secret in SECRET_MARKERS)
 

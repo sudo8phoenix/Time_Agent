@@ -52,7 +52,8 @@ def enqueue_reanalysis(db: Session, project: Project, report: Report, *, actor_i
     settings = get_settings()
     from ..prompts.extraction_v1 import PROMPT_VERSION
     config_snapshot = {"execution_mode": settings.agent_execution_mode,
-                       "model": settings.ollama_model,
+                       "provider": settings.llm_provider,
+                       "model": settings.groq_model if settings.llm_provider == "groq" else settings.ollama_model,
                        "extraction_prompt_version": PROMPT_VERSION}
     job = Job(project_id=project.id, report_id=report.id, parent_job_id=base.id,
               reanalysis_key=idempotency_key, reanalysis_actor_id=actor_id,

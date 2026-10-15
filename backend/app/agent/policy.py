@@ -28,6 +28,9 @@ NODE_TRANSITIONS: Mapping[str, tuple[str, ...]] = {
 NEXT_ACTION_NODES = frozenset(("extract", "repair_extraction", "retrieve", "select", "repair_selection", "persist", "record_failure"))
 
 PUBLIC_STAGES = {
+    "intake": "Loading context",
+    "analysis": "Analyzing report",
+    "review": "Saving for review",
     "load_context": "Loading context",
     "extract": "Extracting observations",
     "validate_extraction": "Validating evidence",

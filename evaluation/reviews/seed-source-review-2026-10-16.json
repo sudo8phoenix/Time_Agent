@@ -1,0 +1,27 @@
+{
+  "version": "seed-source-technical-review-v1",
+  "status": "technical_review_not_human",
+  "scope": "Source-level technical checks against synthetic fixtures; no original label edits or human adjudication",
+  "cases": {
+    "C01": {"expected_work_date": "2026-09-21", "notes": "Today resolves from the supplied trusted report date. Three erected spools are delta work, not whole-activity completion."},
+    "C02": {"expected_work_date": "2026-09-21", "notes": "Missing area leaves both Area A and B erection activities plausible. Retain safe abstention; today is anchored to trusted report metadata."},
+    "C03": {"expected_work_date": "2026-09-22", "notes": "Tomorrow is planned work on the following day. Three is a source planned amount; normalized progress quantity must be absent and effects empty."},
+    "C04": {"notes": "Welding has not started is no-work, without an invented actual start or finish."},
+    "C05": {"notes": "Two atomic assertions: erected spools and welding stopped due to rain. The erection quantity must not attach to welding. A single erection observation misses the blocker."},
+    "C06": {"expected_work_date": "2026-09-21", "notes": "Six delivered spools are material delivery, not erection progress. Source quantity recall and normalized effect safety are distinct measures."},
+    "C07": {"expected_work_date": "2026-09-20", "notes": "An explicit work date is preserved even when different from another report's date. This fixture's own report date is also 20 September."},
+    "C08": {"expected_work_date": "2026-09-21", "notes": "Five spools are cumulative, not an additional delta of five."},
+    "C09": {"expected_work_date": "2026-09-22", "notes": "Two additional spools are a delta. Cross-report cumulative behavior is a separate ledger test."},
+    "C10": {"exclude_single_fragment_quality": true, "notes": "Operational reupload/idempotency instruction, not a standalone physical report. Requires prior C01 source identity and approval context."},
+    "C11": {"exclude_single_fragment_quality": true, "notes": "A correction needs C01 lineage and explicit reviewed supersession. Do not score it as an ordinary standalone additive quantity."},
+    "C12": {"expected_work_date": "2026-09-21", "notes": "0.5 metric tonnes of rebar equals 500 kg. Match rebar fixing, not concrete placement on the same footing."},
+    "C13": {"notes": "Cable laying continued does not state a measured quantity or actual start date. Do not invent either."},
+    "C14": {"expected_work_date": "2026-09-21", "notes": "25 m3 concrete is a volume for placement, not 25 footing identifiers or a rebar mass."},
+    "C15": {"exclude_single_fragment_quality": true, "notes": "Accepted test record HT-01 must be verified externally; merely mentioning it is not independent evidence of acceptance."},
+    "C16": {"notes": "Physical painting completion exists in the text but has no schedule match. The unknown event label is not a semantic assertion that no work occurred."},
+    "C17": {"expected_work_date": "2026-09-21", "notes": "Twenty installed spools exceed the schedule's planned twelve. Preserve the reported amount; the approval/reducer boundary must reject incompatible progress."},
+    "C18": {"expected_work_date": null, "notes": "Header 21 September conflicts with the body's claim that today is 23 September. Remove the unresolved effective date and require reviewer clarification."},
+    "C19": {"notes": "No physical work described. Empty extraction and safe abstention are acceptable; quote presence alone cannot establish semantic support."},
+    "C20": {"exclude_single_fragment_quality": true, "notes": "An obsolete-schedule phrase is not an actual database schedule transition. Staleness must be tested by changing the project's active schedule."}
+  }
+}

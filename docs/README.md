@@ -41,3 +41,7 @@ compact benchmark from the still-pending independent UI-to-export gate.
 The external `progress-agent-plan/` planning package is outside this Git repository.
 References to that package in dated records are historical planning references;
 current repository operation is documented by the guides above.
+
+- [Durable conversations](durable-conversations.md) — versioned worker orchestration, budgets, restart recovery and rollback.
+
+- [Hosted provider capacity](provider-capacity.md) — admission, quota observations, bounded live probes and failure policy.

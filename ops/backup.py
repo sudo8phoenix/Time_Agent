@@ -16,6 +16,7 @@ from sqlalchemy import select, text
 from sqlalchemy.engine import make_url
 
 from app.db.models import (ActivityState, AgentRun, AgentStep, AgentToolCall, AuditEvent, Conversation, ConversationTurn,
+                           AgentTask, ConversationTask, ConversationTaskCall, HostedProviderAdmission,
                            FileRecord, Fragment, IntegrationOutbox, Observation, ProgressEvent,
                            Job, Proposal, ScheduleSourceMetadata)
 from app.db.session import session_factory
@@ -30,10 +31,11 @@ def sha(path):
 RECOVERY_TABLES = {
     "agent_runs": AgentRun, "agent_steps": AgentStep, "agent_tool_calls": AgentToolCall,
     "schedule_source_metadata": ScheduleSourceMetadata, "conversations": Conversation,
-    "conversation_turns": ConversationTurn, "integration_outbox": IntegrationOutbox,
+    "agent_tasks": AgentTask, "conversation_tasks": ConversationTask,
+    "conversation_task_calls": ConversationTaskCall, "conversation_turns": ConversationTurn, "integration_outbox": IntegrationOutbox,
     "activity_states": ActivityState, "progress_events": ProgressEvent,
     "observations": Observation, "proposals": Proposal, "audit_events": AuditEvent,
-    "jobs": Job,
+    "jobs": Job, "hosted_provider_admission": HostedProviderAdmission,
 }
 
 CHECKPOINT_TABLES = ("checkpoints", "checkpoint_blobs", "checkpoint_writes")

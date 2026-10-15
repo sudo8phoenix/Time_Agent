@@ -63,12 +63,16 @@ def test_canonical_agent_status_has_only_sanitized_public_fields():
         "current_stage",
         "counters",
         "steps",
+        "tasks",
+        "hierarchy_usage",
         "error_code",
         "error_message",
         "started_at",
         "updated_at",
         "completed_at",
     }
+    assert body["tasks"] == []
+    assert body["hierarchy_usage"] is None
     serialized = status.model_dump_json().lower()
     for forbidden in (
         "prompt",
@@ -132,6 +136,23 @@ def test_agent_step_rejects_private_or_mismatched_stage_label():
     with pytest.raises(ValidationError):
         AgentRunStatus.model_validate(payload)
 
+
+def test_v2_public_task_identity_and_usage_are_bounded():
+    payload = _payload()
+    payload["graph_version"] = "report-analysis-v2"
+    payload["steps"] = [{"ordinal": 1, "node": "analysis", "label": "Analyzing report",
+        "state": "running", "attempt": 1, "duration_ms": None, "error_code": None}]
+    payload["tasks"] = [{"id": uuid4(), "parent_task_id": None, "role": "root",
+        "status": "succeeded", "attempt": 1, "outcome": "completed"}]
+    payload["hierarchy_usage"] = {"delegations": 2, "supervisor_transitions": 3,
+        "model_calls": 4, "tool_calls": 5}
+    status = AgentRunStatus.model_validate(payload)
+    assert status.tasks[0].role == "root"
+    assert status.hierarchy_usage.model_calls == 4
+
+    payload["hierarchy_usage"]["model_calls"] = 807
+    with pytest.raises(ValidationError):
+        AgentRunStatus.model_validate(payload)
 
 def test_running_step_has_no_duration_and_nonfailed_step_has_no_error():
     payload = _payload()

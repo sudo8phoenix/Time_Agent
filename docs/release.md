@@ -60,3 +60,33 @@ The endpoint responded for the owner-requested rerun after the reported PC crash
 - W-39/O-04 graph acceptance applies to this local prototype only. Freeze exact model digest/config and release artifacts, and rehearse on the intended laptop/network setup before any release claim.
 
 E03 documentation reconciliation is implemented; its full release gate remains pending E02 and the independent data gates. Public/synthetic fixture verification must be reported separately from owner-package and live-model validation.
+
+## Local follow-up — 16 October 2026
+
+The hierarchy and model-assisted flags remain disabled. Durable conversations, versioned report quantity scoring, conflicting-date safety and hosted-provider admission are implemented in the working tree. No deployment or production migration was performed for this follow-up.
+
+See [durable conversations](durable-conversations.md), [provider capacity](provider-capacity.md), and [report evaluation/interruption investigation](../evaluation/results/report-evaluation-2026-10-16/REPORT.md). The new twelve-report controlled pair reaches pending review in both graph versions with no duplicates or ledger writes, but still exposes an omitted blocker and non-actual date-recall gaps. Independent semantic adjudication remains pending. Eight requests each to Groq and the verified free OpenRouter model passed bounded capacity probes; multiple worker processes still require deployment-wide admission. These findings do not authorize broader rollout.
+
+The subsequent [extraction quality follow-up](../evaluation/results/quality-gap-fixes-2026-10-16/REPORT.md)
+adds prompt-version pinning, conservative planned/delivery relative-date recovery
+and blocking warnings for narrowly detected omitted constraints. The three known
+cases now retain their reviewed dates and atomic events, but delivery mapping
+still fails and fresh wording exposes blocker/evidence failures. Two diagnostic
+cases were blocked by a provider rate limit/cooldown. All 359 unit and 173
+integration tests pass; neither rollout flag was enabled. These results supersede
+the earlier known-case date/blocker observations only for the new capture and do
+not establish general quality or sustained provider capacity.
+
+The [v11 quality/capacity follow-up](../evaluation/results/quality-gap-fixes-2026-10-16/FOLLOWUP-v11.md)
+adds guarded evidence-ID repair, blocking completeness warnings, version-pinned
+delivery identity instructions, and PostgreSQL-shared provider admission with
+crash recovery. Migration `0018_hosted_admission` was applied only to the isolated
+test database and is required before this source version uses hosted transports
+on an intended deployment. No production migration, restart or flag enablement
+was performed. Final regression passes 376 unit and 188 integration tests. Live
+Q06 now passes; further Groq quality checks remain rate-limited, and OpenRouter
+preflight declined a two-call probe because only one daily request remained.
+These results supersede the earlier single-process admission limitation: requests
+sharing the same PostgreSQL database now coordinate across processes. They do not
+certify deployment-wide capacity when deployments use different databases, and do
+not close independently adjudicated quality or rollout gates.

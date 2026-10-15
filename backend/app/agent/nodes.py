@@ -14,12 +14,13 @@ from .state import (
     ValidationErrorRecord,
     encode_agent_state,
     observation_keys,
+    parse_agent_state,
 )
 from .tools import AgentToolError
 
 
 def _state(value: AgentState | dict[str, Any]) -> AgentState:
-    return value if isinstance(value, AgentState) else AgentState.model_validate(value)
+    return value if isinstance(value, AgentState) else parse_agent_state(value)
 
 
 def _record(code: str, message: str, *, stage: str, retryable: bool = False) -> dict[str, Any]:
@@ -82,7 +83,7 @@ def _merge(state: AgentState, updates: dict[str, Any]) -> dict[str, Any]:
     counters = updates.pop("counters", state.counters.model_dump(mode="python"))
     result = {**updates, "counters": counters}
     try:
-        merged = AgentState.model_validate({
+        merged = type(state).model_validate({
             **state.model_dump(mode="python", warnings=False),
             **result,
         })
@@ -234,6 +235,11 @@ def _nodes(tools: Any, policy: Any) -> dict[str, Callable[[AgentState], dict[str
         counted = _count(state, policy)
         if counted.get("next_action") == "fail":
             return counted
+        if state.next_action == "fail" and state.validation_errors:
+            # V1's retained graph has a fixed retrieve -> select edge. A failed
+            # retrieval has no candidate sets; preserve its typed error instead
+            # of replacing it with a selection KeyError/internal-error outcome.
+            return _merge(state, {**counted, "next_action": "fail"})
         counters = dict(counted["counters"])
         if repair:
             counters["corrective_retries"] += 1
