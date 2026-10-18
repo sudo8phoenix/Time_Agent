@@ -105,6 +105,12 @@ make native-smoke
 cd frontend && npm run build && node tests/frontend-contracts.test.mjs
 ```
 
+Unit tests create their own synthetic schedule files and do not require the
+large external Cambridge dataset or local GT10 workbooks. These parser contracts
+are separate from audited public-source verification and model-quality results.
+The [publication record](publication-2026-10-18.md#github-unit-test-portability-fix)
+records the clean-checkout check and the original GitHub failure.
+
 `make doctor` checks the model endpoint and exact model tag configured for this local profile.
 
 ## Backup and restore drill

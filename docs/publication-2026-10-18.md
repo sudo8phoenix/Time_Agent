@@ -32,3 +32,22 @@ remain pending. See [current status](current-status.md).
 
 This publication starts no inference or deployment, changes no runtime flags and
 does not resume retained rehearsal tasks or modify their checkpoints.
+
+## GitHub unit-test portability fix
+
+The first published unit run failed because two schedule adapter tests read
+audited datasets from a directory outside the Git repository. Those files existed
+on the development machine but were absent on GitHub. The earlier local 455-pass
+result did not establish clean-checkout portability.
+
+Both tests now create synthetic XLSX/JSON inputs in pytest temporary directories.
+They still verify distinct export/input headers, task and relationship identity,
+source locators, unchanged names, raw timestamp/precision/timezone values,
+project-scoped Cambridge IDs and preservation of unknown source fields. They do
+not claim to validate full public-source row counts or actual dataset accuracy.
+
+Verification copied only Git-tracked files into a fresh temporary checkout with
+no `.env` and no sibling datasets. The full unit suite passed with 454 tests and
+one pre-existing skip, matching the GitHub environment's optional-test behavior.
+The three focused adapter tests and Ruff also passed. No production adapter,
+CI skip policy, provider settings or release acceptance gate was changed.
