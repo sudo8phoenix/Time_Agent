@@ -1,12 +1,54 @@
 # Model evaluation guide
 
+## Current acceptance workflow — 18 October 2026
+
+[Current status](../docs/current-status.md) records the six open workstreams.
+Extraction is configured as Groq `openai/gpt-oss-20b`; V20 remains opt-in.
+The latest completed report spent 111.316 seconds in admission and 2.842 seconds
+in transport across three calls. Its 115.757-second readiness is one sample, not
+a sustained p95. Regression success is not quality/capacity acceptance.
+
+Both V19 validation and holdout are consumed, including provider-failed cases.
+Freeze fresh inputs, group-disjoint splits and eligible reviewed labels before
+V20 acceptance capture. Keep labels out of model calls. Seal initial responses,
+normalized proposals, source/config hashes and failures before scoring every case.
+Evaluate a new holdout after validation; never tune against its results.
+The [frozen owner targets](../docs/evaluation-targets-approved-2026-10-16.json)
+govern acceptance. Use the following current tools:
+
+| Tool | Scope |
+|---|---|
+| `evaluation.extraction_quality` | Live development extraction; accepts `--prompt-version` and `--batch-size` |
+| `evaluation.delivery_matching` | Supplied-observation blocker/delivery matching; `--short-ids` selects V20 behavior |
+| `evaluation.frozen_acceptance` | Real worker report capture for a frozen validation/holdout split |
+| `evaluation.score_frozen_acceptance` | Offline scoring after sealed-capture integrity checks |
+| `evaluation.calibrate` | Eligible validation confidence study; no runtime policy installation |
+| `evaluation.mixed_workload` | Bounded two-worker report/lifecycle-conversation rehearsal on an idle local rehearsal database |
+| `evaluation.full_approval_delivery_latency` | Browser approval, durable commit and automatic HTTP MOCK delivery; isolated by default |
+
+Read each module's `--help` with
+`PYTHONPATH=backend .venv/bin/python -m <module> --help` from the repository root.
+Live commands consume shared provider quota and require a new output directory.
+Extraction, matching and frozen capture default to groups of at most five cases,
+with at least 60 seconds between groups and a cooldown check before each case.
+Pre-submission pacing is recorded separately from report readiness.
+
+Inspect retained work in `progress_rehearsal_20261016` and
+`progress_rehearsal_eval_20261017` before starting workers. The latest mixed runner
+pins V20/Groq conversations, supplies lifecycle starts and rejects empty-card or
+model-free completions, but that revision has not been live validated. The second
+18 October attempt stopped on expired ownership after a clock discontinuity;
+it does not certify sustained operation. Browser latency has not yet been measured
+during the required sustained concurrent workload. See
+[the follow-up](../docs/release-followup-2026-10-18.md).
+
 [RESULTS.md](RESULTS.md) is the measured-results record. Fixture tests, live model
 benchmarks and full application acceptance have different scopes; each result must
 identify its inputs, model digest, prompt/settings, denominators and limitations.
 
 ## Local evidence availability
 
-This documentation-only publication includes the guide and measured report. The Gemma runners, scorer and raw/combined captures remain in the original local workspace. Commands below apply to that workspace; a fresh GitHub checkout alone does not contain the additional scripts or captures. Artifact paths are local references.
+The current workspace contains runners, scorers and raw/combined captures. Some remain uncommitted/unpushed, so verify availability before reproducing from a fresh checkout. Historical documentation-only publications did not include every local artifact. Documentation updates do not publish these files or establish acceptance.
 
 ## Completed compact Gemma benchmark
 

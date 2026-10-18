@@ -1,5 +1,10 @@
 # Remaining work audit — 15 October 2026
 
+> Historical record: statements and instructions below apply to the recorded stage.
+> [Current status — 18 October](current-status.md) and the
+> [latest V20 follow-up](release-followup-2026-10-18.md) supersede its operational
+> status. Both V19 splits are consumed; release remains unaccepted.
+
 Follow-up, 16 October: durable conversation orchestration has since been implemented and locally verified. See [the current conversation guide](durable-conversations.md). Findings below retain the original audit state; provider-capacity and broader report-evaluation gates remain open. A subsequent [report investigation](../evaluation/results/report-evaluation-2026-10-16/REPORT.md) and [capacity guide](provider-capacity.md) record implemented fixes, new evidence and the remaining limits.
 
 Decision: keep both rollout flags disabled. This audit checked current code, retained evaluation captures and fresh deterministic tests. It did not implement the remaining orchestration, make live provider requests or deploy anything.

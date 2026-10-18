@@ -1,25 +1,32 @@
 # Documentation index
 
-Updated 12 October 2026 after the Gemma benchmark and its two-batch rerun.
-[Reconciliation audit](documentation-audit-2026-10-12.md) records the checks and changes.
+Current status: [18 October prototype status](current-status.md).
+Latest evidence: [V20 follow-up](release-followup-2026-10-18.md).
+Previous live follow-up: [V19 acceptance resumption](release-live-followup-2026-10-17.md).
+Earlier candidate review: [17 October acceptance evidence](release-review-2026-10-17.md).
+The [12 October reconciliation audit](documentation-audit-2026-10-12.md) is historical.
 
 ## Current guides and status
 
 | Document | Purpose |
 |---|---|
+| [Current status](current-status.md) | Configured model, measured admission/transport latency, six open gates and retained work |
+| [18 October documentation audit](documentation-audit-2026-10-18.md) | Reconciliation scope, historical evidence boundary and link verification |
 | [Project overview](../README.md) | Current runtime, setup and model-quality summary |
 | [Local runbook](local-run.md) | Application setup, graph worker, recovery and model checks |
 | [Remote Ollama](remote-ollama.md) | Private endpoint configuration and recorded model identity |
 | [Release evidence](release.md) | Verified local prototype behavior and remaining acceptance gates |
+| [18 October V20 follow-up](release-followup-2026-10-18.md) | Evidence repair, live blocker checks and interrupted mixed rehearsal |
+| [17 October candidate review](release-review-2026-10-17.md) | Earlier frozen validation/holdout, calibration and candidate source record |
 | [Implementation task state](task-board.md) | Latest task status, with dated W-series execution evidence |
 | [V2 completion checklist](../PROJECT_COMPLETION_TODO_V2.md) | Lifecycle/data/workflow completion and pending release gates |
 | [API contract](api-contract.json) | Generated OpenAPI for the current application |
 | [Graph-only runtime](handoffs/graph-only-runtime.md) | Current processing and status UI, with recorded verification |
 | [Evaluation guide](../evaluation/README.md) | Capture/scoring reproduction and metric scope |
 | [Measured results](../evaluation/RESULTS.md) | Compact Gemma benchmark and historical results |
-| [Split status](data-splits.md) | Existing synthetic assignments versus provisional release splits |
-| [Calibration contract](confidence-calibration.md) | Independently reviewed inputs required for threshold evidence |
-| [Draft targets](evaluation-targets-draft.md) | Unapproved future acceptance targets |
+| [Split status](data-splits.md) | Consumed evaluation sets, development data and new holdout requirements |
+| [Calibration contract](confidence-calibration.md) | Review policies, unsupported event/link thresholds and runtime confidence limits |
+| [Approved targets](evaluation-targets-approved-2026-10-16.json) | Frozen accuracy, readiness and latency acceptance limits |
 | [Execution history](execution-history.md) | Authorized history, correction, duration and export behavior |
 | [Data decisions](data-decisions.md) | Source provenance and model-visible projections |
 | [Technical data review](data-review-2026-10-12.md) | Source-backed suggestions, separate from human adjudication |

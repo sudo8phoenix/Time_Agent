@@ -1,5 +1,32 @@
 # Evaluation results
 
+## Latest evidence — 18 October 2026
+
+The release remains unaccepted. [Current status](../docs/current-status.md) records
+all open gates; [the follow-up](../docs/release-followup-2026-10-18.md) links raw
+captures. Configured extraction is Groq `openai/gpt-oss-20b`.
+
+| Measurement | Result and scope |
+|---|---|
+| Repeated-heading repair | Offline replay retains three observations instead of one; development only |
+| BM-02 / BM-03 | 2/2 live matching cases pass in 25.685 / 25.385 s; selection and ambiguity abstention |
+| Mixed-run report | Ready in 115.757 s; 111.316 s admission and 2.842 s transport across three calls |
+| Sustained mixed workload | Interrupted on expired ownership after clock discontinuity; cause unproven |
+| Runtime confidence | Null extraction/link scores; no installed or supported event/link threshold |
+| Regression | 455 unit + 14 prompt-pinning integration cases after repair; 73 affected unit cases after later harness changes |
+
+V19 validation and holdout are consumed, with failures retained in denominators.
+V20 needs fresh full-target validation and a new holdout. Isolated browser update
+and mock-delivery timings meet numerical limits but have not been repeated during
+sustained reports/conversations. Candidate v5 is unaccepted, and its latest
+lifecycle-input harness has not been live validated.
+
+## Historical scorers and measurements
+
+The lexical/hybrid comparison interface below describes earlier evaluation
+methods. Current matching uses model-led discovery and selection; use
+[the current guide](README.md) for frozen-worker capture and scoring.
+
 `evaluation/run.py` evaluates saved prediction JSONL against a separately supplied
 label JSONL. It validates event-family membership before joining labels and
 rejects prediction files containing expected-label fields. This prevents the

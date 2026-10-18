@@ -1,5 +1,10 @@
 # Documentation reconciliation — 12 October 2026
 
+> Historical record: statements and instructions below apply to the recorded stage.
+> [Current status — 18 October](current-status.md) and the
+> [latest V20 follow-up](release-followup-2026-10-18.md) supersede its operational
+> status. Both V19 splits are consumed; release remains unaccepted.
+
 The repository's Markdown documentation, current runtime instructions, release/task
 status, evaluation evidence links and generated API contract were reviewed against
 the application source and saved measurements. Current guides are listed in the

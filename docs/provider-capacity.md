@@ -1,12 +1,44 @@
 # Hosted provider capacity and failure policy
 
+## 18 October status and measured delay
+
+Configured extraction uses Groq `openai/gpt-oss-20b`, not GPT-OSS 120B. The latest
+completed V20 report took 115.757 seconds to reach review. Extraction itself took
+47.134 seconds: 46.312 seconds of admission wait and 0.806 seconds of transport.
+Across extraction, retrieval and selection, admission totaled 111.316 seconds and
+transport 2.842 seconds. Transport includes the remote request/response; it does
+not isolate generation time. This single report is not a sustained p95.
+See [numeric tool timings](../evaluation/results/release-completion-2026-10-18/v20-mixed-workload-v2/initial-report-provider-metrics.json).
+
+BM-02/BM-03 passed four live model calls without a 429 in one-case groups.
+The subsequent mixed rehearsal stopped on expired ownership after an observed
+wall/monotonic clock discontinuity, whose cause remains unproven. That interruption
+does not establish a new provider rate limit or sustained capacity. Three keys
+still share one organization quota; separate databases and external clients are
+outside the shared-database coordinator. See [current status](current-status.md)
+and [the latest follow-up](release-followup-2026-10-18.md) before resuming retained
+work. The lifecycle-input rehearsal revision has not yet been live validated.
+
+## 17 October follow-up
+
+Fresh two-worker C01/C03 requests reached review in 192.248/139.829 seconds, still
+exceeding the 120-second target. Original retrieval failures did not recur and
+remain unattributed. Tool-scoped numeric telemetry now separates admission and
+transport time without request/response text or credentials. One extraction spent
+38.880 seconds in admission and 1.292 seconds in transport. No quota, cooldown,
+key-slot or provider-fallback safeguard was removed.
+Experimental v16–v18 decisions omit empty optional context and reserve 768
+completion tokens for small candidate/selection JSON responses. Nonempty facts
+and schedule rows remain available; v12's pinned requests are unchanged. These
+changes do not establish sustained capacity; fresh/mixed workloads remain gates.
+
 Implemented and checked 16 October 2026. Hierarchy and model-assisted rollout flags remain false. This is bounded synthetic/local evidence, not a production saturation or multi-worker capacity certification.
 
 ## Runtime policy
 
 Production Groq and OpenRouter transports now use PostgreSQL admission by provider across roles, models, key slots and processes using the same database. One bounded lease reserves each provider; cooldowns, pacing and numeric quota state survive process restarts. Short transactions claim and release reservations; no database transaction spans inference or admission sleeps. A stale process cannot release a replacement lease. External clients and deployments using other databases remain outside this coordinator.
 
-Migration `0018_hosted_admission` is required before starting this source version's hosted transports. It was applied only to `progress_test`, not production. A missing or unavailable coordinator fails closed with `MODEL_CAPACITY_TIMEOUT`; it does not silently switch to process-local admission. Leases expire after two remaining socket-timeout windows plus five seconds for crash recovery. Backup/restore manifests include this private operational table.
+Migration `0018_hosted_admission` is required before starting this source version's hosted transports. It was initially applied to `progress_test`; the subsequent authorized local rehearsal and application migration also reached 0018, with verified pre/post backups. The main application was checked at 0018 on 17 October. This is a local prototype deployment, not a production certification. A missing or unavailable coordinator fails closed with `MODEL_CAPACITY_TIMEOUT`; it does not silently switch to process-local admission. Leases expire after two remaining socket-timeout windows plus five seconds for crash recovery. Backup/restore manifests include this private operational table.
 
 Starts retain minimum intervals of 2.1 seconds for Groq and 3.2 seconds for OpenRouter. Groq also spaces estimated request cost against the advertised tokens-per-minute limit. The estimate uses UTF-8 bytes/3 plus reserved completion tokens; it is an approximation, not entitlement or an exact tokenizer. Numeric upstream headers and 429 cooldowns remain authoritative.
 

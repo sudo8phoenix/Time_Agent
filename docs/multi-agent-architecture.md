@@ -1,5 +1,10 @@
 # Hierarchical multi-agent architecture and migration plan
 
+> Historical record: statements and instructions below apply to the recorded stage.
+> [Current status — 18 October](current-status.md) and the
+> [latest V20 follow-up](release-followup-2026-10-18.md) supersede its operational
+> status. Both V19 splits are consumed; release remains unaccepted.
+
 Status: proposed for review; no runtime changes. Prepared 15 October 2026.
 
 ## Objective

@@ -1,5 +1,10 @@
 # Architecture decisions
 
+The dated decisions below retain their original scope. Current operational
+configuration, authorized prototype review policy and incomplete release gates
+are recorded in [current status](current-status.md). Groq extraction and shared
+PostgreSQL admission supersede older local-only inference assumptions.
+
 ## O-01 record — 22 September 2026
 
 ### First-release scope

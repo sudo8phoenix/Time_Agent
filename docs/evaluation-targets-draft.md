@@ -1,4 +1,9 @@
-# E02 proposed acceptance targets — awaiting owner/reviewer agreement
+# E02 target proposal — historical draft
+
+The owner approved these values on 16 October. The authoritative frozen record is
+[evaluation-targets-approved-2026-10-16.json](evaluation-targets-approved-2026-10-16.json).
+The proposal below is retained as history; its pending-agreement language no
+longer describes the approved targets. Approval does not establish achievement.
 
 These targets are a draft prepared before any new E02 held-out outcomes. They are not agreed, calibrated or achieved. Independent reviewers must confirm event alignment/labels, scope and temporal semantics; freeze the leakage-aware split and record approval before running unseen evaluation. Targets can be revised now, but must not be tuned against held-out outcomes afterward.
 

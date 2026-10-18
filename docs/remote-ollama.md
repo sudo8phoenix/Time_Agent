@@ -1,5 +1,9 @@
 # Remote Ollama over Tailscale
 
+Current extraction is configured for Groq `openai/gpt-oss-20b`; this guide
+describes the separately configured private Ollama option and historical checks.
+See [current status](current-status.md) and [the local runbook](local-run.md).
+
 The worker can call an Ollama instance on a different network through a Tailscale tailnet. The worker accepts only loopback, private, link-local, or Tailscale CGNAT addresses (`100.64.0.0/10`); public resolved addresses are rejected. HTTPS URLs may omit the port and use 443. TLS certificate verification remains enabled.
 
 On the model host, both laptops need to join the same tailnet. Keep Ollama bound to its local interface, then use Tailscale Serve to proxy the local Ollama port privately:

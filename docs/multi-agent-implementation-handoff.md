@@ -1,5 +1,10 @@
 # Multi-agent implementation handoff
 
+> Historical record: statements and instructions below apply to the recorded stage.
+> [Current status — 18 October](current-status.md) and the
+> [latest V20 follow-up](release-followup-2026-10-18.md) supersede its operational
+> status. Both V19 splits are consumed; release remains unaccepted.
+
 Prepared 15 October 2026. Start implementation from this document and `docs/multi-agent-architecture.md`.
 
 ## User-approved direction

@@ -1,10 +1,10 @@
 # Implementation task state
 
-Current implementation status and remaining release gates are in [release.md](release.md). E01 recovery/reanalysis, E02 evaluation preparation and E03 documentation evidence are in the corresponding [handoffs](handoffs/). The October 11 GT10 five-entry workflow and October 12 one-case graph smoke are bounded workflow evidence; neither completes E02 independent unseen evaluation or lifecycle/duration acceptance. The source-backed technical review is a separate development-data suggestion set, not human review or adjudication. Independent labels, calibration and owner-data gates remain pending.
+Current status is in [the 18 October summary](current-status.md) and [release evidence](release.md). Release remains unaccepted: sustained capacity, broader quality/fresh V20 evaluation, a new holdout, supported/runtime confidence, concurrent browser/update/delivery latency and final release steps remain open. The V20 quote repair passes offline replay; BM-02/BM-03 pass live matching. The interrupted mixed run does not certify sustained operation. An owner sample is not expected; authorized AI-assisted review is permitted and is not independent human adjudication.
 
 The 12 October compact Gemma benchmark now has saved outputs for all 60 existing synthetic held-out cases after batches five and six were rerun. Activity choice was 44/45 (97.8%), quantity accuracy 36/36 (100%), precision across all selected activities 44/49 (89.8%), and unmatched-case safe abstention 10/15 (66.7%). Five unmatched fragments were falsely selected. This benchmark supplies the full schedule and does not complete independently reviewed, frozen-split UI-to-export acceptance. See [saved results](../evaluation/RESULTS.md).
 
-The W-series below is the historical execution record for the application. The user-facing checklist remains at `progress-agent-plan/TASK_BOARD.md` and is updated when a task has passed its acceptance evidence.
+The W-series below is historical execution evidence. The current in-repository checklist is [PROJECT_COMPLETION_TODO_V2.md](../PROJECT_COMPLETION_TODO_V2.md). The external `progress-agent-plan/TASK_BOARD.md` is a historical planning reference, not the current operational entry point.
 
 | Task | Status | Owner | Dependencies | Next acceptance evidence |
 | --- | --- | --- | --- | --- |

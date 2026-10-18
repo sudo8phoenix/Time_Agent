@@ -1,10 +1,28 @@
 # Project completion TODO v2 — lifecycle workflow and audited datasets
 
+## Current acceptance — 18 October 2026
+
+Release remains unaccepted. The six remaining workstreams are sustained provider
+capacity, broader quality/fresh V20 validation, a new frozen holdout, supported
+event/link and runtime confidence, concurrent browser/update/mock-delivery latency,
+and final accepted-source release steps. See [current status](docs/current-status.md)
+for evidence and targets. V20's quote repair passes offline replay; BM-02/BM-03
+pass live component matching. The mixed rehearsal was interrupted; its latest
+lifecycle-input runner is not live validated. No accepted freeze, accepted-source
+restart, commit or push has occurred.
+
+Latest verification is 455 unit and 14 prompt-pinning integration cases after the
+evidence repair, followed by 73 affected unit cases after rehearsal changes. Counts
+and task plans below preserve their older scope; implementation does not establish
+fresh model accuracy or sustained readiness.
+
+## Implementation inventory — 12 October 2026
+
 Updated 12 October 2026. E01 is complete (`implemented`, `verified_fixture`); E02 capture/scoring preparation and E03 documentation/evidence are implemented, with independent unseen live and final release gates pending. L01–L06, T01–T02 and M01–M02 implementation status is recorded below. Status distinguishes implemented code, fixture/database verification and live-model verification. A01 is complete (`implemented`, `verified_fixture`); A02 calibration tooling is implemented and fixture-tested, with independently reviewed threshold evidence still pending (rechecked 10 October 2026). F01–F02 are complete (`implemented`, `verified_fixture`) with reusable report mapping and immutable PDF-page transcription. H01–H02 are complete (`implemented`, `verified_fixture`) with project-scoped event history, correction-aware blockers and precision-aware duration queries; source calendar/labour availability remains explicit.
 
 Completed-task steps below retain the original implementation plan and may mention the former dual-worker components. Current operation and verification are governed by [release.md](docs/release.md) and the [documentation index](docs/README.md).
 
-## Latest model evidence
+## Earlier model evidence — 12 October
 
 The 12 October compact Gemma benchmark now has saved outputs for all 60 existing synthetic held-out cases after batches five and six were rerun. Activity choice was 44/45 (97.8%), quantity accuracy 36/36 (100%), precision across all selected activities 44/49 (89.8%), and unmatched-case safe abstention 10/15 (66.7%). Five unmatched fragments were falsely selected. This benchmark supplies the full schedule and does not complete independently reviewed, frozen-split UI-to-export acceptance. See [results](evaluation/RESULTS.md); E02/A02/D04/D05 remain open.
 
@@ -18,13 +36,13 @@ First milestone: with a trusted report date, “Started excavation at F-01 at 08
 
 If no date context is available, ask for the date. If only a date is reported, retain date precision and leave the time unknown. Never substitute submission time or midnight for an unreported time.
 
-The owner has **not received the problem owner's sample package**. Do not keep asking where that package is or pretend either public source is that package. Work can be planned around the supplied schedules and separately reviewed synthetic reports; real owner-package validation remains a later, explicitly pending gate.
+The owner confirmed that no owner sample is expected. The prototype uses public schedules and separately reviewed synthetic reports under the authorized AI-assisted policy, with MOCK PMIS in scope. These inputs do not establish owner-specific accuracy or calendar semantics.
 
 ## 2. What an implementing agent must know
 
 - Repository: `site-progress-agent/`. Paths in implementation cards are relative to this directory. Dataset originals are in the workspace's `../data/`.
 - Stack: FastAPI, PostgreSQL/SQLAlchemy/Alembic, React/Vite, Ollama, background worker. LangGraph is the only report-processing runtime. Legacy processing, runtime selection and rollback overrides were removed; dated parity evidence below is historical.
-- Current lifecycle fields are dates, effect builders discard them, and approval/UI require quantity or percent. Merely changing an extraction prompt will not implement lifecycle tracking.
+- Lifecycle tracking now preserves endpoint date/time/precision and permits quantity-free start/finish proposals. The earlier discarded-effect audit finding is historical; model accuracy and sustained workflow acceptance remain separate gates.
 - Current matching is model-led, not proof of a working lexical/hybrid retrieval pipeline. Read `agent/schedule_decision.py` and measure the actual implementation.
 - Schedule imports and report uploads are different inputs. GT10's schedule XLSX must not be uploaded as a field-report spreadsheet.
 - Existing UI mapping already supports area, assets, aliases, measurement basis, quantity and unit. Extend it only where needed.
@@ -106,7 +124,7 @@ Steps:
 2. Cambridge record states CC BY 4.0. GitHub identifies MIT, but the local GT10 package does not contain a license file; verify and retain the exact repository license before distributing a derivative.
 3. Select the GT10 P6 export as the initial snapshot for development, subject to a reviewed correction overlay. Preserve the input workbook separately as reconciliation evidence.
 4. Explicitly list unresolved GT10 conflicts: F8 activity named F9, FF versus FS, F10 plaster lag, day/hour lag ambiguity, input/export date differences, WBS differences and missing native XER.
-5. Record owner-package status as `not_received`. Register it when received, rerun the audit and review whether the chosen public fixtures cover the actual project.
+5. Record owner-package status as `not_expected`. If future owner data is explicitly supplied, register/hash it and separately review project-specific coverage.
 
 Done when: every chosen fixture traces to a source/hash and source-version decision; no public schedule is labelled owner data or paired-report gold data.
 
@@ -149,7 +167,7 @@ Done when: the selected demo/evaluation subset has explicit reviewed inclusions/
 
 ### [ ] D04 — Author synthetic report/event pairs and obtain independent review
 
-Status: **demo_ready; evaluation_pending**. Development fixtures implemented; independent review/adjudication pending for all 16 examples. No reviewed validation labels exist in this package. See [completion audit](docs/d01-d05-completion-audit-2026-10-10.md).
+Status: **development reviewed under authorized AI-assisted policy; fresh V20 evaluation pending**. The 16 development cases have separate AI adjudication; independent human review has not occurred. Earlier frozen synthetic validation and holdout sets are consumed. See [split status](docs/data-splits.md) and [current status](docs/current-status.md).
 
 Dependencies: D01 and selected D03 decisions. Existing: `data/synthetic/`, `data/review/W-03-review-instructions.md`, `w03-expanded-review.csv`.
 
@@ -166,7 +184,7 @@ Done when: developer fixtures exist, and final evaluation labels have real revie
 
 ### [ ] D05 — Review and freeze leakage-aware splits
 
-Status: **demo_ready; evaluation_pending**. Structural checks passed on 2026-10-10 (299 projects, 54 groups); independent grouping/coverage review and final split freeze pending. See [completion audit](docs/d01-d05-completion-audit-2026-10-10.md).
+Status: **fresh V20 freeze/evaluation pending**. Cambridge grouping remains provisional and excluded. Separate synthetic prototype splits were frozen and evaluated; both V19 splits are consumed. A new holdout is required. See [split status](docs/data-splits.md).
 
 Dependencies: audited split proposal, D03/D04 for final freeze. Artifact: `../data/schedule-audit-2026-10-09/provisional-splits.json`.
 
@@ -367,7 +385,7 @@ Done when: every proposed update has traceable confidence/provenance, and unavai
 
 ### [ ] A02 — Calibrate thresholds on independently reviewed validation cases
 
-Status: tooling `implemented`, `verified_fixture`; **reviewed threshold evidence pending**. Reproducible calibration rejects unreviewed/unfrozen/leaking inputs; no thresholds are fabricated. D04 lacks independent labels and D05 remains unfrozen, so this acceptance gate cannot yet be marked complete. See [handoff](docs/handoffs/V2-A02.md), [input contract](docs/confidence-calibration.md), and [pending artifact](evaluation/results/calibration-v1-pending.json).
+Status: tooling `implemented`, `verified_fixture`; **reviewed threshold evidence pending**. Reproducible calibration rejects unreviewed/unfrozen/leaking inputs; no thresholds are fabricated. Authorized AI-assisted labels exist, but event/link thresholds lack eligible support and runtime confidence is unavailable; this gate remains open. See [handoff](docs/handoffs/V2-A02.md), [input contract](docs/confidence-calibration.md), and [pending artifact](evaluation/results/calibration-v1-pending.json).
 
 Dependencies: A01/D04/D05. Files: **new** `evaluation/calibrate.py`, versioned calibration artifacts, evaluation metrics.
 
@@ -458,15 +476,15 @@ Steps:
 6. Report denominators, errors, failures, abstentions, review burden, format/discipline strata and project-weighted as well as activity-weighted results where appropriate.
 7. Agree quantitative quality/latency targets before looking at heldout outcomes. Do not invent achieved accuracy, omit failures, or tune on heldout and call the rerun unseen.
 
-Done when: unseen independently reviewed examples have saved real-flow results and assessed targets. Without independent reviewers, this task remains blocked rather than being marked passed.
+Done when: unseen independently reviewed examples have saved real-flow results and assessed targets. The owner-authorized AI-assisted review policy is permitted for this prototype and must be labelled honestly; passing all other targets remains required.
 
 ### [ ] E03 — Reconcile release documentation and owner-package follow-up
 
-Status: documentation reconciliation and reproducible fixture release evidence `implemented`, `verified_fixture`; **full release acceptance pending E02/D04/D05/A02**. README, release record, runbook and task board now describe the current behavior and limitations. Latest recorded graph-only checks: 233 unit, 124 PostgreSQL integration, 44 browser fixture tests and 11 final API/worker regressions; type/build/contracts, required native imports and backup/restore pass. Exact base commit, dirty-tree source hashes, runtime/dependency identifiers and mock label are recorded. Owner package remains `not_received`; its registration/project-specific validation is conditional follow-up. No immutable release commit or independent/live release is claimed. See [handoff](docs/handoffs/V2-E03.md) and [release record](docs/release.md).
+Status: documentation reconciliation and reproducible fixture release evidence `implemented`, `verified_fixture`; **full release acceptance pending E02/D04/D05/A02**. README, release record, runbook and task board now describe the current behavior and limitations. The historical 12 October graph-only checks were 233 unit, 124 PostgreSQL integration, 44 browser fixture tests and 11 final API/worker regressions; type/build/contracts, required native imports and backup/restore pass. Exact base commit, dirty-tree source hashes, runtime/dependency identifiers and mock label are recorded. Owner package is `not_expected` and is not a prototype prerequisite; owner-specific validation is outside current acceptance. No immutable release commit or independent/live release is claimed. See [handoff](docs/handoffs/V2-E03.md) and [release record](docs/release.md).
 
 - [X] Reconcile current docs and record fresh fixture/recovery evidence.
 - [ ] Complete independently reviewed unseen live validation and freeze release identity.
-- [ ] Register and validate the owner package when supplied (currently unavailable).
+- Owner package is `not_expected`; future project-specific validation is conditional, outside current prototype gates.
 
 Dependencies: required gates above. Files: README, `docs/release.md`, task boards, runbook and handoffs.
 

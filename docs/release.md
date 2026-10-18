@@ -1,4 +1,34 @@
-# Local prototype release evidence — updated 12 October 2026
+# Local prototype release evidence — updated 18 October 2026
+
+## Current candidate
+
+The [current status](current-status.md) and [18 October follow-up](release-followup-2026-10-18.md)
+supersede older status below. This owner-authorized public/synthetic prototype
+permits **MOCK PMIS** and expects no owner sample. AI-assisted review is not
+independent human adjudication. V20's evidence repair passes offline replay;
+BM-02/BM-03 now pass live component matching. Fresh V20 validation and a new
+holdout, confidence, sustained capacity and concurrent latency remain open.
+Earlier V19 validation failed and its holdout is consumed. Runtime confidence
+remains unavailable; both rollout flags remain disabled. This is **not a
+release-ready candidate**.
+
+The historical interruption remains unattributed and the original retrieval
+failure has no proven root cause. Fresh successes do not resolve either cause.
+Earlier failures remain in their original evidence. Source and final evidence
+hashes are recorded in dated candidate records; the latest unaccepted source
+inventory is `evaluation/results/release-completion-2026-10-18/v20-candidate-source-v5.json`.
+No accepted freeze or accepted-source restart occurred. The working tree remains
+uncommitted and unpushed.
+
+## Historical evidence and status
+
+The sections below retain the dated 10–16 October observations, configurations
+and gates. Statements about pending owner samples, human-only review, migration
+location, runtime source and process versions describe those earlier stages.
+Use [current status](current-status.md) for their later dispositions. In particular,
+the inspected application database is at migration `0018_hosted_admission`, not
+the historical 0015 head recorded below. Starting the reachable local app on
+port 8001 does not establish that its processes loaded the latest candidate.
 
 This working tree implements the public/synthetic construction-progress prototype. It is not an independently validated release or owner-package acceptance. The completed implementation and remaining acceptance gates are recorded here; versioned task handoffs provide the supporting implementation evidence.
 
@@ -6,7 +36,7 @@ This working tree implements the public/synthetic construction-progress prototyp
 
 Base source revision: `ec9567d` (`Improve report extraction reliability and five-entry review workflow`), with parent `ef89995`. The graph-only update is published through the repository commit history; the source manifest identifies the tested application files. The October 10 release manifest and recovery evidence below document that earlier snapshot and remain historical; they do not identify the current source tree.
 
-The [current source manifest](validation/graph-only-source-manifest-2026-10-12.json) hashes the application, migration, operations, test, frontend and dependency/configuration files. The [acceptance record](validation/graph-only-acceptance-2026-10-12.json) records the final checks, local deployment and remaining data gates. Private configuration and uploaded evidence are excluded from the source manifest.
+The [12 October source manifest](validation/graph-only-source-manifest-2026-10-12.json) hashes the application, migration, operations, test, frontend and dependency/configuration files. The [acceptance record](validation/graph-only-acceptance-2026-10-12.json) records the final checks, local deployment and remaining data gates. Private configuration and uploaded evidence are excluded from the source manifest.
 
 Python 3.12.14; Node 26.0.0; npm 11.12.1; OpenJDK 25.0.1; PostgreSQL container 16.6. Python pins are in `pyproject.toml`/`uv.lock`; frontend pins are in `frontend/package-lock.json`. Lock hashes:
 
@@ -31,7 +61,7 @@ The connector and receiver are labelled **MOCK PMIS — prototype**. Automatic o
 
 A fresh source database `progress_recovery_e01_20261010` was migrated and seeded with explicitly synthetic data using `ops/seed_e01_recovery.py`. `ops/backup.py` created `/private/tmp/e01-recovery-20261010/backup-v2`; `ops/restore_verify.py` restored it into the new `progress_restore_e01_20261010` database and `/private/tmp/e01-recovery-20261010/restored-uploads`. Verification passed for two accepted events, one immutable original, three jobs, one graph operational record, one conversation/turn and one pending outbox record; state/event/lineage/payload content hashes matched. The restored pending outbox then delivered in one attempt to a separate loopback HTTP receiver, whose read-back matched revision 2 and 08:30 minute precision. The receiver's separate storage is outside this application-database backup. Temporary artifacts and both databases were left separate for inspection.
 
-## Current verification — 12 October
+## Historical verification — 12 October
 
 Current working-tree checks on 2026-10-12: 233 unit tests, 124 full PostgreSQL integration tests, and 44 Playwright fixture/review-api browser tests passed. Frontend type checking, production build and frontend contract assertions passed. Native smoke parsed all six required sources and rejected malformed XML. These checks cover the graph-only source tree based on `ec9567d`; the final API/worker regression check also passed 11 tests.
 
@@ -51,7 +81,7 @@ The benchmark captures/scorer remain in the original local workspace; only docum
 
 The endpoint responded for the owner-requested rerun after the reported PC crash; both replacement batches completed. The earlier graph-only deployment connectivity timeout above remains historical evidence rather than the latest model availability observation.
 
-## Remaining acceptance gates
+## Historical acceptance gates — 12 October
 
 - D04 independent event-label review/adjudication and D05 reviewed, frozen leakage-aware splits. The 2026-10-12 source-backed technical review covers 21 quality records and 16 labels and supplies separate suggestions; it does not claim human review or approval. Cambridge project 5060 is a bounded subset screen, not row-level proof for global aggregates.
 - A02 calibrated thresholds from reviewed validation inputs; no fabricated threshold or confidence probability.

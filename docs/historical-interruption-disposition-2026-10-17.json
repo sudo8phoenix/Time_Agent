@@ -1,0 +1,24 @@
+{
+  "version": "historical-interruption-disposition-v1",
+  "status": "retained_unattributed",
+  "transport_failure_observed": true,
+  "subsequent_lease_loss_observed": true,
+  "causal_relationship": "unknown",
+  "missing_evidence": [
+    "original lease ownership transitions",
+    "original process/database logs"
+  ],
+  "attribution_claimed": false,
+  "new_successes_do_not_resolve_original_cause": true,
+  "reopen_when": "Original ownership or process/database evidence is recovered.",
+  "current_risk_controls": [
+    "independent heartbeat",
+    "fenced lease ownership",
+    "sanitized failure categories",
+    "separate admission and transport timing"
+  ],
+  "source_sha256": {
+    "docs/gap-investigation-2026-10-16.md": "4d818d9e55d4fbf7a41ba9275a6f54165b344cbb9b492de4d0d6680c276fdb47",
+    "evaluation/results/report-evaluation-2026-10-16/original-capture-review-v3-02/summary.json": "6f6dc43f791b3bcd78b139b47d583d9449a2903223ceed2302f7802e990fa2d1"
+  }
+}

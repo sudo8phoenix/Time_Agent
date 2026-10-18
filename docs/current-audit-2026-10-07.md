@@ -1,5 +1,10 @@
 # Current implementation audit — 7 October 2026
 
+> Historical record: statements and instructions below apply to the recorded stage.
+> [Current status — 18 October](current-status.md) and the
+> [latest V20 follow-up](release-followup-2026-10-18.md) supersede its operational
+> status. Both V19 splits are consumed; release remains unaccepted.
+
 > Dated evidence: the runtime descriptions below refer to the implementation at the time of this record. For current graph-only operation and later compact model measurements, see [release status](release.md) and [documentation index](README.md).
 
 ## What works now

@@ -1,6 +1,12 @@
 # Local runbook
 
-This profile runs the application and PostgreSQL on this Mac. Ollama may run on a friend's laptop through a private Tailscale connection; public hosting is intentionally deferred. Report processing uses the LangGraph worker. This local checkout is running on port 8001; the separate project on port 8000 is untouched.
+This profile runs the application and PostgreSQL on this Mac. Current extraction is configured for Groq `openai/gpt-oss-20b`. Private Ollama remains a separately configured option; public hosting is deferred. Report processing uses the LangGraph worker. The local homepage on port 8001 returned HTTP 200 and liveness returned `status=ok` on 18 October. Reachability does not certify source freshness or model quality. See [current status](current-status.md).
+
+The default extraction prompt is V12; V20 remains an explicit, unaccepted candidate.
+The latest measured extraction spent 46.312 seconds waiting for admission and
+0.806 seconds in request/response transport. Waiting in the UI may reflect shared
+quota pacing. All three Groq keys share one organization quota. See
+[provider capacity](provider-capacity.md) for bounded failures and retry policy.
 
 ## One-time setup
 
@@ -57,11 +63,22 @@ make worker
 
 The API serves the already-built frontend from `frontend/dist`; rerun `make build-web` after frontend changes. The ordinary `make serve` command uses port 8000. For a second local instance, run `make serve PORT=8001` and open `http://127.0.0.1:8001`.
 
-The worker is deliberately single-process for the laptop profile. Stop it with Ctrl-C; durable graph jobs may be reclaimed after their lease expires and resumed from checkpoint.
+The normal laptop profile uses one worker process. Stop it with Ctrl-C; durable graph jobs may be reclaimed after their lease expires and resumed from checkpoint. Rehearsal workers and retained tasks are separate from normal app operation; inspect them explicitly before resume.
+
+Verify the local app after startup:
+
+```sh
+curl --fail http://127.0.0.1:8001/api/v1/health/live
+```
+
+The homepage is `http://127.0.0.1:8001/`. There is no `/api/v1/health/ready`
+endpoint. Liveness does not exercise extraction, database health or approval.
+Read-only database/queue/cooldown inspection is available with
+`PYTHONPATH=backend .venv/bin/python ops/runtime_status.py`.
 
 ## Report processing and recovery
 
-The report processor uses the bounded LangGraph workflow. There is no selectable alternate processor or runtime-mode setting. `.env` contains server-side model settings; do not copy the private endpoint or credentials into reports or browser settings. The local database was migrated to `0015_schedule_source_metadata` after a backup at `/private/tmp/time-agent-before-graph-20261012`. The live browser-to-API/worker/model run and one-observation smoke are recorded in [release evidence](release.md); each produced a pending proposal and no approved progress update. The local API and worker are running on port 8001. These are bounded workflow checks, not an unseen quality evaluation.
+The report processor uses bounded LangGraph. There is no alternate processor or runtime-mode switch; the hierarchy flag selects versions within LangGraph. `.env` contains server-side model settings; keep endpoints and credentials out of reports and browser settings. The application database was inspected at `0018_hosted_admission`; the earlier 0015 backup is historical. Apply migrations through 0018 before using current hosted transports. The [release record](release.md) preserves dated browser/model smokes; these are bounded workflow checks, not unseen quality acceptance.
 
 To recover from an interrupted worker, stop or restart the worker and allow its lease to expire; the durable graph run resumes from its PostgreSQL checkpoint. For database recovery, use the separate restore verification procedure below. Do not delete run traces, checkpoints, proposals, or requested snapshots as part of recovery. Earlier dated W-39 verification records describe a rollback path that has since been removed; that path is not available in the current runtime.
 
@@ -126,11 +143,11 @@ Choose a writable persistent receiver database path before starting it. The outb
 
 Backup/restore now verifies content hashes for lifecycle state/events, report-job lineage, conversations, graph records and outbox payloads. Use a new restore database and upload directory. The synthetic recovery fixture script refuses nonlocal/non-`progress_recovery_*` databases; see [release evidence](release.md) for the completed isolated drill.
 
-The E02 capture utility stores operator-supplied observations and can emit prediction JSONL. It does not drive or attest a real browser/model workflow. Keep reference labels out of observed capture files and score only after saving and hashing predictions. Independent review, split freeze and target agreement are prerequisites to an unseen evaluation claim.
+The older E02 manual capture utility stores operator-supplied observations and does not attest a browser/model workflow. The current frozen-report runner drives real worker capture and seals it before separate scoring; browser approval/delivery has its own runner. See [the evaluation guide](../evaluation/README.md). Keep labels out of inference, retain failures, use the approved review policy and freeze before capture. Both V19 splits are consumed.
 
 ## Reproduce the compact model benchmark
 
-The [60-case Gemma record](../evaluation/RESULTS.md#gemma-4-12b-quality-evaluation--12-october-2026) and [evaluation guide](../evaluation/README.md) describe its fixed inputs, corrected table locators, draft prompt, failures and reruns. The additional Gemma scorer and captures remain local and are not included in this documentation-only publication. In the original evaluation workspace, scoring saved captures does not contact Ollama:
+The [60-case Gemma record](../evaluation/RESULTS.md#gemma-4-12b-quality-evaluation--12-october-2026) and [evaluation guide](../evaluation/README.md) describe historical inputs, corrected table locators, draft prompt, failures and reruns. The current workspace contains local runners and captures, some still uncommitted; verify their availability in a fresh checkout. Scoring saved captures does not contact Ollama:
 
 ```sh
 .venv/bin/python -m evaluation.summarize_gemma \
@@ -138,3 +155,38 @@ The [60-case Gemma record](../evaluation/RESULTS.md#gemma-4-12b-quality-evaluati
 ```
 
 Live generation is a separate explicit command in that guide. The benchmark's 300-second timeout differs from the report worker's default 360 seconds. A reachable inventory is readiness evidence only; a request interrupted by a host crash must remain in the original record, with replacement captures and denominators identified.
+
+## 17 October candidate operation and rollback
+
+See [current status](current-status.md) before advancing
+either rollout flag. Both flags remain false. New work uses the current prompt;
+previous report/conversation runs retain their pinned versions and journals.
+Changing flags does not rewrite an existing run or change the only supported
+LangGraph execution runtime.
+
+`evaluation/mixed_workload.py` is restricted to an idle local
+`progress_rehearsal_*` database. It runs two real workers with a staged synthetic
+report/conversation mix and refuses automatic acceptance. Its predeclared stop
+criteria include failed work, readiness over 120 seconds, expired ownership,
+cooldown over 90 seconds, unexpected approved writes and worker exit. A stop
+prevents further admission and terminates only its own worker processes with a
+bounded drain, preserving pending work and checkpoints for explicit inspection.
+Do not restart a worker against retained queued work without reviewing that state.
+
+The latest runner explicitly pins conversation V20/provider assignments, supplies
+lifecycle-start messages and rejects empty-card/model-free task completions.
+That revision has not been live validated. Retained work from interrupted attempts
+exists in both `progress_rehearsal_20261016` and
+`progress_rehearsal_eval_20261017`; see [the follow-up](release-followup-2026-10-18.md).
+
+`evaluation/monitor_window.py --seconds 600 --output-dir <new-directory>` supplies
+a separate read-only monitoring window on the rehearsal database. It records
+stop conditions and does not kill workers, reset leases or change flags.
+Read-only monitor success alone does not certify sustained workload capacity.
+
+The main local prototype and isolated captures have separate configuration
+records. Main timeouts are preserved at restart; frozen report and mixed workload
+captures use 90-second request budgets, while component probes use 60 seconds.
+A source hash does not make those configurations
+equivalent. Restoring data requires a fresh database/upload destination and a
+verified backup manifest; disabling rollout flags is not a database rollback.

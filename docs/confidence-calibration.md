@@ -1,5 +1,51 @@
 # Confidence and calibration contract
 
+## Current confidence gate — 18 October 2026
+
+Runtime extraction/link confidence remains null; no threshold is installed.
+The later V19 study emitted seven event and six selected-link predictions against
+24 validation event targets, insufficient for the frozen minimum support of 20.
+Its 21 correct field predictions at cutoff 0.5 cover 17.5% of 120 field targets;
+fields clustered within seven events do not establish event/link support or
+probability calibration. Both V19 splits are now consumed. V20's offline evidence
+repair and live component matching do not supply fresh confidence validation.
+Obtain eligible correct event/link predictions under precision 0.98 / support 20,
+then validate runtime confidence. See [current status](current-status.md) and
+[the V19 study](release-live-followup-2026-10-17.md#calibration-and-runtime-confidence).
+
+## Earlier scored study — 17 October 2026
+
+The frozen validation capture has now been scored in
+`evaluation/results/release-completion-2026-10-17/validation-scored-v1/`.
+The calibration result uses seven eligible synthetic events; one date-unscored
+event is excluded under the policy frozen before scoring. The event and link
+categories have seven targets each and no supported threshold. The field study
+has 34 targets and selects a support-index cutoff of 0.5: 20/20 correct fields,
+58.8% coverage, against the predeclared 0.98 precision / 20 support policy.
+Those fields are clustered within seven events, not 20 independent reports.
+This is an experimental review-priority finding, not deployment calibration.
+No threshold is installed; runtime extraction/link confidence remains null.
+The authorized AI-assisted review is not independent human review. Holdout
+outcomes must not tune this estimator, study policy or cutoff.
+
+## Authorized prototype review policy — 17 October 2026
+
+The owner authorized AI-assisted review in `evaluation-targets-approved-2026-10-16.json`
+and confirmed in `prototype-scope-2026-10-17.json` that no owner sample is expected.
+`review-calibration-v2` retains independent human review as its strict default.
+An explicit `--review-policy owner_authorized_ai_assisted --authorization
+docs/evaluation-targets-approved-2026-10-16.json` selects the approved alternative.
+The manifest must declare `review.kind=ai_assisted`,
+`review.status=ai_assisted_adjudicated`, `review.human_review_completed=false`,
+the authorization file's SHA-256 in `review.authorization_sha256`, and actual
+AI review identity/date, label authors and evidence attestation. Group review and
+each validation label must also declare `ai_assisted_adjudicated`. The tool still
+checks frozen labels/predictions, exact validation coverage, group separation,
+policy and estimator versions. Output is honestly labelled
+`ai_assisted_validation_evidence`, never independent human review. This change
+enables the review basis; it supplies no scores, validation results or thresholds.
+All resulting proposals still require authorized acceptance.
+
 A01 records `proposal-provenance-v1` in observation JSON for report jobs and confirmed conversations. Reviewer corrections record their parent observation/event. No migration or backfill is required. Extraction and linking estimates are separate objects with score, method, version and validation status. Current estimators return `score: null`, `method: not_estimated`, `validation_status: unavailable`. Match strength, retrieval rank and source-quote presence are not calibrated probabilities.
 
 The proposal GET response includes `provenance` and `decision_history`. History is explicitly scoped to the report job: all atomic observations, proposal revisions, accepted events, corrections/retractions, and review audit records with actor, timestamp, reason and before/after values. Original observations and candidate decisions remain stored. New review actions use application UTC timestamps to distinguish multiple actions in the same PostgreSQL transaction. Historic proposal reads permit a superseded schedule; mutation paths retain active/pinned schedule checks and project authorization. Legacy proposals explicitly report incomplete capture. Missing model identity/config metadata from injected callables is unknown, never invented. Confidence metadata is visible in the review screen.
@@ -35,9 +81,29 @@ The artifact records input hashes, declared reviewer, denominators, abstentions/
 
 Thresholds only inform review priority. Low-confidence, ambiguous or conflicting cases still need review; all updates retain deterministic validation and authorized acceptance. No automatic confidence-based approval is installed.
 
-## Current evidence gate
+## Earlier evidence preparation
 
-D04's reports are developer-authored synthetic development cases awaiting independent review. D05's group manifests are provisional and unfrozen. Current confidence scores are unavailable. Therefore A02 cannot produce defensible operational threshold choices yet. `evaluation/results/calibration-v1-pending.json` records this status and dependency hashes. Unit fixtures test the tool's behavior, including simulated review attestations, and are never submitted as actual independently reviewed calibration evidence.
+D04's 16 cases now have separate AI adjudication in `data/review/derived-v1/` and
+remain development. A fresh synthetic split is frozen in
+`data/evaluation/prototype-v1/manifest-v2.json`; Cambridge remains excluded.
+Runtime confidence remains unavailable. `calibration-v1-pending.json` is historical
+pending evidence, not an achieved result. Unit fixtures are never submitted as
+actual calibration evidence.
+
+### Experimental estimator fixed before fresh validation
+
+`evaluation/confidence_estimator.py` defines `evidence-support-index-v1`, offline
+only. Extraction support averages exact nonempty source quotes, declared evidence
+coverage of asserted fields, absence of warnings, and a nonempty atomic summary
+without another work's blocker embedded in actual progress. Link support averages
+saved candidate membership, a unique candidate, an explicit source identifier and
+exact quotes. No expected labels are inputs. These structural support indices are
+**not correctness probabilities**: a quote can still support a wrong interpretation.
+The estimator installs no runtime policy. The diagnostic study uses precision
+0.98 and minimum support 20 per category, chosen before fresh scoring. These are
+study settings, not an automatic approval policy. Insufficient precision/support
+must produce null thresholds; small synthetic samples cannot establish deployment
+calibration. All updates still require authorized acceptance.
 
 
 ## Runtime history note (2026-10-12)

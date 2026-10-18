@@ -8,6 +8,12 @@
 
 Time Agent is a local-first construction progress assistant. It imports project schedules and daily reports, extracts evidence-backed observations, matches them to schedule activities, and prepares proposals for human review. A reviewer must approve a proposal before it can change the deterministic progress ledger.
 
+The [current status](docs/current-status.md) records the 18 October evidence and
+six remaining acceptance workstreams. Release acceptance remains incomplete;
+runtime confidence is unavailable and both rollout flags remain off. Configured
+extraction uses Groq `openai/gpt-oss-20b`. Measured extraction delay is dominated
+by quota admission; see [the timing breakdown](docs/current-status.md#where-the-measured-latency-went).
+
 The application is intended to run on a laptop with FastAPI, PostgreSQL, and a React frontend. Model inference can remain local or use a private, authenticated Ollama endpoint over Tailscale. The system preserves source provenance, schedule versions, review history, corrections, approval effects, and rollback information so progress changes remain explainable.
 
 ## What it does
@@ -26,7 +32,7 @@ The current report-processing runtime uses the bounded LangGraph worker with Pos
 
 The graph-only local prototype was verified on 2026-10-12. Current post-removal checks are recorded in [`docs/handoffs/graph-only-runtime.md`](docs/handoffs/graph-only-runtime.md) and [`docs/release.md`](docs/release.md). A live browser-to-running-API/worker/model graph job and a literal subprocess-kill checkpoint-resume test passed before the processor cleanup; they are bounded workflow evidence, not an unseen evaluation or lifecycle/duration acceptance.
 
-Independent human label review, adjudication/calibration, frozen evaluation splits and a full unseen UI-to-export model evaluation remain pending. The owner sample package is `not_received`. Public Cambridge/GT10 schedules and synthetic reports are development inputs; a technical source-backed review does not constitute planner approval or field truth. See [`docs/release.md`](docs/release.md) for current validation and remaining gates.
+The prototype permits owner-authorized AI-assisted review and MOCK PMIS; an owner sample is `not_expected`. Independent human review has not occurred. Earlier frozen validation and holdout sets have been evaluated and are consumed. V20 still needs fresh validation, a newly frozen holdout, supported confidence, sustained capacity and concurrent latency evidence. Public Cambridge/GT10 schedules and synthetic reports do not establish owner-project accuracy. See [current status](docs/current-status.md) and [release evidence](docs/release.md).
 
 The [Gemma quality evaluation](evaluation/RESULTS.md#gemma-4-12b-quality-evaluation--12-october-2026) covers 60 existing synthetic cases: 44/45 matchable activities and 36/36 stated quantities were correct, but five of 15 unmatched inputs were falsely selected (all-selection precision 89.8%, safe abstention 66.7%). This compact full-schedule benchmark is separate from the production graph flow; it supports human-reviewed use, not automatic approval or an independent release claim.
 
@@ -70,7 +76,7 @@ site-progress-agent/
 - Node.js and npm
 - Docker Desktop with PostgreSQL 16.6
 - Java for native schedule parsing
-- Ollama locally, or a private authenticated Ollama endpoint when live inference is enabled
+- A configured inference provider: Groq for the current local profile, or a separately configured Ollama/OpenRouter adapter
 
 ## Quick start
 
@@ -173,7 +179,7 @@ Time Agent uses FastAPI, Pydantic, SQLAlchemy, Alembic, PostgreSQL, React, Vite,
 
 ### Groq model provider
 
-Set `LLM_PROVIDER=groq`, `GROQ_API_KEY`, and `GROQ_MODEL=openai/gpt-oss-20b` in `.env`, then restart the backend and worker. Both report analysis and conversation use this provider. Report text and model context are sent to Groq. Use `LLM_PROVIDER=ollama` to return to the configured Ollama model.
+The current local extraction configuration is Groq `openai/gpt-oss-20b`, not GPT-OSS 120B. Set `LLM_PROVIDER=groq`, `GROQ_API_KEY`, and `GROQ_MODEL=openai/gpt-oss-20b` in `.env`, and check role-specific `EXTRACTION_*` and `SELECTION_*` overrides before restarting the API and worker. Existing work retains its pinned assignments. Report text and model context are sent to the configured provider. Changing the base provider alone does not override role-specific settings.
 
 The adapter uses Groq JSON schema output with application schema and evidence validation. Existing reanalysis jobs retain their saved provider/model; legacy jobs with a saved model use Ollama. No Groq SDK is required.
 
@@ -181,4 +187,4 @@ Run `.venv/bin/python ops/compare_model_latency.py` to compare three synthetic e
 
 The [hierarchical runtime rollout guide](docs/multi-agent-runtime.md) documents the disabled-by-default v2 report hierarchy, shared conversation specialists, provider roles, durable task traces, verification and rollback. Existing v1 runs retain their stored runtime version.
 
-New conversations created with the hierarchy enabled use durable worker analysis; see [conversation operation and rollback](docs/durable-conversations.md). Apply migration `0017_conversation_tasks` before using the updated worker. Both rollout flags remain disabled by default.
+New conversations created with the hierarchy enabled use durable worker analysis; see [conversation operation and rollback](docs/durable-conversations.md). Apply migrations through `0018_hosted_admission` for the current hosted worker. All three Groq keys share one organization quota; admission is coordinated through PostgreSQL for clients using that database. Both rollout flags remain disabled by default. V20 remains opt-in, and starting the app does not select it automatically.

@@ -1,10 +1,29 @@
 # Durable conversation analysis
 
+Current acceptance and retained-task dispositions are in
+[current status](current-status.md) and [the 18 October follow-up](release-followup-2026-10-18.md).
+The default hierarchy flag remains false; a reachable app does not imply new
+conversations use this durable path. Latest rehearsal code explicitly pins V20 and
+Groq roles, uses lifecycle-start input and rejects empty-card task completions.
+That rehearsal revision has not been live validated. A successful task for a
+delivery-only message can produce no lifecycle cards and does not establish
+lifecycle extraction/matching quality.
+
+Populated restore evidence from 17 October is in
+`evaluation/results/release-completion-2026-10-17/populated-recovery/`.
+A synthetic task was stopped after saving a response, backed up with two provider
+admission rows, restored and hash-verified, then resumed with both rollout flags
+false. It succeeded on attempt two with model-call count still one; replay was
+forbidden from constructing a model. Stale provider release was fenced, the saved
+cooldown remained enforced, and zero approved events were written. Only dead
+leases on the restored copy were expired; all 17 source recovery-table hashes
+stayed unchanged. This is deterministic crash/restore evidence, not live capacity.
+
 Implemented 16 October 2026 behind the existing, disabled-by-default hierarchy flag. Human confirmation still creates pending proposals; authorized reviewer approval remains the only path to ledger effects.
 
 ## Dispatch and operation
 
-Apply additive migration `0017_conversation_tasks` before running the updated API or worker. It adds private `conversation_tasks` and `conversation_task_calls` tables. Only the isolated local test database was migrated during implementation.
+Migration `0017_conversation_tasks` adds private task/call tables; current hosted operation also requires `0018_hosted_admission`. The application database was inspected at 0018 on 18 October. The earlier implementation initially migrated only the isolated test database; this does not describe the later local application state. No production deployment is certified.
 
 New conversations created with `AGENT_HIERARCHY_ENABLED=true` pin `conversation-analysis-v1` in their server-owned draft. Older conversations retain the synchronous path. The flag does not reinterpret existing durable conversations: they continue to accept turns and resume with their stored version after a rollback. `ORCHESTRATOR_MODEL_ASSISTED` does not control this deterministic conversation scheduler.
 

@@ -1,5 +1,10 @@
 # Hierarchical runtime rollout
 
+For the latest model, evidence, retained work and six open release workstreams,
+see [current status](current-status.md). Both rollout flags remain false. V20 is
+opt-in; the default extraction prompt remains V12. The historical implementation
+and measurements below do not establish current acceptance.
+
 Implemented 15 October 2026. Both runtime generations remain available. Human approval remains the only path to ledger effects.
 
 `AGENT_HIERARCHY_ENABLED=false` is the default. It controls creation of report runs and use of shared conversation specialists. Existing report runs dispatch from their stored graph/state versions, independently of the current flag. v1 checkpoints retain their original graph. v2 uses `report-analysis-v2` / `agent-state-v2`, nested intake, analysis, matching and review graphs, and additive `agent_tasks` storage (migration `0016_agent_tasks`). Execution is sequential.
@@ -52,4 +57,4 @@ The full agent PostgreSQL regression suite passed 50 tests after these changes. 
 
 The completed [report evaluation](../evaluation/results/report-planner-super-vl-2026-10-15/REPORT.md) includes an independent live 60-activity pair, a six-fixture controlled specialist replay with live planners, and a separately retained retry of the interrupted clear-match fixture. Domain outputs matched across each controlled pair; all persisted proposals stayed pending, successful terminal replays created no duplicates, and ledger writes were zero. The six-fixture first pass had five successful cases and one transport/lease interruption; its retry later succeeded without replacing the original result. Small synthetic samples and unadjudicated labels remain insufficient for broad rollout.
 
-Current validation after the resumed work: 311 unit tests, 50 PostgreSQL agent integration tests, and 13 browser status scenarios passed. The evaluation preserves distinct diagnostic attempts and explains the planned-quantity label mismatch. Conversation task durability was subsequently implemented; see [its runtime and verification guide](durable-conversations.md). The subsequent [provider capacity work](provider-capacity.md) adds process-local admission and bounded live/fault probes. Deployment-wide capacity remains pending; cross-provider fallback is deliberately unconfigured and fails closed. Neither rollout flag nor credentials were changed.
+At that resumed stage, 311 unit tests, 50 PostgreSQL agent integration tests and 13 browser status scenarios passed; these are historical totals. The evaluation preserves distinct diagnostic attempts and explains the planned-quantity label mismatch. Conversation task durability was subsequently implemented; see [its guide](durable-conversations.md). The [provider capacity implementation](provider-capacity.md) now uses PostgreSQL admission across processes sharing one database. Sustained representative capacity remains unproven; cross-provider fallback remains unconfigured and fails closed. Current verification scope is recorded in [current status](current-status.md).

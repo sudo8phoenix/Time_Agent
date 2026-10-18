@@ -1,0 +1,33 @@
+{
+  "version": "release-targets-v1",
+  "status": "owner_approved_frozen",
+  "approved_at": "2026-10-16T11:44:01Z",
+  "approval_source": "Owner reply in this session",
+  "approval_quote": "Use the proposed targets",
+  "source_document": "docs/evaluation-targets-draft.md",
+  "source_sha256": "d0b396089700c1f8dcefdbd75d02c54f8a829801ebb0167c4388d2051433c919",
+  "review_policy": {
+    "kind": "ai_assisted",
+    "authorization_quote": "u can do it , dw about it",
+    "human_review_completed": false,
+    "authorized_acceptance_required": true
+  },
+  "targets": {
+    "hard_safety_violations_max": 0,
+    "atomic_event_f1_min": 0.9,
+    "selected_link_precision_min": 0.98,
+    "selected_link_coverage_min": 0.8,
+    "candidate_recall_at_8_min": 0.95,
+    "endpoint_exact_accuracy_min": 0.95,
+    "safe_ambiguity_handling_min": 0.95,
+    "proposal_readiness_p95_seconds_max": 120,
+    "acceptance_to_internal_update_p95_seconds_max": 2,
+    "mock_acknowledgement_p95_seconds_without_retry_max": 10
+  },
+  "limitations": [
+    "Approval freezes targets; it does not establish achieved quality.",
+    "Earlier exploratory/development outcomes cannot be relabelled unseen.",
+    "AI-assisted review does not constitute independent human adjudication.",
+    "No confidence-routing threshold is approved or fabricated by this record."
+  ]
+}
