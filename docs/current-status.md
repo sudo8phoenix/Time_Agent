@@ -18,8 +18,15 @@ GPT-OSS 120B is not the configured extraction model. Existing jobs and durable
 conversations retain their saved assignments. Changing `.env` requires restarting
 the API and worker for new settings; it does not rewrite pinned work.
 
-LangGraph is the only report-processing runtime. Both hierarchy and model-assisted
-orchestration rollout flags remain false. The default extraction prompt remains
+LangGraph is the only report-processing runtime. On 18 October, at the owner’s
+request, hierarchy and model-assisted orchestration were enabled locally with
+Groq `openai/gpt-oss-120b` as the orchestrator (credential slot 1). The API on
+port 8001 and normal worker were gracefully restarted while both queues were
+idle. Liveness and a minimal synthetic 120B JSON response passed, along with
+25 focused configuration tests. This is local activation, not release acceptance
+or a complete report-flow quality evaluation. Existing pinned runs keep their
+saved configuration; extraction remains `openai/gpt-oss-20b`.
+The default extraction prompt remains
 `extraction-v12-source-clause-check`; V20
 (`extraction-v20-short-schedule-ids`) is an explicit candidate, not the default.
 The application database was inspected at migration `0018_hosted_admission`.
