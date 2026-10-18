@@ -1,0 +1,86 @@
+[
+  {
+    "case_id": "EXP-C247",
+    "report_id": "EXP-R083",
+    "original_locator": "line:2",
+    "corrected_locator": "line:3",
+    "reason": "Table header is an extra line before the three case rows; shift all case locators by one."
+  },
+  {
+    "case_id": "EXP-C248",
+    "report_id": "EXP-R083",
+    "original_locator": "line:3",
+    "corrected_locator": "line:4",
+    "reason": "Table header is an extra line before the three case rows; shift all case locators by one."
+  },
+  {
+    "case_id": "EXP-C249",
+    "report_id": "EXP-R083",
+    "original_locator": "line:4",
+    "corrected_locator": "line:5",
+    "reason": "Table header is an extra line before the three case rows; shift all case locators by one."
+  },
+  {
+    "case_id": "EXP-C262",
+    "report_id": "EXP-R088",
+    "original_locator": "line:2",
+    "corrected_locator": "line:3",
+    "reason": "Table header is an extra line before the three case rows; shift all case locators by one."
+  },
+  {
+    "case_id": "EXP-C263",
+    "report_id": "EXP-R088",
+    "original_locator": "line:3",
+    "corrected_locator": "line:4",
+    "reason": "Table header is an extra line before the three case rows; shift all case locators by one."
+  },
+  {
+    "case_id": "EXP-C264",
+    "report_id": "EXP-R088",
+    "original_locator": "line:4",
+    "corrected_locator": "line:5",
+    "reason": "Table header is an extra line before the three case rows; shift all case locators by one."
+  },
+  {
+    "case_id": "EXP-C277",
+    "report_id": "EXP-R093",
+    "original_locator": "line:2",
+    "corrected_locator": "line:3",
+    "reason": "Table header is an extra line before the three case rows; shift all case locators by one."
+  },
+  {
+    "case_id": "EXP-C278",
+    "report_id": "EXP-R093",
+    "original_locator": "line:3",
+    "corrected_locator": "line:4",
+    "reason": "Table header is an extra line before the three case rows; shift all case locators by one."
+  },
+  {
+    "case_id": "EXP-C279",
+    "report_id": "EXP-R093",
+    "original_locator": "line:4",
+    "corrected_locator": "line:5",
+    "reason": "Table header is an extra line before the three case rows; shift all case locators by one."
+  },
+  {
+    "case_id": "EXP-C292",
+    "report_id": "EXP-R098",
+    "original_locator": "line:2",
+    "corrected_locator": "line:3",
+    "reason": "Table header is an extra line before the three case rows; shift all case locators by one."
+  },
+  {
+    "case_id": "EXP-C293",
+    "report_id": "EXP-R098",
+    "original_locator": "line:3",
+    "corrected_locator": "line:4",
+    "reason": "Table header is an extra line before the three case rows; shift all case locators by one."
+  },
+  {
+    "case_id": "EXP-C294",
+    "report_id": "EXP-R098",
+    "original_locator": "line:4",
+    "corrected_locator": "line:5",
+    "reason": "Table header is an extra line before the three case rows; shift all case locators by one."
+  }
+]

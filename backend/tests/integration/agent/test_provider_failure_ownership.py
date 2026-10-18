@@ -5,6 +5,40 @@ from evaluation.lease_investigation import scenario
 
 
 @pytest.mark.parametrize("hierarchical", [False, True])
+@pytest.mark.parametrize("kind", ["capacity", "response"])
+def test_private_trace_distinguishes_provider_failure_without_raw_messages(hierarchical, kind, monkeypatch):
+    import json
+    from sqlalchemy import select
+    from app.db.models import AgentRun, AgentStep, AgentToolCall
+    from app.db.session import session_factory
+    from app.llm.hosted import HostedCapacityError
+    from app.llm.ollama import OllamaResponseError
+    from app.settings import get_settings
+    monkeypatch.setattr(get_settings(), "agent_hierarchy_enabled", hierarchical)
+    fixture = runtime_tests.RuntimeFixture()
+    original = fixture.model
+    def model(**kwargs):
+        if "candidate_ids" in kwargs["schema"].get("properties", {}):
+            error_type = HostedCapacityError if kind == "capacity" else OllamaResponseError
+            raise error_type("PRIVATE_PROVIDER_BODY_AND_SOURCE")
+        return original(**kwargs)
+    fixture.model = model
+    try:
+        assert fixture.run()["state"] == "failed"
+        with session_factory() as db:
+            run = db.scalar(select(AgentRun).where(AgentRun.job_id == fixture.job_id))
+            call = db.scalar(select(AgentToolCall).join(AgentStep).where(
+                AgentStep.run_id == run.id, AgentToolCall.tool_name == "retrieve_candidates"))
+            assert call.error_code == "AGENT_TOOL_FAILED"
+            assert call.sanitized_output_summary == {"failure_category":
+                "MODEL_CAPACITY_TIMEOUT" if kind == "capacity" else "MODEL_RESPONSE_INVALID"}
+            assert "PRIVATE_PROVIDER_BODY_AND_SOURCE" not in json.dumps({
+                "summary": call.sanitized_output_summary, "message": call.error_message})
+    finally:
+        fixture.cleanup()
+
+
+@pytest.mark.parametrize("hierarchical", [False, True])
 @pytest.mark.parametrize("worker", [False, True])
 @pytest.mark.parametrize("replace_lease", [False, True])
 def test_transport_and_lease_failures_are_distinguished(hierarchical, worker, replace_lease):

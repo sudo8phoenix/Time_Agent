@@ -1,7 +1,7 @@
 """Validated runtime configuration."""
 from functools import lru_cache
 from typing import Literal
-from pydantic import Field, SecretStr, ValidationError
+from pydantic import Field, SecretStr, ValidationError, field_validator
 from pydantic_settings import BaseSettings, SettingsConfigDict
 
 
@@ -37,6 +37,15 @@ class Settings(BaseSettings):
     agent_execution_mode: Literal["graph"] = "graph"
     agent_hierarchy_enabled: bool = False
     orchestrator_model_assisted: bool = False
+
+    @field_validator("orchestrator_key_slot", "extraction_key_slot", "selection_key_slot", mode="before")
+    @classmethod
+    def parse_key_slot(cls, value):
+        # Environment variables are strings; Literal[int] does not coerce them.
+        # Accept only the documented slots, never bools or arbitrary numbers.
+        if isinstance(value, bool):
+            raise ValueError("key slot must be 0, 1 or 2")
+        return int(value) if isinstance(value, str) and value in {"0", "1", "2"} else value
 
     model_config = SettingsConfigDict(env_file=".env", env_prefix="", extra="ignore")
 

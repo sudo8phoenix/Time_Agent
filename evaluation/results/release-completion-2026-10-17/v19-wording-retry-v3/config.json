@@ -1,0 +1,22 @@
+{
+  "started_at": "2026-10-17T08:04:27.479475+00:00",
+  "prompt_version": "extraction-v19-lifecycle-clause-completeness",
+  "prompt_sha256": "9aa60d1f7bf77c5c700133a162ac206761f65ce9f1652e7914b9ea094fb257d1",
+  "fixture_sha256": "0634aeec920fb40ccd1616322dd7e2645df17336aa88216ada7ada31583231fa",
+  "provider": "groq",
+  "model": "openai/gpt-oss-20b",
+  "key_slot": 0,
+  "transport_retries": 0,
+  "admission_scope": "postgresql_deployment",
+  "case_ids": [
+    "B19-04",
+    "B19-05"
+  ],
+  "timeout_seconds": 60,
+  "scope": "fresh wording synthetic component development checks; no persistence or approvals",
+  "source_sha256": {
+    "backend/app/llm/extract.py": "dce95e95964db7ae5dceb81c49aa5cde28c3c97dc99959083c484b722fe560c0",
+    "backend/app/prompts/extraction_v1.py": "8886545a492a282ee79afc7677db80e2d47af66879ef7bc35e2b65487c7e785d",
+    "/Users/cyrilsabugeorge/Documents/python_project/site-progress-agent/evaluation/extraction_quality.py": "f4e9dc716857d979a3a377f465fdc7c9428946e2f0adf2a8e0d8d931bd538ee1"
+  }
+}

@@ -250,20 +250,31 @@ def _read_response(response, deadline):
 
 
 def request(provider, method, url, payload, timeout, headers):
-    deadline = time.monotonic() + timeout
-    remaining = ADMISSION.acquire(provider, payload, timeout)
+    from .metrics import record_provider_request
+    started = time.monotonic()
+    admitted_at = None
     status, response_headers = None, {}
     try:
-        outgoing = Request(url, data=json.dumps(payload).encode(), method=method,
-            headers={"Content-Type": "application/json", "User-Agent": "site-progress-agent/0.1", **headers})
+        remaining = ADMISSION.acquire(provider, payload, timeout)
+        admitted_at = time.monotonic()
         try:
-            with urlopen(outgoing, timeout=remaining) as response:
-                status, response_headers = response.status, response.headers
-                raw = _read_response(response, deadline)
-                return status, json.loads(raw)
-        except HTTPError as error:
-            status, response_headers = error.code, error.headers
-            error.close()  # Error bodies may echo private input; never read them.
-            return status, {}
+            outgoing = Request(url, data=json.dumps(payload).encode(), method=method,
+                headers={"Content-Type": "application/json", "User-Agent": "site-progress-agent/0.1", **headers})
+            try:
+                with urlopen(outgoing, timeout=remaining) as response:
+                    status, response_headers = response.status, response.headers
+                    raw = _read_response(response, started + timeout)
+                    return status, json.loads(raw)
+            except HTTPError as error:
+                status, response_headers = error.code, error.headers
+                error.close()  # Error bodies may echo private input; never read them.
+                return status, {}
+        finally:
+            transport_finished = time.monotonic()
+            ADMISSION.release(provider, status=status, headers=response_headers)
     finally:
-        ADMISSION.release(provider, status=status, headers=response_headers)
+        finished = time.monotonic()
+        record_provider_request(provider,
+            admission_ms=1000 * ((admitted_at if admitted_at is not None else finished) - started),
+            transport_ms=1000 * (transport_finished - admitted_at) if admitted_at is not None else 0,
+            admitted=admitted_at is not None, status=status)

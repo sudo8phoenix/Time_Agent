@@ -1,0 +1,42 @@
+[
+  {
+    "kind": "report",
+    "id": "4ff1d455-cef8-4e85-b02a-d8f2db09b979",
+    "case_id": "C06",
+    "admitted": 0.07930208300240338,
+    "state": "ready_for_review",
+    "terminal_seconds": 115.757
+  },
+  {
+    "kind": "conversation",
+    "id": "c00b08ac-1252-4bc3-84d7-f84d61aaeb8a",
+    "case_id": "C06",
+    "admitted": 0.09221283299848437,
+    "state": "succeeded",
+    "terminal_seconds": 2.032
+  },
+  {
+    "kind": "report",
+    "id": "5f57ec7b-853a-4725-bf91-bf018ebbd695",
+    "case_id": "C01",
+    "admitted": 150.48557595800958
+  },
+  {
+    "kind": "conversation",
+    "id": "f03acb54-11d1-4e66-92a5-f48c2a1d137c",
+    "case_id": "C01",
+    "admitted": 150.4952371249965
+  },
+  {
+    "kind": "report",
+    "id": "3edd8916-5ced-47bb-b99a-e38b587d1a48",
+    "case_id": "C06",
+    "admitted": 150.49912833300186
+  },
+  {
+    "kind": "conversation",
+    "id": "9cf1f9b3-248a-4055-9fa8-c2e18f4a3242",
+    "case_id": "C06",
+    "admitted": 150.5080055410217
+  }
+]

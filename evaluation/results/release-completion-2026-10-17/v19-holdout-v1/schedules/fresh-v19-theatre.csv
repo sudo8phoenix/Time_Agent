@@ -1,0 +1,4 @@
+activity_id,activity_name,wbs_path,discipline,work_type,area,asset_tags,is_leaf,measurement_basis,planned_quantity,unit,planned_start,planned_finish,aliases
+THEATRE-1,panel installation at Stage vault,theatre/1,electrical,equipment_installation,Stage vault,DB-863,true,unsupported,,,2027-01-01,2027-04-30,
+THEATRE-2,cable termination at Stage vault,theatre/2,electrical,cable_termination,Stage vault,,true,unsupported,,,2027-01-01,2027-04-30,
+THEATRE-3,insulation testing at Stage vault,theatre/3,electrical,other,Stage vault,,true,unsupported,,,2027-01-01,2027-04-30,

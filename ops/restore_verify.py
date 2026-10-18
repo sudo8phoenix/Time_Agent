@@ -60,6 +60,18 @@ def main():
     docker("createdb", "-U", "progress", args.database)
     with dump.open("rb") as handle:
         docker("pg_restore", "-U", "progress", "-d", args.database, "--exit-on-error", stdin=handle)
+    revision = docker("psql", "-U", "progress", "-d", args.database, "-Atc",
+                      "SELECT version_num FROM alembic_version", capture_output=True, text=True).stdout.strip()
+    if manifest.get("schema_revision") and revision != manifest["schema_revision"]:
+        raise SystemExit("Restored migration identity differs from backup manifest")
+    for table in manifest.get("pre_migration_recovery_tables", []):
+        if table not in RECOVERY_TABLES:
+            raise SystemExit("Backup manifest contains an unsupported pre-migration table")
+        present = docker("psql", "-U", "progress", "-d", args.database, "-Atc",
+                         f"SELECT to_regclass('public.{table}') IS NOT NULL",
+                         capture_output=True, text=True).stdout.strip()
+        if present != "f":
+            raise SystemExit("Restored pre-migration table inventory differs from backup manifest")
     for entry in manifest["files"]:
         target = destination / entry["storage_key"]
         target.parent.mkdir(parents=True, exist_ok=True)
@@ -101,6 +113,7 @@ def main():
         if len(lines) != expected["count"] or recovery_digest(lines) != expected["sha256"]:
             raise SystemExit(f"Restored {table} checkpoints differ from backup manifest")
     print(json.dumps({"database": args.database, "uploads": str(destination), "verified": True,
+                      "schema_revision": revision,
                       "approved_events": len(manifest["approved_event_ids"]), "originals": len(manifest["files"]),
                       "recovery_rows": {name: len(row["ids"]) for name, row in manifest.get("recovery_rows", {}).items()},
                       "checkpoint_rows": {name: row["count"] for name, row in manifest.get("checkpoint_rows", {}).items()}}))

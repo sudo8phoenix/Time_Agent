@@ -1,0 +1,1 @@
+{"case_id": "Q07", "state": "failed", "error_type": "HostedCapacityError", "error_code": "MODEL_CAPACITY_TIMEOUT", "retry_after_seconds": 0, "quota_headers": {}, "elapsed_ms": 172}

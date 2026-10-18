@@ -1,0 +1,313 @@
+{
+  "version": "prototype-fresh-cases-manifest-v2",
+  "status": "frozen",
+  "frozen_at": "2026-10-17T07:03:27.170408+00:00",
+  "review": {
+    "kind": "ai_assisted",
+    "status": "ai_assisted_adjudicated",
+    "human_review_completed": false,
+    "reviewer_id": "codex-ai-author-and-adjudicator-2026-10-17",
+    "label_authors": [
+      "codex-ai-author-2026-10-17"
+    ],
+    "reviewed_at": "2026-10-17T07:03:10.341524+00:00",
+    "attestation": "Source assertions and schedule identity reviewed before runtime capture; explicit times retain minute/date precision; no planned dependency is treated as actual chronology. Same AI session authored and adjudicated these cases; no independent reviewer is claimed.",
+    "authorization_sha256": "354ff9726857a8bad2d67c0157594ff965780fa2d4f9dbed5d4439efaf81ed93"
+  },
+  "group_review_status": "ai_assisted_adjudicated",
+  "splits": {
+    "development": [
+      {
+        "case_id": "gt10-dev-001",
+        "group_id": "GT10BLDG-all-snapshots"
+      },
+      {
+        "case_id": "gt10-dev-002",
+        "group_id": "GT10BLDG-all-snapshots"
+      },
+      {
+        "case_id": "gt10-dev-003",
+        "group_id": "GT10BLDG-all-snapshots"
+      },
+      {
+        "case_id": "gt10-dev-004",
+        "group_id": "GT10BLDG-all-snapshots"
+      },
+      {
+        "case_id": "gt10-dev-005",
+        "group_id": "GT10BLDG-all-snapshots"
+      },
+      {
+        "case_id": "gt10-dev-006",
+        "group_id": "GT10BLDG-all-snapshots"
+      },
+      {
+        "case_id": "gt10-dev-007",
+        "group_id": "GT10BLDG-all-snapshots"
+      },
+      {
+        "case_id": "gt10-dev-008",
+        "group_id": "GT10BLDG-all-snapshots"
+      },
+      {
+        "case_id": "gt10-dev-009",
+        "group_id": "GT10BLDG-all-snapshots"
+      },
+      {
+        "case_id": "gt10-dev-010",
+        "group_id": "GT10BLDG-all-snapshots"
+      },
+      {
+        "case_id": "gt10-dev-011",
+        "group_id": "GT10BLDG-all-snapshots"
+      },
+      {
+        "case_id": "gt10-dev-012",
+        "group_id": "GT10BLDG-all-snapshots"
+      },
+      {
+        "case_id": "gt10-dev-013",
+        "group_id": "GT10BLDG-all-snapshots"
+      },
+      {
+        "case_id": "gt10-dev-014",
+        "group_id": "GT10BLDG-all-snapshots"
+      },
+      {
+        "case_id": "gt10-dev-015",
+        "group_id": "GT10BLDG-all-snapshots"
+      },
+      {
+        "case_id": "gt10-dev-016",
+        "group_id": "GT10BLDG-all-snapshots"
+      },
+      {
+        "case_id": "seed:C01",
+        "group_id": "utility-seed-expanded-all-variants"
+      },
+      {
+        "case_id": "seed:C02",
+        "group_id": "utility-seed-expanded-all-variants"
+      },
+      {
+        "case_id": "seed:C03",
+        "group_id": "utility-seed-expanded-all-variants"
+      },
+      {
+        "case_id": "seed:C04",
+        "group_id": "utility-seed-expanded-all-variants"
+      },
+      {
+        "case_id": "seed:C05",
+        "group_id": "utility-seed-expanded-all-variants"
+      },
+      {
+        "case_id": "seed:C06",
+        "group_id": "utility-seed-expanded-all-variants"
+      },
+      {
+        "case_id": "seed:C07",
+        "group_id": "utility-seed-expanded-all-variants"
+      },
+      {
+        "case_id": "seed:C08",
+        "group_id": "utility-seed-expanded-all-variants"
+      },
+      {
+        "case_id": "seed:C09",
+        "group_id": "utility-seed-expanded-all-variants"
+      },
+      {
+        "case_id": "seed:C10",
+        "group_id": "utility-seed-expanded-all-variants"
+      },
+      {
+        "case_id": "seed:C11",
+        "group_id": "utility-seed-expanded-all-variants"
+      },
+      {
+        "case_id": "seed:C12",
+        "group_id": "utility-seed-expanded-all-variants"
+      },
+      {
+        "case_id": "seed:C13",
+        "group_id": "utility-seed-expanded-all-variants"
+      },
+      {
+        "case_id": "seed:C14",
+        "group_id": "utility-seed-expanded-all-variants"
+      },
+      {
+        "case_id": "seed:C15",
+        "group_id": "utility-seed-expanded-all-variants"
+      },
+      {
+        "case_id": "seed:C16",
+        "group_id": "utility-seed-expanded-all-variants"
+      },
+      {
+        "case_id": "seed:C17",
+        "group_id": "utility-seed-expanded-all-variants"
+      },
+      {
+        "case_id": "seed:C18",
+        "group_id": "utility-seed-expanded-all-variants"
+      },
+      {
+        "case_id": "seed:C19",
+        "group_id": "utility-seed-expanded-all-variants"
+      },
+      {
+        "case_id": "seed:C20",
+        "group_id": "utility-seed-expanded-all-variants"
+      },
+      {
+        "case_id": "Q01",
+        "group_id": "scope-wording-development"
+      },
+      {
+        "case_id": "Q02",
+        "group_id": "scope-wording-development"
+      },
+      {
+        "case_id": "Q03",
+        "group_id": "scope-wording-development"
+      },
+      {
+        "case_id": "Q04",
+        "group_id": "scope-wording-development"
+      },
+      {
+        "case_id": "Q05",
+        "group_id": "scope-wording-development"
+      },
+      {
+        "case_id": "Q06",
+        "group_id": "scope-wording-development"
+      },
+      {
+        "case_id": "Q07",
+        "group_id": "scope-wording-development"
+      },
+      {
+        "case_id": "D15-01",
+        "group_id": "scope-wording-development"
+      },
+      {
+        "case_id": "D15-02",
+        "group_id": "scope-wording-development"
+      },
+      {
+        "case_id": "D15-03",
+        "group_id": "scope-wording-development"
+      }
+    ],
+    "train": [],
+    "validation": [
+      {
+        "case_id": "V-WATER-1:e1",
+        "group_id": "V-WATER"
+      },
+      {
+        "case_id": "V-WATER-2:e1",
+        "group_id": "V-WATER"
+      },
+      {
+        "case_id": "V-CIVIL-1:e1",
+        "group_id": "V-CIVIL"
+      },
+      {
+        "case_id": "V-CIVIL-2:e1",
+        "group_id": "V-CIVIL"
+      },
+      {
+        "case_id": "V-STEEL-1:e1",
+        "group_id": "V-STEEL"
+      },
+      {
+        "case_id": "V-POWER-1:e1",
+        "group_id": "V-POWER"
+      },
+      {
+        "case_id": "V-POWER-2:e1",
+        "group_id": "V-POWER"
+      }
+    ],
+    "holdout": [
+      {
+        "case_id": "H-DRAIN-1",
+        "group_id": "H-DRAIN"
+      },
+      {
+        "case_id": "H-DRAIN-2",
+        "group_id": "H-DRAIN"
+      },
+      {
+        "case_id": "H-TANK-1",
+        "group_id": "H-TANK"
+      },
+      {
+        "case_id": "H-TANK-2",
+        "group_id": "H-TANK"
+      },
+      {
+        "case_id": "H-ROAD-1",
+        "group_id": "H-ROAD"
+      },
+      {
+        "case_id": "H-ROAD-2",
+        "group_id": "H-ROAD"
+      },
+      {
+        "case_id": "H-CONTROL-1",
+        "group_id": "H-CONTROL"
+      },
+      {
+        "case_id": "H-CONTROL-2",
+        "group_id": "H-CONTROL"
+      }
+    ]
+  },
+  "hashes": {
+    "holdout-labels.jsonl": "5202a8257f316f85cd99441599137acbd6e7606690c8056611af80f511296d76",
+    "validation-labels.jsonl": "887bedcf3fa319549e3d06eb204d95be5d588ac94221cbb4fda8fe2115533595",
+    "inputs.jsonl": "1e9ea461709666f96ed5570ee806636d9ff601ef8180926b0f92d9129d6b67b7"
+  },
+  "coverage": [
+    "mechanical",
+    "civil",
+    "structural",
+    "electrical",
+    "actual_progress",
+    "start",
+    "finish",
+    "plans",
+    "blockers",
+    "delivery",
+    "no_work",
+    "ambiguity",
+    "unmatched",
+    "injection",
+    "date_conflict",
+    "multiple_atomic_events"
+  ],
+  "limitations": [
+    "16 fresh synthetic reports across 8 fictional projects; small denominators must be reported.",
+    "No owner-specific or public-project generalization claim.",
+    "Narrative text only; native schedule/parser and browser delivery flows have separate evidence.",
+    "Groups identify authored projects; GT10 and earlier utility development variants remain development and are not reused here.",
+    "Holdout content was authored in this AI session; runtime adapters receive no labels and capture must precede scoring."
+  ],
+  "supersedes_manifest_sha256": "32e8507c0eff3985dfbcf004e562be45d83059addeb7689db998b6aa2027930d",
+  "development_fixture_sha256": {
+    "evaluation/fixtures/quality-wording-variants.json": "cfb3af2409864c2a17d987f0eb647588397b2ac5ff33b7049d576f06773f3a02",
+    "evaluation/fixtures/v15-scope-development.json": "9e1e7c034fae096e2a05784fec1dcfc68fde49a871476e0c076b9336c6c44dec"
+  },
+  "labels_sha256": "4c27161c0c3292bba7f6120887d0829c673a4abbe410e5f6fb7660b2ac5b242a",
+  "predictions_sha256": "6515db22423de31f6a46635341a11aad556fceeef82100bc53c4a4658ecb0b12",
+  "policy": {
+    "target_precision": 0.98,
+    "min_support": 20
+  },
+  "derivation": "Atomic validation inventory from frozen report labels; excludes date-unscored events under predeclared study policy."
+}

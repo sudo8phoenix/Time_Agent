@@ -1,0 +1,1537 @@
+{
+  "batch_latency": {
+    "count": 6,
+    "max_ms": 292369.63,
+    "mean_ms": 214228.28,
+    "median_ms": 206273.79,
+    "p50_ms": 206273.79,
+    "p95_ms": 292369.63
+  },
+  "case_failures": 0,
+  "case_outcomes": {
+    "abstained": 11,
+    "abstention_rate": 0.18333333333333332,
+    "cases": 60,
+    "failed": 0,
+    "failure_cases": [],
+    "failure_rate": 0.0
+  },
+  "corrected_review_state": {
+    "cases": 0,
+    "field_accuracy": null,
+    "field_applicable": 0,
+    "field_correct": 0
+  },
+  "critical_fields": {
+    "finish_date": {
+      "accuracy": 0.0,
+      "applicable": 0,
+      "correct": 0
+    },
+    "finish_time": {
+      "accuracy": 0.0,
+      "applicable": 0,
+      "correct": 0
+    },
+    "quantity": {
+      "accuracy": 1.0,
+      "applicable": 36,
+      "correct": 36
+    },
+    "quantity_kind": {
+      "accuracy": 0.6833333333333333,
+      "applicable": 60,
+      "correct": 41
+    },
+    "start_date": {
+      "accuracy": 0.0,
+      "applicable": 0,
+      "correct": 0
+    },
+    "start_time": {
+      "accuracy": 0.0,
+      "applicable": 0,
+      "correct": 0
+    },
+    "tag": {
+      "accuracy": 0.9777777777777777,
+      "applicable": 45,
+      "correct": 44
+    },
+    "time_precision": {
+      "accuracy": 0.0,
+      "applicable": 0,
+      "correct": 0
+    },
+    "unit": {
+      "accuracy": 0.7777777777777778,
+      "applicable": 27,
+      "correct": 21
+    },
+    "work_date": {
+      "accuracy": 0.0,
+      "applicable": 0,
+      "correct": 0
+    }
+  },
+  "error_field_counts": {
+    "activity_selection": 6,
+    "event_type": 7,
+    "quantity": 24,
+    "quantity_kind": 19,
+    "unit": 39
+  },
+  "errors": [
+    {
+      "category": "correct",
+      "count": 48
+    },
+    {
+      "category": "event_type",
+      "count": 7
+    },
+    {
+      "category": "false_match",
+      "count": 5
+    }
+  ],
+  "errors_by_case": [
+    {
+      "actual": {
+        "event_type": "unknown",
+        "quantity": "10",
+        "quantity_kind": "delta",
+        "unit": "m3"
+      },
+      "actual_selection": [
+        "CIV-A-EXC-01"
+      ],
+      "case_id": "EXP-C241",
+      "expected": {
+        "event_type": "actual_progress",
+        "quantity": "10",
+        "quantity_kind": "delta",
+        "unit": "m3"
+      },
+      "expected_selection": [
+        "CIV-A-EXC-01"
+      ],
+      "fields": [
+        "event_type"
+      ]
+    },
+    {
+      "actual": {
+        "event_type": "unknown",
+        "quantity": "None",
+        "quantity_kind": "cumulative",
+        "unit": "none"
+      },
+      "actual_selection": [
+        "MEC-A-SKID-01"
+      ],
+      "case_id": "EXP-C243",
+      "expected": {
+        "event_type": "actual_progress",
+        "quantity": null,
+        "quantity_kind": "cumulative",
+        "unit": null
+      },
+      "expected_selection": [
+        "MEC-A-SKID-01"
+      ],
+      "fields": [
+        "event_type",
+        "quantity",
+        "unit"
+      ]
+    },
+    {
+      "actual": {
+        "event_type": "unknown",
+        "quantity": "2",
+        "quantity_kind": "delta",
+        "unit": "spool"
+      },
+      "actual_selection": [
+        "PIP-A-ERECT-01"
+      ],
+      "case_id": "EXP-C244",
+      "expected": {
+        "event_type": "actual_progress",
+        "quantity": "2",
+        "quantity_kind": "delta",
+        "unit": "spool"
+      },
+      "expected_selection": [
+        "PIP-A-ERECT-01"
+      ],
+      "fields": [
+        "event_type"
+      ]
+    },
+    {
+      "actual": {
+        "event_type": "correction",
+        "quantity": "None",
+        "quantity_kind": "delta",
+        "unit": "none"
+      },
+      "actual_selection": [
+        "CIV-A-FORM-01"
+      ],
+      "case_id": "EXP-C245",
+      "expected": {
+        "event_type": "correction",
+        "quantity": null,
+        "quantity_kind": "none",
+        "unit": "m2"
+      },
+      "expected_selection": [
+        "CIV-A-FORM-01"
+      ],
+      "fields": [
+        "quantity",
+        "quantity_kind",
+        "unit"
+      ]
+    },
+    {
+      "actual": {
+        "event_type": "unknown",
+        "quantity": "50",
+        "quantity_kind": "delta",
+        "unit": "m"
+      },
+      "actual_selection": [
+        "ELE-A-CABLE-01"
+      ],
+      "case_id": "EXP-C247",
+      "expected": {
+        "event_type": "actual_progress",
+        "quantity": "50",
+        "quantity_kind": "delta",
+        "unit": "m"
+      },
+      "expected_selection": [
+        "ELE-A-CABLE-01"
+      ],
+      "fields": [
+        "event_type"
+      ]
+    },
+    {
+      "actual": {
+        "event_type": "correction",
+        "quantity": "10",
+        "quantity_kind": "delta",
+        "unit": "none"
+      },
+      "actual_selection": [
+        "CIV-A-BACK-01"
+      ],
+      "case_id": "EXP-C248",
+      "expected": {
+        "event_type": "correction",
+        "quantity": "10",
+        "quantity_kind": "delta",
+        "unit": "m3"
+      },
+      "expected_selection": [
+        "CIV-A-BACK-01"
+      ],
+      "fields": [
+        "unit"
+      ]
+    },
+    {
+      "actual": {
+        "event_type": "unknown",
+        "quantity": "10",
+        "quantity_kind": "cumulative",
+        "unit": "m3"
+      },
+      "actual_selection": [
+        "CIV-B-EXC-02"
+      ],
+      "case_id": "EXP-C249",
+      "expected": {
+        "event_type": "actual_progress",
+        "quantity": "10",
+        "quantity_kind": "cumulative",
+        "unit": "m3"
+      },
+      "expected_selection": [
+        "CIV-B-EXC-02"
+      ],
+      "fields": [
+        "event_type"
+      ]
+    },
+    {
+      "actual": {
+        "event_type": "unknown",
+        "quantity": "2",
+        "quantity_kind": "delta",
+        "unit": "equipment"
+      },
+      "actual_selection": [
+        "STR-A-STEEL-01"
+      ],
+      "case_id": "EXP-C250",
+      "expected": {
+        "event_type": "actual_progress",
+        "quantity": "2",
+        "quantity_kind": "delta",
+        "unit": "each"
+      },
+      "expected_selection": [
+        "STR-A-STEEL-01"
+      ],
+      "fields": [
+        "event_type",
+        "unit"
+      ]
+    },
+    {
+      "actual": {
+        "event_type": "correction",
+        "quantity": "50",
+        "quantity_kind": "delta",
+        "unit": "none"
+      },
+      "actual_selection": [
+        "ELE-A-CABLE2-01"
+      ],
+      "case_id": "EXP-C251",
+      "expected": {
+        "event_type": "correction",
+        "quantity": "50",
+        "quantity_kind": "delta",
+        "unit": "m"
+      },
+      "expected_selection": [
+        "ELE-A-CABLE2-01"
+      ],
+      "fields": [
+        "unit"
+      ]
+    },
+    {
+      "actual": {
+        "event_type": "unknown",
+        "quantity": "null",
+        "quantity_kind": "none",
+        "unit": "none"
+      },
+      "actual_selection": [],
+      "case_id": "EXP-C253",
+      "expected": {
+        "event_type": "actual_progress",
+        "quantity": null,
+        "quantity_kind": "none",
+        "unit": null
+      },
+      "expected_selection": [
+        "CIV-A-CURE-01"
+      ],
+      "fields": [
+        "event_type",
+        "quantity",
+        "unit",
+        "activity_selection"
+      ]
+    },
+    {
+      "actual": {
+        "event_type": "correction",
+        "quantity": "4",
+        "quantity_kind": "delta",
+        "unit": "none"
+      },
+      "actual_selection": [
+        "PIP-A-WELD2-01"
+      ],
+      "case_id": "EXP-C254",
+      "expected": {
+        "event_type": "correction",
+        "quantity": "4",
+        "quantity_kind": "delta",
+        "unit": "joint"
+      },
+      "expected_selection": [
+        "PIP-A-WELD2-01"
+      ],
+      "fields": [
+        "unit"
+      ]
+    },
+    {
+      "actual": {
+        "event_type": "actual_progress",
+        "quantity": "10",
+        "quantity_kind": "delta",
+        "unit": "widgets"
+      },
+      "actual_selection": [
+        "CIV-B-POUR-02"
+      ],
+      "case_id": "EXP-C257",
+      "expected": {
+        "event_type": "actual_progress",
+        "quantity": "10",
+        "quantity_kind": "delta",
+        "unit": null
+      },
+      "expected_selection": [
+        "CIV-B-POUR-02"
+      ],
+      "fields": [
+        "unit"
+      ]
+    },
+    {
+      "actual": {
+        "event_type": "actual_progress",
+        "quantity": "2",
+        "quantity_kind": "delta",
+        "unit": "none"
+      },
+      "actual_selection": [
+        "STR-B-STEEL-02"
+      ],
+      "case_id": "EXP-C258",
+      "expected": {
+        "event_type": "actual_progress",
+        "quantity": "2",
+        "quantity_kind": "delta",
+        "unit": "each"
+      },
+      "expected_selection": [
+        "STR-B-STEEL-02"
+      ],
+      "fields": [
+        "unit"
+      ]
+    },
+    {
+      "actual": {
+        "event_type": "actual_progress",
+        "quantity": "2",
+        "quantity_kind": "delta",
+        "unit": "widgets"
+      },
+      "actual_selection": [
+        "STR-A-STEEL2-01"
+      ],
+      "case_id": "EXP-C259",
+      "expected": {
+        "event_type": "actual_progress",
+        "quantity": "2",
+        "quantity_kind": "delta",
+        "unit": null
+      },
+      "expected_selection": [
+        "STR-A-STEEL2-01"
+      ],
+      "fields": [
+        "unit"
+      ]
+    },
+    {
+      "actual": {
+        "event_type": "actual_progress",
+        "quantity": "null",
+        "quantity_kind": "none",
+        "unit": "none"
+      },
+      "actual_selection": [
+        "PIP-B-TEST-02"
+      ],
+      "case_id": "EXP-C260",
+      "expected": {
+        "event_type": "actual_progress",
+        "quantity": null,
+        "quantity_kind": "none",
+        "unit": null
+      },
+      "expected_selection": [
+        "PIP-B-TEST-02"
+      ],
+      "fields": [
+        "quantity",
+        "unit"
+      ]
+    },
+    {
+      "actual": {
+        "event_type": "actual_progress",
+        "quantity": "null",
+        "quantity_kind": "delta",
+        "unit": "widget"
+      },
+      "actual_selection": [
+        "CIV-B-CURE-02"
+      ],
+      "case_id": "EXP-C261",
+      "expected": {
+        "event_type": "actual_progress",
+        "quantity": null,
+        "quantity_kind": "none",
+        "unit": null
+      },
+      "expected_selection": [
+        "CIV-B-CURE-02"
+      ],
+      "fields": [
+        "quantity",
+        "quantity_kind",
+        "unit"
+      ]
+    },
+    {
+      "actual": {
+        "event_type": "actual_progress",
+        "quantity": "null",
+        "quantity_kind": "delta",
+        "unit": "widget"
+      },
+      "actual_selection": [
+        "MEC-B-PUMP-02"
+      ],
+      "case_id": "EXP-C263",
+      "expected": {
+        "event_type": "actual_progress",
+        "quantity": null,
+        "quantity_kind": "none",
+        "unit": null
+      },
+      "expected_selection": [
+        "MEC-B-PUMP-02"
+      ],
+      "fields": [
+        "quantity",
+        "quantity_kind",
+        "unit"
+      ]
+    },
+    {
+      "actual": {
+        "event_type": "actual_progress",
+        "quantity": "4",
+        "quantity_kind": "delta",
+        "unit": "widget"
+      },
+      "actual_selection": [
+        "PIP-B-WELD-02"
+      ],
+      "case_id": "EXP-C265",
+      "expected": {
+        "event_type": "actual_progress",
+        "quantity": "4",
+        "quantity_kind": "delta",
+        "unit": null
+      },
+      "expected_selection": [
+        "PIP-B-WELD-02"
+      ],
+      "fields": [
+        "unit"
+      ]
+    },
+    {
+      "actual": {
+        "event_type": "actual_progress",
+        "quantity": "2",
+        "quantity_kind": "delta",
+        "unit": "widget"
+      },
+      "actual_selection": [
+        "STR-B-STEEL2-02"
+      ],
+      "case_id": "EXP-C267",
+      "expected": {
+        "event_type": "actual_progress",
+        "quantity": "2",
+        "quantity_kind": "delta",
+        "unit": null
+      },
+      "expected_selection": [
+        "STR-B-STEEL2-02"
+      ],
+      "fields": [
+        "unit"
+      ]
+    },
+    {
+      "actual": {
+        "event_type": "actual_progress",
+        "quantity": "null",
+        "quantity_kind": "delta",
+        "unit": "widget"
+      },
+      "actual_selection": [
+        "MEC-B-SKID-02"
+      ],
+      "case_id": "EXP-C269",
+      "expected": {
+        "event_type": "actual_progress",
+        "quantity": null,
+        "quantity_kind": "none",
+        "unit": null
+      },
+      "expected_selection": [
+        "MEC-B-SKID-02"
+      ],
+      "fields": [
+        "quantity",
+        "quantity_kind",
+        "unit"
+      ]
+    },
+    {
+      "actual": {
+        "event_type": "actual_progress",
+        "quantity": "null",
+        "quantity_kind": "none",
+        "unit": "widgets"
+      },
+      "actual_selection": [
+        "CIV-B-FORM-02"
+      ],
+      "case_id": "EXP-C271",
+      "expected": {
+        "event_type": "actual_progress",
+        "quantity": null,
+        "quantity_kind": "none",
+        "unit": null
+      },
+      "expected_selection": [
+        "CIV-B-FORM-02"
+      ],
+      "fields": [
+        "quantity",
+        "unit"
+      ]
+    },
+    {
+      "actual": {
+        "event_type": "actual_progress",
+        "quantity": "4",
+        "quantity_kind": "delta",
+        "unit": "widgets"
+      },
+      "actual_selection": [
+        "PIP-C-WELD-03"
+      ],
+      "case_id": "EXP-C273",
+      "expected": {
+        "event_type": "actual_progress",
+        "quantity": "4",
+        "quantity_kind": "delta",
+        "unit": null
+      },
+      "expected_selection": [
+        "PIP-C-WELD-03"
+      ],
+      "fields": [
+        "unit"
+      ]
+    },
+    {
+      "actual": {
+        "event_type": "actual_progress",
+        "quantity": "10",
+        "quantity_kind": "delta",
+        "unit": "widgets"
+      },
+      "actual_selection": [
+        "CIV-C-EXC-03"
+      ],
+      "case_id": "EXP-C275",
+      "expected": {
+        "event_type": "actual_progress",
+        "quantity": "10",
+        "quantity_kind": "delta",
+        "unit": null
+      },
+      "expected_selection": [
+        "CIV-C-EXC-03"
+      ],
+      "fields": [
+        "unit"
+      ]
+    },
+    {
+      "actual": {
+        "event_type": "actual_progress",
+        "quantity": "50",
+        "quantity_kind": "delta",
+        "unit": "widgets"
+      },
+      "actual_selection": [
+        "ELE-B-CABLE2-02"
+      ],
+      "case_id": "EXP-C277",
+      "expected": {
+        "event_type": "actual_progress",
+        "quantity": "50",
+        "quantity_kind": "delta",
+        "unit": null
+      },
+      "expected_selection": [
+        "ELE-B-CABLE2-02"
+      ],
+      "fields": [
+        "unit"
+      ]
+    },
+    {
+      "actual": {
+        "event_type": "actual_progress",
+        "quantity": "null",
+        "quantity_kind": "none",
+        "unit": "widgets"
+      },
+      "actual_selection": [
+        "CIV-C-FORM-03"
+      ],
+      "case_id": "EXP-C279",
+      "expected": {
+        "event_type": "actual_progress",
+        "quantity": null,
+        "quantity_kind": "none",
+        "unit": null
+      },
+      "expected_selection": [
+        "CIV-C-FORM-03"
+      ],
+      "fields": [
+        "quantity",
+        "unit"
+      ]
+    },
+    {
+      "actual": {
+        "event_type": "actual_progress",
+        "quantity": "50",
+        "quantity_kind": "delta",
+        "unit": "widgets"
+      },
+      "actual_selection": [
+        "ELE-C-CABLE-03"
+      ],
+      "case_id": "EXP-C281",
+      "expected": {
+        "event_type": "actual_progress",
+        "quantity": "50",
+        "quantity_kind": "delta",
+        "unit": null
+      },
+      "expected_selection": [
+        "ELE-C-CABLE-03"
+      ],
+      "fields": [
+        "unit"
+      ]
+    },
+    {
+      "actual": {
+        "event_type": "actual_progress",
+        "quantity": "10",
+        "quantity_kind": "delta",
+        "unit": "widgets"
+      },
+      "actual_selection": [
+        "CIV-C-POUR-03"
+      ],
+      "case_id": "EXP-C283",
+      "expected": {
+        "event_type": "actual_progress",
+        "quantity": "10",
+        "quantity_kind": "delta",
+        "unit": null
+      },
+      "expected_selection": [
+        "CIV-C-POUR-03"
+      ],
+      "fields": [
+        "unit"
+      ]
+    },
+    {
+      "actual": {
+        "event_type": "actual_progress",
+        "quantity": "50",
+        "quantity_kind": "delta",
+        "unit": "widgets"
+      },
+      "actual_selection": [
+        "ELE-C-CABLE2-03"
+      ],
+      "case_id": "EXP-C285",
+      "expected": {
+        "event_type": "actual_progress",
+        "quantity": "50",
+        "quantity_kind": "delta",
+        "unit": null
+      },
+      "expected_selection": [
+        "ELE-C-CABLE2-03"
+      ],
+      "fields": [
+        "unit"
+      ]
+    },
+    {
+      "actual": {
+        "event_type": "unknown",
+        "quantity": "null",
+        "quantity_kind": "none",
+        "unit": "null"
+      },
+      "actual_selection": [
+        "CIV-A-EXC-01"
+      ],
+      "case_id": "EXP-C286",
+      "expected": {
+        "event_type": "unknown",
+        "quantity": null,
+        "quantity_kind": "unknown",
+        "unit": null
+      },
+      "expected_selection": [],
+      "fields": [
+        "quantity",
+        "quantity_kind",
+        "unit",
+        "activity_selection"
+      ]
+    },
+    {
+      "actual": {
+        "event_type": "unknown",
+        "quantity": "null",
+        "quantity_kind": "none",
+        "unit": "null"
+      },
+      "actual_selection": [
+        "CIV-A-REBAR-01"
+      ],
+      "case_id": "EXP-C287",
+      "expected": {
+        "event_type": "unknown",
+        "quantity": null,
+        "quantity_kind": "unknown",
+        "unit": null
+      },
+      "expected_selection": [],
+      "fields": [
+        "quantity",
+        "quantity_kind",
+        "unit",
+        "activity_selection"
+      ]
+    },
+    {
+      "actual": {
+        "event_type": "unknown",
+        "quantity": "null",
+        "quantity_kind": "none",
+        "unit": "null"
+      },
+      "actual_selection": [
+        "CIV-A-POUR-01"
+      ],
+      "case_id": "EXP-C288",
+      "expected": {
+        "event_type": "unknown",
+        "quantity": null,
+        "quantity_kind": "unknown",
+        "unit": null
+      },
+      "expected_selection": [],
+      "fields": [
+        "quantity",
+        "quantity_kind",
+        "unit",
+        "activity_selection"
+      ]
+    },
+    {
+      "actual": {
+        "event_type": "unknown",
+        "quantity": "null",
+        "quantity_kind": "none",
+        "unit": "null"
+      },
+      "actual_selection": [
+        "PIP-A-ERECT-01"
+      ],
+      "case_id": "EXP-C289",
+      "expected": {
+        "event_type": "unknown",
+        "quantity": null,
+        "quantity_kind": "unknown",
+        "unit": null
+      },
+      "expected_selection": [],
+      "fields": [
+        "quantity",
+        "quantity_kind",
+        "unit",
+        "activity_selection"
+      ]
+    },
+    {
+      "actual": {
+        "event_type": "unknown",
+        "quantity": "null",
+        "quantity_kind": "none",
+        "unit": "null"
+      },
+      "actual_selection": [
+        "PIP-A-WELD-01"
+      ],
+      "case_id": "EXP-C290",
+      "expected": {
+        "event_type": "unknown",
+        "quantity": null,
+        "quantity_kind": "unknown",
+        "unit": null
+      },
+      "expected_selection": [],
+      "fields": [
+        "quantity",
+        "quantity_kind",
+        "unit",
+        "activity_selection"
+      ]
+    },
+    {
+      "actual": {
+        "event_type": "unknown",
+        "quantity": "null",
+        "quantity_kind": "none",
+        "unit": "null"
+      },
+      "actual_selection": [],
+      "case_id": "EXP-C291",
+      "expected": {
+        "event_type": "unknown",
+        "quantity": null,
+        "quantity_kind": "unknown",
+        "unit": null
+      },
+      "expected_selection": [],
+      "fields": [
+        "quantity",
+        "quantity_kind",
+        "unit"
+      ]
+    },
+    {
+      "actual": {
+        "event_type": "unknown",
+        "quantity": "null",
+        "quantity_kind": "none",
+        "unit": "null"
+      },
+      "actual_selection": [],
+      "case_id": "EXP-C292",
+      "expected": {
+        "event_type": "unknown",
+        "quantity": null,
+        "quantity_kind": "unknown",
+        "unit": null
+      },
+      "expected_selection": [],
+      "fields": [
+        "quantity",
+        "quantity_kind",
+        "unit"
+      ]
+    },
+    {
+      "actual": {
+        "event_type": "unknown",
+        "quantity": "null",
+        "quantity_kind": "none",
+        "unit": "null"
+      },
+      "actual_selection": [],
+      "case_id": "EXP-C293",
+      "expected": {
+        "event_type": "unknown",
+        "quantity": null,
+        "quantity_kind": "unknown",
+        "unit": null
+      },
+      "expected_selection": [],
+      "fields": [
+        "quantity",
+        "quantity_kind",
+        "unit"
+      ]
+    },
+    {
+      "actual": {
+        "event_type": "unknown",
+        "quantity": "null",
+        "quantity_kind": "none",
+        "unit": "null"
+      },
+      "actual_selection": [],
+      "case_id": "EXP-C294",
+      "expected": {
+        "event_type": "unknown",
+        "quantity": null,
+        "quantity_kind": "unknown",
+        "unit": null
+      },
+      "expected_selection": [],
+      "fields": [
+        "quantity",
+        "quantity_kind",
+        "unit"
+      ]
+    },
+    {
+      "actual": {
+        "event_type": "unknown",
+        "quantity": "null",
+        "quantity_kind": "none",
+        "unit": "null"
+      },
+      "actual_selection": [],
+      "case_id": "EXP-C295",
+      "expected": {
+        "event_type": "unknown",
+        "quantity": null,
+        "quantity_kind": "unknown",
+        "unit": null
+      },
+      "expected_selection": [],
+      "fields": [
+        "quantity",
+        "quantity_kind",
+        "unit"
+      ]
+    },
+    {
+      "actual": {
+        "event_type": "unknown",
+        "quantity": "null",
+        "quantity_kind": "none",
+        "unit": "null"
+      },
+      "actual_selection": [],
+      "case_id": "EXP-C296",
+      "expected": {
+        "event_type": "unknown",
+        "quantity": null,
+        "quantity_kind": "unknown",
+        "unit": null
+      },
+      "expected_selection": [],
+      "fields": [
+        "quantity",
+        "quantity_kind",
+        "unit"
+      ]
+    },
+    {
+      "actual": {
+        "event_type": "unknown",
+        "quantity": "null",
+        "quantity_kind": "none",
+        "unit": "null"
+      },
+      "actual_selection": [],
+      "case_id": "EXP-C297",
+      "expected": {
+        "event_type": "unknown",
+        "quantity": null,
+        "quantity_kind": "unknown",
+        "unit": null
+      },
+      "expected_selection": [],
+      "fields": [
+        "quantity",
+        "quantity_kind",
+        "unit"
+      ]
+    },
+    {
+      "actual": {
+        "event_type": "unknown",
+        "quantity": "null",
+        "quantity_kind": "none",
+        "unit": "null"
+      },
+      "actual_selection": [],
+      "case_id": "EXP-C298",
+      "expected": {
+        "event_type": "unknown",
+        "quantity": null,
+        "quantity_kind": "unknown",
+        "unit": null
+      },
+      "expected_selection": [],
+      "fields": [
+        "quantity",
+        "quantity_kind",
+        "unit"
+      ]
+    },
+    {
+      "actual": {
+        "event_type": "unknown",
+        "quantity": "null",
+        "quantity_kind": "none",
+        "unit": "null"
+      },
+      "actual_selection": [],
+      "case_id": "EXP-C299",
+      "expected": {
+        "event_type": "unknown",
+        "quantity": null,
+        "quantity_kind": "unknown",
+        "unit": null
+      },
+      "expected_selection": [],
+      "fields": [
+        "quantity",
+        "quantity_kind",
+        "unit"
+      ]
+    },
+    {
+      "actual": {
+        "event_type": "unknown",
+        "quantity": "null",
+        "quantity_kind": "none",
+        "unit": "null"
+      },
+      "actual_selection": [],
+      "case_id": "EXP-C300",
+      "expected": {
+        "event_type": "unknown",
+        "quantity": null,
+        "quantity_kind": "unknown",
+        "unit": null
+      },
+      "expected_selection": [],
+      "fields": [
+        "quantity",
+        "quantity_kind",
+        "unit"
+      ]
+    }
+  ],
+  "event_type_accuracy": {
+    "applicable": 60,
+    "correct": 53
+  },
+  "extraction": {
+    "f1": null,
+    "precision": null,
+    "recall": null,
+    "status": "unavailable: labels contain no attribute-level atomic events"
+  },
+  "initial_review_state": {
+    "cases": 60,
+    "field_accuracy": 0.9270833333333334,
+    "field_applicable": 96,
+    "field_correct": 89
+  },
+  "latency": {
+    "count": 0,
+    "max_ms": null,
+    "mean_ms": null,
+    "median_ms": null,
+    "p50_ms": null,
+    "p95_ms": null
+  },
+  "latency_note": "Measured per ten-case request; per-case or UI-to-export latency is unavailable.",
+  "lifecycle_latency": {
+    "acceptance_to_update": {
+      "count": 0,
+      "max_ms": null,
+      "mean_ms": null,
+      "median_ms": null,
+      "p50_ms": null,
+      "p95_ms": null
+    },
+    "external_delivery": {
+      "count": 0,
+      "max_ms": null,
+      "mean_ms": null,
+      "median_ms": null,
+      "p50_ms": null,
+      "p95_ms": null
+    },
+    "retries": {
+      "case_count": 0,
+      "cases_with_retry": 0,
+      "total": null
+    },
+    "retry_duration": {
+      "count": 0,
+      "max_ms": null,
+      "mean_ms": null,
+      "median_ms": null,
+      "p50_ms": null,
+      "p95_ms": null
+    },
+    "review_wait": {
+      "count": 0,
+      "max_ms": null,
+      "mean_ms": null,
+      "median_ms": null,
+      "p50_ms": null,
+      "p95_ms": null
+    },
+    "submission_to_update": {
+      "count": 0,
+      "max_ms": null,
+      "mean_ms": null,
+      "median_ms": null,
+      "p50_ms": null,
+      "p95_ms": null
+    },
+    "system_submission_to_update_excluding_review": {
+      "count": 0,
+      "max_ms": null,
+      "mean_ms": null,
+      "median_ms": null,
+      "p50_ms": null,
+      "p95_ms": null
+    }
+  },
+  "project_weighted": {
+    "by_project": {},
+    "macro_project_coverage": null,
+    "macro_project_exact_choice": null,
+    "micro_case": {
+      "cases": 60,
+      "correct": 44,
+      "coverage": 0.9777777777777777,
+      "exact_choice_micro": 0.9777777777777777,
+      "matchable_cases": 45,
+      "selected": 44,
+      "selected_precision": 1.0
+    },
+    "project_count": 0,
+    "status": "unavailable",
+    "unclassified_cases": 60
+  },
+  "prompt_limitations": [
+    "Draft prompt suggests unknown/none for unclear or duplicate assertions; labels sometimes expect actual_progress/delta.",
+    "Draft prompt includes equipment, tonne, percent as canonical units, which differ from production enum each, t, kg, m, m2, m3, spool, joint, point. Unit score is prompt-dependent and cannot isolate model quality."
+  ],
+  "quantity_null_preservation": {
+    "applicable": 24,
+    "correct": 0
+  },
+  "review_burden": {
+    "cases": 60,
+    "review_completed": 0,
+    "review_completed_rate": null,
+    "review_required": 0,
+    "review_required_rate": 0.0
+  },
+  "run": {
+    "config": {
+      "batch_size": 10,
+      "capture_sources": {
+        "evaluation/results/gemma4-12b-2026-10-12/compact/predictions.jsonl": "717e202f41805fbfb31aab1e549f7f0f57bcd7f5eb0e52d754d26daeac1253f7",
+        "evaluation/results/gemma4-12b-2026-10-12/retry-batches-five-six/predictions.jsonl": "e6e92df892c8afa3d074e8ef59717f13df4ff671d2952f9009160cc84a6c9ed6"
+      },
+      "composition": "Original batches 1-4 plus user-requested post-restart reruns of batches 5-6",
+      "input_sha256": "eff0ff9fd92e693b116b7a79e664d9b201c10e50bfbbfc8a69132a653f004dde",
+      "installed": true,
+      "method": "compact-joint-extraction-selection-full-schedule",
+      "model": "gemma4:12b",
+      "model_digest": "6114515d63c17436a7c0417d82820ac65ad643e2806c5a3c89cb62846436ed0b",
+      "model_metadata": {
+        "family": "gemma4",
+        "parameter_size": "11.9B",
+        "quantization_level": "Q4_K_M"
+      },
+      "num_ctx": 8192,
+      "num_predict": 1536,
+      "ok": true,
+      "real_model": true,
+      "response_format": "parallel-arrays-v2",
+      "runtime": "0.40.0",
+      "schedule_sha256": "d576de978efcad0f3a7c014ed13119a36e7f6d5212c010d14a2d175eaebacad8",
+      "scope": "compact benchmark, not production pipeline; all leaf schedule IDs supplied",
+      "system_prompt_sha256": "0dd23aba763f04062d3f16196c7af5a765356e4957e656131318419ff9cdc164",
+      "temperature": 0,
+      "think": false,
+      "timeout_seconds": 300,
+      "transport_retries": 0
+    },
+    "config_sha256": "08aa608925c7abb5ea329952daad711cd535e03ce0da333b6f8a5bbea63e634f",
+    "label_count": 60,
+    "label_sha256": "fed48887d2c7b50c20c6b8f41149893e52d13f2bd43303b110d39d88405c5f8c",
+    "prediction_sha256": "aa5fcec26b65ef26303dfe01bef7a883dab2ed7709696f81a7be80d6ef1892ec",
+    "real_model": true,
+    "split": "held_out"
+  },
+  "scope": {
+    "accuracy": null,
+    "applicable": 0,
+    "correct": 0,
+    "missing": 0
+  },
+  "selection": {
+    "candidate_recall": null,
+    "coverage": 0.9777777777777777,
+    "exact_choice": 0.9777777777777777,
+    "exact_choice_denominator": 45,
+    "exact_choice_numerator": 44,
+    "matchable": 45,
+    "overall_selected": 49,
+    "overall_selected_precision": 0.8979591836734694,
+    "recall_at_8": null,
+    "recall_at_8_denominator": null,
+    "recall_at_8_numerator": null,
+    "retrieval_status": "unavailable: full schedule supplied; no ranked shortlist",
+    "safe_abstention": 0.6666666666666666,
+    "safe_abstention_denominator": 15,
+    "safe_abstention_note": "Fraction of requested unmatched/ambiguous cases with verified valid abstention; failures are not verified abstentions. Successful-response metrics exclude failures.",
+    "safe_abstention_unverified_failures": 0,
+    "safe_abstention_verified_numerator": 10,
+    "selected": 44,
+    "selected_precision": 1.0
+  },
+  "strata": {
+    "discipline": {
+      "groups": {},
+      "status": "unavailable",
+      "unclassified_cases": 60
+    },
+    "format": {
+      "groups": {},
+      "status": "unavailable",
+      "unclassified_cases": 60
+    }
+  },
+  "strict_case_correct": 17,
+  "successful_response_count": 60,
+  "successful_response_metrics": {
+    "case_outcomes": {
+      "abstained": 11,
+      "abstention_rate": 0.18333333333333332,
+      "cases": 60,
+      "failed": 0,
+      "failure_cases": [],
+      "failure_rate": 0.0
+    },
+    "corrected_review_state": {
+      "cases": 0,
+      "field_accuracy": null,
+      "field_applicable": 0,
+      "field_correct": 0
+    },
+    "critical_fields": {
+      "finish_date": {
+        "accuracy": 0.0,
+        "applicable": 0,
+        "correct": 0
+      },
+      "finish_time": {
+        "accuracy": 0.0,
+        "applicable": 0,
+        "correct": 0
+      },
+      "quantity": {
+        "accuracy": 1.0,
+        "applicable": 36,
+        "correct": 36
+      },
+      "quantity_kind": {
+        "accuracy": 0.6833333333333333,
+        "applicable": 60,
+        "correct": 41
+      },
+      "start_date": {
+        "accuracy": 0.0,
+        "applicable": 0,
+        "correct": 0
+      },
+      "start_time": {
+        "accuracy": 0.0,
+        "applicable": 0,
+        "correct": 0
+      },
+      "tag": {
+        "accuracy": 0.9777777777777777,
+        "applicable": 45,
+        "correct": 44
+      },
+      "time_precision": {
+        "accuracy": 0.0,
+        "applicable": 0,
+        "correct": 0
+      },
+      "unit": {
+        "accuracy": 0.7777777777777778,
+        "applicable": 27,
+        "correct": 21
+      },
+      "work_date": {
+        "accuracy": 0.0,
+        "applicable": 0,
+        "correct": 0
+      }
+    },
+    "errors": [
+      {
+        "category": "correct",
+        "count": 48
+      },
+      {
+        "category": "event_type",
+        "count": 7
+      },
+      {
+        "category": "false_match",
+        "count": 5
+      }
+    ],
+    "extraction": {
+      "status": "unavailable: missing atomic labels"
+    },
+    "initial_review_state": {
+      "cases": 60,
+      "field_accuracy": 0.9270833333333334,
+      "field_applicable": 96,
+      "field_correct": 89
+    },
+    "latency": {
+      "count": 0,
+      "max_ms": null,
+      "mean_ms": null,
+      "median_ms": null,
+      "p50_ms": null,
+      "p95_ms": null
+    },
+    "lifecycle_latency": {
+      "acceptance_to_update": {
+        "count": 0,
+        "max_ms": null,
+        "mean_ms": null,
+        "median_ms": null,
+        "p50_ms": null,
+        "p95_ms": null
+      },
+      "external_delivery": {
+        "count": 0,
+        "max_ms": null,
+        "mean_ms": null,
+        "median_ms": null,
+        "p50_ms": null,
+        "p95_ms": null
+      },
+      "retries": {
+        "case_count": 0,
+        "cases_with_retry": 0,
+        "total": null
+      },
+      "retry_duration": {
+        "count": 0,
+        "max_ms": null,
+        "mean_ms": null,
+        "median_ms": null,
+        "p50_ms": null,
+        "p95_ms": null
+      },
+      "review_wait": {
+        "count": 0,
+        "max_ms": null,
+        "mean_ms": null,
+        "median_ms": null,
+        "p50_ms": null,
+        "p95_ms": null
+      },
+      "submission_to_update": {
+        "count": 0,
+        "max_ms": null,
+        "mean_ms": null,
+        "median_ms": null,
+        "p50_ms": null,
+        "p95_ms": null
+      },
+      "system_submission_to_update_excluding_review": {
+        "count": 0,
+        "max_ms": null,
+        "mean_ms": null,
+        "median_ms": null,
+        "p50_ms": null,
+        "p95_ms": null
+      }
+    },
+    "project_weighted": {
+      "by_project": {},
+      "macro_project_coverage": null,
+      "macro_project_exact_choice": null,
+      "micro_case": {
+        "cases": 60,
+        "correct": 44,
+        "coverage": 0.9777777777777777,
+        "exact_choice_micro": 0.9777777777777777,
+        "matchable_cases": 45,
+        "selected": 44,
+        "selected_precision": 1.0
+      },
+      "project_count": 0,
+      "status": "unavailable",
+      "unclassified_cases": 60
+    },
+    "review_burden": {
+      "cases": 60,
+      "review_completed": 0,
+      "review_completed_rate": null,
+      "review_required": 0,
+      "review_required_rate": 0.0
+    },
+    "scope": {
+      "accuracy": null,
+      "applicable": 0,
+      "correct": 0,
+      "missing": 0
+    },
+    "selection": {
+      "candidate_recall": null,
+      "coverage": 0.9777777777777777,
+      "exact_choice": 0.9777777777777777,
+      "exact_choice_denominator": 45,
+      "exact_choice_numerator": 44,
+      "matchable": 45,
+      "overall_selected": 49,
+      "overall_selected_precision": 0.8979591836734694,
+      "recall_at_8": null,
+      "recall_at_8_denominator": null,
+      "recall_at_8_numerator": null,
+      "safe_abstention": 0.6666666666666666,
+      "safe_abstention_denominator": 15,
+      "selected": 44,
+      "selected_precision": 1.0
+    },
+    "strata": {
+      "discipline": {
+        "groups": {},
+        "status": "unavailable",
+        "unclassified_cases": 60
+      },
+      "format": {
+        "groups": {},
+        "status": "unavailable",
+        "unclassified_cases": 60
+      }
+    }
+  }
+}

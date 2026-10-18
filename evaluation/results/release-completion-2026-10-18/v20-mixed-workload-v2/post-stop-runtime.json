@@ -1,0 +1,46 @@
+{
+  "agent_runs": {
+    "by_state": {
+      "ready_for_review": 9,
+      "running": 2
+    },
+    "errors_by_code": {}
+  },
+  "captured_at": "2026-10-18T06:15:45.696352+00:00",
+  "conversation_tasks": {
+    "by_state": {
+      "queued": 2,
+      "succeeded": 1
+    },
+    "errors_by_code": {},
+    "expired_running_ownership_count": 0,
+    "oldest_queued_age_seconds": 707
+  },
+  "hosted_provider_admission": {
+    "groq": {
+      "cooldown_remaining_seconds": 0,
+      "lease_remaining_seconds": null,
+      "remaining_requests": 994,
+      "remaining_tokens": 6135,
+      "request_reset_remaining_seconds": 486,
+      "token_reset_remaining_seconds": 0
+    }
+  },
+  "jobs": {
+    "by_state": {
+      "queued": 1,
+      "ready_for_review": 9,
+      "running": 1
+    },
+    "errors_by_code": {},
+    "expired_running_ownership_count": 1,
+    "oldest_queued_age_seconds": 707
+  },
+  "rollout_configuration": {
+    "agent_hierarchy_enabled": false,
+    "meaning": "configured values only; does not attest running processes",
+    "orchestrator_model_assisted": false
+  },
+  "schema_revision": "0018_hosted_admission",
+  "unavailable_tables": []
+}

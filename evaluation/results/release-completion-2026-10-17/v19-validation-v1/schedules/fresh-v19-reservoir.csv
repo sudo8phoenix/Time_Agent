@@ -1,0 +1,4 @@
+activity_id,activity_name,wbs_path,discipline,work_type,area,asset_tags,is_leaf,measurement_basis,planned_quantity,unit,planned_start,planned_finish,aliases
+RESERVOIR-1,gate installation at Valve house East,reservoir/1,mechanical,equipment_installation,Valve house East,G-612,true,unsupported,,,2027-01-01,2027-04-30,
+RESERVOIR-2,pipe welding at Valve house East,reservoir/2,piping,welding,Valve house East,,true,unsupported,,,2027-01-01,2027-04-30,
+RESERVOIR-3,wall painting at Valve house East,reservoir/3,civil,other,Valve house East,,true,unsupported,,,2027-01-01,2027-04-30,

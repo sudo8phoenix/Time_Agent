@@ -3,6 +3,7 @@ import { expect, test, type Page, type Route } from "@playwright/test";
 const project = { id: "p1", name: "Agent status fixture", timezone: "UTC", active_schedule_version_id: "schedule-1" };
 const jobId = "job-1";
 const safeCounters = { node_executions: 4, extraction_calls: 2, selection_calls: 1, corrective_retries: 1 };
+const authenticatedPages = new WeakSet<Page>();
 
 function status(state: string, overrides: Record<string, unknown> = {}) {
   const terminal = ["ready_for_review", "failed", "stale", "cancelled"].includes(state);
@@ -28,8 +29,15 @@ function job(state = "running", id = jobId, agentRunAvailable = true) {
 }
 
 async function baseApi(route: Route, path: string, currentJobState = "running", runAvailable = true): Promise<boolean> {
-  if (path === "/auth/me") await route.fulfill({ status: 401, json: { detail: "Authentication required" } });
-  else if (path === "/auth/login") await route.fulfill({ json: { csrf_token: "csrf", user: { id: "user-1", username: "reviewer", role: "reviewer" } } });
+  const page = route.request().frame().page();
+  if (path === "/auth/me") {
+    if (authenticatedPages.has(page)) await route.fulfill({ json: { id: "user-1", username: "reviewer", role: "reviewer", csrf_token: "csrf" } });
+    else await route.fulfill({ status: 401, json: { detail: "Authentication required" } });
+  }
+  else if (path === "/auth/login") {
+    authenticatedPages.add(page);
+    await route.fulfill({ json: { csrf_token: "csrf", user: { id: "user-1", username: "reviewer", role: "reviewer" } } });
+  }
   else if (path === "/projects") await route.fulfill({ json: { items: [project] } });
   else if (path === `/projects/${project.id}/reports`) await route.fulfill({ status: 202, json: job(currentJobState, jobId, runAvailable) });
   else if (path === `/jobs/${jobId}`) await route.fulfill({ json: job(currentJobState, jobId, runAvailable) });
@@ -42,6 +50,12 @@ async function enterJob(page: Page) {
   await page.getByLabel("Username").fill("reviewer");
   await page.getByLabel("Password", { exact: true }).fill("password");
   await page.getByRole("button", { name: /Sign in/ }).click();
+  // A focused tab revalidates its session. The mock must retain the login,
+  // including when parallel browser workers change which page has focus.
+  await expect(page.getByLabel("Paste report text")).toBeVisible();
+  const restored = page.waitForResponse(response => response.url().endsWith("/auth/me"));
+  await page.evaluate(() => window.dispatchEvent(new Event("focus")));
+  expect((await restored).status()).toBe(200);
   await page.getByLabel("Paste report text").fill("A synthetic report for the status display.");
   await page.getByRole("button", { name: /Create review job/ }).click();
   await expect(page.locator(".job-header")).toBeVisible({ timeout: 10000 });

@@ -34,7 +34,7 @@ from ..db.models import (
 )
 from ..jobs.service import publish_stage
 from ..llm.extract import extract_fragments
-from ..prompts.extraction_v1 import PROMPT_VERSION, LEGACY_PROMPT_VERSION, V11_PROMPT_VERSION, get_extraction_prompt
+from ..prompts.extraction_v1 import PROMPT_VERSION, LEGACY_PROMPT_VERSION, V20_PROMPT_VERSION, EVIDENCE_COVERAGE_VERSIONS, SOURCE_NORMALIZATION_VERSIONS, get_extraction_prompt
 from .schedule_decision import select_activity, shortlist_activities
 from .checkpoint import make_checkpoint_serializer
 from ..settings import get_settings
@@ -591,11 +591,15 @@ def process_job_with_graph(
         pinned_prompt = (run.config_metadata or {}).get("extraction_prompt_version") or LEGACY_PROMPT_VERSION
         extraction_service = partial(extract_fragments, prompt_version=pinned_prompt)
     # Keep historical matching requests stable for checkpoint/journal recovery.
-    if (run.config_metadata or {}).get("extraction_prompt_version") == V11_PROMPT_VERSION:
+    if (run.config_metadata or {}).get("extraction_prompt_version") in EVIDENCE_COVERAGE_VERSIONS:
+        compact = (run.config_metadata or {}).get("extraction_prompt_version") in SOURCE_NORMALIZATION_VERSIONS
+        short_ids = (run.config_metadata or {}).get("extraction_prompt_version") == V20_PROMPT_VERSION
         if retrieval_service is shortlist_activities:
-            retrieval_service = partial(shortlist_activities, associate_delivery=True, model_call=model_dispatch)
+            retrieval_service = partial(shortlist_activities, associate_delivery=True,
+                compact_context=compact, short_ids=short_ids, model_call=model_dispatch)
         if selection_service is select_activity:
-            selection_service = partial(select_activity, associate_delivery=True)
+            selection_service = partial(select_activity, associate_delivery=True, compact_context=compact,
+                short_ids=short_ids)
     base_tools = AgentTools(
         context,
         extraction_service=extraction_service,

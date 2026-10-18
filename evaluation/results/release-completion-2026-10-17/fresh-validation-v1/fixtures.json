@@ -1,0 +1,42 @@
+{
+  "V-CIVIL-1": [
+    "587e1522-dc04-487e-9bfc-487a3b0ee0d4",
+    "6be7dee2-06c4-4fcf-86d1-242208e6adc9",
+    "981dbce8-df3b-4a9c-bf1f-1f247f6211f4"
+  ],
+  "V-CIVIL-2": [
+    "587e1522-dc04-487e-9bfc-487a3b0ee0d4",
+    "6be7dee2-06c4-4fcf-86d1-242208e6adc9",
+    "a2466967-ecda-4fb1-aaf2-e058e7ea2009"
+  ],
+  "V-POWER-1": [
+    "a8734f9c-9ff2-4b87-b953-5c8abb2806ca",
+    "473cafc5-e399-459c-9da7-0db58fb91068",
+    "085d8db9-dc5e-4f91-bfad-cf3b44e2fb33"
+  ],
+  "V-POWER-2": [
+    "a8734f9c-9ff2-4b87-b953-5c8abb2806ca",
+    "473cafc5-e399-459c-9da7-0db58fb91068",
+    "69f6ed33-b600-44d7-a6ec-6c5a7bcf2195"
+  ],
+  "V-STEEL-1": [
+    "1841efe6-5ffe-4c0c-a757-f513e8b79057",
+    "36e3af45-28cd-4565-bd5e-a48b180ff68d",
+    "3583d4ab-9ea5-45aa-be4a-20ae2d411138"
+  ],
+  "V-STEEL-2": [
+    "1841efe6-5ffe-4c0c-a757-f513e8b79057",
+    "36e3af45-28cd-4565-bd5e-a48b180ff68d",
+    "090f2592-168d-4d3a-9093-f13f81911da9"
+  ],
+  "V-WATER-1": [
+    "e9cdeb7b-ce64-45e6-860c-9c2f98295451",
+    "b9aedfbf-81a5-45c4-a4f6-62dc064957b2",
+    "88028496-eb3d-440c-bcdf-b6ff84d1b1d0"
+  ],
+  "V-WATER-2": [
+    "e9cdeb7b-ce64-45e6-860c-9c2f98295451",
+    "b9aedfbf-81a5-45c4-a4f6-62dc064957b2",
+    "32acb2a3-b940-42f8-8f61-97bc3331e0d9"
+  ]
+}

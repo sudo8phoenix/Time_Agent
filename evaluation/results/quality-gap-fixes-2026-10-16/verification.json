@@ -1,0 +1,28 @@
+{
+  "unit_tests_passed": 359,
+  "integration_tests_passed": 173,
+  "scoped_ruff": "passed",
+  "diff_check": "passed",
+  "agent_hierarchy_enabled": false,
+  "orchestrator_model_assisted": false,
+  "deployed": false,
+  "source_sha256": {
+    "backend/app/prompts/extraction_v1.py": "8efd7b3e8efa841e0eec29603cfc748045846a485623a31fa92911432c17ad18",
+    "backend/app/llm/extract.py": "583b677d04e408f3a1524aac47fd6b1dd3b0b3262b403f8873bfb9d7ca020905",
+    "backend/app/agent/runtime.py": "b469c0137de93f9cfe67f75e17d7608ad019783303527dcbc144e1b3ce422132",
+    "backend/app/agent/specialists.py": "2d16abdcd0aec3ed1e0f368ed823401c9aa0ce74fbda898ec7330ebd85178635",
+    "backend/app/conversation/service.py": "ec6eb6036e7c3c07292fc5b63bbfeae7732d13cf1b2ecd08ed4f87fa9ef9dff0",
+    "backend/app/conversation/runtime.py": "985b23a004dc86ab032db1a709cb043cd9b53d9f10b5a549d83a34ab2ef1428b",
+    "backend/tests/unit/test_extraction.py": "7b18013905b172695d9816bd621737ad9a8c13f75e25630f3046f8ccfb31ecc9",
+    "backend/tests/unit/test_extraction_quality_scoring.py": "54bae21049caa0f48f255470fca042f315ac02045b7a72dccecd48cfb800f146",
+    "backend/tests/integration/agent/test_extraction_prompt_pinning.py": "ede2f8b854b10410618a41f966a01f5ed3971197a56a29b833e6b7f2e21d57c7",
+    "backend/tests/integration/agent/test_provider_failure_ownership.py": "3f3b09b260367484a572925c4842d96ec2b24fd9f1cd82db724d49734d78de6a",
+    "backend/tests/integration/test_durable_conversations.py": "549a5082216c037fad8baf59d8169b983b9f276aac7de3ab2a5ed1d723d17055",
+    "evaluation/extraction_quality.py": "03cc414fb2d11f48748689266215b08fd7b8141e4b101a7336e2725b68b1a7e6",
+    "evaluation/fixtures/quality-wording-variants.json": "875bb23546cd3ea281842145b77862dda7856fa846c3eeb7439fe243693f6728"
+  },
+  "configured_secret_scan": {
+    "files_matching": [],
+    "passed": true
+  }
+}

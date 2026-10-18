@@ -1,0 +1,4 @@
+activity_id,activity_name,aliases,area,asset_tags,discipline,is_leaf,measurement_basis,planned_finish,planned_quantity,planned_start,unit,wbs_path,work_type
+HT83,Hydrotest vessel T-83,,,T-83,mechanical,true,quantity_ratio,2026-12-20,1,2026-11-01,each,SYNTHETIC/HT83,hydrotest
+HT84,Hydrotest vessel T-84,,,T-84,mechanical,true,quantity_ratio,2026-12-20,1,2026-11-01,each,SYNTHETIC/HT84,hydrotest
+HE83,Install vessel T-83,,,T-83,mechanical,true,quantity_ratio,2026-12-20,1,2026-11-01,each,SYNTHETIC/HE83,equipment_installation

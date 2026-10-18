@@ -1,0 +1,107 @@
+{
+  "created_at": "2026-10-17T07:13:54.371152+00:00",
+  "database_sha256": "7430e14e685893f22fcdc9c39c1f2a3daf4af3b97e664782fac9e0eaf72dd1f1",
+  "schema_revision": "0018_hosted_admission",
+  "pre_migration_recovery_tables": [],
+  "checkpoint_rows": {
+    "checkpoints": {
+      "count": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    "checkpoint_blobs": {
+      "count": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    "checkpoint_writes": {
+      "count": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    }
+  },
+  "files": [],
+  "approved_event_ids": [],
+  "approved_evidence_fragment_ids": [],
+  "native_metadata_ids": [],
+  "recovery_rows": {
+    "agent_runs": {
+      "ids": [],
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    "agent_steps": {
+      "ids": [],
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    "agent_tool_calls": {
+      "ids": [],
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    "schedule_source_metadata": {
+      "ids": [],
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    "conversations": {
+      "ids": [
+        "fdfdc93b-8ad6-4755-8c15-4610bb22668a"
+      ],
+      "sha256": "9099868af8606efe5d18323c19ba674c9959202c0a3298ec3ae756b6f63d1851"
+    },
+    "agent_tasks": {
+      "ids": [],
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    "conversation_tasks": {
+      "ids": [
+        "65673d6f-f82d-4395-b196-22dcc87d382a"
+      ],
+      "sha256": "7a56627328156cd03d1f1750e67233c540c1e13000c2158243e10fc27fbebcd7"
+    },
+    "conversation_task_calls": {
+      "ids": [
+        "29ccc232-dbf1-4db4-b1ae-41a30791037e"
+      ],
+      "sha256": "67b542a68ac84be3d097ed8240f0b25a2708ddaf235980ec73eb2c8f620596d3"
+    },
+    "conversation_turns": {
+      "ids": [
+        "810dba32-6d9a-40ce-ac20-729133fdbaeb"
+      ],
+      "sha256": "2900a3f5cb727ad7141c7d755a1ea544b12890f5b7e8c743fbedf99b0e9e1a50"
+    },
+    "integration_outbox": {
+      "ids": [],
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    "activity_states": {
+      "ids": [
+        "9928e641-0387-410a-b47c-0891bfffff6b"
+      ],
+      "sha256": "c3bbcdce2fa009670e22b4995cf99029e6a190153b7c3bf69cd9ddcd02605b3f"
+    },
+    "progress_events": {
+      "ids": [],
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    "observations": {
+      "ids": [],
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    "proposals": {
+      "ids": [],
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    "audit_events": {
+      "ids": [],
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    "jobs": {
+      "ids": [],
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    "hosted_provider_admission": {
+      "ids": [
+        "groq",
+        "openrouter"
+      ],
+      "sha256": "1d75d443cc3f77b622ff83ef601e1c934c693a5bb7f9c9e660565cfc5d1923e9"
+    }
+  }
+}

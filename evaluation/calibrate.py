@@ -10,7 +10,7 @@ import json
 import math
 from pathlib import Path
 
-VERSION = "review-calibration-v1"
+VERSION = "review-calibration-v2"
 BANDS = ((0, .5), (.5, .8), (.8, .9), (.9, 1.0000001))
 
 
@@ -32,17 +32,36 @@ def _index(rows: list[dict]) -> dict:
     return result
 
 
-def freeze_gate(manifest: dict, labels: list[dict], labels_hash: str) -> None:
+def freeze_gate(manifest: dict, labels: list[dict], labels_hash: str, *,
+                review_policy="independent_human", authorization=None,
+                authorization_hash=None) -> None:
     if manifest.get("status") != "frozen" or manifest.get("labels_sha256") != labels_hash:
         raise ValueError("Validation labels must match a frozen manifest hash")
     review = manifest.get("review", {})
-    if (review.get("status") != "independently_reviewed" or
-        review.get("kind") != "human" or not review.get("reviewer_id") or
-        not review.get("reviewed_at") or not review.get("attestation") or
-        not review.get("label_authors") or review["reviewer_id"] in review["label_authors"]):
-        raise ValueError("Independent human review and author separation are required")
-    if manifest.get("group_review_status") != "independently_reviewed":
-        raise ValueError("D05 project/scenario grouping must be independently reviewed")
+    if review_policy == "independent_human":
+        review_status = "independently_reviewed"
+        if (review.get("status") != review_status or review.get("kind") != "human" or
+            not review.get("reviewer_id") or not review.get("reviewed_at") or
+            not review.get("attestation") or not review.get("label_authors") or
+            review["reviewer_id"] in review["label_authors"]):
+            raise ValueError("Independent human review and author separation are required")
+    elif review_policy == "owner_authorized_ai_assisted":
+        review_status = "ai_assisted_adjudicated"
+        if (not isinstance(authorization, dict) or
+            authorization.get("status") != "owner_approved_frozen" or
+            authorization.get("review_policy", {}).get("kind") != "ai_assisted" or
+            authorization.get("review_policy", {}).get("human_review_completed") is not False or
+            authorization.get("review_policy", {}).get("authorized_acceptance_required") is not True or
+            not authorization_hash or review.get("authorization_sha256") != authorization_hash):
+            raise ValueError("Explicit owner AI-review authorization and matching hash are required")
+        if (review.get("kind") != "ai_assisted" or review.get("status") != review_status or
+            review.get("human_review_completed") is not False or not review.get("reviewer_id") or
+            not review.get("reviewed_at") or not review.get("attestation") or not review.get("label_authors")):
+            raise ValueError("AI-assisted adjudication must be declared honestly")
+    else:
+        raise ValueError("Unknown review policy")
+    if manifest.get("group_review_status") != review_status:
+        raise ValueError("D05 project/scenario grouping must match the selected review policy")
     splits = manifest["splits"]
     if set(splits) != {"development", "train", "validation", "holdout"}:
         raise ValueError("All four split inventories are required")
@@ -57,8 +76,8 @@ def freeze_gate(manifest: dict, labels: list[dict], labels_hash: str) -> None:
     expected = {row["case_id"]: row["group_id"] for row in splits["validation"]}
     if not expected or {row["case_id"]: row["group_id"] for row in labels} != expected:
         raise ValueError("Labels must exactly cover the frozen validation inventory")
-    if any(row.get("review_status") != "independently_reviewed" for row in labels):
-        raise ValueError("Every validation case must be independently reviewed")
+    if any(row.get("review_status") != review_status for row in labels):
+        raise ValueError("Every validation case must match the selected review policy")
 
 
 def _score(value: dict | None) -> tuple[float | None, tuple | None]:
@@ -146,20 +165,28 @@ def assess(labels: list[dict], predictions: list[dict], *, target_precision=.95,
                        "authorized_acceptance_required": True}, "metrics": results}
 
 
-def calibrate(labels_path: Path, predictions_path: Path, manifest_path: Path, **policy) -> dict:
+def calibrate(labels_path: Path, predictions_path: Path, manifest_path: Path, *,
+              review_policy="independent_human", authorization_path: Path | None = None,
+              **policy) -> dict:
     labels, predictions = read_rows(labels_path), read_rows(predictions_path)
     manifest = json.loads(manifest_path.read_text())
     _index(labels)
-    freeze_gate(manifest, labels, digest(labels_path))
+    authorization = json.loads(authorization_path.read_text()) if authorization_path else None
+    authorization_hash = digest(authorization_path) if authorization_path else None
+    freeze_gate(manifest, labels, digest(labels_path), review_policy=review_policy,
+                authorization=authorization, authorization_hash=authorization_hash)
     if manifest.get("predictions_sha256") != digest(predictions_path):
         raise ValueError("Predictions must match the frozen pre-scoring prediction hash")
     expected_policy = {"target_precision": policy.get("target_precision", .95),
                        "min_support": policy.get("min_support", 20)}
     if manifest.get("policy") != expected_policy:
         raise ValueError("Precision/support policy must match the frozen manifest")
-    return {"version": VERSION, "status": "reviewed_validation_evidence",
+    return {"version": VERSION,
+            "status": "ai_assisted_validation_evidence" if review_policy == "owner_authorized_ai_assisted" else "reviewed_validation_evidence",
+            "review_policy": review_policy,
             "hashes": {"labels": digest(labels_path), "predictions": digest(predictions_path),
-                       "manifest": digest(manifest_path)}, "review": manifest["review"],
+                       "manifest": digest(manifest_path),
+                       **({"authorization": authorization_hash} if authorization_hash else {})}, "review": manifest["review"],
             **assess(labels, predictions, **policy),
             "limitations": ["Review identity/independence are declared attestations, not verified by this tool.",
                             "Empirical validation precision is not a guarantee on new projects.",
@@ -173,12 +200,16 @@ def main():
         parser.add_argument(f"--{name}", type=Path, required=True)
     parser.add_argument("--target-precision", type=float, default=.95)
     parser.add_argument("--min-support", type=int, default=20)
+    parser.add_argument("--review-policy", choices=("independent_human", "owner_authorized_ai_assisted"), default="independent_human")
+    parser.add_argument("--authorization", type=Path)
     args = parser.parse_args()
     # Do not overwrite an evidence artifact or any input, even through a symlink.
-    if args.output.exists() or args.output.resolve() in {p.resolve() for p in (args.labels, args.predictions, args.manifest)}:
+    inputs = (args.labels, args.predictions, args.manifest) + ((args.authorization,) if args.authorization else ())
+    if args.output.exists() or args.output.resolve() in {p.resolve() for p in inputs}:
         parser.error("Output must be a new artifact path")
     try:
         result = calibrate(args.labels, args.predictions, args.manifest,
+                           review_policy=args.review_policy, authorization_path=args.authorization,
                            target_precision=args.target_precision, min_support=args.min_support)
     except (ValueError, KeyError, TypeError) as exc:
         parser.error(str(exc))

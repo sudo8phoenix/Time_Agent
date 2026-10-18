@@ -70,8 +70,11 @@ definitions and approval. Passing regression tests does not clear these gates.
 
 After the evidence repair, 455 unit tests and 14 PostgreSQL prompt-pinning
 integration cases passed. After the later rehearsal-only changes, 73 affected
-unit cases, scoped Ruff and `git diff --check` passed. The 201-case full integration
-result belongs to an earlier candidate; it was not repeated for the latest source.
+unit cases, scoped Ruff and `git diff --check` passed. Before publishing the
+remaining candidate files, all 455 unit and 201 PostgreSQL integration tests
+passed again. Frontend typecheck, build and contract checks and changed executable
+Python lint passed. These checks do not clear the live acceptance gates. See
+[the publication record](publication-2026-10-18.md).
 
 The first new mixed attempt was interrupted because conversations were not pinned
 to V20. Its report remains queued in `progress_rehearsal_20261016`. The corrected
@@ -86,6 +89,8 @@ revision has not been live validated. Inspect retained tasks, original budgets,
 leases and checkpoints before explicit resume; do not reset them to get a pass.
 
 [The detailed follow-up](release-followup-2026-10-18.md) links the raw evidence.
-`v20-candidate-source-v5.json` is an unaccepted candidate snapshot. No accepted
-freeze, accepted-source restart, commit or push has occurred. This documentation
-update changes no application settings, runtime flags, data, labels or captures.
+`v20-candidate-source-v5.json` is an unaccepted candidate snapshot. Publishing
+candidate source/evidence to Git does not establish an accepted release. Accepted
+hash freeze, accepted-source restart and release acceptance remain pending.
+Publication changes no runtime settings, flags, application data, labels or
+historical captures.

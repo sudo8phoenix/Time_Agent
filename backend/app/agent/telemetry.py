@@ -12,6 +12,7 @@ from sqlalchemy import func, select
 from ..db.models import AgentRun, AgentStep, AgentToolCall
 from .state import AgentState, encode_agent_state
 from .tools import AgentToolError
+from ..llm.metrics import capture_provider_metrics
 
 MAX_SUMMARY_BYTES = 65_536
 SAFE_INTERNAL_MESSAGE = "The report analysis operation failed safely."
@@ -271,18 +272,24 @@ class TelemetryRecorder:
             db.add(call)
             db.flush()
             call_id = call.id
+        metrics = {}
         try:
-            value = function(*args, **kwargs)
+            with capture_provider_metrics() as metrics:
+                value = function(*args, **kwargs)
         except AgentToolError as exc:
-            self._finish_tool(call_id, "failed", code=exc.code, message=exc.safe_message)
+            self._finish_tool(call_id, "failed", code=exc.code, message=exc.safe_message,
+                              output={**({"failure_category": exc.failure_category} if exc.failure_category else {}),
+                                      **({"provider_metrics": metrics} if metrics else {})})
             raise
         except Exception:
             self._finish_tool(
-                call_id, "failed", code="AGENT_TOOL_FAILED", message=SAFE_INTERNAL_MESSAGE
+                call_id, "failed", code="AGENT_TOOL_FAILED", message=SAFE_INTERNAL_MESSAGE,
+                output={"provider_metrics": metrics} if metrics else {}
             )
             raise
         self._finish_tool(
-            call_id, "succeeded", output=_bounded_summary(_tool_output_summary(name, value))
+            call_id, "succeeded", output=_bounded_summary({**_tool_output_summary(name, value),
+                **({"provider_metrics": metrics} if metrics else {})})
         )
         return value
 

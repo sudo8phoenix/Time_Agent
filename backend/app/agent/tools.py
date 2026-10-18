@@ -23,11 +23,17 @@ from .state import AgentState, AgentWarning, MAX_CANDIDATES, MAX_OBSERVATIONS, M
 class AgentToolError(RuntimeError):
     """Stable, safe tool failure; never carries service exception text."""
 
-    def __init__(self, code: str, safe_message: str, *, stage: str | None = None, retryable: bool = False):
+    def __init__(self, code: str, safe_message: str, *, stage: str | None = None,
+                 retryable: bool = False, failure_category: str | None = None):
         self.code = code
         self.safe_message = safe_message
         self._stage = stage
         self._retryable = retryable
+        self.failure_category = failure_category if failure_category in {
+            "MODEL_RATE_LIMITED", "MODEL_QUOTA_EXHAUSTED", "MODEL_CAPACITY_TIMEOUT",
+            "MODEL_REQUEST_FAILED", "MODEL_RESPONSE_INVALID", "MODEL_DECISION_INVALID",
+            "EXTRACTION_VALIDATION_FAILED",
+        } else None
         super().__init__(safe_message)
 
     @property
@@ -41,6 +47,24 @@ class AgentToolError(RuntimeError):
 
 class _ToolModel(StrictModel):
     model_config = ConfigDict(extra="forbid", strict=True)
+
+
+def _failure_category(error: Exception) -> str | None:
+    """Retain only known exception categories, never upstream messages/attributes."""
+    from ..llm.hosted import HostedRateLimitError, HostedQuotaError, HostedCapacityError
+    from ..llm.ollama import OllamaTransportError, OllamaResponseError
+    for kind, code in (
+        (HostedRateLimitError, "MODEL_RATE_LIMITED"),
+        (HostedQuotaError, "MODEL_QUOTA_EXHAUSTED"),
+        (HostedCapacityError, "MODEL_CAPACITY_TIMEOUT"),
+        (OllamaTransportError, "MODEL_REQUEST_FAILED"),
+        (OllamaResponseError, "MODEL_RESPONSE_INVALID"),
+        (AgentDecisionError, "MODEL_DECISION_INVALID"),
+        (ExtractionError, "EXTRACTION_VALIDATION_FAILED"),
+    ):
+        if isinstance(error, kind):
+            return code
+    return None
 
 
 class ReportMetadata(_ToolModel):
@@ -389,10 +413,12 @@ class AgentTools:
             from .specialists import ExtractionInput, extract_source
             results = extract_source(ExtractionInput(tuple(inputs), metadata.report_date,
                 metadata.report_date_trusted), self._context.model_callable, service=self._extract)
-        except ExtractionError:
-            raise AgentToolError("AGENT_TOOL_FAILED", "Extraction output failed validation.", stage="extraction", retryable=True) from None
-        except Exception:
-            raise AgentToolError("AGENT_TOOL_FAILED", "The requested agent operation failed safely.") from None
+        except ExtractionError as exc:
+            raise AgentToolError("AGENT_TOOL_FAILED", "Extraction output failed validation.", stage="extraction", retryable=True,
+                                 failure_category=_failure_category(exc)) from None
+        except Exception as exc:
+            raise AgentToolError("AGENT_TOOL_FAILED", "The requested agent operation failed safely.",
+                                 failure_category=_failure_category(exc)) from None
         try:
             observations = list(deduplicate_results(results))
             if len(observations) > MAX_OBSERVATIONS:
@@ -451,8 +477,9 @@ class AgentTools:
                                      model_call=self._context.model_callable)
             else:
                 raw = self._retrieve(obs, scope.schedule_version_id, list(self._activities.values()))
-        except Exception:
-            raise AgentToolError("AGENT_TOOL_FAILED", "Schedule decision failed safely.") from None
+        except Exception as exc:
+            raise AgentToolError("AGENT_TOOL_FAILED", "Schedule decision failed safely.",
+                                 failure_category=_failure_category(exc)) from None
         warnings = []
         try:
             rows = list(raw.candidates if hasattr(raw, "candidates") else raw)
@@ -535,7 +562,9 @@ class AgentTools:
                     "model_digest": (
                         getattr(value, "model_digest", None) or self._model_metadata.model_digest
                     ),
-                    "selection_prompt_version": "agent-schedule-v1",
+                    "selection_prompt_version": ("agent-schedule-v3-short-ids" if
+                        getattr(self._select, "keywords", {}).get("short_ids") else "agent-schedule-v2-compact" if
+                        getattr(self._select, "keywords", {}).get("compact_context") else "agent-schedule-v1"),
                     "selection_prompt_hash": getattr(value, "prompt_hash", None),
                     "settings_hash": (
                         getattr(value, "settings_hash", None) or self._model_metadata.settings_hash
@@ -547,12 +576,14 @@ class AgentTools:
             proposal = select_source(SelectionInput(obs, tuple(supplied),
                 {key: self._fragments[key].text for key in ids}),
                 service=self._select, model_call=selection_model, project_id=scope.project_id)
-        except AgentDecisionError:
-            raise AgentToolError("AGENT_TOOL_FAILED", "Selection output failed validation.", stage="selection", retryable=True) from None
+        except AgentDecisionError as exc:
+            raise AgentToolError("AGENT_TOOL_FAILED", "Selection output failed validation.", stage="selection", retryable=True,
+                                 failure_category=_failure_category(exc)) from None
         except ValidationError:
             raise AgentToolError("AGENT_TOOL_FAILED", "Selection output failed validation.", stage="selection", retryable=True) from None
-        except Exception:
-            raise AgentToolError("AGENT_TOOL_FAILED", "The requested agent operation failed safely.") from None
+        except Exception as exc:
+            raise AgentToolError("AGENT_TOOL_FAILED", "The requested agent operation failed safely.",
+                                 failure_category=_failure_category(exc)) from None
         try:
             result = proposal if isinstance(proposal, Proposal) else Proposal.model_validate(proposal)
             if any(key not in ids for key in result.evidence_fragment_ids):

@@ -1,0 +1,27 @@
+{
+  "version": "derived-development-review-v1",
+  "status": "frozen_development_only",
+  "created_at": "2026-10-17T06:54:09.690252+00:00",
+  "review_kind": "owner_authorized_ai_assisted",
+  "human_review_completed": false,
+  "all_cases_remain_development": true,
+  "case_count": 16,
+  "workflow_fixture_count": 5,
+  "quality_disposition_count": 21,
+  "source_sha256": {
+    "data/review/v2-ai-adjudication-2026-10-16.json": "82ea1293c5bf5a66922601f6a2a6d076edae2ad738bad6a1b16ababe8aa88528",
+    "data/review/schedule-split-ai-review-2026-10-16.json": "06196ed0bb211631eed487f9aa61399080c0225d8fdf10c274d064c48a526935",
+    "data/synthetic/v2/reports.jsonl": "eee2955b5f89e7ac00a76ee46c8d0b1d3ef6c392a4bec580d7a1a7ce521dd8b6",
+    "data/synthetic/v2/proposed-labels.jsonl": "0690d1561891c0f9802405e0ebe63a82c0cdff4dee4612f05e3975d2ff661471"
+  },
+  "derived_sha256": {
+    "schedule-dispositions.json": "88211f05692fad629647c23cbfb1456816c086a39ed277ae4074273d931cc33b",
+    "development-labels.jsonl": "43ec45b81f804f43404aa7b77726dfbf315de06878769d1b3613c385e4b13e19",
+    "workflow-fixtures.json": "0866e5d6fbd6664a98d03868c47cb20931d0b1d3a05a1ff784f5d17c45ae2f31"
+  },
+  "limitations": [
+    "Workflow fixtures are expected behaviors, not live execution evidence.",
+    "AI review is not independent human adjudication.",
+    "Public schedule exclusions do not prove source defects corrected."
+  ]
+}

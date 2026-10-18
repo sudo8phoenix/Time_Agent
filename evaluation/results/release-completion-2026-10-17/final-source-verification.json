@@ -1,0 +1,7 @@
+{
+  "checked_files": 322,
+  "mismatches": [],
+  "validation_capture_source_matches": true,
+  "holdout_capture_source_matches": true,
+  "application_source_changed_after_final_regression": false
+}

@@ -1,0 +1,27 @@
+{
+  "version": "seed-delivery-ai-adjudication-v1",
+  "review_kind": "owner_authorized_ai_assisted",
+  "human_review_completed": false,
+  "reviewed_at": "2026-10-17",
+  "split": "development",
+  "case_id": "C06",
+  "report_id": "SYN-006",
+  "source_text": "Area A, line 24-XX: 6 spools delivered to the laydown area.",
+  "expected_event_type": "material_delivery",
+  "expected_mapping_state": "suggested",
+  "expected_activity_ids": [
+    "PIP-A-ERECT-024"
+  ],
+  "expected_progress_quantity": null,
+  "source_quantity": "6",
+  "source_unit": "spool",
+  "expected_lifecycle_effects": [],
+  "expected_ledger_effects": {},
+  "reason": "Under the recorded receiving-work-package identity policy, Area A plus line 24-XX and spools identifies the Area A spool erection work package. Area B and line 25 differ; weld joints and hydrotest are different work identities. This is an association of delivered materials, not evidence of installed progress. No dedicated delivery row exists. Unmatched is safe operational abstention but is not the expected identity match for this particular fully specified development case. A source without area/line/material identity must abstain if multiple receiving packages remain plausible.",
+  "source_sha256": {
+    "data/synthetic/labels/seed-labels.jsonl": "c75e835e7168d6f1355ffafacc34205f29c9399568f82ca50800ceaaa753af81",
+    "data/synthetic/reports/seed-reports.jsonl": "1dbf45bac981f5f87bbc911d5bdd4c0287f464680db1d3ffcae6ed65b7b11644",
+    "data/synthetic/schedules/demo-utility-01.csv": "4b0f89a691757a9368694fae5adab7f602aa9563c17ac1cbf8955e8a5c0f21c6"
+  },
+  "original_labels_modified": false
+}

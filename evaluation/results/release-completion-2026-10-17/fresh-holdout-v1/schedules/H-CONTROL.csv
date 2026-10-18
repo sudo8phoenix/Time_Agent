@@ -1,0 +1,3 @@
+activity_id,activity_name,aliases,area,asset_tags,discipline,is_leaf,measurement_basis,planned_finish,planned_quantity,planned_start,unit,wbs_path,work_type
+HC5,Install control panel C-5,,,C-5,electrical,true,quantity_ratio,2026-12-20,1,2026-11-01,each,SYNTHETIC/HC5,equipment_installation
+HC6,Install control panel C-6,,,C-6,electrical,true,quantity_ratio,2026-12-20,1,2026-11-01,each,SYNTHETIC/HC6,equipment_installation

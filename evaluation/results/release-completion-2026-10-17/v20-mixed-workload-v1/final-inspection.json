@@ -1,0 +1,100 @@
+{
+  "captured_at": "2026-10-17T15:34:43.025042+00:00",
+  "read_only": true,
+  "runtime": {
+    "captured_at": "2026-10-17T15:34:43.055536+00:00",
+    "schema_revision": "0018_hosted_admission",
+    "rollout_configuration": {
+      "agent_hierarchy_enabled": false,
+      "orchestrator_model_assisted": false,
+      "meaning": "configured values only; does not attest running processes"
+    },
+    "unavailable_tables": [],
+    "jobs": {
+      "by_state": {
+        "cancelled": 5,
+        "failed": 18,
+        "ready_for_review": 19
+      },
+      "errors_by_code": {
+        "AGENT_DEADLINE": 1,
+        "AGENT_TOOL_FAILED": 17,
+        "REHEARSAL_ABORTED": 4,
+        "REHEARSAL_STOPPED": 1
+      },
+      "oldest_queued_age_seconds": null,
+      "expired_running_ownership_count": 0
+    },
+    "agent_runs": {
+      "by_state": {
+        "created": 2,
+        "failed": 18,
+        "ready_for_review": 19
+      },
+      "errors_by_code": {
+        "AGENT_DEADLINE": 1,
+        "AGENT_TOOL_FAILED": 17
+      }
+    },
+    "conversation_tasks": {
+      "by_state": {
+        "cancelled": 1,
+        "failed": 1,
+        "queued": 1
+      },
+      "errors_by_code": {
+        "CONVERSATION_BUDGET_EXHAUSTED": 1,
+        "MODEL_RATE_LIMITED": 1,
+        "REHEARSAL_STOPPED": 1
+      },
+      "oldest_queued_age_seconds": 52,
+      "expired_running_ownership_count": 0
+    },
+    "hosted_provider_admission": {
+      "groq": {
+        "remaining_requests": 984,
+        "remaining_tokens": 8000,
+        "request_reset_remaining_seconds": 1330,
+        "token_reset_remaining_seconds": 0,
+        "cooldown_remaining_seconds": 594,
+        "lease_remaining_seconds": null
+      },
+      "openrouter": {
+        "request_reset_remaining_seconds": 0,
+        "token_reset_remaining_seconds": 0,
+        "cooldown_remaining_seconds": 0,
+        "lease_remaining_seconds": null
+      }
+    }
+  },
+  "report": [
+    {
+      "id": "7ad5ba39-f527-49e7-81b3-a56483f97620",
+      "state": "failed",
+      "attempts": 1,
+      "error_code": "AGENT_TOOL_FAILED",
+      "lease_expires_at": null
+    }
+  ],
+  "conversation": [
+    {
+      "id": "22d2b979-b4ce-44bc-833e-b31cad4f22da",
+      "state": "queued",
+      "attempts": 1,
+      "model_calls": 1,
+      "next_attempt_at": "2026-10-17 15:44:37.333450+00:00",
+      "deadline_at": "2026-10-17 16:03:50.158839+00:00",
+      "error_code": "MODEL_RATE_LIMITED",
+      "lease_expires_at": null
+    }
+  ],
+  "conversation_calls": [
+    {
+      "ordinal": 0,
+      "role": "extraction",
+      "completed": true
+    }
+  ],
+  "approved_progress_events": 2,
+  "disposition": "Owned rehearsal workers exited. Retain queued conversation and original budgets/checkpoints; inspect explicitly before resume. No automatic retry or cancellation."
+}

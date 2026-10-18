@@ -360,6 +360,12 @@ def test_v10_prompt_and_processing_stay_frozen():
     assert sha256(get_extraction_prompt(V10_PROMPT_VERSION)[1].encode()).hexdigest() == "49835ff04ad824c956189383a6e7ceac2bb6baab2af130bf2b7cecdb526a85a9"
 
 
+def test_v11_prompt_remains_exact_after_default_upgrade():
+    from hashlib import sha256
+    from app.prompts.extraction_v1 import V11_PROMPT_VERSION, get_extraction_prompt
+    assert sha256(get_extraction_prompt(V11_PROMPT_VERSION)[1].encode()).hexdigest() == "b3fdf7a9ec0aa8a30183e69adbbb139c4dceb566071fbb00f179557c20216f40"
+
+
 @pytest.mark.parametrize("text", [
     "Crane unavailable, so reinforcement fixing was held; Installed 3 spools.",
     "Installed 3 spools; testing has been suspended.",
@@ -378,3 +384,134 @@ def test_partial_evidence_rejection_marks_retained_work_for_completeness_review(
     result = extract_batch(batch(fragment(text)), lambda **_: {"observations": [valid, invalid]})
     assert len(result.observations) == 1 and result.errors
     assert any("completeness check" in w for w in result.observations[0].warnings)
+
+
+def test_v12_prompt_remains_pinned_after_location_scope_revision():
+    from hashlib import sha256
+    from app.prompts.extraction_v1 import V12_PROMPT_VERSION, V13_PROMPT_VERSION, PROMPT_VERSION, get_extraction_prompt
+    version, prompt = get_extraction_prompt(V12_PROMPT_VERSION)
+    assert version == V12_PROMPT_VERSION
+    assert sha256(prompt.encode()).hexdigest() == "e388e2807330a6d81289bf508dccfab25be06c54c9f1e122f3767dac9bf52ec6"
+    assert get_extraction_prompt()[0] == PROMPT_VERSION == V12_PROMPT_VERSION
+    assert get_extraction_prompt(V13_PROMPT_VERSION)[1] != prompt
+
+
+def test_v16_unwraps_only_exact_context_with_unchanged_source_body():
+    from app.prompts.extraction_v1 import V16_PROMPT_VERSION, V12_PROMPT_VERSION
+    text = "Yesterday 2 spools arrived at yard T."
+    b = BatchInput("b", (fragment(text),), date(2026, 10, 7), True)
+    quoted = "Trusted report date: 2026-10-07\n[f1 | p1]\n" + text
+    item = observation(quoted, event_type="material_delivery", quantity=None,
+        quantity_kind="none", work_date="2026-10-07", date_basis="report_context")
+    result = extract_batch(b, lambda **_: {"observations": [item]}, prompt_version=V16_PROMPT_VERSION)
+    assert not result.errors
+    actual = result.observations[0]
+    assert actual.evidence[0].quote == text
+    assert actual.work_date == date(2026, 10, 6)
+    assert actual.date_basis == DateBasis.relative_resolved
+    assert any("wrapper" in warning for warning in actual.warnings)
+    old = extract_batch(b, lambda **_: {"observations": [item]}, prompt_version=V12_PROMPT_VERSION)
+    assert old.errors and not old.observations
+
+
+@pytest.mark.parametrize("quote", [
+    "[f1 | p1]\nYesterday 3 spools arrived at yard T.",
+    "Trusted report date: 2026-10-08\n[f1 | p1]\nYesterday 2 spools arrived at yard T.",
+    "[f2 | p1]\nYesterday 2 spools arrived at yard T.",
+])
+def test_v16_does_not_repair_modified_or_wrong_context(quote):
+    from app.prompts.extraction_v1 import V16_PROMPT_VERSION
+    b = BatchInput("b", (fragment("Yesterday 2 spools arrived at yard T."),), date(2026, 10, 7), True)
+    item = observation(quote, event_type="material_delivery", quantity=None,
+        quantity_kind="none", work_date=None, date_basis="unknown")
+    result = extract_batch(b, lambda **_: {"observations": [item]}, prompt_version=V16_PROMPT_VERSION)
+    assert result.errors and not result.observations
+
+
+def test_v20_removes_repeated_heading_from_unique_source_evidence_only():
+    from app.prompts.extraction_v1 import V19_PROMPT_VERSION, V20_PROMPT_VERSION
+    body = "Erected 3 spools today."
+    text = "Bay R: Inspection finished at 09:20. " + body
+    item = observation("Bay R: " + body)
+    item["lifecycle_effects"] = [{"kind": "actual_start", "scope": "whole_activity",
+        "endpoint": {"local_date": "2026-09-21", "precision": "date", "basis": "explicit",
+                     "raw_expression": "2026-09-21"},
+        "evidence": item["evidence"]}]
+    result = extract_batch(batch(fragment(text)), lambda **_: {"observations": [item]},
+        prompt_version=V20_PROMPT_VERSION)
+    assert not result.errors
+    assert result.observations[0].evidence[0].quote == body
+    assert result.observations[0].lifecycle_effects[0].evidence[0].quote == body
+    assert any("Repeated source heading" in w for w in result.observations[0].warnings)
+    old = extract_batch(batch(fragment(text)), lambda **_: {"observations": [item]},
+        prompt_version=V19_PROMPT_VERSION)
+    assert old.errors and not old.observations
+
+
+@pytest.mark.parametrize("text,quote", [
+    ("Bay R: Inspection finished. Erected 3 spools today.", "Bay S: Erected 3 spools today."),
+    ("Bay R: Inspection finished. Erected 3 spools today.", "Bay R: Erected 4 spools today."),
+    ("Bay R: Inspection finished. Erected 3 spools today. Erected 3 spools today.", "Bay R: Erected 3 spools today."),
+    ("Bay R: Inspection finished. Bay S: Erected 3 spools today.", "Bay R: Erected 3 spools today."),
+])
+def test_v20_repeated_heading_repair_rejects_altered_or_ambiguous_evidence(text, quote):
+    from app.prompts.extraction_v1 import V20_PROMPT_VERSION
+    item = observation(quote)
+    result = extract_batch(batch(fragment(text)), lambda **_: {"observations": [item]},
+        prompt_version=V20_PROMPT_VERSION)
+    assert result.errors and not result.observations
+
+
+def test_v17_clears_other_clauses_location_and_keeps_blocked_work_identity():
+    from app.prompts.extraction_v1 import V17_PROMPT_VERSION
+    text = "Reinforcement fixing held for a crane; concrete placed in Sector Q."
+    item = observation(text, event_type="blocker", quantity=None, quantity_kind="none",
+        summary="Reinforcement fixing held for a crane")
+    item.update(area="Sector Q", work_type="other")
+    result = extract_batch(batch(fragment(text)), lambda **_: {"observations": [item]}, prompt_version=V17_PROMPT_VERSION)
+    assert result.observations[0].area is None
+    assert result.observations[0].work_type.value == "rebar_installation"
+    assert any("source clause" in w for w in result.observations[0].warnings)
+
+
+def test_v17_retains_explicit_shared_heading_and_does_not_guess_repeated_scope():
+    from app.prompts.extraction_v1 import V17_PROMPT_VERSION
+    text = "Section Q: cable installed; testing held for access."
+    item = observation(text, event_type="blocker", quantity=None, quantity_kind="none", summary="Testing held for access")
+    item.update(area=None, work_type="cable_laying")
+    result = extract_batch(batch(fragment(text)), lambda **_: {"observations": [item]}, prompt_version=V17_PROMPT_VERSION)
+    assert result.observations[0].area == "Section Q"
+    assert result.observations[0].work_type.value == "other"
+    ambiguous = "Testing held in Section Q; testing also held in Section R."
+    item.update(area=None, evidence=[{"fields": ["summary"], "fragment_id": "f1", "quote": ambiguous}])
+    result = extract_batch(batch(fragment(ambiguous)), lambda **_: {"observations": [item]}, prompt_version=V17_PROMPT_VERSION)
+    assert result.observations[0].area is None
+    assert result.observations[0].work_type.value == "cable_laying"  # No unique scope: no automatic repair.
+
+
+def test_v17_resolves_missing_date_despite_model_relative_resolved_marker():
+    from app.prompts.extraction_v1 import V17_PROMPT_VERSION
+    text = "Tomorrow the crew plans welding."
+    item = observation(text, event_type="planned_work", quantity=None, quantity_kind="none",
+        work_date=None, date_basis="relative_resolved")
+    b = BatchInput("b", (fragment(text),), date(2026, 10, 7), True)
+    result = extract_batch(b, lambda **_: {"observations": [item]}, prompt_version=V17_PROMPT_VERSION)
+    assert result.observations[0].work_date == date(2026, 10, 8)
+
+
+@pytest.mark.parametrize("version", ["extraction-v18-nullable-source-contract", "extraction-v19-lifecycle-clause-completeness"])
+def test_missing_nullable_fields_mean_unknown_without_inventing_endpoints(version):
+    from app.prompts.extraction_v1 import V12_PROMPT_VERSION
+    text = "Painting continued today; rain did not stop the work."
+    item = observation(text, quantity=None, quantity_kind="none", work_date=None, date_basis="unknown")
+    item.pop("actual_start")
+    item.pop("actual_finish")
+    result = extract_batch(batch(fragment(text)), lambda **_: {"observations": [item]}, prompt_version=version)
+    assert result.observations[0].actual_start is result.observations[0].actual_finish is None
+    assert not result.observations[0].lifecycle_effects
+    assert any("Omitted optional" in w for w in result.observations[0].warnings)
+    with pytest.raises(ExtractionError):
+        extract_batch(batch(fragment(text)), lambda **_: {"observations": [item]}, prompt_version=V12_PROMPT_VERSION)
+    item.pop("event_type")
+    with pytest.raises(ExtractionError):
+        extract_batch(batch(fragment(text)), lambda **_: {"observations": [item]}, prompt_version=version)

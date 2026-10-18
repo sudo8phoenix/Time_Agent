@@ -1,0 +1,108 @@
+{
+  "version": "prototype-v19-fresh-v2",
+  "status": "frozen_inputs_and_ai_labels",
+  "frozen_at": "2026-10-17T07:55:41.871283+00:00",
+  "review": {
+    "kind": "ai_assisted",
+    "status": "ai_assisted_adjudicated",
+    "human_review_completed": false,
+    "reviewer_id": "codex-ai-author-and-adjudicator-v19",
+    "label_authors": [
+      "codex-ai-author-v19"
+    ],
+    "reviewed_at": "2026-10-17T07:53:58.737728+00:00",
+    "authorization_sha256": "354ff9726857a8bad2d67c0157594ff965780fa2d4f9dbed5d4439efaf81ed93",
+    "attestation": "Same AI session authored and reviewed literal source assertions and per-project schedule identity before capture; no independent review claimed. No provider has received these inputs."
+  },
+  "group_review_status": "ai_assisted_adjudicated",
+  "splits": {
+    "development": [],
+    "train": [],
+    "validation": [
+      {
+        "case_id": "V19-reservoir",
+        "group_id": "fresh-v19-reservoir"
+      },
+      {
+        "case_id": "V19-tramway",
+        "group_id": "fresh-v19-tramway"
+      },
+      {
+        "case_id": "V19-grain-terminal",
+        "group_id": "fresh-v19-grain-terminal"
+      },
+      {
+        "case_id": "V19-desalination",
+        "group_id": "fresh-v19-desalination"
+      },
+      {
+        "case_id": "V19-library",
+        "group_id": "fresh-v19-library"
+      },
+      {
+        "case_id": "V19-solar-farm",
+        "group_id": "fresh-v19-solar-farm"
+      },
+      {
+        "case_id": "V19-canal-lock",
+        "group_id": "fresh-v19-canal-lock"
+      },
+      {
+        "case_id": "V19-cold-store",
+        "group_id": "fresh-v19-cold-store"
+      }
+    ],
+    "holdout": [
+      {
+        "case_id": "H19-observatory",
+        "group_id": "fresh-v19-observatory"
+      },
+      {
+        "case_id": "H19-ferry-pier",
+        "group_id": "fresh-v19-ferry-pier"
+      },
+      {
+        "case_id": "H19-brewery",
+        "group_id": "fresh-v19-brewery"
+      },
+      {
+        "case_id": "H19-recycling-plant",
+        "group_id": "fresh-v19-recycling-plant"
+      },
+      {
+        "case_id": "H19-theatre",
+        "group_id": "fresh-v19-theatre"
+      },
+      {
+        "case_id": "H19-aquarium",
+        "group_id": "fresh-v19-aquarium"
+      },
+      {
+        "case_id": "H19-paper-mill",
+        "group_id": "fresh-v19-paper-mill"
+      },
+      {
+        "case_id": "H19-mountain-tunnel",
+        "group_id": "fresh-v19-mountain-tunnel"
+      }
+    ]
+  },
+  "hashes": {
+    "holdout-labels.jsonl": "0b8c630554abe7afd2fb6a75339bda84dd80c560e8770f2431b171ab0ed8a099",
+    "validation-labels.jsonl": "5f195e52239b12d8aca96a237919d3d37911848f10021f1177da4fa0905f7e51",
+    "inputs.jsonl": "5490be25fc42bfc338a395a1838f9a16c561f33f445e04760336390319cc723a"
+  },
+  "calibration_policy": {
+    "target_precision": 0.98,
+    "min_support": 20
+  },
+  "estimator_sha256": "2e2fcf0952a2c0f536070468807865306ae701faddfffa8e612737e6bb9bb109",
+  "limitations": [
+    "24 validation events across eight synthetic projects; clustered observations are not independent reports.",
+    "Unseen means not previously submitted to provider, not independently authored.",
+    "Do not tune on holdout results; preserve first attempts and failures.",
+    "Synthetic project groups are disjoint; scenario structures overlap, limiting out-of-distribution claims.",
+    "One delivery and one ambiguity case per split; safe-ambiguity support is bounded."
+  ],
+  "supersedes_unsubmitted_manifest_sha256": "aa601e46bd257b62b712dd996126880065beae75c348b3052d7d8a7f943109fd"
+}

@@ -1,0 +1,12 @@
+{
+  "accepted": false,
+  "reason": "Both workers exited on key-slot string validation before claiming work. Controller manually interrupted to flush logs; original result incorrectly labelled completed and is rejected.",
+  "network_inference_calls": 0,
+  "fixture_jobs_cancelled": [
+    "586f4f5e-48cf-4de1-9c60-9608231e2c1f",
+    "27017d10-0710-4ba9-a6ea-bbc837f1abc8",
+    "5d56c5f7-8b90-49f4-aa84-685bfdbe4704",
+    "9c45dde6-de46-4918-b2b8-e4e5972b45ce"
+  ],
+  "original_capture_retained": true
+}

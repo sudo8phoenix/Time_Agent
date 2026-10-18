@@ -12,7 +12,7 @@ test("supervisor multi-event confirmation survives refresh until reviewer accept
   const reviewer = `t02review_${suffix}`;
   const supervisor = `t02super_${suffix}`;
   const password = `Conversation-${randomUUID()}!`;
-  await page.goto("http://127.0.0.1:8000/");
+  await page.goto("/");
   await page.getByRole("button", { name: /New here/ }).click();
   await page.getByLabel("Username").fill(reviewer);
   await page.getByLabel("Password", { exact: true }).fill(password);

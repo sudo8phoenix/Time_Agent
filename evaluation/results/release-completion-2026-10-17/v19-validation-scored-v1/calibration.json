@@ -1,0 +1,244 @@
+{
+  "case_count": 24,
+  "hashes": {
+    "authorization": "354ff9726857a8bad2d67c0157594ff965780fa2d4f9dbed5d4439efaf81ed93",
+    "labels": "61cef493d899f3a03a10497fd0dc956c5f1006185ccae0eccc7a8a928ec10973",
+    "manifest": "74b261818b5e12a77d52328378c576d4f86cd4fc455e87852579ab095cae0a68",
+    "predictions": "736541dc6bd52ced82e59e7bacc7e0da453c12cb2857b90ccbf64411d92ec65d"
+  },
+  "limitations": [
+    "Review identity/independence are declared attestations, not verified by this tool.",
+    "Empirical validation precision is not a guarantee on new projects.",
+    "Field metrics weight targets; event/link metrics weight cases.",
+    "No holdout labels were read. No automatic acceptance is permitted."
+  ],
+  "metrics": {
+    "event": {
+      "bands": [
+        {
+          "count": 0,
+          "errors": 0,
+          "exact_match_precision": null,
+          "max": 0.5,
+          "min": 0
+        },
+        {
+          "count": 6,
+          "errors": 0,
+          "exact_match_precision": 1.0,
+          "max": 0.8,
+          "min": 0.5
+        },
+        {
+          "count": 1,
+          "errors": 0,
+          "exact_match_precision": 1.0,
+          "max": 0.9,
+          "min": 0.8
+        },
+        {
+          "count": 0,
+          "errors": 0,
+          "exact_match_precision": null,
+          "max": 1,
+          "min": 0.9
+        }
+      ],
+      "correct_abstentions": 0,
+      "estimator": [
+        "evidence_support_index",
+        "evidence-support-index-v1"
+      ],
+      "extra_prediction_count": 0,
+      "label_target_count": 24,
+      "missing_or_abstained": 17,
+      "prediction_count": 7,
+      "review_priority_threshold": null,
+      "tradeoffs": [
+        {
+          "correct": 7,
+          "count": 7,
+          "coverage": 0.2916666666666667,
+          "errors": 0,
+          "precision": 1.0,
+          "threshold": 0.5
+        },
+        {
+          "correct": 3,
+          "count": 3,
+          "coverage": 0.125,
+          "errors": 0,
+          "precision": 1.0,
+          "threshold": 0.75
+        },
+        {
+          "correct": 1,
+          "count": 1,
+          "coverage": 0.041666666666666664,
+          "errors": 0,
+          "precision": 1.0,
+          "threshold": 0.8125
+        }
+      ],
+      "unavailable_score_count": 0
+    },
+    "field": {
+      "bands": [
+        {
+          "count": 0,
+          "errors": 0,
+          "exact_match_precision": null,
+          "max": 0.5,
+          "min": 0
+        },
+        {
+          "count": 19,
+          "errors": 0,
+          "exact_match_precision": 1.0,
+          "max": 0.8,
+          "min": 0.5
+        },
+        {
+          "count": 2,
+          "errors": 0,
+          "exact_match_precision": 1.0,
+          "max": 0.9,
+          "min": 0.8
+        },
+        {
+          "count": 0,
+          "errors": 0,
+          "exact_match_precision": null,
+          "max": 1,
+          "min": 0.9
+        }
+      ],
+      "correct_abstentions": 53,
+      "estimator": [
+        "evidence_support_index",
+        "evidence-support-index-v1"
+      ],
+      "extra_prediction_count": 0,
+      "label_target_count": 120,
+      "missing_or_abstained": 99,
+      "prediction_count": 21,
+      "review_priority_threshold": {
+        "correct": 21,
+        "count": 21,
+        "coverage": 0.175,
+        "errors": 0,
+        "precision": 1.0,
+        "threshold": 0.5
+      },
+      "tradeoffs": [
+        {
+          "correct": 21,
+          "count": 21,
+          "coverage": 0.175,
+          "errors": 0,
+          "precision": 1.0,
+          "threshold": 0.5
+        },
+        {
+          "correct": 8,
+          "count": 8,
+          "coverage": 0.06666666666666667,
+          "errors": 0,
+          "precision": 1.0,
+          "threshold": 0.75
+        },
+        {
+          "correct": 2,
+          "count": 2,
+          "coverage": 0.016666666666666666,
+          "errors": 0,
+          "precision": 1.0,
+          "threshold": 0.8125
+        }
+      ],
+      "unavailable_score_count": 0
+    },
+    "link": {
+      "bands": [
+        {
+          "count": 0,
+          "errors": 0,
+          "exact_match_precision": null,
+          "max": 0.5,
+          "min": 0
+        },
+        {
+          "count": 3,
+          "errors": 0,
+          "exact_match_precision": 1.0,
+          "max": 0.8,
+          "min": 0.5
+        },
+        {
+          "count": 0,
+          "errors": 0,
+          "exact_match_precision": null,
+          "max": 0.9,
+          "min": 0.8
+        },
+        {
+          "count": 3,
+          "errors": 0,
+          "exact_match_precision": 1.0,
+          "max": 1,
+          "min": 0.9
+        }
+      ],
+      "correct_abstentions": 1,
+      "estimator": [
+        "evidence_support_index",
+        "evidence-support-index-v1"
+      ],
+      "extra_prediction_count": 0,
+      "label_target_count": 24,
+      "missing_or_abstained": 18,
+      "prediction_count": 6,
+      "review_priority_threshold": null,
+      "tradeoffs": [
+        {
+          "correct": 6,
+          "count": 6,
+          "coverage": 0.25,
+          "errors": 0,
+          "precision": 1.0,
+          "threshold": 0.75
+        },
+        {
+          "correct": 3,
+          "count": 3,
+          "coverage": 0.125,
+          "errors": 0,
+          "precision": 1.0,
+          "threshold": 1.0
+        }
+      ],
+      "unavailable_score_count": 0
+    }
+  },
+  "missing_prediction_cases": 17,
+  "policy": {
+    "authorized_acceptance_required": true,
+    "min_support": 20,
+    "target_precision": 0.98
+  },
+  "review": {
+    "attestation": "Same AI session authored and reviewed literal source assertions and per-project schedule identity before capture; no independent review claimed. No provider has received these inputs.",
+    "authorization_sha256": "354ff9726857a8bad2d67c0157594ff965780fa2d4f9dbed5d4439efaf81ed93",
+    "human_review_completed": false,
+    "kind": "ai_assisted",
+    "label_authors": [
+      "codex-ai-author-v19"
+    ],
+    "reviewed_at": "2026-10-17T07:53:58.737728+00:00",
+    "reviewer_id": "codex-ai-author-and-adjudicator-v19",
+    "status": "ai_assisted_adjudicated"
+  },
+  "review_policy": "owner_authorized_ai_assisted",
+  "status": "ai_assisted_validation_evidence",
+  "version": "review-calibration-v2"
+}

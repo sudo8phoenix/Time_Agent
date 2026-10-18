@@ -1,0 +1,12 @@
+{
+  "started_at": "2026-10-15T19:12:02.586534+00:00",
+  "prompt_version": "extraction-v10-clause-coverage-dates",
+  "prompt_sha256": "49835ff04ad824c956189383a6e7ceac2bb6baab2af130bf2b7cecdb526a85a9",
+  "fixture_sha256": "875bb23546cd3ea281842145b77862dda7856fa846c3eeb7439fe243693f6728",
+  "provider": "groq",
+  "model": "openai/gpt-oss-20b",
+  "key_slot": 0,
+  "transport_retries": 0,
+  "timeout_seconds": 60,
+  "scope": "fresh wording synthetic component development checks; no persistence or approvals"
+}

@@ -1,0 +1,22 @@
+{
+  "started_at": "2026-10-17T06:53:09.009043+00:00",
+  "prompt_version": "extraction-v14-atomic-source-fields",
+  "prompt_sha256": "54b2cdbfe1b9df8c8ea0a3febc78bc9b530089002fe898103945818976148328",
+  "fixture_sha256": "cfb3af2409864c2a17d987f0eb647588397b2ac5ff33b7049d576f06773f3a02",
+  "provider": "groq",
+  "model": "openai/gpt-oss-20b",
+  "key_slot": 0,
+  "transport_retries": 0,
+  "admission_scope": "postgresql_deployment",
+  "case_ids": [
+    "Q01",
+    "Q02",
+    "Q03",
+    "Q04",
+    "Q05",
+    "Q06",
+    "Q07"
+  ],
+  "timeout_seconds": 60,
+  "scope": "fresh wording synthetic component development checks; no persistence or approvals"
+}

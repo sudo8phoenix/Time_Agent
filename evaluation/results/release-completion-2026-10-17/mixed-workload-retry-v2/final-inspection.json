@@ -1,0 +1,57 @@
+{
+  "read_only": true,
+  "rows": [
+    {
+      "state": "failed",
+      "attempts": 1,
+      "model_calls": null,
+      "error_code": "AGENT_TOOL_FAILED",
+      "lease_expires_at": null,
+      "next_attempt_at": null,
+      "kind": "report",
+      "id": "b008a8ec-865d-475c-b2e1-eb0d47e1fe13",
+      "tools": [
+        {
+          "tool_name": "load_job_context",
+          "state": "succeeded",
+          "error_code": null,
+          "sanitized_output_summary": {
+            "fragment_count": 1,
+            "activity_count": 12
+          }
+        },
+        {
+          "tool_name": "extract_observations",
+          "state": "failed",
+          "error_code": "AGENT_TOOL_FAILED",
+          "sanitized_output_summary": {
+            "failure_category": "MODEL_CAPACITY_TIMEOUT",
+            "provider_metrics": {
+              "groq": {
+                "calls": 1,
+                "admitted": 0,
+                "admission_ms": 532,
+                "transport_ms": 0,
+                "responses_2xx": 0,
+                "responses_429": 0,
+                "responses_other": 0,
+                "no_response": 1
+              }
+            }
+          }
+        }
+      ]
+    },
+    {
+      "state": "queued",
+      "attempts": 1,
+      "model_calls": 1,
+      "error_code": "MODEL_RATE_LIMITED",
+      "lease_expires_at": null,
+      "next_attempt_at": "2026-10-17 07:51:16.050337+00:00",
+      "kind": "conversation",
+      "id": "244eab13-3d21-4ce6-acd5-d455e1492454"
+    }
+  ],
+  "total_approved_events": 2
+}

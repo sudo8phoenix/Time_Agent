@@ -14,6 +14,14 @@ test("quantity-free lifecycle through login, schedule, model, review, refresh an
   const username = `l04live_${randomUUID().slice(0, 12)}`;
   const password = `Lifecycle-${randomUUID()}!`;
   const evidence: Record<string, unknown> = { fixture: "developer synthetic", started_at: new Date().toISOString() };
+  const readiness: number[] = [];
+  const approvals: number[] = [];
+  page.on("response", response => {
+    if (response.request().method() === "POST" && response.url().endsWith("/approve")) {
+      const timing = response.request().timing();
+      approvals.push(timing.responseStart - timing.requestStart);
+    }
+  });
   await page.goto("/");
   await page.getByRole("button", { name: /New here/ }).click();
   await page.getByLabel("Username").fill(username);
@@ -47,6 +55,7 @@ test("quantity-free lifecycle through login, schedule, model, review, refresh an
     await page.getByRole("button", { name: "Report intake" }).click();
     await page.getByLabel("Paste report text").fill(text);
     await page.getByLabel("Report date", { exact: true }).fill(reportDate);
+    const started = Date.now();
     const submitted = page.waitForResponse(response => response.url().endsWith(`/projects/${project.id}/reports`) && response.request().method() === "POST");
     await page.getByRole("button", { name: /Create review job/ }).click();
     const report = await (await submitted).json();
@@ -55,6 +64,7 @@ test("quantity-free lifecycle through login, schedule, model, review, refresh an
     const status = await (await page.request.get(`/api/v1/jobs/${report.job_id}`)).json();
     expect(status.state, JSON.stringify(status)).toBe("ready_for_review");
     expect(status.proposal_ids.length, JSON.stringify(status)).toBeGreaterThan(0);
+    readiness.push(Date.now() - started);
     evidence[`job_${reportDate}`] = { ...status, report_id: report.report_id };
     return status.proposal_ids[0] as string;
   };
@@ -104,6 +114,25 @@ test("quantity-free lifecycle through login, schedule, model, review, refresh an
   expect(exported).toContain("endpoint_precision");
   expect(exported).toContain("actual_finish");
   expect(exported).toContain("date");
+  const durations = await (await page.request.get(`/api/v1/projects/${project.id}/durations`)).json();
+  expect(durations.items[0].elapsed.date_span_days).toBe(1);
+  expect(durations.items[0].elapsed.elapsed_seconds).toBeNull();
+  expect(durations.items[0].calendar_working.status).toBe("unavailable");
+  expect(durations.items[0].labour_productivity.status).toBe("unavailable");
+  evidence.durations = durations;
+  if (process.env.LIVE_MOCK_URL) {
+    const receiverURL = `${process.env.LIVE_MOCK_URL}/activities/${project.id}/${staged.id}/F-01-EXC`;
+    await expect.poll(async () => {
+      const response = await page.request.get(receiverURL);
+      return response.ok() ? (await response.json()).state_revision : null;
+    }, { timeout: 15000 }).toBe(completed.state_revision);
+    const readBack = await (await page.request.get(receiverURL)).json();
+    expect(readBack.state.actual_start.local_time).toBe("08:30:00");
+    expect(readBack.state.actual_finish.local_date).toBe("2026-10-10");
+    expect(readBack.state.actual_finish.local_time).toBeNull();
+    expect(readBack.state.actual_finish.precision).toBe("date");
+    evidence.mock_read_back = readBack;
+  }
   const duplicate = await page.request.post(`/api/v1/projects/${project.id}/reports`, { headers, data: { text: "Finished excavation at Foundation F-01.", report_date: "2026-10-10", report_date_evidence: "Reviewer-entered report date" } });
   expect(duplicate.ok()).toBeTruthy();
   expect((await duplicate.json()).existing).toBeTruthy();
@@ -139,6 +168,10 @@ test("quantity-free lifecycle through login, schedule, model, review, refresh an
       state_revision: beforeConflictRevision, approved_event_count: beforeConflictCount },
     after: { actual_start: unchanged.actual_start, actual_finish: unchanged.actual_finish,
       state_revision: unchanged.state_revision, approved_event_count: unchanged.approved_event_count } };
-  mkdirSync(resolve(root, "frontend/test-results"), { recursive: true });
-  writeFileSync(resolve(root, "frontend/test-results/lifecycle-live-run.json"), JSON.stringify(evidence, null, 2));
+  evidence.proposal_ready_ms = readiness;
+  evidence.approval_response_ms_including_rejected_attempt = approvals;
+  const evidenceDir = process.env.LIVE_EVIDENCE_DIR ?? resolve(root, "frontend/test-results");
+  mkdirSync(evidenceDir, { recursive: true });
+  writeFileSync(resolve(evidenceDir, "lifecycle-live-run.json"), JSON.stringify(evidence, null, 2));
+  await page.screenshot({ path: resolve(evidenceDir, "lifecycle-live.png"), fullPage: true });
 });

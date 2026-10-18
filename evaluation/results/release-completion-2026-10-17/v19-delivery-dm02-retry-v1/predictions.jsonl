@@ -1,0 +1,1 @@
+{"case_id": "DM-02", "state": "failed", "passed": false, "error_type": "OllamaResponseError", "error_code": "MODEL_RESPONSE_INVALID", "retry_after_seconds": null, "elapsed_seconds": 1.224}

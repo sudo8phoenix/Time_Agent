@@ -1,0 +1,894 @@
+{
+  "schema_version": 1,
+  "review_date": "2026-10-16",
+  "reviewer_kind": "ai_assisted",
+  "human_review_completed": false,
+  "owner_authorized": true,
+  "review_scope": "D03/D05 technical review of schedule-quality queue, source reconciliation evidence, and provisional split leakage properties.",
+  "source_sha256": {
+    "data/review/schedule-quality-review.jsonl": "110b826d81262330ae89f36895cfb59cec18aa16ccd44953855bba164d030fe8",
+    "data/review/technical-review-2026-10-12.json": "e1185d61aea8d0f73dd085f31e02ec778cb9987843127d1def7eef7145f46db1",
+    "data/review/cambridge-5060-technical-screen.json": "6b284dd2003bad7060bb6fc5bda5f7e51c911736b17eb532728b69622eff662b",
+    "docs/data-decisions.md": "c565545514ce94263050b4f4d0d082a26adff1fc382a34ff24c1fe958dff4482",
+    "docs/data-splits.md": "7231090fb1de8047f26cc0207a3419c98ed49d147dfbb94370bf4770f44c8126",
+    "data/synthetic/v2/check_splits.py": "f29e16fc8a76bb88377f032350a19d381a40bbb2df3532ad9452154dabe7cca0",
+    "../data/schedule-audit-2026-10-09/provisional-splits.json": "1cca54fadc3518cc951a87d19d8e8e433b3cd4cba54cbf87a481243a51afee75"
+  },
+  "quality_items": [
+    {
+      "queue_locator": "data/review/schedule-quality-review.jsonl:1",
+      "source": "gt10",
+      "project_id": "GT10BLDG",
+      "field": "task_name",
+      "locator": "TASK!A43:D43",
+      "decision": "unresolved",
+      "prior_queue_state": "pending_independent_review",
+      "technical_disposition": "identity_supported_name_conflict_unresolved",
+      "evidence": [
+        {
+          "file": "data/GT10BLDG-P6-Schedule/source/GT10BLDG_input_activities_relationships.xlsx",
+          "locator": "ACTIVITES!65",
+          "cells": {
+            "Activity ID": "SUP-F8-06",
+            "Activity Name": "De-shuttering - F8",
+            "WBS Code": "3.9",
+            "Original Duration": 2,
+            "Activity Type": "Task Dependent",
+            "Calendar": "6-Day Week"
+          }
+        },
+        {
+          "file": "data/GT10BLDG-P6-Schedule/exports/GT10BLDG_v1_P6_export.xlsx",
+          "locator": "TASK!43",
+          "cells": {
+            "task_code": "SUP-F8-06",
+            "status_code": "Not Started",
+            "wbs_id": "GT10BLDG.2.1",
+            "task_name": "De-shuttering - F9",
+            "start_date": {
+              "raw": "2027-09-17 08:00:00",
+              "cell_type": "datetime",
+              "precision": "source_datetime",
+              "timezone_basis": "unspecified"
+            },
+            "end_date": {
+              "raw": "2027-09-20 16:00:00",
+              "cell_type": "datetime",
+              "precision": "source_datetime",
+              "timezone_basis": "unspecified"
+            },
+            "resource_list": null,
+            "delete_record_flag": null
+          }
+        }
+      ],
+      "assessment": "Source records conflict or required semantics are unverified; retain both source values and defer disposition to planner.",
+      "human_action_required": true
+    },
+    {
+      "queue_locator": "data/review/schedule-quality-review.jsonl:2",
+      "source": "gt10",
+      "project_id": "GT10BLDG",
+      "field": "relationship_type/lag",
+      "locator": "MAS-F1-01->MEP-F1-02",
+      "decision": "unresolved",
+      "prior_queue_state": "pending_independent_review",
+      "technical_disposition": "source_versions_disagree_planner_decision_required",
+      "evidence": [
+        {
+          "file": "data/GT10BLDG-P6-Schedule/source/GT10BLDG_input_activities_relationships.xlsx",
+          "locator": "RELATIONSHIP!103",
+          "cells": {
+            "Predecessor Activity ID": "MAS-F1-01",
+            "Successor Activity ID": "MEP-F1-02",
+            "Relationship Type": "SS",
+            "Lag": 0
+          }
+        },
+        {
+          "file": "data/GT10BLDG-P6-Schedule/exports/GT10BLDG_v1_P6_export.xlsx",
+          "locator": "TASKPRED!111",
+          "cells": {
+            "pred_task_id": "MAS-F1-01",
+            "task_id": "MEP-F1-02",
+            "pred_type": "FS",
+            "PREDTASK__status_code": "Not Started",
+            "TASK__status_code": "Not Started",
+            "pred_proj_id": "GT10BLDG",
+            "proj_id": "GT10BLDG",
+            "PREDTASK__PROJWBS__wbs_full_name": "GT10BLDG.3 Masonry & Plastering",
+            "TASK__PROJWBS__wbs_full_name": "GT10BLDG.4.2 Plumbing",
+            "PREDTASK__task_name": "Block Work - F1",
+            "TASK__task_name": "Plumbing Rough-in - F1",
+            "lag_hr_cnt": "0",
+            "PREDTASK__rsrc_id": null,
+            "TASK__rsrc_id": null,
+            "delete_record_flag": null
+          }
+        }
+      ],
+      "assessment": "Source records conflict or required semantics are unverified; retain both source values and defer disposition to planner.",
+      "human_action_required": true
+    },
+    {
+      "queue_locator": "data/review/schedule-quality-review.jsonl:3",
+      "source": "gt10",
+      "project_id": "GT10BLDG",
+      "field": "relationship_type/lag",
+      "locator": "MAS-F10-01->MAS-F10-02",
+      "decision": "unresolved",
+      "prior_queue_state": "pending_independent_review",
+      "technical_disposition": "source_versions_disagree_planner_decision_required",
+      "evidence": [
+        {
+          "file": "data/GT10BLDG-P6-Schedule/source/GT10BLDG_input_activities_relationships.xlsx",
+          "locator": "RELATIONSHIP!98",
+          "cells": {
+            "Predecessor Activity ID": "MAS-F10-01",
+            "Successor Activity ID": "MAS-F10-02",
+            "Relationship Type": "FS",
+            "Lag": 3
+          }
+        },
+        {
+          "file": "data/GT10BLDG-P6-Schedule/exports/GT10BLDG_v1_P6_export.xlsx",
+          "locator": "TASKPRED!81",
+          "cells": {
+            "pred_task_id": "MAS-F10-01",
+            "task_id": "MAS-F10-02",
+            "pred_type": "FS",
+            "PREDTASK__status_code": "Not Started",
+            "TASK__status_code": "Not Started",
+            "pred_proj_id": "GT10BLDG",
+            "proj_id": "GT10BLDG",
+            "PREDTASK__PROJWBS__wbs_full_name": "GT10BLDG.3 Masonry & Plastering",
+            "TASK__PROJWBS__wbs_full_name": "GT10BLDG.3 Masonry & Plastering",
+            "PREDTASK__task_name": "Block Work - F10",
+            "TASK__task_name": "Internal Plastering - F10",
+            "lag_hr_cnt": "0",
+            "PREDTASK__rsrc_id": null,
+            "TASK__rsrc_id": null,
+            "delete_record_flag": null
+          }
+        }
+      ],
+      "assessment": "Source records conflict or required semantics are unverified; retain both source values and defer disposition to planner.",
+      "human_action_required": true
+    },
+    {
+      "queue_locator": "data/review/schedule-quality-review.jsonl:4",
+      "source": "gt10",
+      "project_id": "GT10BLDG",
+      "field": "relationship_type/lag",
+      "locator": "MAS-F10-01->MEP-F10-02",
+      "decision": "unresolved",
+      "prior_queue_state": "pending_independent_review",
+      "technical_disposition": "source_versions_disagree_planner_decision_required",
+      "evidence": [
+        {
+          "file": "data/GT10BLDG-P6-Schedule/source/GT10BLDG_input_activities_relationships.xlsx",
+          "locator": "RELATIONSHIP!121",
+          "cells": {
+            "Predecessor Activity ID": "MAS-F10-01",
+            "Successor Activity ID": "MEP-F10-02",
+            "Relationship Type": "SS",
+            "Lag": 0
+          }
+        },
+        {
+          "file": "data/GT10BLDG-P6-Schedule/exports/GT10BLDG_v1_P6_export.xlsx",
+          "locator": "TASKPRED!112",
+          "cells": {
+            "pred_task_id": "MAS-F10-01",
+            "task_id": "MEP-F10-02",
+            "pred_type": "FS",
+            "PREDTASK__status_code": "Not Started",
+            "TASK__status_code": "Not Started",
+            "pred_proj_id": "GT10BLDG",
+            "proj_id": "GT10BLDG",
+            "PREDTASK__PROJWBS__wbs_full_name": "GT10BLDG.3 Masonry & Plastering",
+            "TASK__PROJWBS__wbs_full_name": "GT10BLDG.4.2 Plumbing",
+            "PREDTASK__task_name": "Block Work - F10",
+            "TASK__task_name": "Plumbing Rough-in - F10",
+            "lag_hr_cnt": "0",
+            "PREDTASK__rsrc_id": null,
+            "TASK__rsrc_id": null,
+            "delete_record_flag": null
+          }
+        }
+      ],
+      "assessment": "Source records conflict or required semantics are unverified; retain both source values and defer disposition to planner.",
+      "human_action_required": true
+    },
+    {
+      "queue_locator": "data/review/schedule-quality-review.jsonl:5",
+      "source": "gt10",
+      "project_id": "GT10BLDG",
+      "field": "relationship_type/lag",
+      "locator": "MAS-F2-01->MEP-F2-02",
+      "decision": "unresolved",
+      "prior_queue_state": "pending_independent_review",
+      "technical_disposition": "source_versions_disagree_planner_decision_required",
+      "evidence": [
+        {
+          "file": "data/GT10BLDG-P6-Schedule/source/GT10BLDG_input_activities_relationships.xlsx",
+          "locator": "RELATIONSHIP!105",
+          "cells": {
+            "Predecessor Activity ID": "MAS-F2-01",
+            "Successor Activity ID": "MEP-F2-02",
+            "Relationship Type": "SS",
+            "Lag": 0
+          }
+        },
+        {
+          "file": "data/GT10BLDG-P6-Schedule/exports/GT10BLDG_v1_P6_export.xlsx",
+          "locator": "TASKPRED!113",
+          "cells": {
+            "pred_task_id": "MAS-F2-01",
+            "task_id": "MEP-F2-02",
+            "pred_type": "FS",
+            "PREDTASK__status_code": "Not Started",
+            "TASK__status_code": "Not Started",
+            "pred_proj_id": "GT10BLDG",
+            "proj_id": "GT10BLDG",
+            "PREDTASK__PROJWBS__wbs_full_name": "GT10BLDG.3 Masonry & Plastering",
+            "TASK__PROJWBS__wbs_full_name": "GT10BLDG.4.2 Plumbing",
+            "PREDTASK__task_name": "Block Work - F2",
+            "TASK__task_name": "Plumbing Rough-in - F2",
+            "lag_hr_cnt": "0",
+            "PREDTASK__rsrc_id": null,
+            "TASK__rsrc_id": null,
+            "delete_record_flag": null
+          }
+        }
+      ],
+      "assessment": "Source records conflict or required semantics are unverified; retain both source values and defer disposition to planner.",
+      "human_action_required": true
+    },
+    {
+      "queue_locator": "data/review/schedule-quality-review.jsonl:6",
+      "source": "gt10",
+      "project_id": "GT10BLDG",
+      "field": "relationship_type/lag",
+      "locator": "MAS-F3-01->MEP-F3-02",
+      "decision": "unresolved",
+      "prior_queue_state": "pending_independent_review",
+      "technical_disposition": "source_versions_disagree_planner_decision_required",
+      "evidence": [
+        {
+          "file": "data/GT10BLDG-P6-Schedule/source/GT10BLDG_input_activities_relationships.xlsx",
+          "locator": "RELATIONSHIP!107",
+          "cells": {
+            "Predecessor Activity ID": "MAS-F3-01",
+            "Successor Activity ID": "MEP-F3-02",
+            "Relationship Type": "SS",
+            "Lag": 0
+          }
+        },
+        {
+          "file": "data/GT10BLDG-P6-Schedule/exports/GT10BLDG_v1_P6_export.xlsx",
+          "locator": "TASKPRED!114",
+          "cells": {
+            "pred_task_id": "MAS-F3-01",
+            "task_id": "MEP-F3-02",
+            "pred_type": "FS",
+            "PREDTASK__status_code": "Not Started",
+            "TASK__status_code": "Not Started",
+            "pred_proj_id": "GT10BLDG",
+            "proj_id": "GT10BLDG",
+            "PREDTASK__PROJWBS__wbs_full_name": "GT10BLDG.3 Masonry & Plastering",
+            "TASK__PROJWBS__wbs_full_name": "GT10BLDG.4.2 Plumbing",
+            "PREDTASK__task_name": "Block Work - F3",
+            "TASK__task_name": "Plumbing Rough-in - F3",
+            "lag_hr_cnt": "0",
+            "PREDTASK__rsrc_id": null,
+            "TASK__rsrc_id": null,
+            "delete_record_flag": null
+          }
+        }
+      ],
+      "assessment": "Source records conflict or required semantics are unverified; retain both source values and defer disposition to planner.",
+      "human_action_required": true
+    },
+    {
+      "queue_locator": "data/review/schedule-quality-review.jsonl:7",
+      "source": "gt10",
+      "project_id": "GT10BLDG",
+      "field": "relationship_type/lag",
+      "locator": "MAS-F4-01->MEP-F4-02",
+      "decision": "unresolved",
+      "prior_queue_state": "pending_independent_review",
+      "technical_disposition": "source_versions_disagree_planner_decision_required",
+      "evidence": [
+        {
+          "file": "data/GT10BLDG-P6-Schedule/source/GT10BLDG_input_activities_relationships.xlsx",
+          "locator": "RELATIONSHIP!109",
+          "cells": {
+            "Predecessor Activity ID": "MAS-F4-01",
+            "Successor Activity ID": "MEP-F4-02",
+            "Relationship Type": "SS",
+            "Lag": 0
+          }
+        },
+        {
+          "file": "data/GT10BLDG-P6-Schedule/exports/GT10BLDG_v1_P6_export.xlsx",
+          "locator": "TASKPRED!115",
+          "cells": {
+            "pred_task_id": "MAS-F4-01",
+            "task_id": "MEP-F4-02",
+            "pred_type": "FS",
+            "PREDTASK__status_code": "Not Started",
+            "TASK__status_code": "Not Started",
+            "pred_proj_id": "GT10BLDG",
+            "proj_id": "GT10BLDG",
+            "PREDTASK__PROJWBS__wbs_full_name": "GT10BLDG.3 Masonry & Plastering",
+            "TASK__PROJWBS__wbs_full_name": "GT10BLDG.4.2 Plumbing",
+            "PREDTASK__task_name": "Block Work - F4",
+            "TASK__task_name": "Plumbing Rough-in - F4",
+            "lag_hr_cnt": "0",
+            "PREDTASK__rsrc_id": null,
+            "TASK__rsrc_id": null,
+            "delete_record_flag": null
+          }
+        }
+      ],
+      "assessment": "Source records conflict or required semantics are unverified; retain both source values and defer disposition to planner.",
+      "human_action_required": true
+    },
+    {
+      "queue_locator": "data/review/schedule-quality-review.jsonl:8",
+      "source": "gt10",
+      "project_id": "GT10BLDG",
+      "field": "relationship_type/lag",
+      "locator": "MAS-F5-01->MEP-F5-02",
+      "decision": "unresolved",
+      "prior_queue_state": "pending_independent_review",
+      "technical_disposition": "source_versions_disagree_planner_decision_required",
+      "evidence": [
+        {
+          "file": "data/GT10BLDG-P6-Schedule/source/GT10BLDG_input_activities_relationships.xlsx",
+          "locator": "RELATIONSHIP!111",
+          "cells": {
+            "Predecessor Activity ID": "MAS-F5-01",
+            "Successor Activity ID": "MEP-F5-02",
+            "Relationship Type": "SS",
+            "Lag": 0
+          }
+        },
+        {
+          "file": "data/GT10BLDG-P6-Schedule/exports/GT10BLDG_v1_P6_export.xlsx",
+          "locator": "TASKPRED!116",
+          "cells": {
+            "pred_task_id": "MAS-F5-01",
+            "task_id": "MEP-F5-02",
+            "pred_type": "FS",
+            "PREDTASK__status_code": "Not Started",
+            "TASK__status_code": "Not Started",
+            "pred_proj_id": "GT10BLDG",
+            "proj_id": "GT10BLDG",
+            "PREDTASK__PROJWBS__wbs_full_name": "GT10BLDG.3 Masonry & Plastering",
+            "TASK__PROJWBS__wbs_full_name": "GT10BLDG.4.2 Plumbing",
+            "PREDTASK__task_name": "Block Work - F5",
+            "TASK__task_name": "Plumbing Rough-in - F5",
+            "lag_hr_cnt": "0",
+            "PREDTASK__rsrc_id": null,
+            "TASK__rsrc_id": null,
+            "delete_record_flag": null
+          }
+        }
+      ],
+      "assessment": "Source records conflict or required semantics are unverified; retain both source values and defer disposition to planner.",
+      "human_action_required": true
+    },
+    {
+      "queue_locator": "data/review/schedule-quality-review.jsonl:9",
+      "source": "gt10",
+      "project_id": "GT10BLDG",
+      "field": "relationship_type/lag",
+      "locator": "MAS-F6-01->MEP-F6-02",
+      "decision": "unresolved",
+      "prior_queue_state": "pending_independent_review",
+      "technical_disposition": "source_versions_disagree_planner_decision_required",
+      "evidence": [
+        {
+          "file": "data/GT10BLDG-P6-Schedule/source/GT10BLDG_input_activities_relationships.xlsx",
+          "locator": "RELATIONSHIP!113",
+          "cells": {
+            "Predecessor Activity ID": "MAS-F6-01",
+            "Successor Activity ID": "MEP-F6-02",
+            "Relationship Type": "SS",
+            "Lag": 0
+          }
+        },
+        {
+          "file": "data/GT10BLDG-P6-Schedule/exports/GT10BLDG_v1_P6_export.xlsx",
+          "locator": "TASKPRED!117",
+          "cells": {
+            "pred_task_id": "MAS-F6-01",
+            "task_id": "MEP-F6-02",
+            "pred_type": "FS",
+            "PREDTASK__status_code": "Not Started",
+            "TASK__status_code": "Not Started",
+            "pred_proj_id": "GT10BLDG",
+            "proj_id": "GT10BLDG",
+            "PREDTASK__PROJWBS__wbs_full_name": "GT10BLDG.3 Masonry & Plastering",
+            "TASK__PROJWBS__wbs_full_name": "GT10BLDG.4.2 Plumbing",
+            "PREDTASK__task_name": "Block Work - F6",
+            "TASK__task_name": "Plumbing Rough-in - F6",
+            "lag_hr_cnt": "0",
+            "PREDTASK__rsrc_id": null,
+            "TASK__rsrc_id": null,
+            "delete_record_flag": null
+          }
+        }
+      ],
+      "assessment": "Source records conflict or required semantics are unverified; retain both source values and defer disposition to planner.",
+      "human_action_required": true
+    },
+    {
+      "queue_locator": "data/review/schedule-quality-review.jsonl:10",
+      "source": "gt10",
+      "project_id": "GT10BLDG",
+      "field": "relationship_type/lag",
+      "locator": "MAS-F7-01->MEP-F7-02",
+      "decision": "unresolved",
+      "prior_queue_state": "pending_independent_review",
+      "technical_disposition": "source_versions_disagree_planner_decision_required",
+      "evidence": [
+        {
+          "file": "data/GT10BLDG-P6-Schedule/source/GT10BLDG_input_activities_relationships.xlsx",
+          "locator": "RELATIONSHIP!115",
+          "cells": {
+            "Predecessor Activity ID": "MAS-F7-01",
+            "Successor Activity ID": "MEP-F7-02",
+            "Relationship Type": "SS",
+            "Lag": 0
+          }
+        },
+        {
+          "file": "data/GT10BLDG-P6-Schedule/exports/GT10BLDG_v1_P6_export.xlsx",
+          "locator": "TASKPRED!118",
+          "cells": {
+            "pred_task_id": "MAS-F7-01",
+            "task_id": "MEP-F7-02",
+            "pred_type": "FS",
+            "PREDTASK__status_code": "Not Started",
+            "TASK__status_code": "Not Started",
+            "pred_proj_id": "GT10BLDG",
+            "proj_id": "GT10BLDG",
+            "PREDTASK__PROJWBS__wbs_full_name": "GT10BLDG.3 Masonry & Plastering",
+            "TASK__PROJWBS__wbs_full_name": "GT10BLDG.4.2 Plumbing",
+            "PREDTASK__task_name": "Block Work - F7",
+            "TASK__task_name": "Plumbing Rough-in - F7",
+            "lag_hr_cnt": "0",
+            "PREDTASK__rsrc_id": null,
+            "TASK__rsrc_id": null,
+            "delete_record_flag": null
+          }
+        }
+      ],
+      "assessment": "Source records conflict or required semantics are unverified; retain both source values and defer disposition to planner.",
+      "human_action_required": true
+    },
+    {
+      "queue_locator": "data/review/schedule-quality-review.jsonl:11",
+      "source": "gt10",
+      "project_id": "GT10BLDG",
+      "field": "relationship_type/lag",
+      "locator": "MAS-F8-01->MEP-F8-02",
+      "decision": "unresolved",
+      "prior_queue_state": "pending_independent_review",
+      "technical_disposition": "source_versions_disagree_planner_decision_required",
+      "evidence": [
+        {
+          "file": "data/GT10BLDG-P6-Schedule/source/GT10BLDG_input_activities_relationships.xlsx",
+          "locator": "RELATIONSHIP!117",
+          "cells": {
+            "Predecessor Activity ID": "MAS-F8-01",
+            "Successor Activity ID": "MEP-F8-02",
+            "Relationship Type": "SS",
+            "Lag": 0
+          }
+        },
+        {
+          "file": "data/GT10BLDG-P6-Schedule/exports/GT10BLDG_v1_P6_export.xlsx",
+          "locator": "TASKPRED!119",
+          "cells": {
+            "pred_task_id": "MAS-F8-01",
+            "task_id": "MEP-F8-02",
+            "pred_type": "FS",
+            "PREDTASK__status_code": "Not Started",
+            "TASK__status_code": "Not Started",
+            "pred_proj_id": "GT10BLDG",
+            "proj_id": "GT10BLDG",
+            "PREDTASK__PROJWBS__wbs_full_name": "GT10BLDG.3 Masonry & Plastering",
+            "TASK__PROJWBS__wbs_full_name": "GT10BLDG.4.2 Plumbing",
+            "PREDTASK__task_name": "Block Work - F8",
+            "TASK__task_name": "Plumbing Rough-in - F8",
+            "lag_hr_cnt": "0",
+            "PREDTASK__rsrc_id": null,
+            "TASK__rsrc_id": null,
+            "delete_record_flag": null
+          }
+        }
+      ],
+      "assessment": "Source records conflict or required semantics are unverified; retain both source values and defer disposition to planner.",
+      "human_action_required": true
+    },
+    {
+      "queue_locator": "data/review/schedule-quality-review.jsonl:12",
+      "source": "gt10",
+      "project_id": "GT10BLDG",
+      "field": "relationship_type/lag",
+      "locator": "MAS-F9-01->MEP-F9-02",
+      "decision": "unresolved",
+      "prior_queue_state": "pending_independent_review",
+      "technical_disposition": "source_versions_disagree_planner_decision_required",
+      "evidence": [
+        {
+          "file": "data/GT10BLDG-P6-Schedule/source/GT10BLDG_input_activities_relationships.xlsx",
+          "locator": "RELATIONSHIP!119",
+          "cells": {
+            "Predecessor Activity ID": "MAS-F9-01",
+            "Successor Activity ID": "MEP-F9-02",
+            "Relationship Type": "SS",
+            "Lag": 0
+          }
+        },
+        {
+          "file": "data/GT10BLDG-P6-Schedule/exports/GT10BLDG_v1_P6_export.xlsx",
+          "locator": "TASKPRED!120",
+          "cells": {
+            "pred_task_id": "MAS-F9-01",
+            "task_id": "MEP-F9-02",
+            "pred_type": "FS",
+            "PREDTASK__status_code": "Not Started",
+            "TASK__status_code": "Not Started",
+            "pred_proj_id": "GT10BLDG",
+            "proj_id": "GT10BLDG",
+            "PREDTASK__PROJWBS__wbs_full_name": "GT10BLDG.3 Masonry & Plastering",
+            "TASK__PROJWBS__wbs_full_name": "GT10BLDG.4.2 Plumbing",
+            "PREDTASK__task_name": "Block Work - F9",
+            "TASK__task_name": "Plumbing Rough-in - F9",
+            "lag_hr_cnt": "0",
+            "PREDTASK__rsrc_id": null,
+            "TASK__rsrc_id": null,
+            "delete_record_flag": null
+          }
+        }
+      ],
+      "assessment": "Source records conflict or required semantics are unverified; retain both source values and defer disposition to planner.",
+      "human_action_required": true
+    },
+    {
+      "queue_locator": "data/review/schedule-quality-review.jsonl:13",
+      "source": "gt10",
+      "project_id": "GT10BLDG",
+      "field": "relationship_type/lag",
+      "locator": "MAS-GF-01->MEP-GF-02",
+      "decision": "unresolved",
+      "prior_queue_state": "pending_independent_review",
+      "technical_disposition": "source_versions_disagree_planner_decision_required",
+      "evidence": [
+        {
+          "file": "data/GT10BLDG-P6-Schedule/source/GT10BLDG_input_activities_relationships.xlsx",
+          "locator": "RELATIONSHIP!101",
+          "cells": {
+            "Predecessor Activity ID": "MAS-GF-01",
+            "Successor Activity ID": "MEP-GF-02",
+            "Relationship Type": "SS",
+            "Lag": 0
+          }
+        },
+        {
+          "file": "data/GT10BLDG-P6-Schedule/exports/GT10BLDG_v1_P6_export.xlsx",
+          "locator": "TASKPRED!121",
+          "cells": {
+            "pred_task_id": "MAS-GF-01",
+            "task_id": "MEP-GF-02",
+            "pred_type": "FS",
+            "PREDTASK__status_code": "Not Started",
+            "TASK__status_code": "Not Started",
+            "pred_proj_id": "GT10BLDG",
+            "proj_id": "GT10BLDG",
+            "PREDTASK__PROJWBS__wbs_full_name": "GT10BLDG.3 Masonry & Plastering",
+            "TASK__PROJWBS__wbs_full_name": "GT10BLDG.4.2 Plumbing",
+            "PREDTASK__task_name": "Block Work - GF",
+            "TASK__task_name": "Plumbing Rough-in - GF",
+            "lag_hr_cnt": "0",
+            "PREDTASK__rsrc_id": null,
+            "TASK__rsrc_id": null,
+            "delete_record_flag": null
+          }
+        }
+      ],
+      "assessment": "Source records conflict or required semantics are unverified; retain both source values and defer disposition to planner.",
+      "human_action_required": true
+    },
+    {
+      "queue_locator": "data/review/schedule-quality-review.jsonl:14",
+      "source": "gt10",
+      "project_id": "GT10BLDG",
+      "field": "relationship_type/lag",
+      "locator": "PRE-020->PRE-030",
+      "decision": "unresolved",
+      "prior_queue_state": "pending_independent_review",
+      "technical_disposition": "source_versions_disagree_planner_decision_required",
+      "evidence": [
+        {
+          "file": "data/GT10BLDG-P6-Schedule/source/GT10BLDG_input_activities_relationships.xlsx",
+          "locator": "RELATIONSHIP!3",
+          "cells": {
+            "Predecessor Activity ID": "PRE-020",
+            "Successor Activity ID": "PRE-030",
+            "Relationship Type": "SS",
+            "Lag": 0
+          }
+        },
+        {
+          "file": "data/GT10BLDG-P6-Schedule/exports/GT10BLDG_v1_P6_export.xlsx",
+          "locator": "TASKPRED!6",
+          "cells": {
+            "pred_task_id": "PRE-020",
+            "task_id": "PRE-030",
+            "pred_type": "FS",
+            "PREDTASK__status_code": "Not Started",
+            "TASK__status_code": "Not Started",
+            "pred_proj_id": "GT10BLDG",
+            "proj_id": "GT10BLDG",
+            "PREDTASK__PROJWBS__wbs_full_name": "GT10BLDG.1 Preliminary & Mobilization",
+            "TASK__PROJWBS__wbs_full_name": "GT10BLDG.1 Preliminary & Mobilization",
+            "PREDTASK__task_name": "Mobilization of Labor/Equipment",
+            "TASK__task_name": "Temporary Site Office & Fencing",
+            "lag_hr_cnt": "0",
+            "PREDTASK__rsrc_id": null,
+            "TASK__rsrc_id": null,
+            "delete_record_flag": null
+          }
+        }
+      ],
+      "assessment": "Source records conflict or required semantics are unverified; retain both source values and defer disposition to planner.",
+      "human_action_required": true
+    },
+    {
+      "queue_locator": "data/review/schedule-quality-review.jsonl:15",
+      "source": "gt10",
+      "project_id": "GT10BLDG",
+      "field": "relationship_type/lag",
+      "locator": "SUP-F9-06->SUP-F10-01",
+      "decision": "unresolved",
+      "prior_queue_state": "pending_independent_review",
+      "technical_disposition": "source_versions_disagree_planner_decision_required",
+      "evidence": [
+        {
+          "file": "data/GT10BLDG-P6-Schedule/source/GT10BLDG_input_activities_relationships.xlsx",
+          "locator": "RELATIONSHIP!71",
+          "cells": {
+            "Predecessor Activity ID": "SUP-F9-06",
+            "Successor Activity ID": "SUP-F10-01",
+            "Relationship Type": "FS",
+            "Lag": 0
+          }
+        },
+        {
+          "file": "data/GT10BLDG-P6-Schedule/exports/GT10BLDG_v1_P6_export.xlsx",
+          "locator": "TASKPRED!77",
+          "cells": {
+            "pred_task_id": "SUP-F9-06",
+            "task_id": "SUP-F10-01",
+            "pred_type": "FF",
+            "PREDTASK__status_code": "Not Started",
+            "TASK__status_code": "Not Started",
+            "pred_proj_id": "GT10BLDG",
+            "proj_id": "GT10BLDG",
+            "PREDTASK__PROJWBS__wbs_full_name": "GT10BLDG.2.1 Excavation, Footing, GF to F10 Structure",
+            "TASK__PROJWBS__wbs_full_name": "GT10BLDG.2.1 Excavation, Footing, GF to F10 Structure",
+            "PREDTASK__task_name": "De-shuttering - F9",
+            "TASK__task_name": "Column Reinforcement - F10",
+            "lag_hr_cnt": "0",
+            "PREDTASK__rsrc_id": null,
+            "TASK__rsrc_id": null,
+            "delete_record_flag": null
+          }
+        }
+      ],
+      "assessment": "Source records conflict or required semantics are unverified; retain both source values and defer disposition to planner.",
+      "human_action_required": true
+    },
+    {
+      "queue_locator": "data/review/schedule-quality-review.jsonl:16",
+      "source": "cambridge",
+      "project_id": null,
+      "field": "planned_finish_before_start",
+      "locator": "audit profile aggregate",
+      "decision": "unresolved",
+      "prior_queue_state": "provisional_quarantine",
+      "technical_disposition": "aggregate_only_cannot_validate_rows",
+      "evidence": [
+        {
+          "file": "../data/schedule-audit-2026-10-09/cambridge-profile.json",
+          "locator": "aggregate profile only",
+          "value": 1022
+        },
+        {
+          "file": "docs/d01-d05-completion-audit-2026-10-10.md",
+          "locator": "D03/D02 audit statements",
+          "note": "row-level review remains required"
+        }
+      ],
+      "assessment": "Aggregate quarantine remains precautionary; the cited row screen does not establish this aggregate count at row level, so do not treat the metric as verified or as approved label data.",
+      "human_action_required": true
+    },
+    {
+      "queue_locator": "data/review/schedule-quality-review.jsonl:17",
+      "source": "cambridge",
+      "project_id": null,
+      "field": "actual_after_status_date",
+      "locator": "audit profile aggregate",
+      "decision": "unresolved",
+      "prior_queue_state": "provisional_quarantine",
+      "technical_disposition": "aggregate_only_cannot_validate_rows",
+      "evidence": [
+        {
+          "file": "../data/schedule-audit-2026-10-09/cambridge-profile.json",
+          "locator": "aggregate profile only",
+          "value": 235
+        },
+        {
+          "file": "docs/d01-d05-completion-audit-2026-10-10.md",
+          "locator": "D03/D02 audit statements",
+          "note": "row-level review remains required"
+        }
+      ],
+      "assessment": "Aggregate quarantine remains precautionary; the cited row screen does not establish this aggregate count at row level, so do not treat the metric as verified or as approved label data.",
+      "human_action_required": true
+    },
+    {
+      "queue_locator": "data/review/schedule-quality-review.jsonl:18",
+      "source": "cambridge",
+      "project_id": null,
+      "field": "redacted_identifiers",
+      "locator": "audit profile aggregate",
+      "decision": "unresolved",
+      "prior_queue_state": "provisional_quarantine",
+      "technical_disposition": "aggregate_only_cannot_validate_rows",
+      "evidence": [
+        {
+          "file": "../data/schedule-audit-2026-10-09/cambridge-profile.json",
+          "locator": "aggregate profile only",
+          "value": 123045
+        },
+        {
+          "file": "docs/d01-d05-completion-audit-2026-10-10.md",
+          "locator": "D03/D02 audit statements",
+          "note": "row-level review remains required"
+        }
+      ],
+      "assessment": "Aggregate quarantine remains precautionary; the cited row screen does not establish this aggregate count at row level, so do not treat the metric as verified or as approved label data.",
+      "human_action_required": true
+    },
+    {
+      "queue_locator": "data/review/schedule-quality-review.jsonl:19",
+      "source": "cambridge",
+      "project_id": null,
+      "field": "calendar_missing_or_unverified",
+      "locator": "audit profile aggregate",
+      "decision": "unresolved",
+      "prior_queue_state": "provisional_quarantine",
+      "technical_disposition": "aggregate_only_cannot_validate_rows",
+      "evidence": [
+        {
+          "file": "../data/schedule-audit-2026-10-09/cambridge-profile.json",
+          "locator": "aggregate profile only",
+          "value": 7795
+        },
+        {
+          "file": "docs/d01-d05-completion-audit-2026-10-10.md",
+          "locator": "D03/D02 audit statements",
+          "note": "row-level review remains required"
+        }
+      ],
+      "assessment": "Aggregate quarantine remains precautionary; the cited row screen does not establish this aggregate count at row level, so do not treat the metric as verified or as approved label data.",
+      "human_action_required": true
+    },
+    {
+      "queue_locator": "data/review/schedule-quality-review.jsonl:20",
+      "source": "cambridge",
+      "project_id": null,
+      "field": "invalid_weather_fields",
+      "locator": "audit profile aggregate",
+      "decision": "unresolved",
+      "prior_queue_state": "provisional_quarantine",
+      "technical_disposition": "aggregate_only_cannot_validate_rows",
+      "evidence": [
+        {
+          "file": "../data/schedule-audit-2026-10-09/cambridge-profile.json",
+          "locator": "aggregate profile only",
+          "value": 346110
+        },
+        {
+          "file": "docs/d01-d05-completion-audit-2026-10-10.md",
+          "locator": "D03/D02 audit statements",
+          "note": "row-level review remains required"
+        }
+      ],
+      "assessment": "Aggregate quarantine remains precautionary; the cited row screen does not establish this aggregate count at row level, so do not treat the metric as verified or as approved label data.",
+      "human_action_required": true
+    },
+    {
+      "queue_locator": "data/review/schedule-quality-review.jsonl:21",
+      "source": "cambridge",
+      "project_id": null,
+      "field": "external_or_unresolved_predecessor",
+      "locator": "audit profile aggregate",
+      "decision": "unresolved",
+      "prior_queue_state": "provisional_quarantine",
+      "technical_disposition": "aggregate_only_cannot_validate_rows",
+      "evidence": [
+        {
+          "file": "../data/schedule-audit-2026-10-09/cambridge-profile.json",
+          "locator": "aggregate profile only",
+          "value": 17631
+        },
+        {
+          "file": "docs/d01-d05-completion-audit-2026-10-10.md",
+          "locator": "D03/D02 audit statements",
+          "note": "row-level review remains required"
+        }
+      ],
+      "assessment": "Aggregate quarantine remains precautionary; the cited row screen does not establish this aggregate count at row level, so do not treat the metric as verified or as approved label data.",
+      "human_action_required": true
+    }
+  ],
+  "split_review": {
+    "status": "structural_disjointness_supported_with_material_uncertainty",
+    "manifest": "../data/schedule-audit-2026-10-09/provisional-splits.json",
+    "manifest_status": "proposal_for_review_not_gold",
+    "groups": 54,
+    "projects_by_partition": {
+      "development": 221,
+      "validation": 39,
+      "held_out_candidate": 39
+    },
+    "activity_counts_by_partition": {
+      "development": 114583,
+      "validation": 176962,
+      "held_out_candidate": 152611
+    },
+    "implemented_grouping": "exact content OR >=20 shared task IDs with >=50% smaller-project coverage OR >=20 shared names with Jaccard>=0.8; plus cross-project predecessor references",
+    "assessment": "Manifest partition membership and declared groups are structurally disjoint under the recorded heuristic. This does not establish physical-project/snapshot identity, eliminate near duplicates outside the heuristic, or resolve cross-project dependency leakage. Partition activity volumes and project-type mix are materially imbalanced; held_out_candidate is a candidate only and no independent gold event labels or generalization claim is established. GT10 and all its scenarios belong to one development/demo family and do not create an independent test family.",
+    "limitations": [
+      "Near-duplicate/physical-project identity needs domain review before freezing.",
+      "Task IDs can be reused for different content; shared-ID/cross-reference grouping is intentionally conservative, not verified project identity.",
+      "A large connected group may dominate development and prevent representative balanced partitions; inspect project-type and activity distributions before use.",
+      "All projects were structurally profiled; no report-event gold labels exist in this source.",
+      "All future reports, paraphrases and corrections inherit their source project group split.",
+      "GT10 input/export are one development/demo family, never independent train/test samples."
+    ],
+    "heldout_labels_read": false
+  },
+  "checker": {
+    "command": ".venv/bin/python data/synthetic/v2/check_splits.py",
+    "result": "structural_checks_passed_not_frozen",
+    "read_only": true,
+    "provisional_sha256": "1cca54fadc3518cc951a87d19d8e8e433b3cd4cba54cbf87a481243a51afee75",
+    "source_sha256": "e32f311e05c73b8b891b25149d85c95f27536d739f97d17bc52624fbc5ef8f47",
+    "label_sha256": "0690d1561891c0f9802405e0ebe63a82c0cdff4dee4612f05e3975d2ff661471",
+    "projects": {
+      "development": 221,
+      "validation": 39,
+      "held_out_candidate": 39
+    },
+    "groups": 54,
+    "gt10_scenario_count": 16,
+    "review_status": "pending_independent_review"
+  },
+  "unresolved_blockers": [
+    "Planner adjudication of GT10 task-name and relationship conflicts, including lag units and authoritative source version.",
+    "Reconcile Cambridge aggregate quarantine counts to row-level sources; retain quarantines until verified.",
+    "Independent domain review of physical-project/snapshot identity, cross-project dependencies, and near-duplicate grouping before split freeze.",
+    "Do not claim held-out generalization or benchmark acceptance without independent labels and review."
+  ],
+  "source_records_modified": false,
+  "human_or_planner_acceptance_claimed": false
+}

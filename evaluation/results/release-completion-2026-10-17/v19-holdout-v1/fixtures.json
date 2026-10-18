@@ -1,0 +1,42 @@
+{
+  "H19-aquarium": [
+    "4aa8d495-8684-4d20-a9d6-65774925a189",
+    "0407e16e-bb0e-493f-af91-966d87c63c5c",
+    "23534e0a-72c8-45b4-a065-333faa236ddf"
+  ],
+  "H19-brewery": [
+    "7dbe915f-588a-4819-891b-44ada57c6065",
+    "a3c8f335-6e18-4853-b1ff-eac0d36ea1b3",
+    "4dcb5b4c-004f-44a7-bc16-069b7e5bd102"
+  ],
+  "H19-ferry-pier": [
+    "e0b657e2-57b8-4b62-ae24-efe6f7b25da5",
+    "cc0b764c-f5b6-4f68-a94d-583d197bbcee",
+    "407c26bd-6db5-408c-8660-79b684743a6b"
+  ],
+  "H19-mountain-tunnel": [
+    "a714f27a-f5df-4a61-a730-8a1dc27e9724",
+    "35b33873-2f8c-48ec-a0da-158d4a44efae",
+    "10abe9ce-9bd8-4613-b8c3-02a26879d05d"
+  ],
+  "H19-observatory": [
+    "57164265-69a4-4cac-91c4-92e27ef0ee74",
+    "9d88ee33-1439-4815-8d87-2c78fb89d90b",
+    "99cd8bc5-39b1-4870-939e-f2d5517ecf24"
+  ],
+  "H19-paper-mill": [
+    "fd0c1e18-4ff9-4b29-83e0-56836daf8960",
+    "211c6143-9dba-414d-af4a-b9ea7f7f8729",
+    "857677d4-44c1-45c0-9b15-b58584bff6c6"
+  ],
+  "H19-recycling-plant": [
+    "e81bf144-eb99-4944-92a6-381a4daec2b4",
+    "b47b4b03-37fb-4c5b-8cf6-ef0638550d63",
+    "23546399-bca7-48a1-aff4-258868a363f3"
+  ],
+  "H19-theatre": [
+    "8e0aa521-c103-450b-8abe-c0e7e0443c80",
+    "698214db-1462-4f8b-819a-74555297c34f",
+    "b12f3877-37ae-48b0-bc22-5ffbd5c5cbd5"
+  ]
+}

@@ -1,0 +1,66 @@
+[
+  {
+    "tool_name": "load_job_context",
+    "state": "succeeded",
+    "error_code": null,
+    "sanitized_output_summary": {
+      "fragment_count": 1,
+      "activity_count": 12
+    },
+    "duration_ms": 39
+  },
+  {
+    "tool_name": "extract_observations",
+    "state": "succeeded",
+    "error_code": null,
+    "sanitized_output_summary": {
+      "observation_count": 1,
+      "warning_count": 0,
+      "error_count": 0
+    },
+    "duration_ms": 80769
+  },
+  {
+    "tool_name": "retrieve_candidates",
+    "state": "succeeded",
+    "error_code": null,
+    "sanitized_output_summary": {
+      "candidate_count": 1,
+      "warning_count": 0
+    },
+    "duration_ms": 71124
+  },
+  {
+    "tool_name": "select_candidate",
+    "state": "succeeded",
+    "error_code": null,
+    "sanitized_output_summary": {
+      "selected": true,
+      "candidate_count": 1,
+      "mapping_state": "suggested"
+    },
+    "duration_ms": 31543
+  },
+  {
+    "tool_name": "validate_proposal_drafts",
+    "state": "succeeded",
+    "error_code": null,
+    "sanitized_output_summary": {
+      "valid": true,
+      "warning_count": 0,
+      "error_count": 0
+    },
+    "duration_ms": 5
+  },
+  {
+    "tool_name": "persist_review_proposals",
+    "state": "succeeded",
+    "error_code": null,
+    "sanitized_output_summary": {
+      "extracted_count": 1,
+      "proposal_count": 1,
+      "already_persisted": false
+    },
+    "duration_ms": 49
+  }
+]

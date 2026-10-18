@@ -19,6 +19,78 @@ def activity(name, tag, work_type):
     }
 
 
+@pytest.mark.parametrize('short_ids', [False, True])
+def test_schedule_wire_ids_round_trip_without_rewriting_source(short_ids):
+    first = activity('Erect Area A spools', '24-XX', 'pipe_spool_erection')
+    second = activity('Erect Area B spools', '24-XX', 'pipe_spool_erection')
+    quote = f'Area B received spools; reference {second["id"]}.'
+    source = {'event_type': 'material_delivery', 'summary': quote,
+        'evidence': [{'fragment_id': 'f1', 'quote': quote}]}
+    calls = []
+    def model(**request):
+        calls.append(request)
+        assert request['user']['observation']['evidence'][0]['quote'] == quote
+        if 'candidate_ids' in request['schema']['properties']:
+            rows = request['user']['schedule_activities']
+            assert rows[1]['external_id'] == second['external_id']
+            assert rows[1]['id'] == ('row2' if short_ids else second['id'])
+            return {'candidate_ids': [rows[1]['id']]}
+        row = request['user']['candidates'][0]
+        assert row['candidate_id'] == ('row1' if short_ids else second['id'])
+        assert request['user']['fragments']['f1'] == quote
+        return {'candidate_id': row['candidate_id'], 'mapping_state': 'suggested',
+            'evidence_fragment_ids': ['f1'], 'reason_codes': [],
+            'explanation': 'Receiving work in Area B', 'missing_information': []}
+    candidates = shortlist_activities(source, 'pinned', [first, second], model_call=model,
+        short_ids=short_ids, associate_delivery=True)
+    proposal = select_activity(source, candidates, {'f1': quote}, model_call=model,
+        short_ids=short_ids, associate_delivery=True)
+    assert str(proposal.candidate_id) == second['id']
+    assert len(calls) == 2
+    assert first['id'] != 'row1' and second['id'] != 'row2'
+
+
+@pytest.mark.parametrize('returned_id', ['row99', 'row1-row2', None, 1])
+def test_short_schedule_ids_reject_unknown_or_malformed_ids(returned_id):
+    row = activity('Install pump', 'P-1', 'equipment_installation')
+    with pytest.raises(AgentDecisionError, match='unknown schedule activity'):
+        shortlist_activities({'summary': 'pump'}, 'pinned', [row], short_ids=True,
+            model_call=lambda **_: {'candidate_ids': [returned_id]})
+
+
+def test_short_schedule_ids_remain_local_across_discovery_batches():
+    rows = [activity(f'Pump {i}', f'P-{i}', 'equipment_installation') for i in range(80)]
+    seen = []
+    def model(**request):
+        pool = request['user']['schedule_activities']
+        assert pool[0]['id'] == 'row1'
+        ids = request['schema']['properties']['candidate_ids']['items']['enum']
+        assert ids == [row['id'] for row in pool]
+        seen.append([row['external_id'] for row in pool])
+        return {'candidate_ids': ids[:1]}
+    result = shortlist_activities({'summary': 'pump'}, 'pinned', rows,
+        model_call=model, short_ids=True, max_candidates=2)
+    assert len(seen) > 1
+    assert all(str(candidate.candidate_id) in {row['id'] for row in rows} for candidate in result)
+
+
+def test_short_selection_repair_uses_wire_ids_and_preserves_evidence_scope():
+    row = activity('Install pump', 'P-1', 'equipment_installation')
+    candidates = shortlist_activities({'summary': 'pump'}, 'pinned', [row],
+        model_call=lambda **_: {'candidate_ids': [row['id']]})
+    calls = []
+    def model(**request):
+        calls.append(request)
+        if len(calls) == 2:
+            assert request['user']['previous_response']['candidate_id'] == 'row1'
+        return {'candidate_id': 'row1', 'mapping_state': 'unmatched' if len(calls) == 1 else 'suggested',
+            'evidence_fragment_ids': ['f1'], 'reason_codes': [],
+            'explanation': 'Pump', 'missing_information': []}
+    result = select_activity({'summary': 'pump'}, candidates, {'f1': 'pump'},
+        model_call=model, short_ids=True)
+    assert str(result.candidate_id) == row['id'] and len(calls) == 2
+
+
 def test_agent_can_choose_pump_despite_bad_extracted_type_and_tag():
     pump = activity("Install pump P-101", "P-101", "equipment_installation")
     pipe = activity("Erect pipe spool", "24-XX", "pipe_spool_erection")
@@ -56,6 +128,30 @@ def test_agent_ids_and_evidence_must_stay_in_loaded_scope():
             "candidate_id": pump["id"], "mapping_state": "suggested", "evidence_fragment_ids": ["other"],
             "reason_codes": [], "explanation": "pump", "missing_information": [],
         })
+
+
+def test_compact_requests_preserve_source_rows_facts_and_zero_values():
+    row = activity("Install pump P-202", "P-202", "equipment_installation")
+    row.update(planned_quantity=Decimal(0), aliases=None)
+    report = {"summary": "Installed pump P-202", "area": None, "asset_tags": [],
+        "reported_percent": 0, "evidence": [{"fragment_id": "f1", "quote": "Installed pump P-202"}]}
+    calls = []
+    def model(**kwargs):
+        calls.append(kwargs)
+        assert kwargs["settings"]["num_predict"] == 768
+        assert kwargs["user"]["observation"]["reported_percent"] == 0
+        assert "area" not in kwargs["user"]["observation"]
+        if "candidate_ids" in kwargs["schema"]["properties"]:
+            assert kwargs["user"]["schedule_activities"][0]["id"] == row["id"]
+            assert kwargs["user"]["schedule_activities"][0]["planned_quantity"] == "0"
+            return {"candidate_ids": [row["id"]]}
+        return {"candidate_id": row["id"], "mapping_state": "suggested",
+            "evidence_fragment_ids": ["f1"], "reason_codes": [],
+            "explanation": "Exact pump", "missing_information": []}
+    candidates = shortlist_activities(report, "schedule", [row], model_call=model, compact_context=True)
+    result = select_activity(report, candidates, {"f1": report["summary"]},
+        model_call=model, compact_context=True)
+    assert str(result.candidate_id) == row["id"] and len(calls) == 2
 
 
 def test_agent_receives_schedule_context_for_selection():

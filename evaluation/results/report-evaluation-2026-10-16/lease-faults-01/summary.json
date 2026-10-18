@@ -1,0 +1,9 @@
+{
+  "captured_at": "2026-10-15T18:48:34.529978+00:00",
+  "scenarios": 8,
+  "transport_only_lease_loss": 0,
+  "replacement_detected": 4,
+  "proposals": 0,
+  "ledger_writes": 0,
+  "historical_root_cause": "not_established_by_original_capture"
+}

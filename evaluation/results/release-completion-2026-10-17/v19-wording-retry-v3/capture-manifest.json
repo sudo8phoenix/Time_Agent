@@ -1,0 +1,10 @@
+{
+  "hashes": {
+    "summary.json": "93080a21638c287bb3f151b6fdecb93359d2ea82bd85001e28f54909e7a515eb",
+    "predictions.jsonl": "ce6826fe19d998e443120c9c9d57abb93748cabb5f42385a4469d16ff4d87444",
+    "provider-metrics.jsonl": "87d0599ffa6eff562d4dd20c43711b84558a836ec90e0bacd47ef03336fd1df5",
+    "config.json": "a24e05f4e0cd11a6f36c49dabcb90cad3b44fc04071cb4a7b0b24ce5c8761142",
+    "inputs.jsonl": "bf9604f6313bddeb283ebbee451927e5d3b19cdbaf7c8585f36e07b732734db6",
+    "model-outputs.jsonl": "bbcdc6aba286bc25eefbae3e36a1da4460b15fba759ff8686cb25d1e3c4471fe"
+  }
+}

@@ -1,0 +1,4 @@
+activity_id,activity_name,wbs_path,discipline,work_type,area,asset_tags,is_leaf,measurement_basis,planned_quantity,unit,planned_start,planned_finish,aliases
+TRAMWAY-1,panel installation at Platform Cedar,tramway/1,electrical,equipment_installation,Platform Cedar,DB-732,true,unsupported,,,2027-01-01,2027-04-30,
+TRAMWAY-2,cable laying at Platform Cedar,tramway/2,electrical,cable_laying,Platform Cedar,,true,unsupported,,,2027-01-01,2027-04-30,
+TRAMWAY-3,insulation testing at Platform Cedar,tramway/3,electrical,other,Platform Cedar,,true,unsupported,,,2027-01-01,2027-04-30,

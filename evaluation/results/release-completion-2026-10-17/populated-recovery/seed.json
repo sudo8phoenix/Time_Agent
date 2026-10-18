@@ -1,0 +1,9 @@
+{
+  "scope": "deterministic synthetic process-death rehearsal; no live provider calls",
+  "task_id": "65673d6f-f82d-4395-b196-22dcc87d382a",
+  "state": "running",
+  "saved_model_calls": 1,
+  "provider_rows": 2,
+  "rollout_flags": false,
+  "approved_events": 0
+}

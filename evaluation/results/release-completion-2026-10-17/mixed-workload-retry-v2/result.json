@@ -1,0 +1,39 @@
+{
+  "status": "stop_criteria_observed",
+  "duration_seconds": 2.667,
+  "stages_admitted": 1,
+  "stop_reasons": [
+    "FAILED_OR_CANCELLED_WORK",
+    "PROVIDER_COOLDOWN_EXCEEDS_90_SECONDS"
+  ],
+  "records": [
+    {
+      "kind": "report",
+      "id": "b008a8ec-865d-475c-b2e1-eb0d47e1fe13",
+      "case_id": "C06",
+      "admitted": 0.07930358298472129,
+      "state": "failed",
+      "terminal_seconds": 2.04,
+      "state_after_shutdown": "failed",
+      "captured_events": []
+    },
+    {
+      "kind": "conversation",
+      "id": "244eab13-3d21-4ce6-acd5-d455e1492454",
+      "case_id": "C06",
+      "admitted": 0.09080962499137968,
+      "state": "queued",
+      "state_after_shutdown": "queued"
+    }
+  ],
+  "worker_exit_codes": [
+    0,
+    0
+  ],
+  "rollback_applied": "Owned workers stopped; flags remain disabled; queued/checkpoint state retained for inspection",
+  "limitations": [
+    "Local synthetic mixed workload only; no UI, approvals or connector latency.",
+    "An early stop fails sustained workload acceptance.",
+    "No automatic resume or rollout advancement."
+  ]
+}

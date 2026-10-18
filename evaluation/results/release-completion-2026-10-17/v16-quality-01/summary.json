@@ -1,0 +1,11 @@
+{
+  "cases": 7,
+  "completed": 7,
+  "passed": 5,
+  "failures": [
+    "Q02",
+    "Q03"
+  ],
+  "independent_human_adjudication": false,
+  "domain_writes": 0
+}

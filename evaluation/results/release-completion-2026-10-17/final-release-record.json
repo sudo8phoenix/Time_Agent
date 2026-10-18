@@ -1,0 +1,513 @@
+{
+  "version": "final-candidate-review-v1",
+  "frozen_at": "2026-10-17T07:48:49.294133+00:00",
+  "status": "not_release_ready",
+  "source_state": "uncommitted_unpushed",
+  "base_commit": "a69653b377472e452cb812cb78863391bb3bc4b5",
+  "prototype_scope": "public/synthetic; MOCK PMIS; owner sample not expected; owner-authorized AI-assisted review, not independent human adjudication",
+  "gates": {
+    "validation": {
+      "atomic_event_f1_min": {
+        "target": 0.9,
+        "observed": 1.0,
+        "passed": true
+      },
+      "selected_link_precision_min": {
+        "target": 0.98,
+        "observed": 1.0,
+        "passed": true
+      },
+      "selected_link_coverage_min": {
+        "target": 0.8,
+        "observed": 1.0,
+        "passed": true
+      },
+      "candidate_recall_at_8_min": {
+        "target": 0.95,
+        "observed": 1.0,
+        "passed": true
+      },
+      "endpoint_exact_accuracy_min": {
+        "target": 0.95,
+        "observed": 0.5,
+        "passed": false
+      },
+      "safe_ambiguity_handling_min": {
+        "target": 0.95,
+        "observed": 1.0,
+        "passed": true
+      },
+      "proposal_readiness_p95_seconds_max": {
+        "target": 120,
+        "observed": 71.719,
+        "passed": true
+      }
+    },
+    "holdout": {
+      "atomic_event_f1_min": {
+        "target": 0.9,
+        "observed": 0.9333333333333333,
+        "passed": true
+      },
+      "selected_link_precision_min": {
+        "target": 0.98,
+        "observed": 0.8333333333333334,
+        "passed": false
+      },
+      "selected_link_coverage_min": {
+        "target": 0.8,
+        "observed": 0.7142857142857143,
+        "passed": false
+      },
+      "candidate_recall_at_8_min": {
+        "target": 0.95,
+        "observed": 0.7142857142857143,
+        "passed": false
+      },
+      "endpoint_exact_accuracy_min": {
+        "target": 0.95,
+        "observed": 1.0,
+        "passed": true
+      },
+      "safe_ambiguity_handling_min": {
+        "target": 0.95,
+        "observed": 1.0,
+        "passed": true
+      },
+      "proposal_readiness_p95_seconds_max": {
+        "target": 120,
+        "observed": 111.298,
+        "passed": true
+      }
+    }
+  },
+  "development_checks": {
+    "broad-quality-known-v1": {
+      "cases": 7,
+      "completed": 7,
+      "passed": 7,
+      "failures": [],
+      "independent_human_adjudication": false,
+      "domain_writes": 0
+    },
+    "broad-quality-wording-v1": {
+      "cases": 5,
+      "completed": 2,
+      "passed": 2,
+      "failures": [
+        "B19-03",
+        "B19-04",
+        "B19-05"
+      ],
+      "independent_human_adjudication": false,
+      "domain_writes": 0
+    },
+    "delivery-matching-v1": {
+      "cases": 5,
+      "passed": 0,
+      "failures": [
+        "C06",
+        "DM-02",
+        "DM-03",
+        "DM-04",
+        "DM-05"
+      ],
+      "scope": "Development component matching with supplied observations, not unseen extraction or end-to-end acceptance",
+      "domain_writes": 0
+    }
+  },
+  "calibration": {
+    "status": "experimental_study_only_runtime_unavailable",
+    "thresholds": {
+      "event": null,
+      "field": {
+        "correct": 20,
+        "count": 20,
+        "coverage": 0.5882352941176471,
+        "errors": 0,
+        "precision": 1.0,
+        "threshold": 0.5
+      },
+      "link": null
+    },
+    "runtime_thresholds_installed": false,
+    "eligible_event_count": 7
+  },
+  "retry_checks": {},
+  "mixed_workload_retry": {
+    "status": "stop_criteria_observed",
+    "duration_seconds": 2.667,
+    "stages_admitted": 1,
+    "stop_reasons": [
+      "FAILED_OR_CANCELLED_WORK",
+      "PROVIDER_COOLDOWN_EXCEEDS_90_SECONDS"
+    ],
+    "records": [
+      {
+        "kind": "report",
+        "id": "b008a8ec-865d-475c-b2e1-eb0d47e1fe13",
+        "case_id": "C06",
+        "admitted": 0.07930358298472129,
+        "state": "failed",
+        "terminal_seconds": 2.04,
+        "state_after_shutdown": "failed",
+        "captured_events": []
+      },
+      {
+        "kind": "conversation",
+        "id": "244eab13-3d21-4ce6-acd5-d455e1492454",
+        "case_id": "C06",
+        "admitted": 0.09080962499137968,
+        "state": "queued",
+        "state_after_shutdown": "queued"
+      }
+    ],
+    "worker_exit_codes": [
+      0,
+      0
+    ],
+    "rollback_applied": "Owned workers stopped; flags remain disabled; queued/checkpoint state retained for inspection",
+    "limitations": [
+      "Local synthetic mixed workload only; no UI, approvals or connector latency.",
+      "An early stop fails sustained workload acceptance.",
+      "No automatic resume or rollout advancement."
+    ]
+  },
+  "retained_rehearsal_work": {
+    "read_only": true,
+    "rows": [
+      {
+        "state": "failed",
+        "attempts": 1,
+        "model_calls": null,
+        "error_code": "AGENT_TOOL_FAILED",
+        "lease_expires_at": null,
+        "next_attempt_at": null,
+        "kind": "report",
+        "id": "b008a8ec-865d-475c-b2e1-eb0d47e1fe13",
+        "tools": [
+          {
+            "tool_name": "load_job_context",
+            "state": "succeeded",
+            "error_code": null,
+            "sanitized_output_summary": {
+              "fragment_count": 1,
+              "activity_count": 12
+            }
+          },
+          {
+            "tool_name": "extract_observations",
+            "state": "failed",
+            "error_code": "AGENT_TOOL_FAILED",
+            "sanitized_output_summary": {
+              "failure_category": "MODEL_CAPACITY_TIMEOUT",
+              "provider_metrics": {
+                "groq": {
+                  "calls": 1,
+                  "admitted": 0,
+                  "admission_ms": 532,
+                  "transport_ms": 0,
+                  "responses_2xx": 0,
+                  "responses_429": 0,
+                  "responses_other": 0,
+                  "no_response": 1
+                }
+              }
+            }
+          }
+        ]
+      },
+      {
+        "state": "queued",
+        "attempts": 1,
+        "model_calls": 1,
+        "error_code": "MODEL_RATE_LIMITED",
+        "lease_expires_at": null,
+        "next_attempt_at": "2026-10-17 07:51:16.050337+00:00",
+        "kind": "conversation",
+        "id": "244eab13-3d21-4ce6-acd5-d455e1492454"
+      }
+    ],
+    "total_approved_events": 2
+  },
+  "remaining_retries_disposition": {
+    "recorded_at": "2026-10-17T07:47:11.915051+00:00",
+    "stopped_controller_pids": [
+      56284
+    ],
+    "reason": "The separate post-cooldown mixed attempt immediately observed a failed report and renewed provider cooldown. Stop further retries; preserve original semantic/provider failures.",
+    "remaining_component_retries": "not_attempted_after_repeated_rate_limit",
+    "workers_already_exited_cleanly": true,
+    "provider_model_keys_unchanged": true
+  },
+  "configuration_sha256": {
+    "compose.yaml": "3e293f9aeb7bbaf9a93a1d2df3d2cb37271b251c2f26ebba8b222cb69229426f"
+  },
+  "mixed_workload": {
+    "status": "stop_criteria_observed",
+    "duration_seconds": 0.126,
+    "stop_reasons": [
+      "PROVIDER_COOLDOWN_EXCEEDS_90_SECONDS"
+    ],
+    "stages_admitted": 1,
+    "rollback": "Owned workers stopped; flags remain disabled; queued/checkpoint state retained for inspection"
+  },
+  "monitoring": {
+    "staged-monitor-600s-v1": {
+      "finished_at": "2026-10-17T07:44:50.327820+00:00",
+      "status": "stop_criteria_observed",
+      "duration_seconds": 600.022,
+      "sample_count": 121,
+      "stop_reasons": [
+        "PROVIDER_COOLDOWN_EXCEEDS_CAPTURE_REQUEST_BUDGET"
+      ],
+      "rollout_flags_enabled": false,
+      "action": "Do not advance rollout; retain bounded diagnostic capture",
+      "limitations": [
+        "A 600-second local monitoring window alone does not establish sustained deployment acceptance.",
+        "Monitor is read-only; it does not kill workers or accept progress.",
+        "Conversation rollback/recovery has separate populated-state evidence."
+      ]
+    },
+    "mixed-stage-monitor-300s-v1": {
+      "finished_at": "2026-10-17T07:48:29.962529+00:00",
+      "status": "stop_criteria_observed",
+      "duration_seconds": 300.025,
+      "sample_count": 61,
+      "stop_reasons": [
+        "CONVERSATION_READINESS_EXCEEDS_120_SECONDS",
+        "NEW_FAILED_REPORT",
+        "PROVIDER_COOLDOWN_EXCEEDS_CAPTURE_REQUEST_BUDGET"
+      ],
+      "rollout_flags_enabled": false,
+      "action": "Do not advance rollout; retain bounded diagnostic capture",
+      "limitations": [
+        "A 300-second local monitoring window alone does not establish sustained deployment acceptance.",
+        "Monitor is read-only; it does not kill workers or accept progress.",
+        "Conversation rollback/recovery has separate populated-state evidence."
+      ]
+    }
+  },
+  "verification": {
+    "unit": {
+      "passed": 435,
+      "junit": "/private/tmp/progress-final-20261017-unit.xml"
+    },
+    "integration": {
+      "passed": 197,
+      "junit": "/private/tmp/progress-final-20261017-integration.xml"
+    },
+    "browser": {
+      "passed": 48,
+      "projects": [
+        "fixtures",
+        "review-api"
+      ]
+    },
+    "frontend_typecheck": "passed",
+    "frontend_build": "passed",
+    "historical_interruption_root_cause": "unknown",
+    "original_retrieval_failure_root_cause": "unproven",
+    "runtime_confidence": "unavailable",
+    "rollout_flags_enabled": false,
+    "native_required_sources_passed": 6,
+    "malformed_xml_actual_probe": "SCHEDULE_PARSE_FAILED",
+    "frontend_contracts": "passed"
+  },
+  "runtime": {
+    "source_manifest_sha256": "ff3f8243f786490619b86b420b2fa561cb47c66e94d41202c35b0c4132c3ca1d",
+    "migration": "0018_hosted_admission",
+    "configuration": {
+      "llm_provider": "groq",
+      "groq_model": "openai/gpt-oss-20b",
+      "report_model_timeout_seconds": 360,
+      "conversation_model_timeout_seconds": 300,
+      "agent_hierarchy_enabled": false,
+      "orchestrator_model_assisted": false
+    },
+    "old_pids": {
+      "api": 43045,
+      "worker": 43046
+    },
+    "api": {
+      "pid": 56206,
+      "log": "/private/tmp/progress-final-20261017-runtime/api.log"
+    },
+    "worker": {
+      "pid": 56207,
+      "log": "/private/tmp/progress-final-20261017-runtime/worker.log"
+    },
+    "health": {
+      "status": 200,
+      "body": {
+        "status": "ok"
+      }
+    },
+    "source_manifest_verified_before_restart": true,
+    "configuration_note": "Existing main report/conversation timeouts preserved; bounded evaluation used 90-second timeouts."
+  },
+  "not_measured": [
+    "Acceptance-to-internal-update sustained p95",
+    "Mock acknowledgement sustained p95 without retry",
+    "Independent hard-safety accuracy across unseen end-to-end approvals"
+  ],
+  "historical_interruption_cause": "unknown",
+  "original_retrieval_failure_root_cause": "unproven",
+  "holdout_status": "consumed_for_evaluation; do not tune this candidate or estimator against it; later tuned candidate needs fresh unseen cases",
+  "rollout_flags_enabled": false,
+  "automatic_acceptance": false,
+  "source_manifest": {
+    "path": "docs/validation/final-candidate-source-2026-10-17.json",
+    "sha256": "ff3f8243f786490619b86b420b2fa561cb47c66e94d41202c35b0c4132c3ca1d"
+  },
+  "documentation_sha256": {
+    "README.md": "18d1a991171529fa9ca5abe004eeb57fcd5526891f631994ba81618f0dec9d28",
+    "docs/release.md": "5393473ce5192f52fed99c31ad491dffde409ee99e943b2aa1763344e7c16ef4",
+    "docs/README.md": "97667cc69a077a7c6aeb2493eb7fbfff3f9cb27ef6964f96b340226914b02ded",
+    "docs/retrieval-resumption-2026-10-17.md": "73ee553187304a0753af985b02df17c926264693ec348d2e20e333d200e4a30c",
+    "docs/release-review-2026-10-17.md": "251e4ade3e9c4d38200475a3bf31fb18c62bbcd9ad87438bda4cef8be835349f",
+    "docs/confidence-calibration.md": "d7012d30f560fcb5ce356d3ee2e1b0ef368164e354fc9061d29646aa42e08567",
+    "docs/local-run.md": "4bcc167aa24223dd45c9ccd410a237878913e7510d868bb70a08352b2711cd8a",
+    "docs/data-splits.md": "4eb1d5b64066b489492e2530d63f0a75bfd2bcab513006246c3beb3c0ea2790a",
+    "docs/provider-capacity.md": "724e14397b49e5f842bc4b5b885814adb8220fc9eddb101a9d7e9f5bd48e87a2"
+  },
+  "evidence_sha256": {
+    "evaluation/results/release-completion-2026-10-17/broad-quality-known-v1/capture-manifest.json": "e7e9a1c6decd6f45406d532b686bf3880bb63e07bfec573a26179afa121c3fdc",
+    "evaluation/results/release-completion-2026-10-17/broad-quality-known-v1/config.json": "18519ab07665fd4dd8271e4764eeee9dbc182ab9481bb375748eac70f8e18849",
+    "evaluation/results/release-completion-2026-10-17/broad-quality-known-v1/inputs.jsonl": "01bc8623603e2bf74a9c8e32e90e366e2ec9ff08b4add62da6cb09b10fbabf9f",
+    "evaluation/results/release-completion-2026-10-17/broad-quality-known-v1/model-outputs.jsonl": "ea199fd4cfd73e5ac1320d4fd28ed62aba4b9f664c61dbc20bf3927b17a0da06",
+    "evaluation/results/release-completion-2026-10-17/broad-quality-known-v1/predictions.jsonl": "214dbd774f56b73b94798c6a14e8ba2752ede9f2f77d5e5117ae98a8faae9c3f",
+    "evaluation/results/release-completion-2026-10-17/broad-quality-known-v1/provider-metrics.jsonl": "0c883413c1a013d544a23747fc74c75c8364bc49569c0a80fc9d4b35a2363eae",
+    "evaluation/results/release-completion-2026-10-17/broad-quality-known-v1/summary.json": "5fd19e21df07b17dc613ff842e7cbd221d3ad5f527a801464dd0b8195b46a593",
+    "evaluation/results/release-completion-2026-10-17/broad-quality-wording-v1/capture-manifest.json": "293e12011764966f2fa63e55686d64334172e08d0537dea51449c086496c7f4a",
+    "evaluation/results/release-completion-2026-10-17/broad-quality-wording-v1/config.json": "e1148b32cc6348cf8f41fdd54e2a64c09c6347e1072056ecbb0ef062fa3c7836",
+    "evaluation/results/release-completion-2026-10-17/broad-quality-wording-v1/inputs.jsonl": "825da460833a1ec2b0f29fa4bcf2d62d63e50ca7e010bb5524bf8582b9712947",
+    "evaluation/results/release-completion-2026-10-17/broad-quality-wording-v1/model-outputs.jsonl": "8f45da13461c9b62fcfbfd1d4a5e8e952fcd703679d08e9c4c22fed091a11b02",
+    "evaluation/results/release-completion-2026-10-17/broad-quality-wording-v1/predictions.jsonl": "38313a17bdb13eae4750070ff17915cbf4a2964323931f9b7c592ca03c868f27",
+    "evaluation/results/release-completion-2026-10-17/broad-quality-wording-v1/provider-metrics.jsonl": "910b6cef250afaf4ce128797d035f0f326e45fdead5595b64369dee8275a97de",
+    "evaluation/results/release-completion-2026-10-17/broad-quality-wording-v1/summary.json": "dff26312a680a002f9a961694027a5f389b470d8c3ae83b0735dc97ae90ab844",
+    "evaluation/results/release-completion-2026-10-17/delivery-matching-v1/calls.jsonl": "d2357c6a1ff04499fa8a78bf2a7b5eb6b06aebb7f95b98e5145c64379bcda199",
+    "evaluation/results/release-completion-2026-10-17/delivery-matching-v1/capture-manifest.json": "f7e5cc924d03225e7a8e02290327d63cba0148e87e53e936dca4c2eceeaf7c70",
+    "evaluation/results/release-completion-2026-10-17/delivery-matching-v1/config.json": "febf730c9be48bb44932ecfdf1e5f83273e5c71ca2ea7a6abf8f8c726c3fec0d",
+    "evaluation/results/release-completion-2026-10-17/delivery-matching-v1/predictions.jsonl": "7d904188d65b478faf1195199d055b071ea98a0a02bbb780130b40d63a72941e",
+    "evaluation/results/release-completion-2026-10-17/delivery-matching-v1/summary.json": "fb2be09087ebc2a717e2f7bec7ee8040c46920b05e815cdc745e7b0518d2d0bf",
+    "evaluation/results/release-completion-2026-10-17/evidence-manifest.json": "5bcbac277007fa448dce2db7de8aac2a607d2aa4388e127658f8ed5e830305c4",
+    "evaluation/results/release-completion-2026-10-17/final-integration.xml": "0468a19f9456a6d27da3600fb7ec8828d1b1cffbe31e3263c0d3c91214f01788",
+    "evaluation/results/release-completion-2026-10-17/final-main-status.json": "64bb823ff0daa4a72a0c50ffdec124f7ce09ac4e3be4d7fa5f7cadc85a52d0f0",
+    "evaluation/results/release-completion-2026-10-17/final-regression-v1.json": "9f0f0778e9c9c917427aea45cf26fa73f5c3ca46c125a255cd3f9952c194b211",
+    "evaluation/results/release-completion-2026-10-17/final-rehearsal-status.json": "19418702d31d13000ce2badc18ac289f0eeb77bcb328960a1477efa02d5fc58f",
+    "evaluation/results/release-completion-2026-10-17/final-runtime.json": "a3a26ef2cbeaa82276af7ac7dd9f631688682e54b44b9468957a878de051cd06",
+    "evaluation/results/release-completion-2026-10-17/final-source-verification.json": "a163209ed03b2144cb9bb05fdecd23d62139a08ff4eb0eb6535a0e870d698221",
+    "evaluation/results/release-completion-2026-10-17/final-unit.xml": "5df6b5dc989253952a267e4b6c178f8f1087f2c7fe3feec07f291c3e76dcb736",
+    "evaluation/results/release-completion-2026-10-17/finish_live_checks_20261017-harness.txt": "22cc0517c46d0ac7bc76eb836c0ab110b4815ecce535477afdfb648aa5d69eb5",
+    "evaluation/results/release-completion-2026-10-17/freeze_candidate_source_20261017-harness.txt": "f1751c58a585b71679d1f0ddbf5db02806bd1ad65116e9c63a0891e4e44557ac",
+    "evaluation/results/release-completion-2026-10-17/freeze_release_record_20261017-harness.txt": "e3d53094c93edd7dc0978b3cf087a01b3b879388e3218397301642fc4ee4da04",
+    "evaluation/results/release-completion-2026-10-17/fresh-holdout-v1/calls.jsonl": "fc6e42016d4d8ff8a6a7d4710b70558d24e9d220fa67f898652abc05ea156e06",
+    "evaluation/results/release-completion-2026-10-17/fresh-holdout-v1/capture-manifest.json": "91db7d9870efca2585e148bf9f43cc535255d6fd264066b9363521e754f0a55f",
+    "evaluation/results/release-completion-2026-10-17/fresh-holdout-v1/config.json": "809a6f0d66335b3d3ea4eb2a867edbfd4ec29de00cedcfb2fbcfc7fa3b39a5c5",
+    "evaluation/results/release-completion-2026-10-17/fresh-holdout-v1/fixtures.json": "c3adfadc3457645ef7e92ef4ba740cc34fd57e8a4ea2ff1484bd3e5adecb4a5e",
+    "evaluation/results/release-completion-2026-10-17/fresh-holdout-v1/predictions.jsonl": "e8e06b86aae276c8f37be6c25d53bf422285ee17a34f925d2d25b4c705811a23",
+    "evaluation/results/release-completion-2026-10-17/fresh-holdout-v1/schedules/H-CONTROL.csv": "6d72351232d22ab14bc299f73d8d9749a7c2fdc0b78050309817bc57d6515fbc",
+    "evaluation/results/release-completion-2026-10-17/fresh-holdout-v1/schedules/H-DRAIN.csv": "2c6c35567ca199c3da5f5750da0bf6a5374bf7a213c5e05f5a35ec7d71520c1f",
+    "evaluation/results/release-completion-2026-10-17/fresh-holdout-v1/schedules/H-ROAD.csv": "e9f09857f920d9ed62f07a53b523312bd8a1d2f3e3f5931408cca91da9694fd9",
+    "evaluation/results/release-completion-2026-10-17/fresh-holdout-v1/schedules/H-TANK.csv": "ec63b11bee75a2ddd15412d550a81dcccf4f26587e6fe55822b493dd7d5ed78b",
+    "evaluation/results/release-completion-2026-10-17/fresh-retrieval-diagnostic/c01-trace.json": "8346f2e67fc4a318385a3bb8d6e248c9e355883a8c44114c856fd4bb2f08d8b3",
+    "evaluation/results/release-completion-2026-10-17/fresh-retrieval-diagnostic/fixture.json": "dee12533c1543be8c90d38b9e528a92564a15474e98e43a201add5acc7843f49",
+    "evaluation/results/release-completion-2026-10-17/fresh-retrieval-diagnostic/live-status.json": "608295b89285db7fe84297f6265ab6b5ac6cc05c5369ee47d4e7b371308d773e",
+    "evaluation/results/release-completion-2026-10-17/fresh-retrieval-diagnostic/result.json": "69c16c4da64311790ff8a5ddefc4beaec505a0c4780e883ea235a04757cc17bb",
+    "evaluation/results/release-completion-2026-10-17/fresh-retrieval-diagnostic/worker-1.stderr.txt": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "evaluation/results/release-completion-2026-10-17/fresh-retrieval-diagnostic/worker-1.stdout.txt": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "evaluation/results/release-completion-2026-10-17/fresh-retrieval-diagnostic/worker-2.stderr.txt": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "evaluation/results/release-completion-2026-10-17/fresh-retrieval-diagnostic/worker-2.stdout.txt": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "evaluation/results/release-completion-2026-10-17/fresh-retrieval-diagnostic/worker-snapshots.json": "b9a7331db39c04ca0246460b773fd311634beedad91a23a190b56bb5c55605c6",
+    "evaluation/results/release-completion-2026-10-17/fresh-validation-v1/calls.jsonl": "98241c6121043114c30c7910ab7a3f66674845310f8aca724ae6c02b5234a65a",
+    "evaluation/results/release-completion-2026-10-17/fresh-validation-v1/capture-manifest.json": "cdcbaa0ff6b752cf47e1b085c2591bd0e6f3dd8773bca532d4ad48e2028b3c22",
+    "evaluation/results/release-completion-2026-10-17/fresh-validation-v1/config.json": "383624032fa9a465c58d10bd8cb49629178586f33f65c60762a433b1274992f5",
+    "evaluation/results/release-completion-2026-10-17/fresh-validation-v1/fixtures.json": "ae25d4b6e5c621d1bae399b09fc1fde75fbda0c1039c8c24c45139fa37bd3322",
+    "evaluation/results/release-completion-2026-10-17/fresh-validation-v1/predictions.jsonl": "8d23bd4933f8127045fe5987d4d32073796b55cadd2ef7410205d8f2f639fdd5",
+    "evaluation/results/release-completion-2026-10-17/fresh-validation-v1/schedules/V-CIVIL.csv": "1d4b8e6ca06b3e6a25b8d81406ed29f194b5ee9476c52fb1b80dbb5136d1135e",
+    "evaluation/results/release-completion-2026-10-17/fresh-validation-v1/schedules/V-POWER.csv": "4e2d1c6ea1568583008cd1db05c0ecf91315deefedc86c18a18bb78ac39a34ec",
+    "evaluation/results/release-completion-2026-10-17/fresh-validation-v1/schedules/V-STEEL.csv": "abe0b9891808a3fd90d25a115a7a1d05b6701bbe642ae3382d596aabcf8d4c7f",
+    "evaluation/results/release-completion-2026-10-17/fresh-validation-v1/schedules/V-WATER.csv": "6c05883af01b6fb1a06b8f0dfbc36c0783dc830ff0f4a682e47809ed65aa4f9e",
+    "evaluation/results/release-completion-2026-10-17/groq-120b-separate-key-probe.json": "7c9d7ab5ed9ea5bda05f11dd3d051d62ab8b2eec5ac6584ca04c47ef85a2f5ad",
+    "evaluation/results/release-completion-2026-10-17/holdout-scored-v1/calibration-labels.jsonl": "f103ddb72c45eb0891a780f7ce5888cede99d49a345be38e6e0146871a10cd52",
+    "evaluation/results/release-completion-2026-10-17/holdout-scored-v1/calibration-predictions.jsonl": "4e77a76d68a24f23c27bb188250f95c0400946f5e63bf513babef581bbc65137",
+    "evaluation/results/release-completion-2026-10-17/holdout-scored-v1/estimated-predictions.jsonl": "31ee6c8060537bb2d7722a81c688e69b1b3bd19fd53fbf6b15eb5f20d9a77694",
+    "evaluation/results/release-completion-2026-10-17/holdout-scored-v1/pre-scoring-estimates-manifest.json": "ef9b67ba0305c81d65c66a2612db86f050b47e347b529ac15695d135566fec55",
+    "evaluation/results/release-completion-2026-10-17/holdout-scored-v1/summary.json": "9fdc9cc5546a50dbae29dc6795924d75b82d40a51c15455e3b114e77aaa503c9",
+    "evaluation/results/release-completion-2026-10-17/mixed-stage-monitor-300s-v1/result.json": "08f9466901fda31f847c0e8e4ae2989b993211a4ac35141a4216565a54c297d4",
+    "evaluation/results/release-completion-2026-10-17/mixed-stage-monitor-300s-v1/samples.jsonl": "7f7cec64ecb16a16b363f70cc307a93ca0c616f64c3e746054b6ac687d2a3369",
+    "evaluation/results/release-completion-2026-10-17/mixed-workload-retry-v2/config.json": "78183a168727de38b1d2bdcfc2dfabf2b5c1874807e0e1b8a2d6ef1889f45acf",
+    "evaluation/results/release-completion-2026-10-17/mixed-workload-retry-v2/final-inspection.json": "42423caa45e6e4e1e810d42e6cd34851a05c6b8dcf2351515f2cb5ddadd88b01",
+    "evaluation/results/release-completion-2026-10-17/mixed-workload-retry-v2/fixtures.json": "492259f0d53cbb98faa0e364e2f7911e30bd150cfaad0ada312fcf106b51c51b",
+    "evaluation/results/release-completion-2026-10-17/mixed-workload-retry-v2/result.json": "2c70e09793a10ad604ac6a57a51d31ae7b8572fa610329ea6722b4c7e5485053",
+    "evaluation/results/release-completion-2026-10-17/mixed-workload-retry-v2/samples.jsonl": "73a5dc91d13cc101bb9a39742af4590dad8fcfa9caf7b353e689eb1a7e5c0b91",
+    "evaluation/results/release-completion-2026-10-17/mixed-workload-retry-v2/worker-1.log": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "evaluation/results/release-completion-2026-10-17/mixed-workload-retry-v2/worker-2.log": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "evaluation/results/release-completion-2026-10-17/mixed-workload-v1/config.json": "c87a663a7bd5fc78e27e05c35e6ac81dcf8c6ba771d9434e1537c233ca1b655c",
+    "evaluation/results/release-completion-2026-10-17/mixed-workload-v1/fixtures.json": "31eb8ba67f31de11b082fe4c85405e1d86ccce2dbb8fdbe4b6003515b793b9d2",
+    "evaluation/results/release-completion-2026-10-17/mixed-workload-v1/post-stop-disposition.json": "93f50e4637f2d168bda0465e1234fce94d58ac1aeaa15ed475b29898641da78b",
+    "evaluation/results/release-completion-2026-10-17/mixed-workload-v1/result.json": "a22d23c6a5c5ecc01fda07232c9ed4d7d0d3fe63b31a81d78c8925d96c7d7d7f",
+    "evaluation/results/release-completion-2026-10-17/mixed-workload-v1/samples.jsonl": "135ed84d4499b082472a301ade5d3b3b0a23c71464ed960670fe5dc2344e0c50",
+    "evaluation/results/release-completion-2026-10-17/mixed-workload-v1/worker-1.log": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "evaluation/results/release-completion-2026-10-17/mixed-workload-v1/worker-2.log": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "evaluation/results/release-completion-2026-10-17/populated-recovery/backup-manifest.json": "390a77381eb1aed0713170cbc9182f52f6b54349ea7953a32cde1940ddc7c81a",
+    "evaluation/results/release-completion-2026-10-17/populated-recovery/seed.json": "30ebbf5ff43df2b1bad61120e795715c95e0f0df88586ba1bc80212590342dea",
+    "evaluation/results/release-completion-2026-10-17/populated-recovery/source-preserved.json": "17c908e3414bc2abbeb028dcf50aeb8d65d28fa7524683a7916b0cef28ef6a11",
+    "evaluation/results/release-completion-2026-10-17/populated-recovery/verified-resume.json": "f2c0d695b50ab50d0a8e6cb87c096159cf53583713f2caf1f47ff54a2d07f845",
+    "evaluation/results/release-completion-2026-10-17/pre-resume-inspection.json": "2ea4f308c94c67683b4db87aaa502aa3ddf4b60ecc6757faf96cf6a9f3446a26",
+    "evaluation/results/release-completion-2026-10-17/restart_final_candidate_20261017-harness.txt": "fb9044e254d33f1939222449299546dea8c230c2e6afd3fcc076282446508684",
+    "evaluation/results/release-completion-2026-10-17/resumed-diagnostic/before.json": "f411cf6765c667298c0f5381f202ef281e0d36281a78041a7abcadabd89aa22d",
+    "evaluation/results/release-completion-2026-10-17/resumed-diagnostic/remaining-worker.log": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "evaluation/results/release-completion-2026-10-17/resumed-diagnostic/result.json": "fb867efbc0b3fca38d0a61695dfbb43684f5ec6f63ffb243c736d8061d5160ca",
+    "evaluation/results/release-completion-2026-10-17/resumed-diagnostic/snapshots.jsonl": "a2fed2422f188cd08d2c207f50a0b05ca8c53abc294a7f1c6c9a7144181a6598",
+    "evaluation/results/release-completion-2026-10-17/resumed-diagnostic/worker-1.log": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "evaluation/results/release-completion-2026-10-17/resumed-diagnostic/worker-2.log": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "evaluation/results/release-completion-2026-10-17/retry-harness-stop.json": "25605cead823e1c0bebd3ae1fa8adae76b921c4086dde601941b9961cd825ee6",
+    "evaluation/results/release-completion-2026-10-17/retry_after_cooldown_20261017-harness.txt": "99b0251eaf8edab4429e8a4bccf037f516f3e5aced6a624210f96a7ecea8d308",
+    "evaluation/results/release-completion-2026-10-17/staged-monitor-600s-v1/result.json": "ad6eb92e944d05fe60e4f31f75caabcc9fa936f099d5a10650ea804ca8249f7f",
+    "evaluation/results/release-completion-2026-10-17/staged-monitor-600s-v1/samples.jsonl": "b974b42bc3678a3cd26b02d1496156d4dd9943908c2262f94de18d075f3a2d16",
+    "evaluation/results/release-completion-2026-10-17/v12-field-rescore.json": "857ee89c5875a79a314b95ea126b39b89a5e1e8db5266511c524afb81775267c",
+    "evaluation/results/release-completion-2026-10-17/v13-field-checks/config.json": "5dd3a2ef25e62ab1b26ecfa24de6e37fc5b7b38f0347aef19ec649bf2f552cb5",
+    "evaluation/results/release-completion-2026-10-17/v13-field-checks/fixtures.json": "ea35e1ebe137d6ad1170efec945be5e2b9b9bccfdd9577f8c2a0be33d4e2a669",
+    "evaluation/results/release-completion-2026-10-17/v13-field-checks/model-outputs.jsonl": "393baa3d5ab7ba9b1c1814b4d508627c88c9b4951cb65dfdcbffc741d053cdf1",
+    "evaluation/results/release-completion-2026-10-17/v13-field-checks/predictions.jsonl": "cae8fae047b0f443cf119a51815acd897fa3a961d578ddde17b39ad567622e22",
+    "evaluation/results/release-completion-2026-10-17/v13-field-checks/summary.json": "10c2e9fe4d6ea4a58f2d921e2f36ab6f4d767cdfdcd893aa6e317daca14936fa",
+    "evaluation/results/release-completion-2026-10-17/v14-quality-01/config.json": "420ddf87f02b922e65286ccdd80270eef332b210635bc775319d1458a2e29d0a",
+    "evaluation/results/release-completion-2026-10-17/v14-quality-01/model-outputs.jsonl": "22f6bf4496bb25bff30ebc4b78fc99d39a1c9fcad88a670bb8f3656205448f4f",
+    "evaluation/results/release-completion-2026-10-17/v14-quality-01/predictions.jsonl": "073cfc2333322c552069e0af0370ae6585a928fb45fae0ffa7bf7948b3053e31",
+    "evaluation/results/release-completion-2026-10-17/v14-quality-01/provider-metrics.jsonl": "0dcc31c432d04dc229e548544410fc630ffd253499d0053bfb11bd8eb3b0184a",
+    "evaluation/results/release-completion-2026-10-17/v14-quality-01/summary.json": "5c3a898719de288b003fc646ff706bf0eae0d85586efcddcf3dc172ae18000e5",
+    "evaluation/results/release-completion-2026-10-17/v15-scope-01/config.json": "ebdaf41d5d72d81f747237ce4c768151c3abd7299268ae662c8b306461e248f7",
+    "evaluation/results/release-completion-2026-10-17/v15-scope-01/model-outputs.jsonl": "4de20c7e3915bf6188028794c82fba01b73a588a924ba8106feef711620f5675",
+    "evaluation/results/release-completion-2026-10-17/v15-scope-01/predictions.jsonl": "052fb10fb40ed90d8d21e24a0a5c9f66b92ba6bcac7d14a699560f7bd7acd559",
+    "evaluation/results/release-completion-2026-10-17/v15-scope-01/provider-metrics.jsonl": "9f40a802a019d4291a8805fae0bf4a8de00a15087a670ec1ce5aff7c8a3d40b2",
+    "evaluation/results/release-completion-2026-10-17/v15-scope-01/summary.json": "41a092dc5f83681164a74a5dce1ae7f648d3abf060639119bf2ea70dc8206a38",
+    "evaluation/results/release-completion-2026-10-17/v16-quality-01/config.json": "c9a298b255c5ab1f72952b0c78585f75aa1981a34418fb65b53b15d4be0ab3c8",
+    "evaluation/results/release-completion-2026-10-17/v16-quality-01/model-outputs.jsonl": "6730fa77de8dca3d15b17cdb7573c36b533d724d95d8377aa3a5e51c30e9f333",
+    "evaluation/results/release-completion-2026-10-17/v16-quality-01/predictions.jsonl": "1cd0525b80266a19da69deb7c03a591f628b3fb6b932c7e029f77bb12879d239",
+    "evaluation/results/release-completion-2026-10-17/v16-quality-01/provider-metrics.jsonl": "09f8449f76f016c1efbebaa11346713800b9ec1868c3cace6332bdf62add8705",
+    "evaluation/results/release-completion-2026-10-17/v16-quality-01/summary.json": "76101abf914fefe4738ddd5ad346b152b5b1dee17e7fc2339fd206518e1060c6",
+    "evaluation/results/release-completion-2026-10-17/v17-quality-01/config.json": "49ac6a5d2d3ac831e1d639ecae986c51dd492ce9932a261fb2e1d862b0f648a6",
+    "evaluation/results/release-completion-2026-10-17/v17-quality-01/model-outputs.jsonl": "3062d548661afebe9c8a3983430adc22959d3e1b5a99b7113a6bc5c9005acc97",
+    "evaluation/results/release-completion-2026-10-17/v17-quality-01/predictions.jsonl": "ccd9e45dd260e94d2c77445d1c93b30dbee7f2dccfab6f719725105eb1b1cc66",
+    "evaluation/results/release-completion-2026-10-17/v17-quality-01/provider-metrics.jsonl": "194aaebbb1b56322b84f17ba196b9c8c3ccdae8a8a201165fb20c210ac35f1f9",
+    "evaluation/results/release-completion-2026-10-17/v17-quality-01/summary.json": "c59a0b1ff9ab5546082a85f2b05bb1fc33061bfb162de09026601a1360f9c729",
+    "evaluation/results/release-completion-2026-10-17/v18-scope-01/capture-manifest.json": "8d50f46fb6bc5745c5af6a6bb0dcc4aee572c15c97726a2e8e489c7e7253ee3a",
+    "evaluation/results/release-completion-2026-10-17/v18-scope-01/config.json": "353240cba8a78edd00e94607763630f0d0de522c22d4c422937c1a72fdf20396",
+    "evaluation/results/release-completion-2026-10-17/v18-scope-01/inputs.jsonl": "2bcd5b2877a373e6636b57b3648d00ddce8092f6d1ae4d1b1287f4f829bf7cb8",
+    "evaluation/results/release-completion-2026-10-17/v18-scope-01/model-outputs.jsonl": "c1f79a18a672dd6e1a94a6565821880c8c3cdf420ac452a366a1beea6c0b97c2",
+    "evaluation/results/release-completion-2026-10-17/v18-scope-01/predictions.jsonl": "bc58bde396f0353940d7af5758bbc8463de148f9dbc28cf281d1b1857f508cb3",
+    "evaluation/results/release-completion-2026-10-17/v18-scope-01/provider-metrics.jsonl": "33ff7bf902dea36fefa43b108fcb33ebb531330a8b03ac988501ba891ee484e5",
+    "evaluation/results/release-completion-2026-10-17/v18-scope-01/summary.json": "41a092dc5f83681164a74a5dce1ae7f648d3abf060639119bf2ea70dc8206a38",
+    "evaluation/results/release-completion-2026-10-17/validation-monitor-window/result.json": "572f3eeb896681b48b1ec20ddfeef9920743a0d86334cb820c01fcff7e095a88",
+    "evaluation/results/release-completion-2026-10-17/validation-monitor-window/samples.jsonl": "001de7268f9854ed10f2a248b655f95a85299a3306c8bc6c979b87fc648f3f37",
+    "evaluation/results/release-completion-2026-10-17/validation-scored-v1/calibration-labels.jsonl": "4c27161c0c3292bba7f6120887d0829c673a4abbe410e5f6fb7660b2ac5b242a",
+    "evaluation/results/release-completion-2026-10-17/validation-scored-v1/calibration-manifest.json": "b11ee2cd50bf83328882fed0a907fc1ca52809f80e072762f7812ed2056a15ff",
+    "evaluation/results/release-completion-2026-10-17/validation-scored-v1/calibration-predictions.jsonl": "6515db22423de31f6a46635341a11aad556fceeef82100bc53c4a4658ecb0b12",
+    "evaluation/results/release-completion-2026-10-17/validation-scored-v1/calibration-result.json": "320a0d294dba86f2e0c75f872e6f6f37ff4d5c51e8ed86f88955486c01ab6684",
+    "evaluation/results/release-completion-2026-10-17/validation-scored-v1/estimated-predictions.jsonl": "783116a482c9f0512df6b491a3a26bf94c267877609a375ea59b7673db832a78",
+    "evaluation/results/release-completion-2026-10-17/validation-scored-v1/pre-scoring-estimates-manifest.json": "bf187b4636f25e22c040364e11c99be17f77a9946ac12fbbf0f242981eebbc43",
+    "evaluation/results/release-completion-2026-10-17/validation-scored-v1/summary.json": "523efbd1bfead2f7749367c1748a6cd547810e6b85ddf7a98496686524ff48ab"
+  }
+}

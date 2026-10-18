@@ -1,0 +1,61 @@
+{
+  "version": "gt10-workflow-fixtures-v1",
+  "status": "ai_adjudicated_expected_behaviors_not_execution_results",
+  "workflows": [
+    {
+      "workflow_id": "duplicate-of-001",
+      "case_id": "gt10-dev-009",
+      "setup": [
+        "ingest and approve gt10-dev-001"
+      ],
+      "action": "reingest identical source bytes in same project",
+      "expected_additional_approved_events": 0,
+      "source_identity_required": true
+    },
+    {
+      "workflow_id": "correction-of-001",
+      "case_id": "gt10-dev-010",
+      "setup": [
+        "approve gt10-dev-001",
+        "supply original event ID through correction lineage"
+      ],
+      "action": "review and approve explicit supersession at 09:30",
+      "expected_original_record": "retained",
+      "expected_active_start": "2026-10-12T09:30",
+      "standalone_without_lineage": "clarification_required"
+    },
+    {
+      "workflow_id": "finish-before-start-arrival",
+      "case_id": "gt10-dev-011",
+      "isolated_scenario": true,
+      "setup": [
+        "no accepted start or finish"
+      ],
+      "action": [
+        "review/accept stated finish",
+        "review/accept start from gt10-dev-001"
+      ],
+      "expected_final_start": "2026-10-12T08:30",
+      "expected_final_finish": "2026-10-14T16:15",
+      "comparison": "same reducer result as start then finish"
+    },
+    {
+      "workflow_id": "finish-before-known-start",
+      "case_id": "gt10-dev-012",
+      "setup": [
+        "approve gt10-dev-001 start"
+      ],
+      "action": "attempt approval of stated earlier finish",
+      "expected_approval": "rejected",
+      "expected_additional_approved_events": 0,
+      "expected_revision_change": 0
+    },
+    {
+      "workflow_id": "leaf-does-not-complete-parent",
+      "case_id": "gt10-dev-013",
+      "action": "review/accept leaf finish",
+      "expected_updated_activity": "SUP-F8-03",
+      "expected_parent_lifecycle_change": false
+    }
+  ]
+}

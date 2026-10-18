@@ -1,0 +1,18 @@
+{
+  "started_at": "2026-10-16T11:18:27.901712+00:00",
+  "requests_per_provider": 2,
+  "providers": [
+    "openrouter"
+  ],
+  "submitted_concurrency_per_provider": 2,
+  "wave_seconds": 20,
+  "timeout_seconds": 30,
+  "groq_model": "openai/gpt-oss-20b",
+  "groq_inference_key_slot": 0,
+  "openrouter_model": "nvidia/nemotron-3.5-super-vl:free",
+  "max_output_tokens": 256,
+  "transport_retries": 0,
+  "cross_provider_fallback": false,
+  "admission_scope": "postgresql_deployment_all_roles_and_keys",
+  "synthetic_only": true
+}

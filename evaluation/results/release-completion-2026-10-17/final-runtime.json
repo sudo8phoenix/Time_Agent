@@ -1,0 +1,32 @@
+{
+  "source_manifest_sha256": "ff3f8243f786490619b86b420b2fa561cb47c66e94d41202c35b0c4132c3ca1d",
+  "migration": "0018_hosted_admission",
+  "configuration": {
+    "llm_provider": "groq",
+    "groq_model": "openai/gpt-oss-20b",
+    "report_model_timeout_seconds": 360,
+    "conversation_model_timeout_seconds": 300,
+    "agent_hierarchy_enabled": false,
+    "orchestrator_model_assisted": false
+  },
+  "old_pids": {
+    "api": 43045,
+    "worker": 43046
+  },
+  "api": {
+    "pid": 56206,
+    "log": "/private/tmp/progress-final-20261017-runtime/api.log"
+  },
+  "worker": {
+    "pid": 56207,
+    "log": "/private/tmp/progress-final-20261017-runtime/worker.log"
+  },
+  "health": {
+    "status": 200,
+    "body": {
+      "status": "ok"
+    }
+  },
+  "source_manifest_verified_before_restart": true,
+  "configuration_note": "Existing main report/conversation timeouts preserved; bounded evaluation used 90-second timeouts."
+}

@@ -1,0 +1,26 @@
+{
+  "started_at": "2026-10-17T07:12:21.187744+00:00",
+  "prompt_version": "extraction-v18-nullable-source-contract",
+  "prompt_sha256": "22f5967e0f3a05610c5ba881ddc0dc2ebf9783b762d2754f7c3c7766edcdf624",
+  "fixture_sha256": "9e1e7c034fae096e2a05784fec1dcfc68fde49a871476e0c076b9336c6c44dec",
+  "provider": "groq",
+  "model": "openai/gpt-oss-20b",
+  "key_slot": 0,
+  "transport_retries": 0,
+  "admission_scope": "postgresql_deployment",
+  "case_ids": [
+    "Q01",
+    "Q02",
+    "Q04",
+    "D15-01",
+    "D15-02",
+    "D15-03"
+  ],
+  "timeout_seconds": 60,
+  "scope": "fresh wording synthetic component development checks; no persistence or approvals",
+  "source_sha256": {
+    "backend/app/llm/extract.py": "66289f1eace3aadd1264c4cc3b50020aa202134a0ded99382b31cc16fce9d782",
+    "backend/app/prompts/extraction_v1.py": "7a161c40ec5fca86343492e82a5a6a8527d5b348aba22c0ed9910952a30e82f6",
+    "/Users/cyrilsabugeorge/Documents/python_project/site-progress-agent/evaluation/extraction_quality.py": "f4e9dc716857d979a3a377f465fdc7c9428946e2f0adf2a8e0d8d931bd538ee1"
+  }
+}

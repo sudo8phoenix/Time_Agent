@@ -1,0 +1,337 @@
+{
+  "checked_at": "2026-10-15T15:58:11.442247+00:00",
+  "source": "https://openrouter.ai/api/v1/models",
+  "timeout_seconds": 35,
+  "max_output_tokens": 1536,
+  "transport_retries": 0,
+  "models": [
+    {
+      "model": "nvidia/nemotron-3-super-120b-a12b:free",
+      "catalog_present": true,
+      "trials": [
+        {
+          "expected_action": "intake",
+          "http_status": 200,
+          "tokens": {
+            "prompt_tokens": 103,
+            "completion_tokens": 54,
+            "total_tokens": 157
+          },
+          "finish_reason": "stop",
+          "action": "intake",
+          "passed": true,
+          "elapsed_ms": 1428
+        },
+        {
+          "expected_action": "analysis",
+          "http_status": 200,
+          "tokens": {
+            "prompt_tokens": 102,
+            "completion_tokens": 65,
+            "total_tokens": 167
+          },
+          "finish_reason": "stop",
+          "action": "analysis",
+          "passed": true,
+          "elapsed_ms": 1325
+        },
+        {
+          "expected_action": "review",
+          "http_status": 200,
+          "tokens": {
+            "prompt_tokens": 102,
+            "completion_tokens": 66,
+            "total_tokens": 168
+          },
+          "finish_reason": "stop",
+          "action": "review",
+          "passed": true,
+          "elapsed_ms": 1834
+        }
+      ],
+      "pricing": {
+        "prompt": "0",
+        "completion": "0"
+      },
+      "supported_parameters": [
+        "include_reasoning",
+        "max_tokens",
+        "reasoning",
+        "reasoning_effort",
+        "response_format",
+        "seed",
+        "structured_outputs",
+        "temperature",
+        "tool_choice",
+        "tools",
+        "top_p"
+      ],
+      "reasoning": {
+        "mandatory": false,
+        "default_enabled": true,
+        "supports_max_tokens": true,
+        "supported_efforts": [
+          "medium",
+          "low"
+        ],
+        "default_effort": "medium"
+      }
+    },
+    {
+      "model": "google/gemma-4-31b-it:free",
+      "catalog_present": true,
+      "trials": [
+        {
+          "expected_action": "intake",
+          "http_status": 429,
+          "tokens": {},
+          "passed": false,
+          "error_type": "OllamaResponseError",
+          "elapsed_ms": 493
+        }
+      ],
+      "pricing": {
+        "prompt": "0",
+        "completion": "0"
+      },
+      "supported_parameters": [
+        "include_reasoning",
+        "max_tokens",
+        "reasoning",
+        "response_format",
+        "seed",
+        "temperature",
+        "tool_choice",
+        "tools",
+        "top_p"
+      ],
+      "reasoning": {
+        "mandatory": false,
+        "default_enabled": false
+      }
+    },
+    {
+      "model": "google/gemma-4-26b-a4b-it:free",
+      "catalog_present": true,
+      "trials": [
+        {
+          "expected_action": "intake",
+          "http_status": 429,
+          "tokens": {},
+          "passed": false,
+          "error_type": "OllamaResponseError",
+          "elapsed_ms": 463
+        }
+      ],
+      "pricing": {
+        "prompt": "0",
+        "completion": "0"
+      },
+      "supported_parameters": [
+        "include_reasoning",
+        "max_tokens",
+        "reasoning",
+        "response_format",
+        "seed",
+        "temperature",
+        "tool_choice",
+        "tools",
+        "top_p"
+      ],
+      "reasoning": {
+        "mandatory": false,
+        "default_enabled": false
+      }
+    },
+    {
+      "model": "nvidia/nemotron-3-nano-omni-30b-a3b-reasoning:free",
+      "catalog_present": true,
+      "trials": [
+        {
+          "expected_action": "intake",
+          "http_status": 200,
+          "tokens": {
+            "prompt_tokens": 103,
+            "completion_tokens": 173,
+            "total_tokens": 276
+          },
+          "finish_reason": "stop",
+          "action": "intake",
+          "passed": true,
+          "elapsed_ms": 3892
+        },
+        {
+          "expected_action": "analysis",
+          "http_status": 200,
+          "tokens": {
+            "prompt_tokens": 102,
+            "completion_tokens": 165,
+            "total_tokens": 267
+          },
+          "finish_reason": "stop",
+          "action": "analysis",
+          "passed": true,
+          "elapsed_ms": 1944
+        },
+        {
+          "expected_action": "review",
+          "http_status": 200,
+          "tokens": {
+            "prompt_tokens": 102,
+            "completion_tokens": 157,
+            "total_tokens": 259
+          },
+          "finish_reason": "stop",
+          "action": "review",
+          "passed": true,
+          "elapsed_ms": 4059
+        }
+      ],
+      "pricing": {
+        "prompt": "0",
+        "completion": "0"
+      },
+      "supported_parameters": [
+        "include_reasoning",
+        "max_tokens",
+        "reasoning",
+        "seed",
+        "temperature",
+        "tool_choice",
+        "tools",
+        "top_p"
+      ],
+      "reasoning": {
+        "mandatory": false,
+        "default_enabled": true,
+        "supports_max_tokens": true
+      }
+    },
+    {
+      "model": "nvidia/nemotron-3.5-lightning:free",
+      "catalog_present": true,
+      "trials": [
+        {
+          "expected_action": "intake",
+          "http_status": 200,
+          "tokens": {
+            "prompt_tokens": 103,
+            "completion_tokens": 656,
+            "total_tokens": 759
+          },
+          "finish_reason": "stop",
+          "action": "intake",
+          "passed": true,
+          "elapsed_ms": 7412
+        },
+        {
+          "expected_action": "analysis",
+          "http_status": 200,
+          "tokens": {
+            "prompt_tokens": 102,
+            "completion_tokens": 527,
+            "total_tokens": 629
+          },
+          "finish_reason": "stop",
+          "action": "analysis",
+          "passed": true,
+          "elapsed_ms": 6020
+        },
+        {
+          "expected_action": "review",
+          "http_status": 200,
+          "tokens": {
+            "prompt_tokens": 102,
+            "completion_tokens": 460,
+            "total_tokens": 562
+          },
+          "finish_reason": "stop",
+          "action": "review",
+          "passed": true,
+          "elapsed_ms": 6784
+        }
+      ],
+      "pricing": {
+        "prompt": "0",
+        "completion": "0"
+      },
+      "supported_parameters": [
+        "include_reasoning",
+        "max_tokens",
+        "reasoning",
+        "seed",
+        "temperature",
+        "tool_choice",
+        "tools",
+        "top_p"
+      ],
+      "reasoning": {
+        "mandatory": false
+      }
+    },
+    {
+      "model": "nvidia/nemotron-3.5-super-vl:free",
+      "catalog_present": true,
+      "trials": [
+        {
+          "expected_action": "intake",
+          "http_status": 200,
+          "tokens": {
+            "prompt_tokens": 103,
+            "completion_tokens": 74,
+            "total_tokens": 177
+          },
+          "finish_reason": "stop",
+          "action": "intake",
+          "passed": true,
+          "elapsed_ms": 625
+        },
+        {
+          "expected_action": "analysis",
+          "http_status": 200,
+          "tokens": {
+            "prompt_tokens": 102,
+            "completion_tokens": 84,
+            "total_tokens": 186
+          },
+          "finish_reason": "stop",
+          "action": "analysis",
+          "passed": true,
+          "elapsed_ms": 1229
+        },
+        {
+          "expected_action": "review",
+          "http_status": 200,
+          "tokens": {
+            "prompt_tokens": 102,
+            "completion_tokens": 83,
+            "total_tokens": 185
+          },
+          "finish_reason": "stop",
+          "action": "review",
+          "passed": true,
+          "elapsed_ms": 491
+        }
+      ],
+      "pricing": {
+        "prompt": "0",
+        "completion": "0"
+      },
+      "supported_parameters": [
+        "include_reasoning",
+        "max_tokens",
+        "reasoning",
+        "response_format",
+        "seed",
+        "structured_outputs",
+        "temperature",
+        "tool_choice",
+        "tools",
+        "top_p"
+      ],
+      "reasoning": {
+        "mandatory": false
+      }
+    }
+  ]
+}

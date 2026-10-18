@@ -1,0 +1,42 @@
+{
+  "H-CONTROL-1": [
+    "56ebd14b-87dd-4979-b864-aa87e167e26e",
+    "89a33220-bdb4-4829-ab8f-ed0329274d76",
+    "ddf67e83-6903-433c-9fe5-0dedfa576ecd"
+  ],
+  "H-CONTROL-2": [
+    "56ebd14b-87dd-4979-b864-aa87e167e26e",
+    "89a33220-bdb4-4829-ab8f-ed0329274d76",
+    "c9b769ad-f331-4a54-93b6-72069a3bc8cd"
+  ],
+  "H-DRAIN-1": [
+    "e823afc0-2a97-414c-b857-5ba88a08efea",
+    "33bbf5bd-5813-449b-9743-adc3d9cfe2d6",
+    "488db117-3b26-4047-b6ce-5eca3c814edb"
+  ],
+  "H-DRAIN-2": [
+    "e823afc0-2a97-414c-b857-5ba88a08efea",
+    "33bbf5bd-5813-449b-9743-adc3d9cfe2d6",
+    "406cbe99-19f6-4f3d-97b8-0127b6f0111f"
+  ],
+  "H-ROAD-1": [
+    "0d7e1deb-03e0-4509-9a71-ab47ae5a59a9",
+    "d0d586ea-90ac-4cc5-87f3-b5e54944f848",
+    "53d50184-ba81-4e46-80cb-f1322a7e338e"
+  ],
+  "H-ROAD-2": [
+    "0d7e1deb-03e0-4509-9a71-ab47ae5a59a9",
+    "d0d586ea-90ac-4cc5-87f3-b5e54944f848",
+    "1380ab4e-5740-4931-9494-61f600c918df"
+  ],
+  "H-TANK-1": [
+    "87615f1f-8125-4fcd-93e0-a066e1b1fc71",
+    "33ddbb1b-bfbc-4f82-9f98-e4c60b4b20c1",
+    "8f533fab-c6c1-4520-bafd-705a8c3d7a24"
+  ],
+  "H-TANK-2": [
+    "87615f1f-8125-4fcd-93e0-a066e1b1fc71",
+    "33ddbb1b-bfbc-4f82-9f98-e4c60b4b20c1",
+    "c6b68393-adf8-42e7-bbf9-d96c9eece955"
+  ]
+}

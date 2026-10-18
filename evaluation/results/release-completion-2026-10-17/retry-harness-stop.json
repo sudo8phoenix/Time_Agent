@@ -1,0 +1,10 @@
+{
+  "recorded_at": "2026-10-17T07:47:11.915051+00:00",
+  "stopped_controller_pids": [
+    56284
+  ],
+  "reason": "The separate post-cooldown mixed attempt immediately observed a failed report and renewed provider cooldown. Stop further retries; preserve original semantic/provider failures.",
+  "remaining_component_retries": "not_attempted_after_repeated_rate_limit",
+  "workers_already_exited_cleanly": true,
+  "provider_model_keys_unchanged": true
+}

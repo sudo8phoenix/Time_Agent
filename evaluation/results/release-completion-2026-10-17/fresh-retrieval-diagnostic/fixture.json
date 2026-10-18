@@ -1,0 +1,29 @@
+{
+  "case_ids": [
+    "C01",
+    "C03"
+  ],
+  "dataset": "seed",
+  "job_ids": [
+    "0b95170b-27f4-4617-99a9-0abc03bd2865",
+    "58c1a626-9562-44e6-a293-465061c3dd47"
+  ],
+  "pinned_graph_versions": [
+    "report-analysis-v2",
+    "report-analysis-v1"
+  ],
+  "project_id": "6c9bbe7f-fa75-486a-8911-51786e696ada",
+  "provider_policy": {
+    "v1": "groq slot 0",
+    "v2 planner": "nvidia/nemotron-3.5-super-vl:free",
+    "v2 specialists": "groq slot 0"
+  },
+  "report_ids": [
+    "c3fe7432-bbdf-4961-8222-e73c6881c658",
+    "5d964b2d-e7ff-4b9a-9b47-9a79251b3cad"
+  ],
+  "worker_runtime_flags": {
+    "agent_hierarchy_enabled": false,
+    "orchestrator_model_assisted": false
+  }
+}

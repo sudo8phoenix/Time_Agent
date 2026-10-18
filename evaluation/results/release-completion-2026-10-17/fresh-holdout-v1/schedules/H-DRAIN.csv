@@ -1,0 +1,4 @@
+activity_id,activity_name,aliases,area,asset_tags,discipline,is_leaf,measurement_basis,planned_finish,planned_quantity,planned_start,unit,wbs_path,work_type
+HBK,Backfill Channel K,,Channel K,CHANNEL-K,civil,true,quantity_ratio,2026-12-20,100,2026-11-01,m3,SYNTHETIC/HBK,backfill
+HXK,Excavate Channel K,,Channel K,CHANNEL-K,civil,true,quantity_ratio,2026-12-20,100,2026-11-01,m3,SYNTHETIC/HXK,excavation
+HXL,Excavate Channel L,,Channel L,CHANNEL-L,civil,true,quantity_ratio,2026-12-20,100,2026-11-01,m3,SYNTHETIC/HXL,excavation

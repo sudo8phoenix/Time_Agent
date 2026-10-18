@@ -1,0 +1,28 @@
+{
+  "captured_at": "2026-10-17T15:28:47.344765+00:00",
+  "scope": "Read-only authentication/model listing; no inference or capacity claim",
+  "slots": [
+    {
+      "slot": 0,
+      "configured": true,
+      "http_status": 200,
+      "model_listed": true
+    },
+    {
+      "slot": 1,
+      "configured": true,
+      "http_status": 200,
+      "model_listed": true
+    },
+    {
+      "slot": 2,
+      "configured": true,
+      "http_status": 200,
+      "model_listed": true
+    }
+  ],
+  "distinct_configured_keys": 3,
+  "organization_scope": "not_established_by_model_listing",
+  "shared_admission_retained": true,
+  "cross_key_fallback": false
+}

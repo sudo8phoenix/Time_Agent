@@ -1,0 +1,3 @@
+{"case_id": "BM-01", "state": "failed", "passed": false, "error_type": "HostedRateLimitError", "error_code": "MODEL_RATE_LIMITED", "retry_after_seconds": 411.9998777919973, "elapsed_seconds": 0.497}
+{"case_id": "BM-02", "state": "failed", "passed": false, "error_type": "HostedCapacityError", "error_code": "MODEL_CAPACITY_TIMEOUT", "retry_after_seconds": 411.97553992271423, "elapsed_seconds": 0.02}
+{"case_id": "BM-03", "state": "failed", "passed": false, "error_type": "HostedCapacityError", "error_code": "MODEL_CAPACITY_TIMEOUT", "retry_after_seconds": 411.95825028419495, "elapsed_seconds": 0.016}

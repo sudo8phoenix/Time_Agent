@@ -1,0 +1,39 @@
+{
+  "scope": "Live receiving-package identity diagnostics; no persistence or approvals.\n\nExplicitly development cases, including C06 and ambiguous receiving locations.\nSupplies synthetic observations to isolate matching from extraction quality.\n",
+  "provider": "groq",
+  "model": "openai/gpt-oss-20b",
+  "schedule_sha256": "4b0f89a691757a9368694fae5adab7f602aa9563c17ac1cbf8955e8a5c0f21c6",
+  "source_sha256": {
+    "/Users/cyrilsabugeorge/Documents/python_project/site-progress-agent/evaluation/delivery_matching.py": "4bc1afaa4d599f75ae84b6636edab01d9b5bfdaccd301d93b8741ae0cfc90e87",
+    "backend/app/agent/schedule_decision.py": "597c21b18ef1c379580a5ae2e0608b590bb6cf5dd26165fecfce23edbec6a42d"
+  },
+  "cases": [
+    [
+      "C06",
+      "Area A, line 24-XX: 6 spools delivered to the laydown area.",
+      "PIP-A-ERECT-024"
+    ],
+    [
+      "DM-02",
+      "Two spools for line 24-XX arrived in Area B today.",
+      "PIP-B-ERECT-024"
+    ],
+    [
+      "DM-03",
+      "Area A received three spools for line 25-YY today.",
+      "PIP-A-ERECT-025"
+    ],
+    [
+      "DM-04",
+      "Spools for line 24-XX arrived at the laydown yard.",
+      null
+    ],
+    [
+      "DM-05",
+      "Four spools arrived at the central yard.",
+      null
+    ]
+  ],
+  "domain_writes": 0,
+  "human_review_completed": false
+}

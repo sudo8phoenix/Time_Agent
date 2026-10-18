@@ -1,0 +1,112 @@
+{
+  "status": "stop_criteria_observed",
+  "duration_seconds": 230.185,
+  "stages_admitted": 2,
+  "stop_reasons": [
+    "EXPIRED_WORK_OWNERSHIP"
+  ],
+  "records": [
+    {
+      "kind": "report",
+      "id": "4ff1d455-cef8-4e85-b02a-d8f2db09b979",
+      "case_id": "C06",
+      "admitted": 0.07930208300240338,
+      "state": "ready_for_review",
+      "terminal_seconds": 115.757,
+      "state_after_shutdown": "ready_for_review",
+      "captured_events": [
+        {
+          "fields": {
+            "discipline": "other",
+            "work_type": "other",
+            "event_type": "material_delivery",
+            "observed_status": "unknown",
+            "area": "Area A",
+            "asset_tags": [],
+            "explicit_activity_id": null,
+            "work_date": "2026-09-21",
+            "date_basis": "report_context",
+            "quantity": null,
+            "quantity_kind": "none",
+            "unit": null,
+            "raw_unit": null,
+            "reported_percent": null,
+            "actual_start": null,
+            "actual_finish": null,
+            "blocker": null,
+            "summary": "6 spools delivered to the laydown area.",
+            "evidence": [
+              {
+                "fields": [
+                  "fragment_id",
+                  "quote"
+                ],
+                "fragment_id": "bdfc6fd1-49c5-4a3b-a7b9-4ab597862a43",
+                "quote": "Area A, line 24-XX: 6 spools delivered to the laydown area."
+              }
+            ],
+            "warnings": [],
+            "lifecycle_effects": []
+          },
+          "selected_activity": "PIP-A-ERECT-024",
+          "mapping_state": "suggested",
+          "effects": {},
+          "review_state": "pending"
+        }
+      ]
+    },
+    {
+      "kind": "conversation",
+      "id": "c00b08ac-1252-4bc3-84d7-f84d61aaeb8a",
+      "case_id": "C06",
+      "admitted": 0.09221283299848437,
+      "state": "succeeded",
+      "terminal_seconds": 2.032,
+      "state_after_shutdown": "succeeded"
+    },
+    {
+      "kind": "report",
+      "id": "5f57ec7b-853a-4725-bf91-bf018ebbd695",
+      "case_id": "C01",
+      "admitted": 150.48557595800958,
+      "state": "running",
+      "state_after_shutdown": "running",
+      "captured_events": []
+    },
+    {
+      "kind": "conversation",
+      "id": "f03acb54-11d1-4e66-92a5-f48c2a1d137c",
+      "case_id": "C01",
+      "admitted": 150.4952371249965,
+      "state": "queued",
+      "state_after_shutdown": "queued"
+    },
+    {
+      "kind": "report",
+      "id": "3edd8916-5ced-47bb-b99a-e38b587d1a48",
+      "case_id": "C06",
+      "admitted": 150.49912833300186,
+      "state": "running",
+      "state_after_shutdown": "queued",
+      "captured_events": []
+    },
+    {
+      "kind": "conversation",
+      "id": "9cf1f9b3-248a-4055-9fa8-c2e18f4a3242",
+      "case_id": "C06",
+      "admitted": 150.5080055410217,
+      "state": "queued",
+      "state_after_shutdown": "queued"
+    }
+  ],
+  "worker_exit_codes": [
+    0,
+    0
+  ],
+  "rollback_applied": "Owned workers stopped; flags remain disabled; queued/checkpoint state retained for inspection",
+  "limitations": [
+    "Local synthetic mixed workload only; no UI, approvals or connector latency.",
+    "An early stop fails sustained workload acceptance.",
+    "No automatic resume or rollout advancement."
+  ]
+}

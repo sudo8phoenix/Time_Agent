@@ -12,7 +12,7 @@ import shutil
 import subprocess
 from datetime import datetime, timezone
 
-from sqlalchemy import select, text
+from sqlalchemy import inspect, select, text
 from sqlalchemy.engine import make_url
 
 from app.db.models import (ActivityState, AgentRun, AgentStep, AgentToolCall, AuditEvent, Conversation, ConversationTurn,
@@ -39,6 +39,25 @@ RECOVERY_TABLES = {
 }
 
 CHECKPOINT_TABLES = ("checkpoints", "checkpoint_blobs", "checkpoint_writes")
+
+# These tables do not exist in a valid pre-upgrade application database.
+# Missing tables at or after their introducing migration still indicate damage.
+RECOVERY_INTRODUCED = {"agent_tasks": 16, "conversation_tasks": 17,
+                       "conversation_task_calls": 17, "hosted_provider_admission": 18}
+
+
+def recovery_inventory(db):
+    revision = db.execute(text("SELECT version_num FROM alembic_version")).scalar_one()
+    try:
+        number = int(revision.split("_", 1)[0])
+    except (ValueError, AttributeError) as exc:
+        raise ValueError("Unsupported migration identity for recovery inventory") from exc
+    tables = set(inspect(db.connection()).get_table_names())
+    absent = set(RECOVERY_TABLES) - tables
+    unexpected = {name for name in absent if number >= RECOVERY_INTRODUCED.get(name, 0)}
+    if unexpected:
+        raise ValueError(f"Required recovery tables are missing: {', '.join(sorted(unexpected))}")
+    return revision, {name: model for name, model in RECOVERY_TABLES.items() if name in tables}, sorted(absent)
 
 
 def checkpoint_manifest(db):
@@ -81,6 +100,7 @@ def main():
     settings = get_settings()
     upload_root = Path(settings.upload_dir).resolve()
     with session_factory() as db:
+        revision, recovery_models, unavailable = recovery_inventory(db)
         records = db.scalars(select(FileRecord)).all()
         events = [str(value) for value in db.scalars(select(ProgressEvent.id))]
         evidence = [
@@ -95,7 +115,7 @@ def main():
         native = [str(value) for value in db.scalars(select(ScheduleSourceMetadata.schedule_version_id))]
         recovery_rows = {table: {"ids": [str(value) for value in db.scalars(select(getattr(model, model.__mapper__.primary_key[0].name)))],
                                  "sha256": table_digest(db, model)}
-                         for table, model in RECOVERY_TABLES.items()}
+                         for table, model in recovery_models.items()}
         checkpoint_rows = checkpoint_manifest(db)
         files = []
         for record in records:
@@ -117,6 +137,7 @@ def main():
         subprocess.run(["docker", "compose", "exec", "-T", "db", "pg_dump", "-U", username, "-d", database, "-Fc"], stdout=handle, check=True)
     os.chmod(dump, 0o600)
     manifest = {"created_at": datetime.now(timezone.utc).isoformat(), "database_sha256": sha(dump),
+                "schema_revision": revision, "pre_migration_recovery_tables": unavailable,
                 "checkpoint_rows": checkpoint_rows,
                 "files": files, "approved_event_ids": events,
                 "approved_evidence_fragment_ids": evidence, "native_metadata_ids": native,

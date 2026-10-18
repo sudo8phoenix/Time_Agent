@@ -1,0 +1,9 @@
+{
+  "expected_labels_parsed": false,
+  "estimated_predictions_sha256": "89eceaf6fafa30d795336542fa01a29c95b987e4135bb7f9919d0f42d6846b0d",
+  "estimator_source_sha256": "2e2fcf0952a2c0f536070468807865306ae701faddfffa8e612737e6bb9bb109",
+  "policy": {
+    "target_precision": 0.98,
+    "min_support": 20
+  }
+}

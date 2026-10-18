@@ -49,6 +49,57 @@ def test_thresholds_and_missing_fields(tmp_path):
     assert "secret" not in json.dumps(result)
 
 
+def ai_fixture(tmp_path):
+    lp, pp, mp, manifest = fixture(tmp_path)
+    authorization = tmp_path / "authorization.json"
+    authorization.write_text(json.dumps({"status": "owner_approved_frozen", "review_policy": {
+        "kind": "ai_assisted", "human_review_completed": False,
+        "authorized_acceptance_required": True}, "attestation": "TEST FIXTURE ONLY"}))
+    labels = [json.loads(line) for line in lp.read_text().splitlines()]
+    for label in labels:
+        label["review_status"] = "ai_assisted_adjudicated"
+    lp.write_text("".join(json.dumps(label) + "\n" for label in labels))
+    manifest.update(labels_sha256=digest(lp), group_review_status="ai_assisted_adjudicated")
+    manifest["review"].update(kind="ai_assisted", status="ai_assisted_adjudicated",
+        human_review_completed=False, authorization_sha256=digest(authorization))
+    mp.write_text(json.dumps(manifest))
+    return lp, pp, mp, authorization
+
+
+def test_ai_policy_is_explicit_and_never_labeled_independent_human(tmp_path):
+    lp, pp, mp, authorization = ai_fixture(tmp_path)
+    with pytest.raises(ValueError, match="Independent human"):
+        calibrate(lp, pp, mp, min_support=1)
+    result = calibrate(lp, pp, mp, min_support=1,
+        review_policy="owner_authorized_ai_assisted", authorization_path=authorization)
+    assert result["status"] == "ai_assisted_validation_evidence"
+    assert result["review"]["human_review_completed"] is False
+    assert result["policy"]["authorized_acceptance_required"] is True
+
+
+@pytest.mark.parametrize("mutation", ["missing", "hash", "human_claim", "row_status", "leak"])
+def test_ai_policy_keeps_authorization_and_evidence_gates(tmp_path, mutation):
+    lp, pp, mp, authorization = ai_fixture(tmp_path)
+    manifest = json.loads(mp.read_text())
+    if mutation == "missing":
+        authorization = None
+    if mutation == "hash":
+        manifest["review"]["authorization_sha256"] = "changed"
+    if mutation == "human_claim":
+        manifest["review"]["human_review_completed"] = True
+    if mutation == "row_status":
+        labels = [json.loads(line) for line in lp.read_text().splitlines()]
+        labels[0]["review_status"] = "independently_reviewed"
+        lp.write_text("".join(json.dumps(label) + "\n" for label in labels))
+        manifest["labels_sha256"] = digest(lp)
+    if mutation == "leak":
+        manifest["splits"]["holdout"][0]["group_id"] = "validation-project"
+    mp.write_text(json.dumps(manifest))
+    with pytest.raises(ValueError):
+        calibrate(lp, pp, mp, min_support=1,
+            review_policy="owner_authorized_ai_assisted", authorization_path=authorization)
+
+
 @pytest.mark.parametrize("mutation", ["unreviewed", "author", "ai", "hash", "group", "leak"])
 def test_review_and_split_gates(tmp_path, mutation):
     lp, pp, mp, manifest = fixture(tmp_path)

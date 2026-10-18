@@ -457,22 +457,23 @@ def test_extreme_provider_cooldown_is_bounded_by_original_task_deadline(fixture)
         assert task.next_attempt_at == task.deadline_at
 
 
-@pytest.mark.parametrize("legacy", [False, True, "v10"])
+@pytest.mark.parametrize("legacy", [False, True, "v10", "v11"])
 def test_extraction_prompt_is_pinned_across_restart(fixture, monkeypatch, legacy):
-    from app.prompts.extraction_v1 import PROMPT_VERSION, LEGACY_PROMPT_VERSION, V10_PROMPT_VERSION, get_extraction_prompt
+    from app.prompts.extraction_v1 import PROMPT_VERSION, LEGACY_PROMPT_VERSION, V10_PROMPT_VERSION, V11_PROMPT_VERSION, get_extraction_prompt
     task_id = enqueue(fixture)
     with sessions.begin() as db:
         task = db.get(ConversationTask, task_id)
         assert task.config["extraction_prompt_version"] == PROMPT_VERSION
-        if legacy == "v10":
-            task.config = {**task.config, "extraction_prompt_version": V10_PROMPT_VERSION}
+        if legacy in ("v10", "v11"):
+            task.config = {**task.config, "extraction_prompt_version":
+                V10_PROMPT_VERSION if legacy == "v10" else V11_PROMPT_VERSION}
         elif legacy:
             config = dict(task.config)
             config.pop("extraction_prompt_version")
             task.config = config
     _, token = runtime.claim(sessions)
     original = runtime.analyze
-    expected = get_extraction_prompt(V10_PROMPT_VERSION if legacy == "v10" else LEGACY_PROMPT_VERSION if legacy else PROMPT_VERSION)[1]
+    expected = get_extraction_prompt(V11_PROMPT_VERSION if legacy == "v11" else V10_PROMPT_VERSION if legacy == "v10" else LEGACY_PROMPT_VERSION if legacy else PROMPT_VERSION)[1]
     calls = []
     def pinned_model(**kwargs):
         assert kwargs["system"] == expected

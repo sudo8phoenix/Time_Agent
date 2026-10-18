@@ -1,0 +1,14 @@
+{
+  "status": "structured_response_passed",
+  "provider": "groq",
+  "model": "openai/gpt-oss-120b",
+  "orchestrator_key_slot": 1,
+  "extraction_key_slot": 0,
+  "selection_key_slot": 0,
+  "secondary_key_distinct_from_primary": true,
+  "elapsed_seconds": 2.382,
+  "response": {"status": "ok"},
+  "scope": "Single small structured-response probe; report workload latency and sustained capacity remain unverified.",
+  "application_defaults_changed": false,
+  "saved_run_assignments_changed": false
+}

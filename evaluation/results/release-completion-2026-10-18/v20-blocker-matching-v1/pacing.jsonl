@@ -1,0 +1,2 @@
+{"case_id": "BM-02", "recorded_at": "2026-10-18T05:57:48.456686+00:00", "case_index": 0, "batch_size": 1, "batch_pause_seconds": 0, "pre_submission_wait_seconds": 0.165, "excluded_from_per_report_readiness": true}
+{"case_id": "BM-03", "recorded_at": "2026-10-18T05:59:14.155882+00:00", "case_index": 1, "batch_size": 1, "batch_pause_seconds": 60, "pre_submission_wait_seconds": 60.013, "excluded_from_per_report_readiness": true}

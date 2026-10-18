@@ -1,0 +1,2 @@
+{"case_id": "BM-02", "state": "failed", "passed": false, "error_type": "HostedRateLimitError", "error_code": "MODEL_RATE_LIMITED", "retry_after_seconds": 614.9998742500029, "elapsed_seconds": 0.38}
+{"case_id": "BM-03", "state": "failed", "passed": false, "error_type": "HostedRateLimitError", "error_code": "MODEL_RATE_LIMITED", "retry_after_seconds": 327.9997180409846, "elapsed_seconds": 24.901}

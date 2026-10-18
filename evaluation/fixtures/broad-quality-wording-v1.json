@@ -1,0 +1,111 @@
+[
+  {
+    "case_id": "B19-01",
+    "text": "Sector M: installed 11 m of cable; testing stopped because the permit had expired.",
+    "report_date": "2026-10-05",
+    "trusted": true,
+    "expected_events": [
+      "actual_progress",
+      "blocker"
+    ],
+    "expected_quantity": {
+      "event": "actual_progress",
+      "quantity": "11",
+      "unit": "m"
+    },
+    "expected_fields": [
+      {
+        "event": "actual_progress",
+        "area": "Sector M",
+        "work_type": "cable_laying"
+      },
+      {
+        "event": "blocker",
+        "area": "Sector M",
+        "work_type": "other"
+      }
+    ]
+  },
+  {
+    "case_id": "B19-02",
+    "text": "Rebar installation was held because the crane broke down; 9 m3 concrete was placed in Bay K.",
+    "report_date": "2026-10-05",
+    "trusted": true,
+    "expected_events": [
+      "actual_progress",
+      "blocker"
+    ],
+    "expected_quantity": {
+      "event": "actual_progress",
+      "quantity": "9",
+      "unit": "m3"
+    },
+    "expected_fields": [
+      {
+        "event": "actual_progress",
+        "area": "Bay K",
+        "work_type": "concrete_pour"
+      },
+      {
+        "event": "blocker",
+        "area": null,
+        "work_type": "rebar_installation"
+      }
+    ]
+  },
+  {
+    "case_id": "B19-03",
+    "text": "Yesterday three joints were delivered to compound H.",
+    "report_date": "2026-10-05",
+    "trusted": true,
+    "expected_events": [
+      "material_delivery"
+    ],
+    "expected_work_date": "2026-10-04",
+    "expected_fields": [
+      {
+        "event": "material_delivery",
+        "area": "compound H",
+        "asset_tags": []
+      }
+    ]
+  },
+  {
+    "case_id": "B19-04",
+    "text": "Today two spools for line 24-XX arrived at the laydown yard in Area A.",
+    "report_date": "2026-10-05",
+    "trusted": true,
+    "expected_events": [
+      "material_delivery"
+    ],
+    "expected_work_date": "2026-10-05",
+    "expected_fields": [
+      {
+        "event": "material_delivery",
+        "area": "Area A"
+      }
+    ]
+  },
+  {
+    "case_id": "B19-05",
+    "text": "Cable laying was held for lack of access in Sector P; in Bay J, 4 m3 concrete was poured today.",
+    "report_date": "2026-10-05",
+    "trusted": true,
+    "expected_events": [
+      "actual_progress",
+      "blocker"
+    ],
+    "expected_fields": [
+      {
+        "event": "actual_progress",
+        "area": "Bay J",
+        "work_type": "concrete_pour"
+      },
+      {
+        "event": "blocker",
+        "area": "Sector P",
+        "work_type": "cable_laying"
+      }
+    ]
+  }
+]

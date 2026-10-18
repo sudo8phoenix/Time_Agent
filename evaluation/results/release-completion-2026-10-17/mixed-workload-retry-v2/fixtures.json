@@ -1,0 +1,14 @@
+[
+  {
+    "kind": "report",
+    "id": "b008a8ec-865d-475c-b2e1-eb0d47e1fe13",
+    "case_id": "C06",
+    "admitted": 0.07930358298472129
+  },
+  {
+    "kind": "conversation",
+    "id": "244eab13-3d21-4ce6-acd5-d455e1492454",
+    "case_id": "C06",
+    "admitted": 0.09080962499137968
+  }
+]

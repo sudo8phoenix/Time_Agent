@@ -1,0 +1,24 @@
+{
+  "started_at": "2026-10-17T14:57:05.958758+00:00",
+  "split": "validation",
+  "inputs_sha256": "5490be25fc42bfc338a395a1838f9a16c561f33f445e04760336390319cc723a",
+  "manifest_sha256": "5c16d4c3832541402084027712ae2bc611a470323416567500c201fad469c70e",
+  "provider": "groq",
+  "model": "openai/gpt-oss-20b",
+  "key_slot": 0,
+  "prompt_version": "extraction-v19-lifecycle-clause-completeness",
+  "prompt_sha256": "9aa60d1f7bf77c5c700133a162ac206761f65ce9f1652e7914b9ea094fb257d1",
+  "timeout_seconds": 90,
+  "rollout_flags": false,
+  "source_sha256": {
+    "backend/app/agent/runtime.py": "b6ac0ada46b5a2159fe09704d778fc7b4da6d92637fb863c5b858ef1f4caa146",
+    "backend/app/agent/schedule_decision.py": "597c21b18ef1c379580a5ae2e0608b590bb6cf5dd26165fecfce23edbec6a42d",
+    "backend/app/llm/extract.py": "dce95e95964db7ae5dceb81c49aa5cde28c3c97dc99959083c484b722fe560c0",
+    "backend/app/llm/hosted.py": "6c675058d5af419ed2de86097fa0bf3c2b5bb072c8093d2264866b27a129873e",
+    "backend/app/prompts/extraction_v1.py": "8886545a492a282ee79afc7677db80e2d47af66879ef7bc35e2b65487c7e785d",
+    "/Users/cyrilsabugeorge/Documents/python_project/site-progress-agent/evaluation/frozen_acceptance.py": "f7f799f1d610e21b3f99b8c217d794c7edd9f8e52ac796958f23541c0a433b7f"
+  },
+  "labels_read_by_capture": false,
+  "automatic_acceptance": false,
+  "scope": "Sequential real worker baseline; synthetic narrative reports; no UI/approval/connector timing"
+}

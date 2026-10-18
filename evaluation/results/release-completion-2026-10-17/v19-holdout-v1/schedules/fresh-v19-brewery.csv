@@ -1,0 +1,4 @@
+activity_id,activity_name,wbs_path,discipline,work_type,area,asset_tags,is_leaf,measurement_basis,planned_quantity,unit,planned_start,planned_finish,aliases
+BREWERY-1,pump installation at Fermentation hall,brewery/1,mechanical,equipment_installation,Fermentation hall,P-396,true,unsupported,,,2027-01-01,2027-04-30,
+BREWERY-2,pipe spool erection at Fermentation hall,brewery/2,piping,pipe_spool_erection,Fermentation hall,,true,unsupported,,,2027-01-01,2027-04-30,
+BREWERY-3,pressure testing at Fermentation hall,brewery/3,piping,other,Fermentation hall,,true,unsupported,,,2027-01-01,2027-04-30,

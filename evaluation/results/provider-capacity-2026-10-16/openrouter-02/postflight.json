@@ -1,0 +1,8 @@
+{
+  "http_status": 200,
+  "free_model_daily_requests": {
+    "used": 38,
+    "limit": 50,
+    "remaining": 12
+  }
+}

@@ -1,0 +1,38 @@
+{
+  "status": "stop_criteria_observed",
+  "duration_seconds": 54.406,
+  "stages_admitted": 1,
+  "stop_reasons": [
+    "CONTROLLER_INTERRUPTED_OR_FAILED"
+  ],
+  "records": [
+    {
+      "kind": "report",
+      "id": "a2c7145a-55da-43e3-8cd2-b3887a4ffa58",
+      "case_id": "C06",
+      "admitted": 0.07252433299436234,
+      "state": "running",
+      "state_after_shutdown": "queued",
+      "captured_events": []
+    },
+    {
+      "kind": "conversation",
+      "id": "9f6c9d72-3df4-42ef-80fb-e054c451290a",
+      "case_id": "C06",
+      "admitted": 0.08504662499763072,
+      "state": "succeeded",
+      "terminal_seconds": 4.061,
+      "state_after_shutdown": "succeeded"
+    }
+  ],
+  "worker_exit_codes": [
+    0,
+    0
+  ],
+  "rollback_applied": "Owned workers stopped; flags remain disabled; queued/checkpoint state retained for inspection",
+  "limitations": [
+    "Local synthetic mixed workload only; no UI, approvals or connector latency.",
+    "An early stop fails sustained workload acceptance.",
+    "No automatic resume or rollout advancement."
+  ]
+}

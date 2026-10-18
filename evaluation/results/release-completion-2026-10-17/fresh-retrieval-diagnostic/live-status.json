@@ -1,0 +1,189 @@
+{
+  "captured_at": "2026-10-17T06:45:32.429902+00:00",
+  "schema_revision": "0018_hosted_admission",
+  "rollout_configuration": {
+    "agent_hierarchy_enabled": false,
+    "orchestrator_model_assisted": false,
+    "meaning": "configured values only; does not attest running processes"
+  },
+  "unavailable_tables": [],
+  "jobs": {
+    "by_state": {
+      "cancelled": 4,
+      "failed": 3,
+      "ready_for_review": 7,
+      "running": 1
+    },
+    "errors_by_code": {
+      "AGENT_DEADLINE": 1,
+      "AGENT_TOOL_FAILED": 2,
+      "REHEARSAL_ABORTED": 4
+    },
+    "oldest_queued_age_seconds": null,
+    "expired_running_ownership_count": 0
+  },
+  "agent_runs": {
+    "by_state": {
+      "created": 2,
+      "failed": 3,
+      "ready_for_review": 7,
+      "running": 1
+    },
+    "errors_by_code": {
+      "AGENT_DEADLINE": 1,
+      "AGENT_TOOL_FAILED": 2
+    }
+  },
+  "conversation_tasks": {
+    "by_state": {},
+    "errors_by_code": {},
+    "oldest_queued_age_seconds": null,
+    "expired_running_ownership_count": 0
+  },
+  "hosted_provider_admission": {
+    "groq": {
+      "remaining_requests": 994,
+      "remaining_tokens": 6986,
+      "request_reset_remaining_seconds": 517,
+      "token_reset_remaining_seconds": 6,
+      "cooldown_remaining_seconds": 0,
+      "lease_remaining_seconds": null
+    },
+    "openrouter": {
+      "request_reset_remaining_seconds": 0,
+      "token_reset_remaining_seconds": 0,
+      "cooldown_remaining_seconds": 0,
+      "lease_remaining_seconds": null
+    }
+  },
+  "calls": [
+    {
+      "job_id": "58c1a626-9562-44e6-a293-465061c3dd47",
+      "current_node": "finalize",
+      "tool_name": "load_job_context",
+      "state": "succeeded",
+      "error_code": null,
+      "sanitized_output_summary": {
+        "fragment_count": 1,
+        "activity_count": 12
+      },
+      "duration_ms": 37
+    },
+    {
+      "job_id": "58c1a626-9562-44e6-a293-465061c3dd47",
+      "current_node": "finalize",
+      "tool_name": "extract_observations",
+      "state": "succeeded",
+      "error_code": null,
+      "sanitized_output_summary": {
+        "observation_count": 1,
+        "warning_count": 0,
+        "error_count": 0
+      },
+      "duration_ms": 1269
+    },
+    {
+      "job_id": "0b95170b-27f4-4617-99a9-0abc03bd2865",
+      "current_node": "analysis",
+      "tool_name": "load_job_context",
+      "state": "succeeded",
+      "error_code": null,
+      "sanitized_output_summary": {
+        "fragment_count": 1,
+        "activity_count": 12
+      },
+      "duration_ms": 39
+    },
+    {
+      "job_id": "58c1a626-9562-44e6-a293-465061c3dd47",
+      "current_node": "finalize",
+      "tool_name": "retrieve_candidates",
+      "state": "succeeded",
+      "error_code": null,
+      "sanitized_output_summary": {
+        "candidate_count": 1,
+        "warning_count": 0
+      },
+      "duration_ms": 52896
+    },
+    {
+      "job_id": "0b95170b-27f4-4617-99a9-0abc03bd2865",
+      "current_node": "analysis",
+      "tool_name": "extract_observations",
+      "state": "succeeded",
+      "error_code": null,
+      "sanitized_output_summary": {
+        "observation_count": 1,
+        "warning_count": 0,
+        "error_count": 0
+      },
+      "duration_ms": 80769
+    },
+    {
+      "job_id": "58c1a626-9562-44e6-a293-465061c3dd47",
+      "current_node": "finalize",
+      "tool_name": "select_candidate",
+      "state": "succeeded",
+      "error_code": null,
+      "sanitized_output_summary": {
+        "selected": true,
+        "candidate_count": 1,
+        "mapping_state": "suggested"
+      },
+      "duration_ms": 82567
+    },
+    {
+      "job_id": "0b95170b-27f4-4617-99a9-0abc03bd2865",
+      "current_node": "analysis",
+      "tool_name": "retrieve_candidates",
+      "state": "running",
+      "error_code": null,
+      "sanitized_output_summary": {},
+      "duration_ms": null
+    },
+    {
+      "job_id": "58c1a626-9562-44e6-a293-465061c3dd47",
+      "current_node": "finalize",
+      "tool_name": "validate_proposal_drafts",
+      "state": "succeeded",
+      "error_code": null,
+      "sanitized_output_summary": {
+        "valid": true,
+        "warning_count": 0,
+        "error_count": 0
+      },
+      "duration_ms": 8
+    },
+    {
+      "job_id": "58c1a626-9562-44e6-a293-465061c3dd47",
+      "current_node": "finalize",
+      "tool_name": "persist_review_proposals",
+      "state": "succeeded",
+      "error_code": null,
+      "sanitized_output_summary": {
+        "extracted_count": 1,
+        "proposal_count": 1,
+        "already_persisted": false
+      },
+      "duration_ms": 45
+    },
+    {
+      "job_id": "58c1a626-9562-44e6-a293-465061c3dd47",
+      "current_node": "finalize",
+      "tool_name": null,
+      "state": null,
+      "error_code": null,
+      "sanitized_output_summary": null,
+      "duration_ms": null
+    },
+    {
+      "job_id": "58c1a626-9562-44e6-a293-465061c3dd47",
+      "current_node": "finalize",
+      "tool_name": null,
+      "state": null,
+      "error_code": null,
+      "sanitized_output_summary": null,
+      "duration_ms": null
+    }
+  ]
+}

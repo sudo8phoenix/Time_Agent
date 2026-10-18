@@ -1,0 +1,36 @@
+{
+  "v1_groq": {
+    "cases": 0,
+    "ready": 0,
+    "mapping_correct": 0,
+    "safe_abstentions": 0,
+    "abstention_cases": 0,
+    "quantity_correct": 0,
+    "quantity_cases": 0,
+    "unsupported_persisted_evidence": 0,
+    "ledger_writes": 0,
+    "model_calls": 0,
+    "planner_calls": 0,
+    "failed_model_calls": 0,
+    "median_ms": null,
+    "failure_codes": []
+  },
+  "v2_super_vl": {
+    "cases": 1,
+    "ready": 0,
+    "mapping_correct": 0,
+    "safe_abstentions": 0,
+    "abstention_cases": 1,
+    "quantity_correct": 0,
+    "quantity_cases": 0,
+    "unsupported_persisted_evidence": 0,
+    "ledger_writes": 0,
+    "model_calls": 0,
+    "planner_calls": 0,
+    "failed_model_calls": 0,
+    "median_ms": 33,
+    "failure_codes": [
+      "EVALUATION_RUNTIME_FAILED"
+    ]
+  }
+}

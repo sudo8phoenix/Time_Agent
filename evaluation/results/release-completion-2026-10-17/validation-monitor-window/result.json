@@ -1,0 +1,14 @@
+{
+  "finished_at": "2026-10-17T07:19:06.163001+00:00",
+  "status": "bounded_baseline_window_completed",
+  "duration_seconds": 120.027,
+  "sample_count": 25,
+  "stop_reasons": [],
+  "rollout_flags_enabled": false,
+  "action": "Retain baseline evidence; no rollout enablement authorized by this monitor",
+  "limitations": [
+    "A two-minute local baseline window is not sustained deployment acceptance.",
+    "Monitor is read-only; it does not kill workers or accept progress.",
+    "Conversation rollback/recovery has separate populated-state evidence."
+  ]
+}

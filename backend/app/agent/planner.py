@@ -21,12 +21,14 @@ def create_planner(settings: Any, *, timeout: float,
     """Validate the persisted orchestrator assignment and return its chat callable.
 
     This guard is intentionally independent of runtime.py so configuration errors
-    cannot create an import cycle. It accepts only explicit OpenRouter model IDs
-    from the maintained free-model allowlist.
+    cannot create an import cycle. Only explicitly supported provider/model pairs
+    are accepted; saved OpenRouter assignments remain valid.
     """
     provider = getattr(settings, "orchestrator_provider", None)
     model = getattr(settings, "orchestrator_model", None)
-    if provider != "openrouter" or model not in ALLOWED_PLANNER_MODELS:
+    supported = ((provider == "openrouter" and model in ALLOWED_PLANNER_MODELS)
+                 or (provider == "groq" and model == "openai/gpt-oss-120b"))
+    if not supported:
         raise PlannerConfigurationError("Unsupported planner configuration")
 
     if adapter_factory is None:

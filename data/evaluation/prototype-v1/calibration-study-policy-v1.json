@@ -1,0 +1,24 @@
+{
+  "version": "prototype-calibration-study-policy-v1",
+  "frozen_before_truth_scoring_at": "2026-10-17T07:22:04.451139+00:00",
+  "policy": {
+    "target_precision": 0.98,
+    "min_support": 20
+  },
+  "review_policy": "owner_authorized_ai_assisted",
+  "estimator": "evidence-support-index-v1",
+  "score_meaning": "structural_review_priority_index_not_probability",
+  "runtime_policy_installation": false,
+  "label_free_estimates_sealed_before_label_parsing": true,
+  "eligible_events": "Only frozen validation events with all date fields declared scored; exclusions are not based on outcomes.",
+  "hashes": {
+    "evaluation/confidence_estimator.py": "2e2fcf0952a2c0f536070468807865306ae701faddfffa8e612737e6bb9bb109",
+    "data/evaluation/prototype-v1/manifest-v2.json": "4e5fa24bb13181f642799733f6dfc628e9abcf7a5c926870cf27397a3a609ed8",
+    "docs/evaluation-targets-approved-2026-10-16.json": "354ff9726857a8bad2d67c0157594ff965780fa2d4f9dbed5d4439efaf81ed93"
+  },
+  "limitations": [
+    "Small synthetic evidence only.",
+    "Category support can be below 20; null thresholds are required when unsupported.",
+    "All updates require authorized acceptance."
+  ]
+}

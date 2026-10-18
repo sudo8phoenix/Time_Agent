@@ -1,0 +1,10 @@
+{
+  "cases": 2,
+  "passed": 0,
+  "failures": [
+    "BM-02",
+    "BM-03"
+  ],
+  "scope": "Development component matching with supplied observations, not unseen extraction or end-to-end acceptance",
+  "domain_writes": 0
+}

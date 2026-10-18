@@ -1,0 +1,4 @@
+activity_id,activity_name,aliases,area,asset_tags,discipline,is_leaf,measurement_basis,planned_finish,planned_quantity,planned_start,unit,wbs_path,work_type
+VS7,Erect portal S-7,,,S-7,structural,true,quantity_ratio,2026-12-20,1,2026-11-01,each,SYNTHETIC/VS7,structural_erection
+VW7,Weld portal S-7 joints,,,S-7,structural,true,quantity_ratio,2026-12-20,20,2026-11-01,joint,SYNTHETIC/VW7,welding
+VW8,Weld portal S-8 joints,,,S-8,structural,true,quantity_ratio,2026-12-20,20,2026-11-01,joint,SYNTHETIC/VW8,welding

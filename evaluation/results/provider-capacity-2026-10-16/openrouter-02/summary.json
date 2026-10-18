@@ -1,0 +1,23 @@
+{
+  "scope": "bounded synthetic probe, not production saturation certification",
+  "providers": {
+    "groq": {
+      "requests": 0,
+      "successes": 0,
+      "submitted_concurrency_max": 0,
+      "network_concurrency_max": 0,
+      "network_requests": 0,
+      "errors": [],
+      "elapsed_span_ms": 0
+    },
+    "openrouter": {
+      "requests": 8,
+      "successes": 8,
+      "submitted_concurrency_max": 2,
+      "network_concurrency_max": 1,
+      "network_requests": 8,
+      "errors": [],
+      "elapsed_span_ms": 63816
+    }
+  }
+}

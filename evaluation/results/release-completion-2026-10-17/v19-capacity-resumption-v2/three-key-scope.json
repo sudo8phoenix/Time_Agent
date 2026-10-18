@@ -1,0 +1,11 @@
+{
+  "recorded_at": "2026-10-17T15:29:26.742113+00:00",
+  "same_organization": true,
+  "basis": "User confirmed all three Groq keys belong to the same organization in this session",
+  "inference_key_slot": 0,
+  "all_three_keys_authorized_if_required": true,
+  "shared_organization_admission_retained": true,
+  "cross_key_rate_limit_fallback": false,
+  "documentation": "https://console.groq.com/docs/rate-limits",
+  "meaning": "All three distinct configured keys authenticate; they do not provide independent organization quotas."
+}

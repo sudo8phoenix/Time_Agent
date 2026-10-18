@@ -1,0 +1,42 @@
+{
+  "V19-canal-lock": [
+    "b17f5429-2b29-443b-80d8-5d430c34abd5",
+    "59ca6e3b-c06c-4f43-8b34-7dc7fa13d6b7",
+    "2762eef3-9bd8-4f03-8743-f9c4596b1dc2"
+  ],
+  "V19-cold-store": [
+    "c5fcf510-9ba2-4120-877e-d67fbd39f40c",
+    "945da70a-7239-48ef-9434-35d267b72fbf",
+    "6cfa52a3-297b-4c92-b3f9-5fdcbc36d3ed"
+  ],
+  "V19-desalination": [
+    "31d2dcb5-a519-4b99-93a3-8fa139db32d5",
+    "2b909082-9374-406e-b4c0-d938934e281b",
+    "7c33a36d-3634-4c10-b2a0-23afaef31f4f"
+  ],
+  "V19-grain-terminal": [
+    "cafe2c9f-1364-4d8c-8ae8-b15eddfa2cd5",
+    "4efdf715-08c2-4e8a-bd33-1a90e424dd19",
+    "c09984e4-b032-47a8-b80f-375e9e7aa6da"
+  ],
+  "V19-library": [
+    "31fd874e-afb0-452d-b852-c28d76148b3f",
+    "04fe447e-c6df-4299-949f-be8db61b7be3",
+    "edd90078-7d60-49a9-85ce-47d6b6ad0bd7"
+  ],
+  "V19-reservoir": [
+    "dbc5ba59-c7b9-4874-bc48-bbed62689d10",
+    "f674bb6b-003b-46fa-9f5a-4e15fe794293",
+    "0a9b2014-c502-4ead-a2db-80fbc40b85f8"
+  ],
+  "V19-solar-farm": [
+    "dd24bf95-c378-443a-afc4-5114f1d7e174",
+    "e247324a-bc30-448d-8acf-e3c32e14c57c",
+    "64a4edfd-d353-4c24-9f64-4f022e7f3856"
+  ],
+  "V19-tramway": [
+    "6458dad9-3fdd-4275-8361-fe6a4dc21a4a",
+    "78590d91-5cc3-41ac-b308-d8e4558dbaa2",
+    "dc33554c-2c80-4466-9f87-1717d010f945"
+  ]
+}

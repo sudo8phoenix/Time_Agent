@@ -1,0 +1,5 @@
+{"case_id": "C06", "stage": "retrieval", "ok": false, "error_type": "HostedCapacityError"}
+{"case_id": "DM-02", "stage": "retrieval", "ok": false, "error_type": "HostedCapacityError"}
+{"case_id": "DM-03", "stage": "retrieval", "ok": false, "error_type": "HostedCapacityError"}
+{"case_id": "DM-04", "stage": "retrieval", "ok": false, "error_type": "HostedCapacityError"}
+{"case_id": "DM-05", "stage": "retrieval", "ok": false, "error_type": "HostedCapacityError"}

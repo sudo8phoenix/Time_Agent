@@ -1,0 +1,37 @@
+{
+  "at": "2026-10-15T19:36:00.387332+00:00",
+  "unit_tests_passed": 376,
+  "integration_tests_passed": 188,
+  "scoped_ruff": "passed",
+  "diff_check": "passed",
+  "agent_hierarchy_enabled": false,
+  "orchestrator_model_assisted": false,
+  "migration_applied_only_to": "progress_test",
+  "production_migrated": false,
+  "deployed": false,
+  "source_sha256": {
+    "backend/app/prompts/extraction_v1.py": "668fc89ed91a5270806b97e23dda4da05a1c66a1e6c0957ee890ea55ef34f533",
+    "backend/app/llm/extract.py": "163663152358cd8d469f53caa2da745c06f00f18365977e4e1153545a48d866c",
+    "backend/app/llm/hosted.py": "56d2032ec330f0786557bd3ed226c9a7e015eae3bf82de4d964fca2ae27f0ae5",
+    "backend/app/llm/capacity.py": "ceacf23927f9de6946cf97c0c6a68586a9a94f991fab0d63da628fbf7cacb5bf",
+    "backend/app/agent/runtime.py": "4cdde8b8d3b32e8625494f91e0410da77a338cf1b024df4ab78e355a28582779",
+    "backend/app/agent/schedule_decision.py": "78d586b19d28315d76168e2cab9080c2b39f1ef4290a5bf21e70151f42c28753",
+    "backend/app/db/models.py": "34362c36dee34decb1a1972b31dbadde80f28c119134df5592632c36cf33a301",
+    "backend/migrations/versions/0018_hosted_admission.py": "962fd3a5e6068b6331d1d9f3ace2c88b148e115b9d41d9e6a402c618c5dfb5ed",
+    "backend/tests/unit/test_extraction.py": "c4bb5619c35bde2a5320364e481f4d04f86238327f3ac27f17f31e7022930f58",
+    "backend/tests/unit/test_hosted_capacity.py": "074d0818a370f54dc12cc23472cc858d623f08610deeb46b4003d64aeddea68d",
+    "backend/tests/unit/test_agent_schedule_decision.py": "e7391e357bb830bd149c42d5e7d14a5cce733e4d2c0f6e8853b4ca9a1baa535c",
+    "backend/tests/integration/test_hosted_admission.py": "3254aa7a70c7c35200af7a6ae0deb0baffc0cef899d9a3af66b2463bcfd9fd1a",
+    "backend/tests/integration/agent/test_extraction_prompt_pinning.py": "a83902e58dba3d633cab6c76f6c8fba6260e2ce205b90c6086a660154ac089be",
+    "backend/tests/integration/agent/test_provider_failure_ownership.py": "5df1f18e0028c0b715bd0cbae707cb89cf7624c4ef8605994cf125107fdb88a7",
+    "backend/tests/integration/test_durable_conversations.py": "a11ea564f5ebf2c3dd3340eeea82aae593a80d79c1fa392e533eee95fbf632f7",
+    "evaluation/extraction_quality.py": "ea588fa1fdf5edc05f979ff49a94acfae21d54dd558b0d8e7cde015e0897d929",
+    "evaluation/provider_capacity.py": "cc6496b97205a4f273bbbd2027f9c1b96ca6f4c9afc3a7ac7299728d40438d7c",
+    "ops/backup.py": "fda034e941ef955340a7301a50f5a7c71a8a5ce6137f0e59fb370df1d1c41e34",
+    "ops/restore_verify.py": "0f574fd25ca9510109589ab39120807307f6261ab15460a7979bcb1ee4889069"
+  },
+  "configured_secret_scan": {
+    "passed": true,
+    "files_matching": []
+  }
+}

@@ -1,0 +1,25 @@
+{
+  "all_source_recovery_hashes_unchanged": true,
+  "tables": {
+    "agent_runs": true,
+    "agent_steps": true,
+    "agent_tool_calls": true,
+    "schedule_source_metadata": true,
+    "conversations": true,
+    "agent_tasks": true,
+    "conversation_tasks": true,
+    "conversation_task_calls": true,
+    "conversation_turns": true,
+    "integration_outbox": true,
+    "activity_states": true,
+    "progress_events": true,
+    "observations": true,
+    "proposals": true,
+    "audit_events": true,
+    "jobs": true,
+    "hosted_provider_admission": true
+  },
+  "restore_pre_resume_verification": "ops/restore_verify.py returned verified=true for schema 0018 and all recovery rows before intentional replay mutations",
+  "source_database": "progress_rehearsal_recovery_20261017",
+  "restored_database": "progress_restore_populated_20261017"
+}

@@ -1,0 +1,16 @@
+{
+  "finished_at": "2026-10-17T07:44:50.327820+00:00",
+  "status": "stop_criteria_observed",
+  "duration_seconds": 600.022,
+  "sample_count": 121,
+  "stop_reasons": [
+    "PROVIDER_COOLDOWN_EXCEEDS_CAPTURE_REQUEST_BUDGET"
+  ],
+  "rollout_flags_enabled": false,
+  "action": "Do not advance rollout; retain bounded diagnostic capture",
+  "limitations": [
+    "A 600-second local monitoring window alone does not establish sustained deployment acceptance.",
+    "Monitor is read-only; it does not kill workers or accept progress.",
+    "Conversation rollback/recovery has separate populated-state evidence."
+  ]
+}

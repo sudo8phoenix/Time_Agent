@@ -1,0 +1,199 @@
+{
+  "reviewer_kind": "ai_technical_review_not_human",
+  "review_date": "2026-10-16",
+  "scope": "Field-level semantic comparison of the wording fixture, captured predictions, and raw model outputs. This is not independent human adjudication.",
+  "source_files": {
+    "evaluation/fixtures/quality-wording-variants.json": {
+      "sha256": "875bb23546cd3ea281842145b77862dda7856fa846c3eeb7439fe243693f6728"
+    },
+    "evaluation/results/quality-gap-fixes-2026-10-16/v12-wording-09/predictions.jsonl": {
+      "sha256": "45cd5c70a5520a9f6ab894aa6219f55930132c415e54bc7eb9e15c068bf9ca0e"
+    },
+    "evaluation/results/quality-gap-fixes-2026-10-16/v12-wording-09/model-outputs.jsonl": {
+      "sha256": "57df7ea09388dbde336a620ad207b4685d11bd0d99823667bee4a52d27b1ec00"
+    }
+  },
+  "overall_findings": [
+    "The 7/7 component metric does not cover every field: it passes Q01 and Q02 despite the definite location/work-type errors recorded here.",
+    "Quantity/unit clearing for planned_work, material_delivery, and no_work is deliberate normalized-domain policy. Source amounts may remain in summary; null normalized quantities are not extraction defects.",
+    "The review distinguishes definite field errors from conservative choices where the source does not establish an event date. All labels and scores remain synthetic development checks, not human-adjudicated ground truth."
+  ],
+  "cases": [
+    {
+      "case_id": "Q01",
+      "review_classification": "definite_field_errors",
+      "supported_fields": {
+        "actual_progress": {
+          "event_type": "actual_progress",
+          "work_type": "cable_laying",
+          "quantity": "8",
+          "unit": "m",
+          "quantity_kind": "delta",
+          "work_date": "2026-09-30",
+          "date_basis": "report_context",
+          "status": "completed"
+        },
+        "blocker": {
+          "event_type": "blocker",
+          "work_type": "other",
+          "status": "blocked",
+          "blocker": "testing suspended because the access permit expired",
+          "work_scope": "testing (descriptive source scope; not asserted as a schema enum)"
+        },
+        "shared": {
+          "discipline": "electrical",
+          "area": "Zone C",
+          "evidence_quote": "Zone C: installed 8 m of cable; testing suspended because the access permit expired."
+        }
+      },
+      "semantic_concerns": [
+        {
+          "classification": "definite_error",
+          "field": "area",
+          "observation": "Both observations have area=null and asset_tags=[] although the report explicitly locates the work in Zone C.",
+          "impact": "Drops a directly stated location."
+        },
+        {
+          "classification": "definite_error",
+          "field": "blocker.work_type",
+          "observation": "The blocker is classified as cable_laying, inherited from the separate cable installation event. The blocked work described in the source is testing; the canonical work_type for that scope is unresolved and should be reviewed.",
+          "impact": "Conflates separate work scopes and may route the blocker to the wrong schedule activity; do not substitute a non-enum work_type."
+        }
+      ],
+      "score_coverage_note": "Passing quantity/event checks do not cover the omitted area or event-specific blocker work type."
+    },
+    {
+      "case_id": "Q02",
+      "review_classification": "one_definite_error_one_conservative_ambiguity",
+      "supported_fields": {
+        "blocker": {
+          "event_type": "blocker",
+          "work_type": "rebar_installation",
+          "status": "blocked",
+          "blocker": "The crane was unavailable, so reinforcement fixing was held"
+        },
+        "actual_progress": {
+          "event_type": "actual_progress",
+          "work_type": "concrete_pour",
+          "status": "completed",
+          "quantity": "7",
+          "unit": "m3",
+          "quantity_kind": "delta",
+          "area": "Bay D"
+        },
+        "report_context": {
+          "report_date": "2026-09-30",
+          "trusted": true
+        }
+      },
+      "semantic_concerns": [
+        {
+          "classification": "unsupported_cross_clause_inference_requiring_adjudication",
+          "field": "blocker.area",
+          "observation": "The blocker observation says area=Bay D, but Bay D appears only in the separate concrete-pour clause. The source does not establish whether the reinforcement blocker also occurred in Bay D; assigning it appears to infer location across clauses and requires adjudication.",
+          "impact": "May incorrectly associate the blocker with the concrete location; retain as unresolved pending domain review."
+        },
+        {
+          "classification": "conservative_ambiguity",
+          "field": "work_date",
+          "observation": "Both observations have work_date=null. The report date is trusted context, but the source does not say that either event happened 'today' or otherwise explicitly align the event date with the report date.",
+          "impact": "Leaving the event date unknown is a conservative choice; the fixture does not make the report date an independently asserted actual-event date."
+        }
+      ],
+      "score_coverage_note": "The 7/7 component metric does not inspect blocker-location bleed. Unknown event dates are not counted as errors by the supplied fixture."
+    },
+    {
+      "case_id": "Q03",
+      "review_classification": "no_semantic_defect_identified",
+      "supported_fields": {
+        "event_type": "planned_work",
+        "work_type": "concrete_pour",
+        "area": "Bay E",
+        "source_amount": "9 m3",
+        "work_date": "2026-10-01",
+        "date_basis": "relative_resolved",
+        "status": "unknown"
+      },
+      "semantic_concerns": [],
+      "normalization_note": "Quantity/unit are intentionally cleared for planned_work observations. The source amount remains in summary; null normalized quantity/unit is expected policy behavior, not extraction loss.",
+      "score_coverage_note": "The component score checks planned event and date, not every descriptive field."
+    },
+    {
+      "case_id": "Q04",
+      "review_classification": "definite_location_field_error",
+      "supported_fields": {
+        "event_type": "material_delivery",
+        "source_amount": "4 joints",
+        "work_date": "2026-09-29",
+        "date_basis": "relative_resolved",
+        "location": "compound Z"
+      },
+      "semantic_concerns": [
+        {
+          "classification": "definite_error",
+          "field": "area/asset_tags",
+          "observation": "The prediction puts compound Z in asset_tags and leaves area null. Compound Z is the delivery location, not an asset tag.",
+          "impact": "Misstates the location field and can corrupt location-based matching."
+        }
+      ],
+      "normalization_note": "Quantity/unit are intentionally cleared for material_delivery observations. The source amount remains in summary; null normalized quantity/unit is expected policy behavior, not extraction loss.",
+      "taxonomy_note": "work_type=other is retained as a supported enum value; this review does not assert a more specific canonical work-type mapping."
+    },
+    {
+      "case_id": "Q05",
+      "review_classification": "no_semantic_defect_identified",
+      "supported_fields": {
+        "event_type": "actual_progress",
+        "source_activity": "painting",
+        "status": "in_progress",
+        "work_date": "2026-09-30",
+        "date_basis": "report_context",
+        "blocker": null
+      },
+      "semantic_concerns": [],
+      "taxonomy_note": "The work_type enum has no painting value, so work_type=other is the supported enum choice. The source wording 'Painting continued...' is preserved in summary. Rain explicitly did not stop the work, so no blocker is appropriate."
+    },
+    {
+      "case_id": "Q06",
+      "review_classification": "no_semantic_defect_identified",
+      "supported_fields": {
+        "event_type": "planned_work",
+        "work_type": "welding",
+        "source_amount": "4 joints",
+        "work_date": null,
+        "date_basis": "unknown",
+        "status": "unknown"
+      },
+      "semantic_concerns": [],
+      "normalization_note": "Quantity/unit are intentionally cleared for planned_work observations; the source amount remains in summary. Since report_date is absent and untrusted, leaving 'tomorrow' unresolved is correct."
+    },
+    {
+      "case_id": "Q07",
+      "review_classification": "safe_conflict_handling_in_prediction; raw_output_was_unsafe",
+      "supported_fields": {
+        "event_type": "material_delivery",
+        "source_amount": "6 spools",
+        "date_conflict": {
+          "header": "2026-09-30",
+          "body_today": "2026-10-02"
+        },
+        "prediction_work_date": null,
+        "warning": "Conflicting report/current-day dates require reviewer clarification."
+      },
+      "semantic_concerns": [
+        {
+          "classification": "raw_model_output_concern",
+          "field": "work_date",
+          "observation": "The raw model output chose 2026-10-02 without a warning despite the 2026-09-30 header. The captured prediction instead keeps work_date null and includes a conflict warning.",
+          "impact": "The persisted prediction handles the contradiction safely; retain concern about the raw model output's unsupported date selection."
+        }
+      ],
+      "normalization_note": "Quantity/unit are intentionally cleared for material_delivery observations; the source amount remains in summary. This is expected normalized behavior, not extraction loss."
+    }
+  ],
+  "limitations": [
+    "This AI technical review compares only the supplied wording fixture and captured artifacts; it is not independent human adjudication.",
+    "It does not change labels, predictions, scores, or domain taxonomy decisions.",
+    "Confirmed field concerns are Q01's dropped Zone C and cross-event blocker work-type bleed, Q02's unsupported Bay D cross-clause inference requiring adjudication, and Q04's location in asset_tags. Q02's unknown date is conservative ambiguity; Q07's captured prediction handles the date conflict safely although the raw model output does not."
+  ]
+}

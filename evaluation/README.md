@@ -48,7 +48,7 @@ identify its inputs, model digest, prompt/settings, denominators and limitations
 
 ## Local evidence availability
 
-The current workspace contains runners, scorers and raw/combined captures. Some remain uncommitted/unpushed, so verify availability before reproducing from a fresh checkout. Historical documentation-only publications did not include every local artifact. Documentation updates do not publish these files or establish acceptance.
+The candidate publication includes runners, scorers, reproducible fixtures and saved captures. Local imported schedule copies, credentials, runtime databases and logs remain excluded. Historical documentation-only publications did not include every artifact; the [publication record](../docs/publication-2026-10-18.md) records the expanded scope. Published captures retain their original candidate hashes and failures; publication does not establish acceptance.
 
 ## Completed compact Gemma benchmark
 

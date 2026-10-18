@@ -1,6 +1,6 @@
 {
   "schema_version": 1,
-  "owner_package_status": "not_received",
+  "owner_package_status": "not_expected",
   "selected_snapshot": "gt10:GT10BLDG_v1_P6_export.xlsx",
   "sources": [
     {
@@ -78,5 +78,6 @@
     "WBS differences",
     "native XER missing"
   ],
-  "distribution_gate": "Retain MIT copyright/license notice with GT10 derivatives; Cambridge attribution/license review remains required."
+  "distribution_gate": "Retain MIT copyright/license notice with GT10 derivatives; Cambridge attribution/license review remains required.",
+  "owner_scope_decision": "docs/prototype-scope-2026-10-17.json"
 }

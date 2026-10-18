@@ -25,3 +25,7 @@ mock-pmis.sqlite3*
 # Recursive editor/cache artifacts
 **/.DS_Store
 **/__pycache__/
+
+# Local imported schedules and operator notes; application fixtures live in data/synthetic.
+/data/schedules/
+/terminal-commands.txt

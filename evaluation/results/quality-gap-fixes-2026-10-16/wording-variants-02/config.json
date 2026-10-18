@@ -1,0 +1,12 @@
+{
+  "started_at": "2026-10-15T19:19:11.632919+00:00",
+  "prompt_version": "extraction-v11-exact-evidence-coverage",
+  "prompt_sha256": "b3fdf7a9ec0aa8a30183e69adbbb139c4dceb566071fbb00f179557c20216f40",
+  "fixture_sha256": "875bb23546cd3ea281842145b77862dda7856fa846c3eeb7439fe243693f6728",
+  "provider": "groq",
+  "model": "openai/gpt-oss-20b",
+  "key_slot": 0,
+  "transport_retries": 0,
+  "timeout_seconds": 60,
+  "scope": "fresh wording synthetic component development checks; no persistence or approvals"
+}

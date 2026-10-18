@@ -1,0 +1,12 @@
+{
+  "cases": 5,
+  "completed": 2,
+  "passed": 2,
+  "failures": [
+    "B19-03",
+    "B19-04",
+    "B19-05"
+  ],
+  "independent_human_adjudication": false,
+  "domain_writes": 0
+}

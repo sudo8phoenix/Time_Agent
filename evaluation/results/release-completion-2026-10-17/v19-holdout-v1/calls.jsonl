@@ -1,0 +1,8 @@
+{"case_id": "H19-observatory", "stage": "extraction", "ok": false, "error_type": "HostedRateLimitError"}
+{"case_id": "H19-ferry-pier", "stage": "extraction", "ok": false, "error_type": "HostedCapacityError"}
+{"case_id": "H19-brewery", "stage": "extraction", "ok": false, "error_type": "HostedCapacityError"}
+{"case_id": "H19-recycling-plant", "stage": "extraction", "ok": false, "error_type": "HostedCapacityError"}
+{"case_id": "H19-theatre", "stage": "extraction", "ok": false, "error_type": "HostedCapacityError"}
+{"case_id": "H19-aquarium", "stage": "extraction", "ok": false, "error_type": "HostedCapacityError"}
+{"case_id": "H19-paper-mill", "stage": "extraction", "ok": false, "error_type": "HostedCapacityError"}
+{"case_id": "H19-mountain-tunnel", "stage": "extraction", "ok": false, "error_type": "HostedCapacityError"}

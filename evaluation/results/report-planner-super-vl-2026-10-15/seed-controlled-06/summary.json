@@ -1,0 +1,42 @@
+{
+  "v1_groq": {
+    "cases": 6,
+    "ready": 5,
+    "mapping_correct": 5,
+    "safe_abstentions": 3,
+    "abstention_cases": 3,
+    "quantity_correct": 2,
+    "quantity_cases": 4,
+    "unsupported_persisted_evidence": 0,
+    "ledger_writes": 0,
+    "model_calls": 15,
+    "live_request_count": 15,
+    "replayed_calls": 0,
+    "planner_calls": 0,
+    "failed_model_calls": 1,
+    "median_ms": 40205.5,
+    "failure_codes": [
+      "JOB_LEASE_LOST"
+    ]
+  },
+  "v2_super_vl": {
+    "cases": 6,
+    "ready": 5,
+    "mapping_correct": 5,
+    "safe_abstentions": 3,
+    "abstention_cases": 3,
+    "quantity_correct": 2,
+    "quantity_cases": 4,
+    "unsupported_persisted_evidence": 0,
+    "ledger_writes": 0,
+    "model_calls": 32,
+    "live_request_count": 17,
+    "replayed_calls": 15,
+    "planner_calls": 17,
+    "failed_model_calls": 1,
+    "median_ms": null,
+    "failure_codes": [
+      "AGENT_INTERNAL_ERROR"
+    ]
+  }
+}

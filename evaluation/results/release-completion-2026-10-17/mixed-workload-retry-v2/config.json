@@ -1,0 +1,22 @@
+{
+  "started_at": "2026-10-17T07:46:13.880082+00:00",
+  "duration_budget_seconds": 600,
+  "stage_interval_seconds": 150,
+  "worker_count": 2,
+  "initial_stage": {
+    "reports": 1,
+    "conversations": 1
+  },
+  "later_stages": {
+    "reports": 2,
+    "conversations": 2
+  },
+  "readiness_stop_seconds": 120,
+  "cooldown_stop_seconds": 90,
+  "automatic_acceptance": false,
+  "rollout_flags": false,
+  "provider": "groq",
+  "model": "openai/gpt-oss-20b",
+  "retains_fixtures": true,
+  "rollback": "Stop new admission; SIGTERM owned workers, allow 100s drain, then kill if needed. Preserve checkpoints and queued work for inspection. Never resume automatically."
+}

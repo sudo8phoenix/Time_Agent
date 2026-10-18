@@ -16,8 +16,8 @@ from typing import Any, Callable, Mapping, Sequence
 from pydantic import ValidationError
 
 from ..schemas.observation import Observation, ObservationBatch
-from ..schemas.common import EventType, DateBasis, QuantityKind
-from ..prompts.extraction_v1 import LEGACY_PROMPT_VERSION, V11_PROMPT_VERSION, get_extraction_prompt
+from ..schemas.common import EventType, DateBasis, QuantityKind, WorkType
+from ..prompts.extraction_v1 import LEGACY_PROMPT_VERSION, EVIDENCE_COVERAGE_VERSIONS, V18_PROMPT_VERSION, V19_PROMPT_VERSION, V20_PROMPT_VERSION, SOURCE_NORMALIZATION_VERSIONS, CLAUSE_NORMALIZATION_VERSIONS, get_extraction_prompt
 
 MAX_BATCH_CHARS = 12000
 MAX_FRAGMENTS = 8
@@ -97,10 +97,12 @@ def _context(batch: BatchInput) -> str:
     return header + "\n\n".join(f"[{f.fragment_id} | {f.locator}]\n{f.text}" for f in batch.fragments)
 
 
-def _restore_non_actual_date(observation: Observation, batch: BatchInput) -> Observation:
+def _restore_non_actual_date(observation: Observation, batch: BatchInput, *, correct_context=False) -> Observation:
     """Restore one unambiguous relative day from validated quoted source only."""
     if (observation.event_type not in {EventType.planned_work, EventType.material_delivery}
-            or observation.work_date is not None or observation.date_basis != DateBasis.unknown
+            or not ((observation.work_date is None and observation.date_basis == DateBasis.unknown)
+                or (correct_context and (observation.date_basis == DateBasis.relative_resolved or
+                    (observation.date_basis == DateBasis.report_context and observation.work_date == batch.report_date))))
             or not batch.report_date_trusted or batch.report_date is None
             or _conflicting_today_context(observation, batch)):
         return observation
@@ -127,8 +129,118 @@ def _restore_non_actual_date(observation: Observation, batch: BatchInput) -> Obs
     index = evidence.index(chosen[0][1])
     if "work_date" not in evidence[index].fields and len(evidence[index].fields) < 30:
         evidence[index] = evidence[index].model_copy(update={"fields": [*evidence[index].fields, "work_date"]})
-    return observation.model_copy(update={"work_date": resolved,
-        "date_basis": DateBasis.relative_resolved, "evidence": evidence})
+    updates = {"work_date": resolved, "date_basis": DateBasis.relative_resolved, "evidence": evidence}
+    if observation.work_date is not None and observation.work_date != resolved:
+        updates["warnings"] = [*observation.warnings[:29],
+            "Report-context date corrected to the exact source-stated relative day."]
+    return observation.model_copy(update=updates)
+
+
+def _unwrap_exact_source_quotes(observation: Observation, batch: BatchInput) -> Observation:
+    """Remove only exact application-rendered wrappers, never rewrite source text."""
+    by_id = {fragment.fragment_id: fragment for fragment in batch.fragments}
+    changed = False
+    def repair(evidence):
+        nonlocal changed
+        fragment = by_id.get(evidence.fragment_id)
+        if fragment is None or len(fragment.text) > 2000:
+            return evidence
+        wrapper = f"[{fragment.fragment_id} | {fragment.locator}]\n{fragment.text}"
+        context = (f"Trusted report date: {batch.report_date.isoformat()}\n"
+                   if batch.report_date_trusted and batch.report_date else "") + wrapper
+        if evidence.quote in {wrapper, context} and evidence.quote != fragment.text:
+            changed = True
+            return evidence.model_copy(update={"quote": fragment.text})
+        return evidence
+    evidence = [repair(e) for e in observation.evidence]
+    effects = [effect.model_copy(update={"evidence": [repair(e) for e in effect.evidence]})
+               for effect in observation.lifecycle_effects]
+    if not changed:
+        return observation
+    return observation.model_copy(update={"evidence": evidence, "lifecycle_effects": effects,
+        "warnings": [*observation.warnings[:29], "Exact input wrapper removed from source evidence quote."]})
+
+
+def _remove_repeated_source_heading(observation: Observation, batch: BatchInput) -> Observation:
+    """Remove a copied leading heading only before a unique exact source span.
+
+    This never repairs words, punctuation or fragment identity. Restrict the
+    heading to the source's first line and refuse another non-clock colon in
+    intervening text, where a new heading could have changed ownership.
+    """
+    sources = {f.fragment_id: f.text for f in batch.fragments}
+    changed = False
+
+    def repair(evidence):
+        nonlocal changed
+        source = sources.get(evidence.fragment_id)
+        if not source or evidence.quote in source:
+            return evidence
+        heading = re.match(r"[^:\n]{1,120}:\s+", source)
+        if heading is None or not evidence.quote.startswith(heading.group()):
+            return evidence
+        body = evidence.quote[len(heading.group()):]
+        if not body.strip() or source.count(body) != 1:
+            return evidence
+        offset = source.index(body)
+        if offset < heading.end() or re.search(r"(?<!\d):|:(?!\d)", source[heading.end():offset]):
+            return evidence
+        changed = True
+        return evidence.model_copy(update={"quote": body})
+
+    evidence = [repair(e) for e in observation.evidence]
+    effects = [effect.model_copy(update={"evidence": [repair(e) for e in effect.evidence]})
+               for effect in observation.lifecycle_effects]
+    if not changed:
+        return observation
+    return observation.model_copy(update={"evidence": evidence, "lifecycle_effects": effects,
+        "warnings": [*observation.warnings[:29], "Repeated source heading removed before unique exact evidence span."]})
+
+
+def _normalise_explicit_blocker_clause(observation: Observation, batch: BatchInput) -> Observation:
+    """Ground a blocker in one uniquely identified source work clause.
+
+    This is deliberately narrow: no event creation, schedule matching or nearest
+    clause guesses. Multiple matching scopes remain unresolved for review.
+    """
+    if observation.event_type != EventType.blocker:
+        return observation
+    patterns = {
+        WorkType.rebar_installation: r"\b(?:reinforcement\s+fixing|fixing\s+(?:reinforcement|rebar)|rebar\s+(?:fixing|installation))\b",
+        WorkType.welding: r"\bwelding\b",
+        WorkType.other: r"\b(?:testing|inspection|painting)\b",
+    }
+    matched = [(kind, pattern) for kind, pattern in patterns.items()
+               if re.search(pattern, observation.summary, re.I)]
+    if len(matched) != 1:
+        return observation
+    kind, pattern = matched[0]
+    fragments = {f.fragment_id: f for f in batch.fragments}
+    ids = {e.fragment_id for e in observation.evidence}
+    if len(ids) != 1 or not ids <= fragments.keys():
+        return observation
+    source = fragments[next(iter(ids))].text
+    clauses = source.split(";")
+    own = [clause for clause in clauses if re.search(pattern, clause, re.I)]
+    if len(own) != 1:
+        return observation
+    updates = {}
+    if observation.work_type != kind:
+        updates["work_type"] = kind
+    area = observation.area
+    # Only an explicit location heading is shared. An asset ID or a cause label
+    # before ':' is not silently promoted to a location.
+    heading_match = re.match(r"\s*((?:zone|area|bay|sector|section|gallery|compound|yard|floor|level|duct|cut)\b[^:;\n]{0,90}):", source, re.I)
+    heading = heading_match.group(1).strip() if heading_match else None
+    if area and area.casefold() not in own[0].casefold() and (not heading or area.casefold() != heading.casefold()):
+        updates["area"] = None
+    elif area is None and heading:
+        updates["area"] = heading
+    if not updates:
+        return observation
+    updates["warnings"] = [*observation.warnings[:29],
+        "Blocker work/location normalized to its uniquely supported source clause; reviewer verification required."]
+    return observation.model_copy(update=updates)
 
 
 def _warn_missing_constraint(observations: list[Observation], batch: BatchInput, *, extended: bool = False) -> list[Observation]:
@@ -227,7 +339,7 @@ _NULLABLE_OBSERVATION_FIELDS = frozenset({
 })
 
 
-def _normalise_nullable_literals(raw: Any) -> Any:
+def _normalise_nullable_literals(raw: Any, *, fill_missing=False) -> Any:
     """Convert model null placeholders to JSON null before strict schema validation.
 
     Local models occasionally emit ``\"unknown\"`` for optional scalar fields despite
@@ -245,10 +357,17 @@ def _normalise_nullable_literals(raw: Any) -> Any:
             observations.append(item)
             continue
         observation = dict(item)
+        missing = []
         for field in _NULLABLE_OBSERVATION_FIELDS:
+            if fill_missing and field not in observation:
+                observation[field] = None
+                missing.append(field)
             value = observation.get(field)
             if isinstance(value, str) and value.strip().casefold() in _NULL_LITERALS:
                 observation[field] = None
+        if missing and isinstance(observation.get("warnings"), list):
+            observation["warnings"] = [*observation["warnings"][:29],
+                "Omitted optional scalar fields retained as unknown: " + ", ".join(sorted(missing))]
         observations.append(observation)
     normalised["observations"] = observations
     return normalised
@@ -388,7 +507,7 @@ def extract_batch(batch: BatchInput, model_call: ModelCall, *, model: str = "unk
         model = getattr(raw, "model", model)
         raw = raw.value
     try:
-        normalised = _normalise_nullable_literals(raw)
+        normalised = _normalise_nullable_literals(raw, fill_missing=prompt_version in {V18_PROMPT_VERSION, V19_PROMPT_VERSION, V20_PROMPT_VERSION})
         repaired = _repair_unitless_percent_quantity(normalised, batch.fragments)
         parsed = ObservationBatch.model_validate(_repair_source_stated_clock(repaired))
     except ValidationError as exc:
@@ -397,9 +516,15 @@ def extract_batch(batch: BatchInput, model_call: ModelCall, *, model: str = "unk
     errors: list[str] = []
     for observation in parsed.observations:
         try:
-            if prompt_version == V11_PROMPT_VERSION:
+            if prompt_version in SOURCE_NORMALIZATION_VERSIONS:
+                observation = _unwrap_exact_source_quotes(observation, batch)
+            if prompt_version in EVIDENCE_COVERAGE_VERSIONS:
                 observation = _repair_decorated_fragment_ids(observation, batch)
+            if prompt_version == V20_PROMPT_VERSION:
+                observation = _remove_repeated_source_heading(observation, batch)
             _validate_evidence(observation, batch.fragments)
+            if prompt_version in CLAUSE_NORMALIZATION_VERSIONS:
+                observation = _normalise_explicit_blocker_clause(observation, batch)
             date_conflict = observation.date_basis == DateBasis.conflicting or _conflicting_today_context(observation, batch)
             if date_conflict:
                 observation = observation.model_copy(update={
@@ -409,7 +534,8 @@ def extract_batch(batch: BatchInput, model_call: ModelCall, *, model: str = "unk
                         "Conflicting report/current-day dates require reviewer clarification."],
                 })
             if prompt_version != LEGACY_PROMPT_VERSION and not date_conflict:
-                observation = _restore_non_actual_date(observation, batch)
+                observation = _restore_non_actual_date(observation, batch,
+                    correct_context=prompt_version in SOURCE_NORMALIZATION_VERSIONS)
             unsupported_context = (
                 observation.date_basis in {DateBasis.report_context, DateBasis.relative_resolved}
                 and (not batch.report_date_trusted or (
@@ -452,8 +578,8 @@ def extract_batch(batch: BatchInput, model_call: ModelCall, *, model: str = "unk
         except ExtractionError as exc:
             errors.append(str(exc))
     if prompt_version != LEGACY_PROMPT_VERSION:
-        accepted = _warn_missing_constraint(accepted, batch, extended=prompt_version == V11_PROMPT_VERSION)
-        if prompt_version == V11_PROMPT_VERSION and errors:
+        accepted = _warn_missing_constraint(accepted, batch, extended=prompt_version in EVIDENCE_COVERAGE_VERSIONS)
+        if prompt_version in EVIDENCE_COVERAGE_VERSIONS and errors:
             # A rejected sibling may be a separate constraint or activity. Prevent
             # partial success from silently approving only the retained work.
             accepted = [o.model_copy(update={"warnings": [*o.warnings[:29],

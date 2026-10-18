@@ -1,0 +1,64 @@
+{
+  "created": "2026-10-16",
+  "gt10_integrity_check": {
+    "cambridge_status": "upstream byte identity and exact retained attribution remain unverified",
+    "derivative_notice_requirement": "Retain GT10 MIT copyright and permission notice with permitted derivatives; the notice is already retained.",
+    "files": {
+      "../data/GT10BLDG-P6-Schedule/exports/GT10BLDG_v1_P6_export.xlsx": {
+        "matches_registry_and_pinned_archive_member": true,
+        "sha256": "b84946cc8c279e879979ed174539357b92ac6cb3011562d30a44e4cce2913953"
+      },
+      "../data/GT10BLDG-P6-Schedule/source/GT10BLDG_input_activities_relationships.xlsx": {
+        "matches_registry_and_pinned_archive_member": true,
+        "sha256": "598e2fcfa2bae290284cb6ca9f4eaff164ce149b4269099b7e763bc2e4ea5951"
+      },
+      "data/references/licenses/GT10-MIT.txt": {
+        "matches_registry_and_pinned_archive_member": true,
+        "sha256": "e9d0e6c0666a540af93165fef00ab7cb461b405237f67d3ee52ce2413b63125f"
+      }
+    },
+    "status": "verified_against_registry_and_pinned_upstream_archive",
+    "upstream_archive_sha256": "0ec793405c03f31126985cdf13d874dfa5954596ec5fd89015880d4c63f7980e",
+    "upstream_revision": "d7eff9bb75e8d56634ea93e435d9746ad1b15b22",
+    "verified_at": "2026-10-16"
+  },
+  "holdout_labels_read": false,
+  "human_attestations_available": false,
+  "independently_reviewed": false,
+  "open_gates": [
+    "D01 independent source-version acceptance; Cambridge upstream byte identity and exact attribution/license review remain pending (GT10 hashes and MIT notice are verified)",
+    "D03 independent planner decisions and approved overlay if applicable",
+    "D04 independent review/adjudication and final label hashes",
+    "D05 independently reviewed grouping/coverage and frozen disjoint manifest",
+    "A02 agreed frozen policy and scored versioned predictions",
+    "independent unseen live validation and owner-specific package"
+  ],
+  "source_sha256": {
+    "PROJECT_COMPLETION_TODO_V2.md": "a63efb52506191653b85d560edd33cb4d2093b403eecee636ac6477233a68556",
+    "data/references/schedule-sources.json": "cf7e242cf8d9a93317bb8cb6999fc9b972dd4ff86fdae68b4ab7e62c9bb2555e",
+    "data/review/W-03-review-instructions.md": "68c416d6598ea2e7505f2035824bd9ad667976cf71ca87e2f8f677ef20aa7086",
+    "data/review/schedule-overrides.jsonl": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "data/review/schedule-quality-review.jsonl": "110b826d81262330ae89f36895cfb59cec18aa16ccd44953855bba164d030fe8",
+    "data/review/technical-review-2026-10-12.json": "e1185d61aea8d0f73dd085f31e02ec778cb9987843127d1def7eef7145f46db1",
+    "data/review/v2-label-adjudication.jsonl": "79dd1be9c41bb0bd984162e0530bfed24e59a7f78dd87fde2f33941c7793862f",
+    "data/synthetic/v2/check_splits.py": "f29e16fc8a76bb88377f032350a19d381a40bbb2df3532ad9452154dabe7cca0",
+    "data/synthetic/v2/manifest.json": "704b60743973a4cf6b235c17c55ed541f648d7ea3e70520e0e1c386bece6e6e0",
+    "data/synthetic/v2/proposed-labels.jsonl": "0690d1561891c0f9802405e0ebe63a82c0cdff4dee4612f05e3975d2ff661471",
+    "data/synthetic/v2/reports.jsonl": "eee2955b5f89e7ac00a76ee46c8d0b1d3ef6c392a4bec580d7a1a7ce521dd8b6",
+    "data/synthetic/v2/split-check.json": "6cbe36302ee7c9c86080b27b0138865109bb4017d80140dbaddecffa75620ed5",
+    "docs/confidence-calibration.md": "a563d9f8b57e4f1475acf3cbbfc2072b115d7a4e535bf5c75a0d4b3aadf6a98b",
+    "docs/d01-d05-completion-audit-2026-10-10.md": "734c4dd06983469cf7c9b65d61642a33027e7685d406691132520045f73447cd",
+    "docs/data-decisions.md": "c565545514ce94263050b4f4d0d082a26adff1fc382a34ff24c1fe958dff4482",
+    "docs/data-splits.md": "7231090fb1de8047f26cc0207a3419c98ed49d147dfbb94370bf4770f44c8126",
+    "docs/review-handoff-2026-10-16.md": "0dd503dbc96ad2ed65d2290599bc84cb9740686eb15bc446fcd955215bcbeb6c",
+    "evaluation/calibrate.py": "238478efe756f366fdc2ba2f82c1b992146588b18fca422a6dd07bfa6f20b854",
+    "evaluation/results/calibration-v1-pending.json": "9e4098421eecff85eda83fa4861a827839f45b4b1ca00718e74d3a86b4d762da"
+  },
+  "status": "pending_human_review_and_calibration",
+  "thresholds": {
+    "event": null,
+    "field": null,
+    "link": null
+  },
+  "version": 1
+}

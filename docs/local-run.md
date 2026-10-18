@@ -147,7 +147,7 @@ The older E02 manual capture utility stores operator-supplied observations and d
 
 ## Reproduce the compact model benchmark
 
-The [60-case Gemma record](../evaluation/RESULTS.md#gemma-4-12b-quality-evaluation--12-october-2026) and [evaluation guide](../evaluation/README.md) describe historical inputs, corrected table locators, draft prompt, failures and reruns. The current workspace contains local runners and captures, some still uncommitted; verify their availability in a fresh checkout. Scoring saved captures does not contact Ollama:
+The [60-case Gemma record](../evaluation/RESULTS.md#gemma-4-12b-quality-evaluation--12-october-2026) and [evaluation guide](../evaluation/README.md) describe historical inputs, corrected table locators, draft prompt, failures and reruns. Runners and saved captures are included in the candidate publication; local databases, logs and imported schedule copies are excluded. Scoring saved captures does not contact Ollama:
 
 ```sh
 .venv/bin/python -m evaluation.summarize_gemma \

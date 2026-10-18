@@ -1,0 +1,44 @@
+{
+  "recorded_at": "2026-10-17T14:50:54.507624+00:00",
+  "scope": "Browser click through authenticated HTTP, durable commit and automatic MOCK delivery.\n\nSynthetic proposals are seeded explicitly in a local rehearsal database and retained.\nNo model is called. Results do not certify concurrent model workloads.\n",
+  "requested_samples": 1,
+  "samples": 1,
+  "all_samples_verified": true,
+  "durable_commits": true,
+  "browser_and_auth_measured": true,
+  "automatic_connector_polling": true,
+  "concurrent_model_workload_measured": false,
+  "fixture_users_deactivated": true,
+  "deliveries": [
+    {
+      "activity_id": "6d112f24-a0cf-4c20-97a4-7f3e3e160b7f",
+      "status": "delivered",
+      "attempts": 1,
+      "verified": true
+    }
+  ],
+  "metrics": {
+    "browser_click_to_approval_response_seconds": {
+      "support": 1,
+      "p95": 0.0569312910000001,
+      "max": 0.0569312910000001
+    },
+    "browser_click_to_verified_internal_update_seconds": {
+      "support": 1,
+      "p95": 0.07988045800000008,
+      "max": 0.07988045800000008
+    },
+    "browser_click_to_verified_mock_seconds": {
+      "support": 1,
+      "p95": 1.013338458,
+      "max": 1.013338458
+    }
+  },
+  "release_gate_passed": false,
+  "source_sha256": {
+    "/Users/cyrilsabugeorge/Documents/python_project/site-progress-agent/evaluation/full_approval_delivery_latency.py": "e311201b69f1a262e1c3bc48e7c40e634a2c1e8596d2aeff20d9d20c288f6b99",
+    "evaluation/browser_delivery_latency.mjs": "1f449585eb52517004d96e931b0f1451bc04a9dbf601611550df2fffcd658db1",
+    "backend/app/api/endpoints/review.py": "187a43f738ded54b245715e19013635742088e0ef3448907e814471eade7f925",
+    "backend/app/integrations/outbox.py": "307ecfe1c84730bfb8347542b69ca3acac289377f36b24512d7b0c5da60995b1"
+  }
+}

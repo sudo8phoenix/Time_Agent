@@ -14,6 +14,22 @@ class Adapter:
         return kwargs
 
 
+def test_groq_planner_preserves_separate_credential_assignment():
+    settings = SimpleNamespace(orchestrator_provider="groq",
+                               orchestrator_model="openai/gpt-oss-120b",
+                               orchestrator_key_slot=1, extraction_key_slot=0,
+                               selection_key_slot=0)
+    calls = []
+
+    def factory(actual_settings, *, timeout, role):
+        calls.append((actual_settings.orchestrator_key_slot, role))
+        return Adapter()
+
+    create_planner(settings, timeout=17, adapter_factory=factory)
+    assert calls == [(1, "orchestrator")]
+    assert settings.extraction_key_slot == settings.selection_key_slot == 0
+
+
 @pytest.mark.parametrize("model", sorted(ALLOWED_PLANNER_MODELS))
 def test_planner_accepts_allowlisted_openrouter_models_and_honors_pinned_model(model):
     settings = SimpleNamespace(orchestrator_provider="openrouter", orchestrator_model=model)

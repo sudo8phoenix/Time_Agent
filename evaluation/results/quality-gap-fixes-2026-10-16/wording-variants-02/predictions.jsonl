@@ -1,0 +1,7 @@
+{"case_id": "Q01", "state": "failed", "error_type": "HostedRateLimitError", "error_code": "MODEL_RATE_LIMITED", "elapsed_ms": 156}
+{"case_id": "Q02", "state": "failed", "error_type": "HostedCapacityError", "error_code": "MODEL_CAPACITY_TIMEOUT", "elapsed_ms": 2}
+{"case_id": "Q03", "state": "failed", "error_type": "HostedCapacityError", "error_code": "MODEL_CAPACITY_TIMEOUT", "elapsed_ms": 2}
+{"case_id": "Q04", "state": "failed", "error_type": "HostedCapacityError", "error_code": "MODEL_CAPACITY_TIMEOUT", "elapsed_ms": 2}
+{"case_id": "Q05", "state": "failed", "error_type": "HostedCapacityError", "error_code": "MODEL_CAPACITY_TIMEOUT", "elapsed_ms": 2}
+{"case_id": "Q06", "state": "failed", "error_type": "HostedCapacityError", "error_code": "MODEL_CAPACITY_TIMEOUT", "elapsed_ms": 2}
+{"case_id": "Q07", "state": "failed", "error_type": "HostedCapacityError", "error_code": "MODEL_CAPACITY_TIMEOUT", "elapsed_ms": 2}

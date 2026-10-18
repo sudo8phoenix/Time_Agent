@@ -1,0 +1,18 @@
+{
+  "started_at": "2026-10-17T06:46:41.867634+00:00",
+  "prompt_version": "extraction-v13-location-scope",
+  "prompt_sha256": "bcd20d2f7b37f01b5ac12dc51fec94154d7350343b89822016c2a078603b5694",
+  "fixture_sha256": "ea35e1ebe137d6ad1170efec945be5e2b9b9bccfdd9577f8c2a0be33d4e2a669",
+  "provider": "groq",
+  "model": "openai/gpt-oss-20b",
+  "key_slot": 0,
+  "transport_retries": 0,
+  "admission_scope": "postgresql_deployment",
+  "case_ids": [
+    "Q01",
+    "Q02",
+    "Q04"
+  ],
+  "timeout_seconds": 60,
+  "scope": "fresh wording synthetic component development checks; no persistence or approvals"
+}
