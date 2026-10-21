@@ -11,7 +11,7 @@ from app.agent.contracts import AgentRole, TaskEnvelope, TaskOutcome, TaskResult
 from app.agent.registry import DelegationError, validate_child
 from app.agent.task_store import TaskStore, TaskStoreError, input_fingerprint
 from app.db.base import Base
-from app.db.models import AgentRun, Job, Project, Report, ScheduleVersion
+from app.db.models import AgentRun, AgentTask, Job, Project, Report, ScheduleVersion
 
 
 def envelope(role: AgentRole, *, parent=None, run=None, project=None, source=None, schedule=None,
@@ -148,4 +148,54 @@ def test_task_store_does_not_persist_error_message_and_budget_reservations_survi
     assert restored["used"]["model_calls"] == 1
     with pytest.raises(BudgetExceeded):
         store.reserve_budget("model_calls", 2, limits=BudgetLimits(model_calls=2))
+    engine.dispose()
+
+
+def test_task_store_rejects_late_child_after_parent_finishes():
+    engine, sessions, store, ids = make_store()
+    run_id, project_id, source_id, schedule_id = ids
+    root = envelope(AgentRole.ROOT, run=run_id, project=project_id, source=source_id, schedule=schedule_id)
+    store.begin(root, input_fingerprint=input_fingerprint("root"))
+    root_result = TaskResult(
+        task_id=root.task_id, parent_task_id=None, run_id=run_id, agent_role=AgentRole.ROOT,
+        project_id=project_id, source_id=source_id, schedule_version_id=schedule_id,
+        outcome=TaskOutcome.COMPLETED,
+    )
+    store.finish(root, root_result)
+
+    late_child = envelope(AgentRole.ANALYSIS, parent=root.task_id, run=run_id, project=project_id,
+                          source=source_id, schedule=schedule_id)
+    with pytest.raises(TaskStoreError, match="parent task is not active"):
+        store.begin(late_child, input_fingerprint=input_fingerprint("late"))
+    engine.dispose()
+
+
+def test_task_store_rejects_forged_child_result_and_conflicting_duplicate_finish():
+    engine, sessions, store, ids = make_store()
+    run_id, project_id, source_id, schedule_id = ids
+    root = envelope(AgentRole.ROOT, run=run_id, project=project_id, source=source_id, schedule=schedule_id)
+    store.begin(root, input_fingerprint=input_fingerprint("root"))
+    child = envelope(AgentRole.ANALYSIS, parent=root.task_id, run=run_id, project=project_id,
+                     source=source_id, schedule=schedule_id)
+    store.begin(child, input_fingerprint=input_fingerprint("child"))
+    good = TaskResult(
+        task_id=child.task_id, parent_task_id=root.task_id, run_id=run_id,
+        agent_role=AgentRole.ANALYSIS, project_id=project_id, source_id=source_id,
+        schedule_version_id=schedule_id, outcome=TaskOutcome.COMPLETED,
+        output_references=["observations:good"],
+    )
+    forged = good.model_copy(update={"project_id": uuid4()})
+    with pytest.raises(ValueError, match="identity or pinned scope"):
+        store.finish(child, forged)
+    with sessions() as session:
+        row = session.get(AgentTask, child.task_id)
+        assert row.status == "running"
+        assert row.output_references == []
+    used_before_retry = store.reserve_budget("model_calls")
+    assert used_before_retry == 1
+
+    store.finish(child, good)
+    with pytest.raises(TaskStoreError, match="different result"):
+        store.finish(child, good.model_copy(update={"output_references": ["observations:forged"]}))
+    assert store.budget_snapshot()["used"]["model_calls"] == used_before_retry
     engine.dispose()

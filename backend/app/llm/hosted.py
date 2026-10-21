@@ -115,6 +115,7 @@ class HostedAdmission:
 
     def acquire(self, provider, payload, timeout):
         deadline = self.clock() + timeout
+        base_provider = provider.partition(":")[0]
         # Approximate admission cost, including the reserved completion. Three
         # UTF-8 bytes/token deliberately overestimates ordinary English input;
         # numeric provider headers and 429 cooldowns remain authoritative.
@@ -142,8 +143,8 @@ class HostedAdmission:
                     state.last_started, state.last_estimate = now, estimate
                     # Smooth sustained Groq traffic at the advertised TPM rather
                     # than repeatedly bursting at the nominal request interval.
-                    interval = self.intervals.get(provider, 0)
-                    if provider == "groq" and state.token_limit:
+                    interval = self.intervals.get(base_provider, 0)
+                    if base_provider == "groq" and state.token_limit:
                         interval = max(interval, 60 * estimate / state.token_limit)
                     state.next_request = now + interval
                     if state.remaining_tokens is not None:
@@ -157,7 +158,7 @@ class HostedAdmission:
             now = self.clock()
             safe = safe_headers(headers or {})
             state.headers = safe
-            if provider == "groq" and safe.get("x-ratelimit-limit-tokens", 0) > 0:
+            if provider.partition(":")[0] == "groq" and safe.get("x-ratelimit-limit-tokens", 0) > 0:
                 state.token_limit = safe["x-ratelimit-limit-tokens"]
                 state.next_request = max(state.next_request,
                     state.last_started + 60 * state.last_estimate / state.token_limit)
@@ -214,10 +215,10 @@ class DeploymentHostedAdmission(HostedAdmission):
 ADMISSION = DeploymentHostedAdmission()
 
 
-def raise_for_status(provider, status):
+def raise_for_status(provider, status, *, scope=None):
     if status == 429:
         with ADMISSION.condition:
-            state = ADMISSION.states.get(provider)
+            state = ADMISSION.states.get(scope or provider)
             wait = max(0, state.cooldown - ADMISSION.clock()) if state else 60
         raise HostedRateLimitError(f"{provider} rate limit reached", retry_after_seconds=wait)
     if status >= 400:
@@ -249,13 +250,18 @@ def _read_response(response, deadline):
             return b"".join(chunks)
 
 
-def request(provider, method, url, payload, timeout, headers):
+def request(provider, method, url, payload, timeout, headers, *, capacity_scope=None):
     from .metrics import record_provider_request
     started = time.monotonic()
     admitted_at = None
     status, response_headers = None, {}
+    if capacity_scope is not None:
+        from .account_scopes import SCOPES
+        if provider != "groq" or capacity_scope not in SCOPES:
+            raise HostedCapacityError("Unverified hosted capacity scope")
+    scope = capacity_scope or provider
     try:
-        remaining = ADMISSION.acquire(provider, payload, timeout)
+        remaining = ADMISSION.acquire(scope, payload, timeout)
         admitted_at = time.monotonic()
         try:
             outgoing = Request(url, data=json.dumps(payload).encode(), method=method,
@@ -271,7 +277,7 @@ def request(provider, method, url, payload, timeout, headers):
                 return status, {}
         finally:
             transport_finished = time.monotonic()
-            ADMISSION.release(provider, status=status, headers=response_headers)
+            ADMISSION.release(scope, status=status, headers=response_headers)
     finally:
         finished = time.monotonic()
         record_provider_request(provider,

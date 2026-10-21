@@ -250,6 +250,35 @@ def test_retrieval_rejects_wrong_schedule_version():
         tools.retrieve_candidates("obs-0001", fixture.observation, str(uid()))
 
 
+def test_retrieval_rejects_candidate_from_another_project_before_selection():
+    fixture = Fixture()
+    foreign_project_id, foreign_schedule_id, foreign_activity_id = uid(), uid(), uid()
+    with Session(fixture.engine) as db:
+        db.add_all([
+            Project(id=foreign_project_id, name="Other project",
+                    active_schedule_version_id=foreign_schedule_id),
+            ScheduleVersion(id=foreign_schedule_id, project_id=foreign_project_id,
+                            version_number=1, content_sha256="c" * 64, state="active"),
+            Activity(id=foreign_activity_id, schedule_version_id=foreign_schedule_id,
+                     external_id="FOREIGN-1", name="Foreign pump", wbs="1",
+                     discipline="mechanical", work_type="equipment_installation",
+                     is_leaf=True, measurement_basis="unsupported"),
+        ])
+        db.commit()
+    foreign = Candidate(candidate_id=foreign_activity_id, external_id="FOREIGN-1",
+                        activity_name="Foreign pump", area=None,
+                        work_type="equipment_installation", is_leaf=True,
+                        retrieval_rank=1, retrieval_score=0.9)
+    tools = fixture.tools(retrieval_service=lambda *args, **kwargs: [foreign])
+    scope = fixture.load(tools)
+    tools.extract_observations(scope.fragment_ids, ReportMetadata(
+        report_date=date(2026, 9, 1), report_date_trusted=True))
+    calls_before_retrieval = fixture.model_calls
+    with pytest.raises(AgentToolError, match="unknown or unsafe candidate"):
+        tools.retrieve_candidates("obs-0001", fixture.observation, scope.schedule_version_id)
+    assert fixture.model_calls == calls_before_retrieval
+
+
 def test_exact_fragments_metadata_model_failures_and_budgets():
     fixture = Fixture()
     tools = fixture.tools()

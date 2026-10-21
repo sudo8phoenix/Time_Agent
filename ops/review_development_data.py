@@ -86,7 +86,7 @@ def main() -> None:
                                     "field_equivalence": "related_screen_signal_only" if item["field"] == "redacted_identifiers" else "same_flag_name"})
             f.update({"technical_disposition": "aggregate_only_cannot_validate_rows",
                       "source_evidence": [{"file": "../data/schedule-audit-2026-10-09/cambridge-profile.json", "locator": "aggregate profile only", "value": item["old_value"]},
-                                          {"file": "docs/d01-d05-completion-audit-2026-10-10.md", "locator": "D03/D02 audit statements", "note": "row-level review remains required"}],
+                                          {"file": "evaluation/contracts/historical-data-review-context.md", "locator": "D03/D02 audit statements", "note": "row-level review remains required"}],
                       "supplemental_subset_evidence": supplements,
                       "suggestion": "Keep global aggregate field out of trusted labels/duration claims pending row-level review and planner decision. Any project 5060 screen evidence is bounded to that derived subset and does not identify rows behind global counts. Redacted-description evidence is related to, but not identical with, the queued redacted-identifiers field. No source rows are corrected by this review."})
         findings.append(f)
@@ -163,7 +163,7 @@ def main() -> None:
         finding["suggested_label"] = events
         label_review.append(finding)
 
-    source_paths = [REPORT, REPORTS, LABELS, inp_path, exp_path, ROOT / "data/synthetic/v2/check_splits.py", ROOT / "docs/d01-d05-completion-audit-2026-10-10.md", Path(__file__).resolve()]
+    source_paths = [REPORT, REPORTS, LABELS, inp_path, exp_path, ROOT / "data/synthetic/v2/check_splits.py", ROOT / "evaluation/contracts/historical-data-review-context.md", Path(__file__).resolve()]
     if cambridge_screen:
         source_paths.append(CAMBRIDGE_SCREEN)
     result = {

@@ -1,4 +1,0 @@
-activity_id,activity_name,wbs_path,discipline,work_type,area,asset_tags,is_leaf,measurement_basis,planned_quantity,unit,planned_start,planned_finish,aliases
-CANAL-LOCK-1,hoist installation at Gate chamber,canal-lock/1,mechanical,equipment_installation,Gate chamber,H-267,true,unsupported,,,2027-01-01,2027-04-30,
-CANAL-LOCK-2,rebar installation at Gate chamber,canal-lock/2,civil,rebar_installation,Gate chamber,,true,unsupported,,,2027-01-01,2027-04-30,
-CANAL-LOCK-3,Deliver junction box JB-624 at Gate chamber,canal-lock/3,civil,other,Gate chamber,JB-624,true,unsupported,,,2027-01-01,2027-04-30,

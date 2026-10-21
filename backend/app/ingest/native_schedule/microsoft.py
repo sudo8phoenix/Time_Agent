@@ -6,10 +6,9 @@ import argparse
 import hashlib
 import json
 import re
-import struct
 from pathlib import Path
 
-from app.ingest.native_schedule.runner import ParserRuntimeError, run_reader_module
+from app.ingest.native_schedule.runner import JVM_OPTIONS, ParserRuntimeError, run_reader_module
 from app.schemas.native_schedule import SchedulePreview
 
 PARSER_VERSION = "mpxj-14.0.0"
@@ -49,7 +48,7 @@ def _child_read(path: Path, source_project_id: str | None) -> dict[str, object]:
     try:
         import mpxj
 
-        mpxj.startJVM(convertStrings=True)
+        mpxj.startJVM(*JVM_OPTIONS, convertStrings=True)
         from org.mpxj.reader import UniversalProjectReader
     except Exception as exc:
         raise ParserRuntimeError(

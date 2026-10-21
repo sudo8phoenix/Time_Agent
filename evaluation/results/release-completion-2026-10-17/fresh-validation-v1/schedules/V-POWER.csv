@@ -1,4 +1,0 @@
-activity_id,activity_name,aliases,area,asset_tags,discipline,is_leaf,measurement_basis,planned_finish,planned_quantity,planned_start,unit,wbs_path,work_type
-VF61,Lay feeder F-61 cable,,Duct A,F-61,electrical,true,quantity_ratio,2026-12-20,200,2026-11-01,m,SYNTHETIC/VF61,cable_laying
-VF62,Lay feeder F-62 cable,,Duct B,F-62,electrical,true,quantity_ratio,2026-12-20,200,2026-11-01,m,SYNTHETIC/VF62,cable_laying
-VT62,Terminate feeder F-62 cable,,Duct B,F-62,electrical,true,quantity_ratio,2026-12-20,20,2026-11-01,point,SYNTHETIC/VT62,cable_termination

@@ -45,11 +45,13 @@ def validated_decision(model_call, expected: str) -> str:
 class HierarchyExecution:
     """Ephemeral coordinator; durable reservations survive failed calls and restarts."""
 
-    def __init__(self, session_factory, initial, *, ensure_active, planner=None, clock=None):
+    def __init__(self, session_factory, initial, *, ensure_active, planner=None, clock=None,
+                 ensure_not_cancelled=None):
         self.sessions = session_factory
         self.initial = initial
         self.store = TaskStore(session_factory, UUID(initial.run_id))
         self.ensure_active = ensure_active
+        self.ensure_not_cancelled = ensure_not_cancelled or ensure_active
         self.planner = planner
         self.clock = clock
         self.active_role = "extraction"
@@ -108,6 +110,42 @@ class HierarchyExecution:
             outcome=outcome, error=TaskError(code=getattr(error, "code", "AGENT_TOOL_FAILED")) if error else None,
             output_references=[f"checkpoint:{task.run_id}"]))
 
+    def finish_analysis_scope(self, parent, *, failed=False):
+        """Atomically close matching children and their analysis parent."""
+        from ..db.models import AgentTask
+        from datetime import datetime
+        with self.sessions.begin() as db:
+            self.store.lock_active_job(db)
+            parent_row = db.scalar(select(AgentTask).where(
+                AgentTask.id == parent.task_id
+            ).with_for_update())
+            if parent_row is None or parent_row.status != "running":
+                raise AgentToolError("AGENT_TASK_NOT_ACTIVE", "The analysis task is no longer active.")
+            rows = list(db.scalars(select(AgentTask).where(
+                AgentTask.parent_task_id == parent_row.id,
+                AgentTask.agent_role == AgentRole.MATCHING.value,
+                AgentTask.status == "running",
+            ).with_for_update()))
+            scope_ids = [parent_row.id, *(row.id for row in rows)]
+            if db.scalar(select(AgentTask.id).where(
+                AgentTask.parent_task_id.in_(scope_ids),
+                AgentTask.status == "running",
+                AgentTask.id.not_in(scope_ids),
+            ).limit(1)) is not None:
+                raise AgentToolError("AGENT_DEPENDENCY_PENDING", "An analysis child is still running.")
+            now = datetime.now(timezone.utc)
+            outcome = "failed" if failed else "completed"
+            status = "failed" if failed else "succeeded"
+            error_code = "AGENT_TOOL_FAILED" if failed else None
+            for row in [*rows, parent_row]:
+                row.status, row.outcome, row.error_code = status, outcome, error_code
+                row.output_references = [f"checkpoint:{row.run_id}"]
+                row.evidence_references = []
+                row.warnings = []
+                row.actual_usage = dict(self.task_usage.get(row.id, {}))
+                row.safe_summary = {}
+                row.finished_at = now
+
     def run(self, task, function, fingerprint):
         self.reserve("delegations", 1300)
         record = self.store.begin(task, input_fingerprint=fingerprint)
@@ -115,16 +153,31 @@ class HierarchyExecution:
         self.active_task = task
         try:
             value = function()
+        except AgentToolError as error:
+            # A domain failure is a terminal attempt; a repair gets a new identity.
+            # Process interruptions below intentionally remain resumable.
+            if not record.reused:
+                if task.agent_role == AgentRole.ANALYSIS:
+                    self.finish_analysis_scope(task, failed=True)
+                else:
+                    self.finish(task, error=error)
+            raise
         except BaseException:
             # A worker interruption leaves the attempt resumable. Domain failures
             # are returned as typed state and finalized in the success branch.
             raise
         else:
+            # A cancelled run may receive a late model response. Do not record
+            # terminal child success after explicit cancellation.
+            self.ensure_not_cancelled()
             failed = isinstance(value, dict) and value.get("next_action") == "fail"
             if not record.reused:
-                mapping = getattr(getattr(value, "mapping_state", None), "value", None)
-                self.finish(task, error=AgentToolError("AGENT_TOOL_FAILED", "Task failed safely.") if failed else None,
-                    unresolved=mapping is not None and mapping != "suggested")
+                if task.agent_role == AgentRole.ANALYSIS:
+                    self.finish_analysis_scope(task, failed=failed)
+                else:
+                    mapping = getattr(getattr(value, "mapping_state", None), "value", None)
+                    self.finish(task, error=AgentToolError("AGENT_TOOL_FAILED", "Task failed safely.") if failed else None,
+                        unresolved=mapping is not None and mapping != "suggested")
             return value
         finally:
             self.active_task = previous
@@ -191,8 +244,25 @@ class ScopedTools:
             role = AgentRole.SELECTION if name == "select_candidate" else AgentRole(self.role)
             # Matching owns retrieval and delegates selection, one scope per observation.
             if self.role == "matching":
-                matching = execution.envelope(AgentRole.MATCHING,
-                    execution.envelope(AgentRole.ANALYSIS, execution.root), observation_key=key)
+                from ..db.models import AgentTask
+                with execution.sessions() as db:
+                    from sqlalchemy import func
+                    matching_row = db.scalar(select(AgentTask).where(
+                        AgentTask.run_id == UUID(execution.initial.run_id),
+                        AgentTask.agent_role == AgentRole.MATCHING.value,
+                        AgentTask.observation_key == key,
+                        AgentTask.status == "running",
+                    ).order_by(AgentTask.attempt.desc()).limit(1))
+                    matching_attempt = int(db.scalar(select(func.count()).select_from(AgentTask).where(
+                        AgentTask.run_id == UUID(execution.initial.run_id),
+                        AgentTask.agent_role == AgentRole.MATCHING.value,
+                        AgentTask.observation_key == key,
+                    ))) + 1
+                analysis = execution.envelope(AgentRole.ANALYSIS, execution.root)
+                matching = (execution.envelope(AgentRole.MATCHING, analysis,
+                    observation_key=key, attempt=matching_row.attempt) if matching_row else
+                    execution.envelope(AgentRole.MATCHING, analysis,
+                    observation_key=key, attempt=matching_attempt))
                 execution.store.begin(matching, input_fingerprint=execution.fingerprint({"observation": key}))
                 parent = matching
                 if name == "retrieve_candidates":
@@ -214,12 +284,8 @@ class ScopedTools:
                     AgentTask.observation_key == key))) + 1
             task = execution.envelope(role, parent, observation_key=key, attempt=attempt)
             execution.active_role = "selection" if role == AgentRole.SELECTION else "extraction"
-            try:
-                return execution.run(task, lambda: value(*args, **kwargs),
-                    execution.fingerprint({"name": name, "args": args}))
-            finally:
-                if self.role == "matching":
-                    execution.finish(matching)
+            return execution.run(task, lambda: value(*args, **kwargs),
+                execution.fingerprint({"name": name, "args": args}))
         return invoke
 
 

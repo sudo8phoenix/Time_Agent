@@ -283,6 +283,11 @@ function Review({ proposalId, project, position, total, onBack, onNext, onRevise
       .catch(value => { if (active) setError(value.message); });
     return () => { active = false; };
   }, [proposalId, proposalReload]);
+  useEffect(() => {
+    if (!proposal) return;
+    const heading = document.querySelector<HTMLElement>(".review-header h1");
+    if (heading) { heading.tabIndex = -1; heading.focus({ preventScroll: true }); }
+  }, [proposal?.id]);
   if (!proposal) return <><p role={error ? "alert" : "status"}>{error || "Loading review proposal…"}</p><button className="back-button" onClick={() => void onBack().catch(value => setError(value.message))}>Back to job</button></>;
   const chosen = selected ?? proposal.chosen_activity_id ?? "";
   const pending = proposal.review_state === "pending";

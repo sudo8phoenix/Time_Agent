@@ -29,3 +29,27 @@ mock-pmis.sqlite3*
 # Local imported schedules and operator notes; application fixtures live in data/synthetic.
 /data/schedules/
 /terminal-commands.txt
+
+# Private environment variants; only the template is publishable.
+.env.*
+!.env.example
+
+# Generated evaluation evidence and local execution history.
+/evaluation/results/
+/evaluation/RESULTS.md
+/PROJECT_COMPLETION_TODO*.md
+
+# Publish only maintained system documentation. Keep historical notes locally.
+/docs/*
+!/docs/README.md
+!/docs/SYSTEM.md
+!/docs/local-run.md
+!/docs/TESTING_AND_QUALITY.md
+!/docs/document-input-capabilities.md
+!/docs/provider-capacity.md
+!/docs/durable-model-configuration.md
+
+# Browser and local database artifacts.
+frontend/playwright-report/
+frontend/.playwright-compat-*/
+*.sqlite3-*

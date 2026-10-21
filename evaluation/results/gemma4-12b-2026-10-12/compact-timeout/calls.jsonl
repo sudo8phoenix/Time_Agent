@@ -1,1 +1,0 @@
-{"batch_index": 0, "case_ids": ["EXP-C241", "EXP-C242", "EXP-C243", "EXP-C244", "EXP-C245", "EXP-C246", "EXP-C247", "EXP-C248", "EXP-C249", "EXP-C250"], "failure": {"type": "OllamaTransportError", "message": "Ollama request timed out or failed"}, "wall_ms": 180005.9}

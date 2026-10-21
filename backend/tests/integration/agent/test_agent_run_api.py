@@ -282,3 +282,30 @@ def test_version_mismatches_use_safe_placeholders(client):
     assert response.status_code == 200, response.text
     assert response.json()["graph_version"] == "unrecognized"
     assert response.json()["framework_version"] == "unrecognized"
+
+
+@pytest.mark.parametrize("role", ["reviewer", "viewer"])
+def test_job_cancellation_requires_reviewer_csrf_and_membership(client, role):
+    browser, factory = client
+    seeded = _seed(factory, role=role, steps=False)
+    url = f"/api/v1/jobs/{seeded['job_id']}/cancel"
+    assert browser.post(url).status_code == 401
+    login = browser.post("/api/v1/auth/login", json={
+        "username": _username(factory, seeded["user_id"]), "password": "test-password"})
+    assert browser.post(url).status_code == 403
+    headers = {"X-CSRF-Token": login.json()["csrf_token"]}
+    response = browser.post(url, headers=headers)
+    if role == "viewer":
+        assert response.status_code == 403
+        return
+    assert response.status_code == 200, response.text
+    assert response.json()["state"] == "cancelled"
+    assert browser.post(url, headers=headers).json() == response.json()
+    with factory() as db:
+        assert db.get(AgentRun, seeded["run_id"]).state == "cancelled"
+        assert db.get(Job, seeded["job_id"]).lease_token is None
+    public = browser.get(f"/api/v1/jobs/{seeded['job_id']}/agent-run")
+    assert public.json()["error_code"] == "JOB_CANCELLED"
+    assert public.json()["error_message"] == "The job was cancelled."
+    outsider = _seed(factory, steps=False)
+    assert browser.post(f"/api/v1/jobs/{outsider['job_id']}/cancel", headers=headers).status_code == 404

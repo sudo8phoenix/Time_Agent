@@ -98,6 +98,58 @@ def test_selection_precision_counts_unsafe_selections_and_recall_at_8_truncates(
     assert got["recall_at_8"] == 0
 
 
+@pytest.mark.parametrize("labels,predictions,error", [
+    ([{"case_id": "a"}, {"case_id": "a"}], [], "labels contain duplicate"),
+    ([{"case_id": "a"}], [{"case_id": "a"}, {"case_id": "a"}], "predictions contain duplicate"),
+    ([{"case_id": "a"}], [{"case_id": "a", "candidate_ids": "A"}], "candidate_ids must be a list"),
+])
+def test_selection_scorer_rejects_ambiguous_case_or_candidate_inventory(labels, predictions, error):
+    with pytest.raises(ValueError, match=error):
+        selection_metrics(labels, predictions)
+
+
+def test_failed_diagnostic_selections_cannot_earn_recall_precision_or_coverage_credit():
+    labels = [
+        {"case_id": "good", "expected_mapping_state": "suggested", "expected_activity_ids": ["A"]},
+        {"case_id": "wrong", "expected_mapping_state": "suggested", "expected_activity_ids": ["B"]},
+        {"case_id": "failed", "expected_mapping_state": "suggested", "expected_activity_ids": ["F"]},
+        {"case_id": "unmatched", "expected_mapping_state": "unmatched", "expected_activity_ids": []},
+    ]
+    got = selection_metrics(labels, [
+        {"case_id": "good", "selected_activity_id": "A", "candidate_ids": ["A"]},
+        {"case_id": "wrong", "selected_activity_id": "X", "candidate_ids": ["B"]},
+        {"case_id": "failed", "status": "failed", "selected_activity_id": "F", "candidate_ids": ["F"]},
+        {"case_id": "unmatched", "selected_activity_id": "INVENTED"},
+    ])
+    assert got["recall_at_8_numerator"] == 2
+    assert got["recall_at_8_denominator"] == 3
+    assert got["exact_choice_numerator"] == 1
+    assert got["selected"] == 3
+    assert got["successful_selected"] == 2
+    assert got["selected_precision"] == pytest.approx(1 / 3)
+    assert got["overall_selected"] == 4
+    assert got["overall_selected_precision"] == pytest.approx(1 / 4)
+    assert got["coverage"] == pytest.approx(2 / 3)
+
+
+@pytest.mark.parametrize("bad_row", [
+    {}, {"case_id": None}, {"case_id": ""}, {"case_id": "   "},
+])
+def test_selection_scorer_rejects_missing_or_blank_case_identity(bad_row):
+    with pytest.raises(ValueError, match="missing or blank case ID"):
+        selection_metrics([{"case_id": "gold", "expected_mapping_state": "unmatched"}], [bad_row])
+
+
+def test_unlabeled_prediction_rows_do_not_add_selection_credit_or_denominators():
+    labels = [{"case_id": "gold", "expected_mapping_state": "suggested", "expected_activity_ids": ["A"]}]
+    expected = selection_metrics(labels, [{"case_id": "gold", "selected_activity_id": "A", "candidate_ids": ["A"]}])
+    with_extra = selection_metrics(labels, [
+        {"case_id": "gold", "selected_activity_id": "A", "candidate_ids": ["A"]},
+        {"case_id": "orphan", "selected_activity_id": "INVENTED", "candidate_ids": ["A"]},
+    ])
+    assert with_extra == expected
+
+
 def test_latency_uses_nearest_rank_and_rejects_invalid_lifecycle_intervals():
     from evaluation.metrics import latency_summary, lifecycle_latency_summary
     assert latency_summary([{"latency_ms": 1}, {"latency_ms": 2}, {"latency_ms": 3}])["p95_ms"] == 3
@@ -144,7 +196,7 @@ def test_case_failure_abstention_scope_review_strata_and_project_weighting():
     ]
     got = evaluate(labels, preds)
     assert got["case_outcomes"]["failed"] == 1
-    assert got["case_outcomes"]["abstained"] == 1
+    assert got["case_outcomes"]["abstained"] == 0
     assert got["scope"] == {"correct": 1, "applicable": 3, "missing": 1, "accuracy": 1 / 3}
     assert got["review_burden"]["review_required"] == 2
     assert got["review_burden"]["review_completed"] == 1
@@ -166,10 +218,104 @@ def test_case_id_validation_rejects_missing_duplicate_and_mismatched_ids():
 def test_split_rejects_overlap_and_missing_family():
     split = {"splits":{"development":["f1"], "held_out":["f2"]}}
     validate_split([{"event_family_id":"f2"}], split, "held_out")
-    with pytest.raises(ValueError): validate_split([{"event_family_id":"f1"}], split, "held_out")
-    with pytest.raises(ValueError): validate_split([{"event_family_id":"f3"}], split, "held_out")
+    with pytest.raises(ValueError):
+        validate_split([{"event_family_id":"f1"}], split, "held_out")
+    with pytest.raises(ValueError):
+        validate_split([{"event_family_id":"f3"}], split, "held_out")
 
 
 def test_split_allows_multiple_atomic_labels_from_one_event_family():
     split = {"splits": {"held_out": ["f2"]}}
     validate_split([{"event_family_id": "f2"}, {"event_family_id": "f2"}], split, "held_out")
+
+
+@pytest.mark.parametrize("prediction", [
+    None,
+    {"status": "failed"},
+    {"status": "error"},
+    {"status": "timeout"},
+    {"failure": "quota exhausted"},
+])
+def test_missing_or_failed_output_is_not_verified_safe_abstention(prediction):
+    labels = [{"case_id": "u", "expected_mapping_state": "unmatched",
+               "expected_activity_ids": []}]
+    predictions = [] if prediction is None else [{"case_id": "u", **prediction}]
+    got = selection_metrics(labels, predictions)
+    assert got["safe_abstention"] == 0
+    assert got["safe_abstention_denominator"] == 1
+
+
+def test_verified_abstention_and_false_match_keep_all_attempt_denominators():
+    labels = [
+        {"case_id": "ok", "expected_mapping_state": "unmatched"},
+        {"case_id": "bad", "expected_mapping_state": "unmatched"},
+        {"case_id": "missing", "expected_mapping_state": "unmatched"},
+    ]
+    got = selection_metrics(labels, [
+        {"case_id": "ok", "selected_activity_ids": []},
+        {"case_id": "bad", "selected_activity_ids": ["INVENTED"]},
+    ])
+    assert got["safe_abstention"] == pytest.approx(1 / 3)
+    assert got["overall_selected_precision"] == 0
+    assert got["overall_selected"] == 1
+
+
+def test_case_outcomes_separate_missing_and_failed_outputs_from_abstentions():
+    labels = [{"case_id": key} for key in ("missing", "failed", "timeout", "safe", "selected")]
+    predictions = [
+        {"case_id": "failed", "failure": "quota"},
+        {"case_id": "timeout", "status": "TIMEOUT"},
+        {"case_id": "safe", "selected_activity_ids": []},
+        {"case_id": "selected", "selected_activity_id": "A"},
+    ]
+    got = evaluate(labels, predictions)["case_outcomes"]
+    assert got["failed"] == 3
+    assert got["failure_cases"] == ["missing", "failed", "timeout"]
+    assert got["failure_rate"] == 3 / 5
+    assert got["abstained"] == 1
+    assert got["abstention_rate"] == 1 / 5
+
+
+@pytest.mark.parametrize("field", ["quantity", "unit", "work_date", "start_time"])
+@pytest.mark.parametrize("prediction,correct", [
+    ({}, 0),
+    ({"VALUE": None}, 1),
+    ({"VALUE": "None"}, 0),
+    ({"VALUE": "null"}, 0),
+    ({"VALUE": ""}, 0),
+    ({"VALUE": 0}, 0),
+    ({"VALUE": None, "status": "failed"}, 0),
+])
+def test_critical_fields_distinguish_explicit_null_missing_and_string_null(field, prediction, correct):
+    from evaluation.metrics import critical_fields
+    label = {"case_id": "a", f"expected_{field}": None}
+    pred = {field if key == "VALUE" else key: value for key, value in prediction.items()}
+    got = critical_fields([label], [{"case_id": "a", **pred}])[field]
+    assert got == {"correct": correct, "applicable": 1, "accuracy": float(correct)}
+
+
+def test_critical_fields_skip_unlabelled_fields_and_accept_legacy_aliases_and_iterables():
+    from evaluation.metrics import critical_fields
+    labels = [{"case_id": "a", "expected_quantity": None, "expected_unit": "m3"}]
+    predictions = [{"case_id": "a", "predicted_quantity": None, "predicted_unit": "m3"}]
+    got = critical_fields(iter(labels), predictions)
+    assert got["quantity"]["correct"] == got["unit"]["correct"] == 1
+    assert got["work_date"]["applicable"] == 0
+    assert critical_fields(labels, [])["quantity"]["correct"] == 0
+
+
+def test_atomic_alignment_is_order_independent_for_repeated_event_types_and_counts_duplicates():
+    from evaluation.metrics import atomic_extraction
+    labels = [{"case_id": "a", "atomic_events": [
+        {"expected_event_type": "progress", "expected_quantity": "3", "expected_unit": "m3"},
+        {"expected_event_type": "progress", "expected_quantity": "7", "expected_unit": "m3"},
+    ]}]
+    events = [
+        {"event_type": "progress", "quantity": "7", "unit": "m3"},
+        {"event_type": "progress", "quantity": "3", "unit": "m3"},
+    ]
+    assert atomic_extraction(labels, [{"case_id": "a", "atomic_events": events}])["f1"] == 1
+    got = atomic_extraction(labels, [{"case_id": "a", "atomic_events": events + [events[0]]}])
+    assert got["true_positive"] == 2
+    assert got["false_positive"] == 1
+    assert got["false_negative"] == 0

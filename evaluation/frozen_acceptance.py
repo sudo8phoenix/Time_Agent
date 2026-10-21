@@ -38,6 +38,10 @@ def _write(path, value):
 
 def load_inputs(path, manifest_path, split):
     manifest = json.loads(manifest_path.read_text())
+    if split == 'holdout':
+        control = manifest.get('holdout_control', {})
+        if control.get('tuning_status') != 'stopped':
+            raise ValueError('Stop tuning before opening holdout inputs')
     if manifest.get("status") != "frozen_inputs_and_ai_labels" or manifest["hashes"].get(path.name) != digest(path):
         raise ValueError("Inputs must match a frozen input manifest")
     seen_cases, seen_groups = set(), set()
@@ -68,9 +72,11 @@ def load_inputs(path, manifest_path, split):
     return selected
 
 
-def capture(inputs, manifest, output, split, prompt_version, *, batch_size=5):
+def capture(inputs, manifest, output, split, prompt_version, *, batch_size=5, consumption_registry=None):
     if not 1 <= batch_size <= 5:
         raise ValueError('Use groups of at most five live cases')
+    if split == 'holdout' and consumption_registry is None:
+        raise ValueError('Holdout capture requires an explicit retained consumption registry')
     settings = get_settings()
     _validate_target(settings.database_url)
     if settings.agent_hierarchy_enabled or settings.orchestrator_model_assisted or settings.llm_provider != "groq":
@@ -85,10 +91,21 @@ def capture(inputs, manifest, output, split, prompt_version, *, batch_size=5):
     with sessions() as db:
         if db.scalar(select(func.count()).select_from(Job).where(Job.state.in_(("running", "queued")))):
             raise ValueError("Inspect pending rehearsal work before capture")
-    output.mkdir(parents=True)
     source_paths = [Path("backend/app/agent/runtime.py"), Path("backend/app/agent/schedule_decision.py"),
         Path("backend/app/llm/extract.py"), Path("backend/app/llm/hosted.py"),
-        Path("backend/app/prompts/extraction_v1.py"), Path('evaluation/live_pacing.py'), Path(__file__)]
+        Path("backend/app/prompts/extraction_v1.py"), Path('evaluation/live_pacing.py'),
+        Path('evaluation/study_controls.py'), Path('evaluation/score_frozen_acceptance.py'), Path(__file__)]
+    configuration = dict(provider='groq', model=settings.groq_model, key_slot=0,
+                         prompt_version=version, prompt_sha256=sha256(prompt.encode()).hexdigest(),
+                         timeout_seconds=settings.report_model_timeout_seconds,
+                         source_sha256={str(p): digest(p) for p in source_paths})
+    holdout_reservation = None
+    if split == 'holdout':
+        from evaluation.study_controls import guard_holdout
+        holdout_reservation = guard_holdout(
+            rows, json.loads(manifest.read_text()), registry=consumption_registry,
+            configuration=configuration, dataset_sha256=digest(inputs))
+    output.mkdir(parents=True)
     _write(output / "config.json", {
         "started_at": datetime.now(timezone.utc).isoformat(), "split": split,
         "inputs_sha256": digest(inputs), "manifest_sha256": digest(manifest),
@@ -97,6 +114,7 @@ def capture(inputs, manifest, output, split, prompt_version, *, batch_size=5):
         "timeout_seconds": settings.report_model_timeout_seconds,
         "rollout_flags": False, "source_sha256": {str(p): digest(p) for p in source_paths},
         "labels_read_by_capture": False, "automatic_acceptance": False,
+        "holdout_reservation": holdout_reservation,
         "scope": "Sequential real worker baseline; synthetic narrative reports; no UI/approval/connector timing",
         "batch_size": batch_size, "batch_pause_seconds": 60,
         "readiness_excludes_recorded_pre_submission_pacing": True,
@@ -210,9 +228,10 @@ def main():
     parser.add_argument("--split", choices=("validation", "holdout"), required=True)
     parser.add_argument("--prompt-version", required=True)
     parser.add_argument("--batch-size", type=int, choices=range(1, 6), default=5)
+    parser.add_argument("--consumption-registry", type=Path)
     args = parser.parse_args()
     capture(args.inputs, args.manifest, args.output_dir, args.split, args.prompt_version,
-        batch_size=args.batch_size)
+        batch_size=args.batch_size, consumption_registry=args.consumption_registry)
 
 
 if __name__ == "__main__":

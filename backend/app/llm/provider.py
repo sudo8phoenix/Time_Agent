@@ -38,6 +38,7 @@ def create_adapter(settings, *, timeout, model_name=None, provider=None, role: R
 
     if provider == "groq":
         from .groq import GroqChatAdapter
+        from .account_scopes import resolve_scope
         key = {
             0: settings.groq_api_key,
             1: getattr(settings, "groq_api_key_1", None),
@@ -45,7 +46,7 @@ def create_adapter(settings, *, timeout, model_name=None, provider=None, role: R
         }.get(key_slot)
         return GroqChatAdapter(model_name or settings.groq_model,
             bearer_token=key.get_secret_value() if key else None,
-            timeout=timeout, max_retries=0)
+            timeout=timeout, max_retries=0, capacity_scope=resolve_scope(settings, key_slot))
     if provider == "openrouter":
         from .openrouter import OpenRouterChatAdapter
         token = getattr(settings, "openrouter_api_key", None)

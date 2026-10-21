@@ -1,4 +1,0 @@
-activity_id,activity_name,wbs_path,discipline,work_type,area,asset_tags,is_leaf,measurement_basis,planned_quantity,unit,planned_start,planned_finish,aliases
-DESALINATION-1,pump installation at Intake West,desalination/1,mechanical,equipment_installation,Intake West,P-915,true,unsupported,,,2027-01-01,2027-04-30,
-DESALINATION-2,pipe spool erection at Intake West,desalination/2,piping,pipe_spool_erection,Intake West,,true,unsupported,,,2027-01-01,2027-04-30,
-DESALINATION-3,pressure testing at Intake West,desalination/3,piping,other,Intake West,,true,unsupported,,,2027-01-01,2027-04-30,

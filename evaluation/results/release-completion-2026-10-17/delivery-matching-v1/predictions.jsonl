@@ -1,5 +1,0 @@
-{"case_id": "C06", "state": "failed", "passed": false, "error_type": "HostedCapacityError", "elapsed_seconds": 0.205}
-{"case_id": "DM-02", "state": "failed", "passed": false, "error_type": "HostedCapacityError", "elapsed_seconds": 0.008}
-{"case_id": "DM-03", "state": "failed", "passed": false, "error_type": "HostedCapacityError", "elapsed_seconds": 0.006}
-{"case_id": "DM-04", "state": "failed", "passed": false, "error_type": "HostedCapacityError", "elapsed_seconds": 0.009}
-{"case_id": "DM-05", "state": "failed", "passed": false, "error_type": "HostedCapacityError", "elapsed_seconds": 0.006}

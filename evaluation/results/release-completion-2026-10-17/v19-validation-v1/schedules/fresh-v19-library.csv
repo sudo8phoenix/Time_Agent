@@ -1,4 +1,0 @@
-activity_id,activity_name,wbs_path,discipline,work_type,area,asset_tags,is_leaf,measurement_basis,planned_quantity,unit,planned_start,planned_finish,aliases
-LIBRARY-1,fan installation at Reading wing,library/1,mechanical,equipment_installation,Reading wing,F-528,true,unsupported,,,2027-01-01,2027-04-30,
-LIBRARY-2,duct installation at Reading wing,library/2,mechanical,other,Reading wing,,true,unsupported,,,2027-01-01,2027-04-30,
-LIBRARY-3,welding at Reading wing,library/3,mechanical,welding,Reading wing,,true,unsupported,,,2027-01-01,2027-04-30,

@@ -1,4 +1,0 @@
-activity_id,activity_name,wbs_path,discipline,work_type,area,asset_tags,is_leaf,measurement_basis,planned_quantity,unit,planned_start,planned_finish,aliases
-FERRY-PIER-1,winch installation at Berth Maple,ferry-pier/1,mechanical,equipment_installation,Berth Maple,W-284,true,unsupported,,,2027-01-01,2027-04-30,
-FERRY-PIER-2,concrete placement at Berth Maple,ferry-pier/2,civil,concrete_pour,Berth Maple,,true,unsupported,,,2027-01-01,2027-04-30,
-FERRY-PIER-3,reinforcement fixing at Berth Maple,ferry-pier/3,civil,rebar_installation,Berth Maple,,true,unsupported,,,2027-01-01,2027-04-30,

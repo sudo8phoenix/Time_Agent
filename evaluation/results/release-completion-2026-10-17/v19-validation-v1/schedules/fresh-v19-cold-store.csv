@@ -1,5 +1,0 @@
-activity_id,activity_name,wbs_path,discipline,work_type,area,asset_tags,is_leaf,measurement_basis,planned_quantity,unit,planned_start,planned_finish,aliases
-COLD-STORE-1,compressor installation at Loading bay Pine,cold-store/1,mechanical,equipment_installation,Loading bay Pine,C-359,true,unsupported,,,2027-01-01,2027-04-30,
-COLD-STORE-2,steel erection at Loading bay Pine,cold-store/2,structural,structural_erection,Loading bay Pine,,true,unsupported,,,2027-01-01,2027-04-30,
-COLD-STORE-3,pipe welding batch alpha at Loading bay Pine,cold-store/3,piping,welding,Loading bay Pine,BATCH-ALPHA,true,unsupported,,,2027-01-01,2027-04-30,
-COLD-STORE-3B,pipe welding batch beta at Loading bay Pine,cold-store/3,piping,welding,Loading bay Pine,BATCH-BETA,true,unsupported,,,2027-01-01,2027-04-30,

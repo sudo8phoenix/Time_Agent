@@ -1,4 +1,0 @@
-activity_id,activity_name,aliases,area,asset_tags,discipline,is_leaf,measurement_basis,planned_finish,planned_quantity,planned_start,unit,wbs_path,work_type
-VP804,Install pump P-804,,Gallery North,P-804,mechanical,true,quantity_ratio,2026-12-20,1,2026-11-01,each,SYNTHETIC/VP804,equipment_installation
-VP805,Install pump P-805,,Gallery South,P-805,mechanical,true,quantity_ratio,2026-12-20,1,2026-11-01,each,SYNTHETIC/VP805,equipment_installation
-VC804,Terminate pump P-804 cables,,Gallery North,P-804,electrical,true,quantity_ratio,2026-12-20,12,2026-11-01,point,SYNTHETIC/VC804,cable_termination

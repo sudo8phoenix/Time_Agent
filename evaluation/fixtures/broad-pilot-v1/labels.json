@@ -1,0 +1,13 @@
+{
+  "scope":"AI-authored synthetic development labels, frozen before diagnostic; no independent human adjudication or acceptance holdout",
+  "cases":{
+    "BROAD-20261020-01":[{"event_type":"actual_progress","work_date":"2026-10-20","area":"Trench Elm","quantity":"4","unit":"m3","quantity_kind":"delta"}],
+    "BROAD-20261020-02":[{"event_type":"actual_progress","work_date":"2026-10-20","area":"Trench Ash","quantity":null,"unit":null,"quantity_kind":"none"}],
+    "BROAD-20261020-03":[{"event_type":"actual_progress","work_date":"2026-10-20","area":"Trench Alder","quantity":"6","unit":"m3","quantity_kind":"delta"}],
+    "BROAD-20261020-04":[
+      {"event_type":"actual_progress","work_date":"2026-10-20","area":"Trench Pine","quantity":"3","unit":"m3","quantity_kind":"delta"},
+      {"event_type":"planned_work","work_date":"2026-10-21","area":"Trench Oak","quantity":null,"unit":null,"quantity_kind":"none"},
+      {"event_type":"no_work","work_date":"2026-10-20","area":"Trench Oak","quantity":null,"unit":null,"quantity_kind":"none"}
+    ]
+  }
+}

@@ -1,8 +1,0 @@
-{
-  "recorded_at": "2026-10-17T15:16:42.000869+00:00",
-  "command": "DATABASE_URL=<isolated progress_test> PYTHONPATH=backend .venv/bin/pytest backend/tests/integration -q",
-  "passed": 201,
-  "duration_seconds": 67.06,
-  "scope": "PostgreSQL regression with fixtures; no live provider acceptance claim",
-  "candidate_source_manifest_sha256": "6ec46a904f4e52a055d6d038fb22530f5db6ea089ef0ba345f768f991bef4c4c"
-}

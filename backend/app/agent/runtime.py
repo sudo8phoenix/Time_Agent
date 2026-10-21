@@ -129,6 +129,16 @@ def _create_or_load_run(db: Session, job: Job, *, clock: Callable[[], datetime])
         except ValueError:
             raise AgentRuntimeError("AGENT_CHECKPOINT_INCOMPATIBLE") from None
         configuration["extraction_prompt_version"] = extraction_version
+        from ..llm.durable_contract import source_contract
+        configuration["source_contract"] = source_contract(settings)
+        configuration["groq_account_scopes_enabled"] = settings.groq_account_scopes_enabled
+        configuration["timeout"] = settings.report_model_timeout_seconds
+        snapshot = job.config_snapshot or {}
+        baseline_provider = snapshot.get("provider") or ("ollama" if snapshot.get("model") else settings.llm_provider)
+        configuration["baseline_assignment"] = {
+            "provider": baseline_provider,
+            "model": snapshot.get("model") or getattr(settings, f"{baseline_provider}_model"),
+        }
         run = AgentRun(
             id=run_id,
             job_id=job.id,
@@ -163,6 +173,9 @@ def _create_or_load_run(db: Session, job: Job, *, clock: Callable[[], datetime])
         or run.thread_id != str(run.id)
         or run.execution_mode != "graph"
     ):
+        raise AgentRuntimeError("AGENT_CHECKPOINT_INCOMPATIBLE")
+    from ..llm.durable_contract import compatible_contract
+    if run.state != "ready_for_review" and not compatible_contract(run.config_metadata or {}, get_settings()):
         raise AgentRuntimeError("AGENT_CHECKPOINT_INCOMPATIBLE")
     return run
 
@@ -203,11 +216,15 @@ def _ensure_active(
             raise AgentRuntimeError("SCHEDULE_VERSION_STALE")
 
 
-def _model_callable(model_name: str | None = None, provider: str | None = None, *, role=None) -> Callable[..., Any]:
+def _model_callable(model_name: str | None = None, provider: str | None = None, *, role=None,
+                    timeout=None, account_scopes_enabled=None) -> Callable[..., Any]:
     from ..llm.provider import create_adapter
     settings = get_settings()
+    if account_scopes_enabled is not None:
+        settings = settings.model_copy(update={"groq_account_scopes_enabled": account_scopes_enabled})
     return create_adapter(settings, model_name=model_name, provider=provider,
-                          timeout=settings.report_model_timeout_seconds, role=role).chat
+                          timeout=timeout if timeout is not None else settings.report_model_timeout_seconds,
+                          role=role).chat
 
 
 def _json(value: Any) -> Any:
@@ -400,6 +417,12 @@ def _finalize(session_factory, job_id: UUID, token: str, run_id: UUID, state: Ag
         job = db.get(Job, job_id)
         if run is None or job is None:
             raise AgentRuntimeError("AGENT_RUN_CONFLICT")
+        if run.graph_version == "report-analysis-v2":
+            from .task_store import TaskStore, TaskStoreError
+            try:
+                TaskStore(session_factory, run_id).lock_active_job(db)
+            except TaskStoreError:
+                raise AgentRuntimeError("JOB_LEASE_LOST") from None
         observations = int(db.scalar(select(func.count()).select_from(DBObservation).where(
             DBObservation.job_id == job_id
         )) or 0)
@@ -551,31 +574,48 @@ def process_job_with_graph(
     hierarchy_execution = None
     model_dispatch = model_callable
     if not hierarchical and model_dispatch is None:
-        model_dispatch = _model_callable((job.config_snapshot or {}).get("model"),
-            (job.config_snapshot or {}).get("provider") or ("ollama" if (job.config_snapshot or {}).get("model") else None))
+        assignment = run.config_metadata["baseline_assignment"]
+        model_dispatch = _model_callable(assignment["model"], assignment["provider"],
+            timeout=run.config_metadata["timeout"],
+            account_scopes_enabled=run.config_metadata["groq_account_scopes_enabled"])
     if hierarchical:
         from .hierarchy import HierarchyExecution
         from ..llm.provider import create_adapter
         settings = get_settings()
         role_snapshot = (run.config_metadata or {}).get("roles", {})
         pinned_settings = settings.model_copy(update={
+            "groq_account_scopes_enabled": (run.config_metadata or {}).get("groq_account_scopes_enabled", False),
+            **{
             f"{role}_{field}": value for role, assignment in role_snapshot.items()
             for field, value in assignment.items()
+            },
         })
         def active():
             _ensure_active(session_factory, job.id, token, job_for_heartbeat=job,
                 heartbeat_callback=heartbeat_callback, should_stop=should_stop, clock=clock)
+        def not_cancelled():
+            # A provider response can arrive after an explicit cancellation.
+            # The regular active check also fences lease changes; this narrower
+            # post-call check prevents only cancelled work from being finalized.
+            from .task_store import TaskStore, TaskStoreError
+            with session_factory() as db:
+                try:
+                    TaskStore(session_factory, run.id).lock_active_job(db)
+                    db.commit()
+                except TaskStoreError:
+                    raise AgentRuntimeError("JOB_LEASE_LOST") from None
         planner = None
         if (run.config_metadata or {}).get("model_assisted", False):
             from .planner import PlannerConfigurationError, create_planner
             try:
-                planner = create_planner(pinned_settings, timeout=settings.report_model_timeout_seconds)
+                planner = create_planner(pinned_settings, timeout=(run.config_metadata or {}).get("timeout", settings.report_model_timeout_seconds))
             except PlannerConfigurationError as exc:
                 raise AgentRuntimeError("AGENT_PLANNER_CONFIGURATION") from exc
         hierarchy_execution = HierarchyExecution(session_factory, initial,
-            ensure_active=active, planner=planner, clock=clock)
+            ensure_active=active, ensure_not_cancelled=not_cancelled,
+            planner=planner, clock=clock)
         models = {role: model_callable or create_adapter(pinned_settings,
-            timeout=settings.report_model_timeout_seconds, role=role).chat
+            timeout=(run.config_metadata or {}).get("timeout", settings.report_model_timeout_seconds), role=role).chat
             for role in ("extraction", "selection")}
         model_dispatch = hierarchy_execution.model(models)
     context = AgentRuntimeContext(
@@ -731,14 +771,23 @@ def process_job_with_graph(
                     events.close()
             if current.terminal_state not in {"ready_for_review", "failed", "stale", "cancelled"}:
                 raise AgentRuntimeError("AGENT_CHECKPOINT_INCOMPATIBLE")
-        if hierarchy_execution:
-            hierarchy_execution.finish(hierarchy_execution.root, error=(
-                AgentToolError("AGENT_TOOL_FAILED", "Run failed safely.")
-                if current.terminal_state != "ready_for_review" else None))
+        if hierarchy_execution and current.terminal_state == "ready_for_review":
+            hierarchy_execution.finish(hierarchy_execution.root)
+        # Failure may interrupt an unfinished subtree (for example the pinned
+        # root deadline). _finalize closes that tree atomically with the run;
+        # generic successful parent completion must still reject active children.
         return _finalize(session_factory, job.id, token, run.id, current)
     except AgentRuntimeError as exc:
         recorder.fail_step(exc.code, exc.safe_message)
         if exc.code == "JOB_LEASE_LOST":
+            # Explicit cancellation closes the durable task tree even when an
+            # active-node fence observes it before the post-provider fence.
+            from .task_store import TaskStore, TaskStoreError
+            with session_factory() as db:
+                try:
+                    TaskStore(session_factory, run.id).lock_active_job(db)
+                except TaskStoreError:
+                    pass
             raise
         current = _failed_state(
             current,

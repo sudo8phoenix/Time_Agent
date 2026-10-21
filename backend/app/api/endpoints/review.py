@@ -53,9 +53,40 @@ def _proposal(db: DBSession, proposal_id: UUID, user: User, *, lock: bool = Fals
     ))
     if membership is None:
         raise HTTPException(403, "Project access denied")
+    _validate_proposal_sources(db, proposal)
     if proposal.chosen_activity_id is not None:
         _validate_pinned_activity(db, proposal, proposal.chosen_activity_id, require_active=not allow_stale)
     return proposal
+
+
+def _validate_proposal_sources(db: DBSession, proposal: Proposal) -> None:
+    # Persisted model output is untrusted. Membership in the proposal's project
+    # does not authorize dereferencing another report's source or provenance.
+    observation = db.get(Observation, proposal.observation_id)
+    job = db.get(Job, observation.job_id) if observation else None
+    report = db.get(Report, job.report_id) if job else None
+    if job is None or report is None or job.project_id != proposal.project_id or report.project_id != proposal.project_id:
+        raise HTTPException(422, detail={"code": "PROPOSAL_SOURCE_SCOPE_INVALID"})
+
+    def validate_fragments(value):
+        if isinstance(value, dict):
+            if value.get("fragment_id") is not None:
+                try:
+                    fragment = db.get(Fragment, UUID(str(value["fragment_id"])))
+                except (ValueError, TypeError, AttributeError):
+                    fragment = None
+                if fragment is None or fragment.report_id != report.id:
+                    raise HTTPException(422, detail={"code": "PROPOSAL_EVIDENCE_SCOPE_INVALID"})
+            for child in value.values():
+                validate_fragments(child)
+        elif isinstance(value, list):
+            for child in value:
+                validate_fragments(child)
+
+    validate_fragments({"fragment_id": str(observation.fragment_id)} if observation.fragment_id else {})
+    validate_fragments(observation.fields)
+    validate_fragments(observation.field_evidence)
+    validate_fragments(proposal.proposed_effects)
 
 
 def _validate_pinned_activity(db: DBSession, proposal: Proposal, activity_id: UUID, *, require_active: bool = True) -> Activity:
@@ -94,6 +125,7 @@ def _candidate_payload(candidate: object, rank: int) -> dict[str, object]:
 
 
 def _proposal_payload(db: DBSession, proposal: Proposal) -> dict[str, object]:
+    _validate_proposal_sources(db, proposal)
     observation = db.get(Observation, proposal.observation_id)
     fields = dict(observation.fields or {}) if observation else {}
     selection = (observation.field_evidence or {}).get("selection", {}) if observation else {}

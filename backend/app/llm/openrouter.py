@@ -72,7 +72,14 @@ class OpenRouterChatAdapter:
             from .hosted import raise_for_status
             raise_for_status("openrouter", status)
             try:
+                if (not isinstance(body, Mapping) or not isinstance(body.get("choices"), list)
+                        or len(body["choices"]) != 1):
+                    raise OllamaResponseError("OpenRouter returned an invalid JSON response")
                 choice = body["choices"][0]
+                if not isinstance(choice, Mapping) or not isinstance(choice.get("message"), Mapping):
+                    raise OllamaResponseError("OpenRouter returned an invalid JSON response")
+                if choice.get("message", {}).get("refusal"):
+                    raise OllamaResponseError("OpenRouter refused the request")
                 if choice.get("finish_reason") != "stop":
                     raise OllamaResponseError("OpenRouter response was incomplete")
                 value = json.loads(choice["message"]["content"])
@@ -94,15 +101,36 @@ def _validate_schema(value: dict[str, Any], schema: Mapping[str, Any]) -> None:
         raise OllamaResponseError("OpenRouter response did not match the requested schema")
 
 
-def _matches_schema(value: Any, schema: Mapping[str, Any]) -> bool:
-    """Validate the JSON Schema subset used by our typed worker contracts."""
+def _matches_schema(value: Any, schema: Mapping[str, Any], *,
+                    root: Mapping[str, Any] | None = None,
+                    refs: frozenset[tuple[int, str]] = frozenset()) -> bool:
+    """Validate our schema subset, resolving local definitions without network IO."""
+    root = schema if root is None else root
+    if "$ref" in schema:
+        reference = schema["$ref"]
+        if not isinstance(reference, str) or not reference.startswith("#/"):
+            return False
+        identity = (id(value), reference)
+        if identity in refs:
+            return False
+        target = root
+        for token in reference[2:].split("/"):
+            token = token.replace("~1", "/").replace("~0", "~")
+            if not isinstance(target, Mapping) or token not in target:
+                return False
+            target = target[token]
+        if not isinstance(target, Mapping):
+            return False
+        siblings = {key: item for key, item in schema.items() if key != "$ref"}
+        return (_matches_schema(value, target, root=root, refs=refs | {identity}) and
+                _matches_schema(value, siblings, root=root, refs=refs))
     if "enum" in schema and value not in schema["enum"]:
         return False
     if "anyOf" in schema:
-        return any(_matches_schema(value, option) for option in schema["anyOf"])
+        return any(_matches_schema(value, option, root=root, refs=refs) for option in schema["anyOf"])
     kind = schema.get("type")
     if isinstance(kind, list):
-        return any(_matches_schema(value, {**schema, "type": item}) for item in kind)
+        return any(_matches_schema(value, {**schema, "type": item}, root=root, refs=refs) for item in kind)
     type_matches = {
         "object": lambda item: isinstance(item, dict),
         "array": lambda item: isinstance(item, list),
@@ -120,7 +148,7 @@ def _matches_schema(value: Any, schema: Mapping[str, Any]) -> bool:
         properties = schema.get("properties", {})
         if schema.get("additionalProperties") is False and any(key not in properties for key in value):
             return False
-        return all(key not in properties or _matches_schema(item, properties[key])
+        return all(key not in properties or _matches_schema(item, properties[key], root=root, refs=refs)
                    for key, item in value.items())
     if isinstance(value, list):
         if len(value) > schema.get("maxItems", len(value)):
@@ -128,5 +156,5 @@ def _matches_schema(value: Any, schema: Mapping[str, Any]) -> bool:
         if schema.get("uniqueItems") and len(value) != len({json.dumps(item, sort_keys=True) for item in value}):
             return False
         item_schema = schema.get("items")
-        return item_schema is None or all(_matches_schema(item, item_schema) for item in value)
+        return item_schema is None or all(_matches_schema(item, item_schema, root=root, refs=refs) for item in value)
     return True

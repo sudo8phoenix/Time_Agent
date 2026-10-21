@@ -1,0 +1,71 @@
+{
+  "scope": "Derived from paired-development-v1 before inference; v2 shortens long filler to fit the 12000-character extraction batch limit; no model results relabelled",
+  "cases": {
+    "DEV-20261020-01": {
+      "group_id": "ordinary-measured",
+      "parent_case_ids": [],
+      "exposure": "AI-authored consumed development; never unseen validation/holdout",
+      "parent_fixture": "paired-development-v1/DEV-20261020-01"
+    },
+    "DEV-20261020-02": {
+      "group_id": "unquantified-completion",
+      "parent_case_ids": [],
+      "exposure": "AI-authored consumed development; never unseen validation/holdout",
+      "parent_fixture": "paired-development-v1/DEV-20261020-02"
+    },
+    "DEV-20261020-03": {
+      "group_id": "negated-stoppage",
+      "parent_case_ids": [
+        "LOC-20261020-01",
+        "BROAD-20261020-01"
+      ],
+      "exposure": "AI-authored consumed development; never unseen validation/holdout",
+      "parent_fixture": "paired-development-v1/DEV-20261020-03"
+    },
+    "DEV-20261020-04": {
+      "group_id": "correction",
+      "parent_case_ids": [],
+      "exposure": "AI-authored consumed development; never unseen validation/holdout",
+      "parent_fixture": "paired-development-v1/DEV-20261020-04"
+    },
+    "DEV-20261020-05": {
+      "group_id": "cumulative-only",
+      "parent_case_ids": [],
+      "exposure": "AI-authored consumed development; never unseen validation/holdout",
+      "parent_fixture": "paired-development-v1/DEV-20261020-05"
+    },
+    "DEV-20261020-06": {
+      "group_id": "similar-identifiers",
+      "parent_case_ids": [],
+      "exposure": "AI-authored consumed development; never unseen validation/holdout",
+      "parent_fixture": "paired-development-v1/DEV-20261020-06"
+    },
+    "DEV-20261020-07": {
+      "group_id": "mixed-time-location",
+      "parent_case_ids": [
+        "LOC-20261020-02",
+        "BROAD-20261020-04"
+      ],
+      "exposure": "AI-authored consumed development; never unseen validation/holdout",
+      "parent_fixture": "paired-development-v1/DEV-20261020-07"
+    },
+    "DEV-20261020-08": {
+      "group_id": "missing-identity",
+      "parent_case_ids": [],
+      "exposure": "AI-authored consumed development; never unseen validation/holdout",
+      "parent_fixture": "paired-development-v1/DEV-20261020-08"
+    },
+    "DEV-20261020-09": {
+      "group_id": "embedded-instruction",
+      "parent_case_ids": [],
+      "exposure": "AI-authored consumed development; never unseen validation/holdout",
+      "parent_fixture": "paired-development-v1/DEV-20261020-09"
+    },
+    "DEV-20261020-10": {
+      "group_id": "long-multi-event",
+      "parent_case_ids": [],
+      "exposure": "AI-authored consumed development; never unseen validation/holdout",
+      "parent_fixture": "paired-development-v1/DEV-20261020-10"
+    }
+  }
+}

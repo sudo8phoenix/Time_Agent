@@ -1,8 +1,0 @@
-{
-  "hashes": {
-    "summary.json": "a9f6ddedd4b370bc55fc24281be95010cfd2a92ce134b8b602c5dbbd01a65d74",
-    "predictions.jsonl": "27a1e2fed0a2f0f4724e485e621500833c1cff0240e952773083116060e9e01f",
-    "config.json": "606a6400ce01c62b2d4b7bf42915898cd57663a061435bcb22148a5390543cc5",
-    "calls.jsonl": "324c4d46787f1b1aae65641935cf94c0d72434da4f6bd1c7556cd542ae0cea6f"
-  }
-}

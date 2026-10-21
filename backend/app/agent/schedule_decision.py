@@ -49,6 +49,14 @@ def _get(value: Any, key: str, default: Any = None) -> Any:
     return value.get(key, default) if isinstance(value, Mapping) else getattr(value, key, default)
 
 
+def _schedule_id(activity: Any) -> str:
+    """Read the pinned row ID, falling back to candidate_id for caller fixtures."""
+    value = _get(activity, "id")
+    if value is None:
+        value = _get(activity, "candidate_id")
+    return str(value) if value is not None else ""
+
+
 def _json(value: Any) -> Any:
     if hasattr(value, "model_dump"):
         return value.model_dump(mode="json")
@@ -123,7 +131,7 @@ def _decision_call(model_call, *, short_ids=False, **request):
 
 def _activity_record(activity: Any) -> dict[str, Any]:
     return {
-        "id": str(_get(activity, "id", _get(activity, "candidate_id"))),
+        "id": _schedule_id(activity),
         "external_id": str(_get(activity, "external_id", "")),
         "name": str(_get(activity, "name", _get(activity, "activity_name", ""))),
         "discipline": str(_get(activity, "discipline", "")),
@@ -149,7 +157,7 @@ def _candidate(activity: Any) -> Candidate:
     if isinstance(tags, str):
         tags = [part.strip() for part in tags.replace("|", ";").split(";") if part.strip()]
     return Candidate.model_validate({
-        "candidate_id": str(_get(activity, "id", _get(activity, "candidate_id"))),
+        "candidate_id": _schedule_id(activity),
         "external_id": _get(activity, "external_id"),
         "activity_name": _get(activity, "name", _get(activity, "activity_name")),
         "area": _get(activity, "area"),
@@ -200,6 +208,11 @@ def shortlist_activities(
     rows = [row for row in activities if bool(_get(row, "is_leaf", True))]
     if not rows:
         return []
+    supplied_ids = [_schedule_id(row) for row in rows]
+    if any(not value for value in supplied_ids) or len(supplied_ids) != len(set(supplied_ids)):
+        # IDs are the only identity the model can return. Ambiguous IDs make
+        # both schema validation and mapping back to the pinned row unsafe.
+        raise AgentDecisionError("duplicate or missing supplied schedule IDs")
     observation_data = _json(observation)
     if compact_context:
         observation_data = _compact(observation_data)
@@ -248,7 +261,7 @@ def shortlist_activities(
         return len(json.dumps(request, ensure_ascii=False, separators=(",", ":")).encode("utf-8"))
 
     def fits(pool: Sequence[Any], limit: int) -> bool:
-        ids = [str(_get(row, "id", _get(row, "candidate_id"))) for row in pool]
+        ids = [_schedule_id(row) for row in pool]
         context = {"observation": observation_data,
                    "schedule_activities": [_activity_record(row) for row in pool]}
         # Reserve for the bounded empty-result reconsideration as well.
@@ -258,7 +271,7 @@ def shortlist_activities(
 
     def choose(pool: Sequence[Any], limit: int) -> list[Any]:
         nonlocal calls
-        ids = [str(_get(row, "id", _get(row, "candidate_id"))) for row in pool]
+        ids = [_schedule_id(row) for row in pool]
         schema = {
             "type": "object", "additionalProperties": False,
             "required": ["candidate_ids"],

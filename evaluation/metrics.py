@@ -34,7 +34,7 @@ def _gold_ids(row: Mapping[str, Any]) -> list[str]:
 
 
 EVENT_FIELDS = ("event_type", "work_date", "start_date", "finish_date", "start_time", "finish_time",
-                "quantity", "quantity_kind", "unit", "scope", "precision")
+                "quantity", "quantity_kind", "unit", "scope", "precision", "date_basis")
 
 
 def _event_signature(event: Mapping[str, Any], *, label: bool) -> tuple[tuple[str, str], ...] | None:
@@ -68,6 +68,8 @@ def atomic_extraction(labels: Iterable[Mapping[str, Any]], predictions: Iterable
             else:
                 gold[(str(row.get("case_id", "")), signature)] += 1
     for row in predictions:
+        if _prediction_failed(row):
+            continue
         events = row.get("atomic_events", [])
         if not events:
             count = row.get("atomic_count", row.get("predicted_atomic_count"))
@@ -88,18 +90,25 @@ def atomic_extraction(labels: Iterable[Mapping[str, Any]], predictions: Iterable
     fn = sum(max(0, gold[key] - pred[key]) for key in keys)
     p = tp / (tp + fp) if tp + fp else 0.0
     r = tp / (tp + fn) if tp + fn else 0.0
+    # Counts below describe only alignable events. Publishing their rates when
+    # other events cannot be aligned would silently exclude unknown errors and
+    # can turn a partially annotated/invalid output into a perfect score.
+    complete = not (unavailable_gold or unavailable_pred)
     return {"status": "scored_with_unaligned_events" if unavailable_gold or unavailable_pred else "scored",
-            "true_positive": tp, "false_positive": fp, "false_negative": fn, "precision": p, "recall": r,
+            "true_positive": tp, "false_positive": fp, "false_negative": fn,
+            "precision": p if complete else None, "recall": r if complete else None,
             "unmatched_gold_count": unavailable_gold, "unmatched_prediction_count": unavailable_pred,
-            "f1": 2 * p * r / (p + r) if p + r else 0.0}
+            "f1": (2 * p * r / (p + r) if p + r else 0.0) if complete else None}
 
 
 def critical_fields(labels: Iterable[Mapping[str, Any]], predictions: Iterable[Mapping[str, Any]]) -> dict[str, Any]:
+    labels = list(labels)
     pred_by = {str(x["case_id"]): x for x in predictions}
     fields = {"tag": "expected_activity_ids", "work_date": "expected_work_date", "start_date": "expected_start_date",
               "finish_date": "expected_finish_date", "start_time": "expected_start_time",
               "finish_time": "expected_finish_time", "time_precision": "expected_time_precision",
-              "quantity": "expected_quantity", "quantity_kind": "expected_quantity_kind", "unit": "expected_unit"}
+              "quantity": "expected_quantity", "quantity_kind": "expected_quantity_kind", "unit": "expected_unit",
+              "date_basis": "expected_date_basis"}
     result: dict[str, Any] = {}
     for name, gold_key in fields.items():
         applicable = correct = 0
@@ -110,22 +119,30 @@ def critical_fields(labels: Iterable[Mapping[str, Any]], predictions: Iterable[M
             if name == "tag":
                 expected, actual = set(_gold_ids(label)), set(_ids(pred))
                 applicable += bool(expected)
-                correct += int(expected == actual) if expected else 0
+                correct += int(expected == actual and not _prediction_failed(pred)) if expected else 0
             elif name == "time_precision":
                 endpoints = [k for k in ("expected_start_time", "expected_finish_time", "expected_work_date",
                                          "expected_start_date", "expected_finish_date") if label.get(k) is not None]
-                if not endpoints:
+                if not endpoints or gold_key not in label:
                     continue
                 applicable += len(endpoints)
                 actual_precision = pred.get("time_precision", pred.get("event_precision"))
-                correct += sum(str(actual_precision) == str(label.get("expected_time_precision")) for _ in endpoints)
+                present = "time_precision" in pred or "event_precision" in pred
+                expected_precision = label[gold_key]
+                equal = (actual_precision is None if expected_precision is None else
+                         actual_precision is not None and str(actual_precision) == str(expected_precision))
+                correct += len(endpoints) * int(present and equal and not _prediction_failed(pred))
             else:
-                expected = label.get(gold_key)
-                if expected is None:
+                if gold_key not in label:
                     continue
+                expected = label[gold_key]
                 applicable += 1
-                actual = pred.get(name, pred.get(f"predicted_{name}"))
-                correct += int(str(actual) == str(expected))
+                key = name if name in pred else f"predicted_{name}"
+                actual = pred.get(key)
+                if _prediction_failed(pred) or key not in pred:
+                    continue
+                correct += int(actual is None if expected is None else
+                               actual is not None and str(actual) == str(expected))
         result[name] = {"correct": correct, "applicable": applicable,
                         "accuracy": correct / applicable if applicable else 0.0}
     return result
@@ -133,16 +150,43 @@ def critical_fields(labels: Iterable[Mapping[str, Any]], predictions: Iterable[M
 
 def selection_metrics(labels: Iterable[Mapping[str, Any]], predictions: Iterable[Mapping[str, Any]]) -> dict[str, Any]:
     labels, predictions = list(labels), list(predictions)
+    def case_id(row: Mapping[str, Any]) -> str:
+        value = row.get("case_id")
+        if value is None or not str(value).strip():
+            raise ValueError("selection inventory contains a missing or blank case ID")
+        return str(value)
+
+    label_case_ids = [case_id(x) for x in labels]
+    prediction_case_ids = [case_id(x) for x in predictions]
+    if len(label_case_ids) != len(set(label_case_ids)):
+        raise ValueError("selection labels contain duplicate case IDs")
+    if len(prediction_case_ids) != len(set(prediction_case_ids)):
+        raise ValueError("selection predictions contain duplicate case IDs")
+    for row in predictions:
+        if "candidate_ids" in row and not isinstance(row["candidate_ids"], (list, tuple)):
+            raise ValueError("candidate_ids must be a list")
     by = {str(x["case_id"]): x for x in predictions}
     matchable = [x for x in labels if x.get("expected_mapping_state") == "suggested" and _gold_ids(x)]
+    # Keep diagnostic selections in the precision denominator, including
+    # selections attached to failed attempts. Only successful outputs may earn
+    # candidate-recall, exact-choice, or coverage credit.
     selected = [x for x in matchable if _ids(by.get(str(x["case_id"]), {}))]
-    correct = [x for x in selected if set(_ids(by[str(x["case_id"])])) == set(_gold_ids(x))]
-    candidates_ok = [x for x in matchable if set(_gold_ids(x)) & set(str(i) for i in by.get(str(x["case_id"]), {}).get("candidate_ids", [])[:8])]
+    successful_selected = [x for x in selected if not _prediction_failed(by[str(x["case_id"])])]
+    correct = [x for x in successful_selected
+               if set(_ids(by[str(x["case_id"])])) == set(_gold_ids(x))]
+    candidates_ok = [x for x in matchable
+        if not _prediction_failed(prediction := by.get(str(x["case_id"])))
+        and set(_gold_ids(x)) & set(str(i) for i in prediction.get("candidate_ids", [])[:8])]
     all_selected = [x for x in labels if _ids(by.get(str(x["case_id"]), {}))]
-    all_correct = [x for x in all_selected if x.get("expected_mapping_state") == "suggested" and
+    all_correct = [x for x in all_selected
+                   if not _prediction_failed(by[str(x["case_id"])])
+                   and x.get("expected_mapping_state") == "suggested" and
                    set(_ids(by[str(x["case_id"])])) == set(_gold_ids(x))]
     safe_rows = [x for x in labels if x.get("expected_mapping_state") in {"ambiguous", "unmatched"}]
-    safe = [x for x in safe_rows if not _ids(by.get(str(x["case_id"]), {}))]
+    # Missing/failed outputs are operational failures, not verified abstentions.
+    safe = [x for x in safe_rows
+            if not _prediction_failed(prediction := by.get(str(x["case_id"])))
+            and not _ids(prediction)]
     return {"candidate_recall": len(candidates_ok) / len(matchable) if matchable else 0.0,
             "recall_at_8": len(candidates_ok) / len(matchable) if matchable else 0.0,
             "recall_at_8_numerator": len(candidates_ok), "recall_at_8_denominator": len(matchable),
@@ -151,9 +195,11 @@ def selection_metrics(labels: Iterable[Mapping[str, Any]], predictions: Iterable
             "selected_precision": len(correct) / len(selected) if selected else 0.0,
             "overall_selected_precision": len(all_correct) / len(all_selected) if all_selected else 0.0,
             "overall_selected": len(all_selected),
-            "coverage": len(selected) / len(matchable) if matchable else 0.0,
+            "coverage": len(successful_selected) / len(matchable) if matchable else 0.0,
             "safe_abstention": len(safe) / len(safe_rows) if safe_rows else 0.0,
-            "matchable": len(matchable), "selected": len(selected), "safe_abstention_denominator": len(safe_rows)}
+            "matchable": len(matchable), "selected": len(selected),
+            "successful_selected": len(successful_selected),
+            "safe_abstention_denominator": len(safe_rows)}
 
 
 def latency_summary(predictions: Iterable[Mapping[str, Any]]) -> dict[str, float | int]:
@@ -220,11 +266,25 @@ def error_categories(labels: Iterable[Mapping[str, Any]], predictions: Iterable[
     for label in labels:
         pred = by.get(str(label.get("case_id")), {})
         cats = []
-        if label.get("expected_mapping_state") == "ambiguous" and _ids(pred): cats.append("unsafe_ambiguous_selection")
-        if label.get("expected_mapping_state") == "unmatched" and _ids(pred): cats.append("false_match")
-        if label.get("expected_event_type") != pred.get("event_type", pred.get("predicted_event_type")): cats.append("event_type")
-        if label.get("expected_quantity") is not None and str(label["expected_quantity"]) != str(pred.get("quantity", pred.get("predicted_quantity"))): cats.append("quantity")
-        for cat in cats or ["correct"]: counts[cat] += 1
+        if _prediction_failed(pred):
+            counts["missing_output" if not pred else "failed_output"] += 1
+            continue
+        if label.get("expected_mapping_state") == "ambiguous" and _ids(pred):
+            cats.append("unsafe_ambiguous_selection")
+        if label.get("expected_mapping_state") == "unmatched" and _ids(pred):
+            cats.append("false_match")
+        for field in ("event_type", "quantity"):
+            gold_key = f"expected_{field}"
+            if gold_key not in label:
+                continue
+            key = field if field in pred else f"predicted_{field}"
+            expected, actual = label[gold_key], pred.get(key)
+            equal = (actual is None if expected is None else
+                     actual is not None and str(actual) == str(expected))
+            if key not in pred or not equal:
+                cats.append(field)
+        for cat in cats or ["correct"]:
+            counts[cat] += 1
     return [{"category": key, "count": counts[key]} for key in sorted(counts)]
 
 
@@ -245,12 +305,26 @@ def _prediction_index(predictions: Iterable[Mapping[str, Any]]) -> dict[str, Map
     return {str(row.get("case_id", "")): row for row in predictions}
 
 
+def _prediction_failed(prediction: Mapping[str, Any] | None) -> bool:
+    """Missing and explicitly failed outputs cannot establish successful decisions.
+
+    Legacy saved rows without status are supported; this is not a transport or
+    schema-completion validator.
+    """
+    return (not prediction or
+            any(str(prediction.get(key, "")).lower() in
+                {"failed", "error", "timeout", "cancelled", "canceled", "unattempted", "pending", "running"}
+                for key in ("status", "state")) or
+            bool(prediction.get("failure")))
+
+
 def _case_outcomes(labels: Iterable[Mapping[str, Any]], predictions: Iterable[Mapping[str, Any]]) -> dict[str, Any]:
     by = _prediction_index(predictions)
     rows = list(labels)
-    failed = [row for row in rows if str(by.get(str(row.get("case_id")), {}).get("status", "")).lower() in
-              {"failed", "error", "timeout"} or by.get(str(row.get("case_id")), {}).get("failure")]
-    abstained = [row for row in rows if not _ids(by.get(str(row.get("case_id")), {}))]
+    failed = [row for row in rows if _prediction_failed(by.get(str(row.get("case_id"))))]
+    abstained = [row for row in rows
+                 if not _prediction_failed(prediction := by.get(str(row.get("case_id"))))
+                 and not _ids(prediction)]
     return {"cases": len(rows), "failed": len(failed), "failure_rate": len(failed) / len(rows) if rows else None,
             "abstained": len(abstained), "abstention_rate": len(abstained) / len(rows) if rows else None,
             "failure_cases": [str(row.get("case_id")) for row in failed]}
@@ -265,7 +339,7 @@ def _scope_metrics(labels: Iterable[Mapping[str, Any]], predictions: Iterable[Ma
             continue
         applicable += 1
         actual = by.get(str(label.get("case_id")), {}).get("scope")
-        if actual is None:
+        if actual is None or _prediction_failed(by.get(str(label.get("case_id")))):
             missing += 1
         elif str(actual) == str(expected):
             matched += 1
@@ -286,16 +360,18 @@ def _review_burden(labels: Iterable[Mapping[str, Any]], predictions: Iterable[Ma
 def _case_selection_correct(label: Mapping[str, Any], prediction: Mapping[str, Any]) -> bool | None:
     if label.get("expected_mapping_state") != "suggested" or not _gold_ids(label):
         return None
-    return bool(_ids(prediction)) and set(_ids(prediction)) == set(_gold_ids(label))
+    return not _prediction_failed(prediction) and bool(_ids(prediction)) and set(_ids(prediction)) == set(_gold_ids(label))
 
 
 def _group_summary(labels: list[Mapping[str, Any]], by: Mapping[str, Mapping[str, Any]]) -> dict[str, Any]:
     applicable = [row for row in labels if _case_selection_correct(row, by.get(str(row.get("case_id")), {})) is not None]
     selected = sum(bool(_ids(by.get(str(row.get("case_id")), {}))) for row in applicable)
+    successful_selected = sum(not _prediction_failed(pred := by.get(str(row.get("case_id"))))
+                              and bool(_ids(pred)) for row in applicable)
     correct = sum(_case_selection_correct(row, by.get(str(row.get("case_id")), {})) is True for row in applicable)
     return {"cases": len(labels), "matchable_cases": len(applicable), "selected": selected, "correct": correct,
             "exact_choice_micro": correct / len(applicable) if applicable else None,
-            "coverage": selected / len(applicable) if applicable else None,
+            "coverage": successful_selected / len(applicable) if applicable else None,
             "selected_precision": correct / selected if selected else None}
 
 
@@ -346,7 +422,7 @@ def _review_quality(labels: Iterable[Mapping[str, Any]], predictions: Iterable[M
             actual = pred.get("initial_state", pred)
         else:
             actual = pred.get("reviewer_corrected_state", pred.get("final_state"))
-        if not isinstance(actual, Mapping):
+        if _prediction_failed(pred) or not isinstance(actual, Mapping):
             continue
         total += 1
         fields = {"event_type": "expected_event_type", "quantity": "expected_quantity",

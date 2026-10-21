@@ -1,0 +1,68 @@
+{
+  "version": "batch24-quality-controlled-v1",
+  "origin": "authored synthetic controlled boundary fixtures",
+  "review_status": "AI-authored; no independent semantic adjudication",
+  "holdout_eligible": false,
+  "atomic": [
+    {"mode": "complete", "tp": 2, "fp": 0, "fn": 0},
+    {"mode": "omission", "tp": 1, "fp": 0, "fn": 1},
+    {"mode": "invention", "tp": 2, "fp": 1, "fn": 0},
+    {"mode": "duplicate", "tp": 2, "fp": 1, "fn": 0},
+    {"mode": "merge", "tp": 0, "fp": 1, "fn": 2}
+  ],
+  "non_progress": [
+    {"event": "planned_work", "source": "Tomorrow plan to install 8 spools."},
+    {"event": "material_delivery", "source": "Delivered 8 spools to the laydown yard."},
+    {"event": "no_work", "source": "No spool installation today."}
+  ],
+  "states": [
+    {"source": "Installation blocked by missing permit.", "event": "blocker", "status": "blocked"},
+    {"source": "Installation stopped; no work today.", "event": "no_work", "status": "blocked"},
+    {"source": "Installation delayed by rain.", "event": "blocker", "status": "blocked"},
+    {"source": "Installation resumed; erected 2 spools.", "event": "actual_progress", "status": "in_progress"},
+    {"source": "Installation started today.", "event": "actual_start", "status": "in_progress"},
+    {"source": "Installation completed today.", "event": "actual_finish", "status": "completed"},
+    {"source": "Installation has not started.", "event": "no_work", "status": "not_started"},
+    {"source": "Installation is not completed.", "event": "no_work", "status": "in_progress"}
+  ],
+  "numbers": [
+    {"value": "2.50", "accepted": true}, {"value": "0", "accepted": true},
+    {"value": "1000", "accepted": true}, {"value": "1,000", "accepted": false},
+    {"value": "2-4", "accepted": false}, {"value": "~3", "accepted": false},
+    {"value": "-2", "accepted": false}, {"value": "NaN", "accepted": false},
+    {"value": "Infinity", "accepted": false}
+  ],
+  "percentages": [
+    {"value": "0", "accepted": true}, {"value": "25.5", "accepted": true},
+    {"value": "100", "accepted": true}, {"value": "-1", "accepted": false},
+    {"value": "100.1", "accepted": false}
+  ],
+  "units": [
+    {"from": "cm", "to": "m", "quantity": "250", "ratio": "25"},
+    {"from": "mm", "to": "m", "quantity": "2500", "ratio": "25"},
+    {"from": "t", "to": "kg", "quantity": "0.0025", "ratio": "25"},
+    {"from": "kg", "to": "t", "quantity": "2500", "ratio": "25"},
+    {"from": "m2", "to": "m", "quantity": "2", "ratio": null},
+    {"from": "m3", "to": "m2", "quantity": "2", "ratio": null},
+    {"from": null, "to": "m", "quantity": "2", "ratio": null},
+    {"from": "m", "to": null, "quantity": "2", "ratio": null}
+  ],
+  "dates": [
+    {"report": "2026-12-31", "word": "Tomorrow", "expected": "2027-01-01"},
+    {"report": "2026-01-01", "word": "Yesterday", "expected": "2025-12-31"},
+    {"report": "2028-02-28", "word": "Tomorrow", "expected": "2028-02-29"},
+    {"report": "2028-03-01", "word": "Yesterday", "expected": "2028-02-29"},
+    {"report": "2026-10-21", "word": "Today", "expected": "2026-10-21"}
+  ],
+  "locations": [
+    {"source": "AREA-A: erected 2 spools. Delivered 5 spools to AREA-B.", "first": "AREA-A", "second": "AREA-B"},
+    {"source": "Zone Oak: erected 2 spools. Delivered 5 spools to Zone Pine.", "first": "Zone Oak", "second": "Zone Pine"},
+    {"source": "North trench: erected 2 spools. Delivered 5 spools to South yard.", "first": "North trench", "second": "South yard"}
+  ],
+  "identities": ["001", "01", "1", "A-01", "A.01", "A/01", "A_01", "P-001A", "P-001B", "24-XX", "24-XY"],
+  "evidence": [
+    {"mode": "exact", "accepted": true}, {"mode": "invented", "accepted": false},
+    {"mode": "wrong_fragment", "accepted": false}, {"mode": "missing_fragment", "accepted": false},
+    {"mode": "repeated", "accepted": false}, {"mode": "wrong_event", "accepted": true}
+  ]
+}

@@ -8,7 +8,7 @@ from ..db.models import Job, Project, Report
 
 LEASE_SECONDS = 120
 MAX_ATTEMPTS = 3
-TERMINAL = {"ready_for_review", "needs_transcription", "failed", "stale"}
+TERMINAL = {"ready_for_review", "needs_transcription", "failed", "stale", "cancelled"}
 
 def _now() -> datetime:
     return datetime.now(timezone.utc)
@@ -133,3 +133,30 @@ def retry_job(db: Session, job: Job) -> Job:
     if job.attempts >= MAX_ATTEMPTS: raise ValueError("JOB_ATTEMPT_LIMIT")
     job.state="queued"; job.error_code=None; job.error_message=None; job.lease_token=None; job.lease_expires_at=None
     db.flush(); return job
+
+
+def cancel_job(db: Session, job: Job, *, now: datetime | None = None) -> Job:
+    """Cancel queued/running work and its journal atomically; caller commits.
+
+    Uses the same Job → Run → Task lock order as worker finalization. Cancellation
+    is terminal and idempotent; it never resets charged usage or the root clock.
+    """
+    from ..db.models import AgentRun
+    from ..agent.task_store import close_cancelled_run
+    now = now or _now()
+    job = db.scalar(select(Job).where(Job.id == job.id).with_for_update()
+                    .execution_options(populate_existing=True))
+    if job is None:
+        raise ValueError("JOB_NOT_FOUND")
+    if job.state not in {"queued", "running", "cancelled"}:
+        raise ValueError("JOB_NOT_CANCELLABLE")
+    if job.state != "cancelled":
+        job.state, job.error_code = "cancelled", "JOB_CANCELLED"
+        job.error_message = "The job was cancelled."
+        job.lease_token = job.lease_expires_at = None
+    run = db.scalar(select(AgentRun).where(AgentRun.job_id == job.id).with_for_update()
+                    .execution_options(populate_existing=True))
+    if run is not None:
+        close_cancelled_run(db, run, now=now)
+    db.flush()
+    return job

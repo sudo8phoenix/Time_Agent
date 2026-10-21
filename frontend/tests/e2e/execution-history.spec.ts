@@ -5,6 +5,7 @@ for (const width of [390, 1440]) test(`execution history filters, evidence and h
   const errors: string[] = [];
   page.on("pageerror", error => errors.push(error.message));
   let sawFilter = false;
+  let originalUrl = "/api/v1/projects/p1/reports/r1/original";
   await page.route("**/api/v1/**", async route => {
     const url = new URL(route.request().url()), path = url.pathname;
     if (path.endsWith("/auth/me")) return route.fulfill({ status: 401, json: {} });
@@ -13,7 +14,7 @@ for (const width of [390, 1440]) test(`execution history filters, evidence and h
     if (path.endsWith("/progress")) return route.fulfill({ json: { project_id: "p1", schedule_version: 1, counts: { activities: 1, approved_events: 2, pending_review: 0 }, notice: "Developer fixture", items: [{ activity_id: "a1", external_id: "EXC-01", name: "Excavation", wbs: "Site", completed_quantity: "0", planned_quantity: null, unit: null, physical_percent: null, actual_start: "2026-10-02", actual_start_precision: "date", lifecycle_status: "in_progress", approved_event_count: 2, history: [] }] } });
     if (path.endsWith("/history")) {
       sawFilter ||= url.searchParams.get("blocker") === "access" && url.searchParams.get("active_only") === "true";
-      return route.fulfill({ json: { total: 1, next_offset: null, items: [{ event_id: "e1", activity_id: "a1", activity_external_id: "EXC-01", activity_name: "Excavation", discipline: "civil", work_type: "excavation", wbs: "Site", status: "active", correction_status: "correction", event_type: "blocker", work_date: "2026-10-02", scope: null, blocker: "Waiting for access", blocker_category: "access", accepted_values: { blocker: "Waiting for access" }, latest_activity_state: { actual_start: "2026-10-02" }, source_locator: "page:1", provenance: { source: { original_url: "/api/v1/projects/p1/reports/r1/original" } }, evidence: [{ quote: "Waiting for access at excavation", locator: "page:1" }], confidence: { extraction: { score: null, validation_status: "unavailable" } }, decisions: [] }] } });
+      return route.fulfill({ json: { total: 1, next_offset: null, items: [{ event_id: "e1", activity_id: "a1", activity_external_id: "EXC-01", activity_name: "Excavation", discipline: "civil", work_type: "excavation", wbs: "Site", status: "active", correction_status: "correction", event_type: "blocker", work_date: "2026-10-02", scope: null, blocker: "Waiting for access", blocker_category: "access", accepted_values: { blocker: "Waiting for access" }, latest_activity_state: { actual_start: "2026-10-02" }, source_locator: "page:1", provenance: { source: { original_url: originalUrl } }, evidence: [{ quote: "Waiting for access at excavation", locator: "page:1" }], confidence: { extraction: { score: null, validation_status: "unavailable" } }, decisions: [] }] } });
     }
     if (path.endsWith("/blockers")) return route.fulfill({ json: { items: [{ category: "access", count: 1 }] } });
     if (path.endsWith("/durations")) return route.fulfill({ json: { next_offset: null, items: [{ activity_id: "a1", activity_external_id: "EXC-01", work_type: "excavation", elapsed: { status: "available", basis: "date_span", date_span_days: 3, elapsed_seconds: null }, calendar_working: { reason: "reviewed_versioned_calendar_definition_unavailable" }, labour_productivity: { reason: "measured_compatible_labour_data_unavailable" } }] } });
@@ -31,6 +32,14 @@ for (const width of [390, 1440]) test(`execution history filters, evidence and h
   await history.getByRole("button", { name: /access: 1/ }).click();
   await expect.poll(() => sawFilter).toBeTruthy();
   await expect(history.getByRole("link", { name: "Open original evidence" })).toHaveAttribute("href", /\/reports\/r1\/original/);
+  for (const unsafe of ["javascript:window.__historyExecuted=true", "data:text/html,<script>alert(1)</script>", "//untrusted.example/report"]) {
+    originalUrl = unsafe;
+    await history.getByRole("button", { name: "Refresh execution history" }).click();
+    await expect(history.getByRole("link", { name: "Open original evidence" })).toHaveCount(0);
+  }
+  originalUrl = "/api/v1/projects/p1/reports/r1/original";
+  await history.getByRole("button", { name: "Refresh execution history" }).click();
+  await expect(history.getByRole("link", { name: "Open original evidence" })).toHaveAttribute("href", originalUrl);
   await history.getByText("Accepted event values", { exact: true }).click();
   await expect(history.locator("pre").first()).toContainText("Waiting for access");
   await history.getByRole("combobox", { name: /^Activity/ }).selectOption("a1");

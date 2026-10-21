@@ -2,6 +2,7 @@
 import json
 import math
 import time
+from functools import partial
 from collections.abc import Mapping
 from .ollama import (LLMResult, OllamaConfigurationError,
                      OllamaResponseError, OllamaTransportError, _hash)
@@ -15,7 +16,8 @@ def _validate_schema(value, schema):
 
 
 class GroqChatAdapter:
-    def __init__(self, model, *, bearer_token, timeout=120, max_retries=0, transport=None):
+    def __init__(self, model, *, bearer_token, timeout=120, max_retries=0, transport=None,
+                 capacity_scope=None):
         if not bearer_token or any(c in bearer_token for c in "\r\n"):
             raise OllamaConfigurationError("A valid GROQ_API_KEY is required")
         if (not model.strip() or not math.isfinite(timeout) or not 0 < timeout <= 900
@@ -23,11 +25,16 @@ class GroqChatAdapter:
             raise OllamaConfigurationError("Invalid Groq model, timeout or retries")
         self.model, self.timeout, self.max_retries = model, timeout, max_retries
         self._token = bearer_token
-        self._transport = transport or self._http_transport
+        self.capacity_scope = capacity_scope
+        self._transport = transport or (partial(self._http_transport, capacity_scope=capacity_scope)
+                                       if capacity_scope else self._http_transport)
 
     @staticmethod
-    def _http_transport(method, url, payload, timeout, headers):
+    def _http_transport(method, url, payload, timeout, headers, *, capacity_scope=None):
         from .hosted import request
+        if capacity_scope:
+            return request("groq", method, url, payload, timeout, headers,
+                           capacity_scope=capacity_scope)
         return request("groq", method, url, payload, timeout, headers)
 
     def chat(self, *, system, user, schema, settings=None, metadata=True):
@@ -60,9 +67,16 @@ class GroqChatAdapter:
             if status >= 500 and attempt < self.max_retries:
                 continue
             from .hosted import raise_for_status
-            raise_for_status("groq", status)
+            raise_for_status("groq", status, scope=self.capacity_scope)
             try:
+                if (not isinstance(body, Mapping) or not isinstance(body.get("choices"), list)
+                        or len(body["choices"]) != 1):
+                    raise OllamaResponseError("Groq returned an invalid JSON response")
                 choice = body["choices"][0]
+                if not isinstance(choice, Mapping) or not isinstance(choice.get("message"), Mapping):
+                    raise OllamaResponseError("Groq returned an invalid JSON response")
+                if choice.get("message", {}).get("refusal"):
+                    raise OllamaResponseError("Groq refused the request")
                 if choice.get("finish_reason") != "stop":
                     raise OllamaResponseError("Groq response was incomplete")
                 value = json.loads(choice["message"]["content"])

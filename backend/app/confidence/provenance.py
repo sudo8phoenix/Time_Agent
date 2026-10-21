@@ -5,6 +5,8 @@ match strength, retrieval rank and a quote substring check are not probabilities
 """
 from __future__ import annotations
 
+from copy import deepcopy
+
 VERSION = "proposal-provenance-v1"
 
 
@@ -15,7 +17,10 @@ def unavailable(stage: str, *, version: str | None = None) -> dict:
 
 
 def capture(fields: dict, selection: dict, *, metadata: dict | None = None) -> dict:
-    metadata = metadata or {}
+    # Audit snapshots must survive later locator repairs and review edits.
+    fields = deepcopy(fields)
+    selection = deepcopy(selection)
+    metadata = deepcopy(metadata or {})
     evidence = fields.get("evidence", [])
     return {
         "version": VERSION,

@@ -52,6 +52,7 @@ _SAFE_ERRORS = {
     "AGENT_TOOL_FAILED": "The report analysis tool failed safely.",
     "AGENT_RUN_CONFLICT": "Existing persisted output is incompatible with this run.",
     "AGENT_INTERNAL_ERROR": "The report analysis run failed safely.",
+    "JOB_CANCELLED": "The job was cancelled.",
     "JOB_LEASE_LOST": "The job lease is no longer valid.",
     "SCHEDULE_VERSION_STALE": "The project schedule changed during this run.",
 }

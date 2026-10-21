@@ -183,6 +183,8 @@ fixture.run()
             )),
             "DATABASE_URL": database_url,
             "LANGGRAPH_STRICT_MSGPACK": "true",
+            "AGENT_HIERARCHY_ENABLED": "false",
+            "ORCHESTRATOR_MODEL_ASSISTED": "false",
             "PYTHONUNBUFFERED": "1",
         }
         process = subprocess.Popen(

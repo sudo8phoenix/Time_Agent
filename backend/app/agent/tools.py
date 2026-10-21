@@ -20,6 +20,23 @@ from .context import AgentRuntimeContext
 from .state import AgentState, AgentWarning, MAX_CANDIDATES, MAX_OBSERVATIONS, ModelMetadata, ValidationErrorRecord, observation_keys
 
 
+def _candidate_metadata_matches(candidate: Candidate, activity: Any) -> bool:
+    """Optional enrichment may be omitted, but cannot invent schedule facts."""
+    from .schedule_decision import candidate_for_activity
+
+    expected = candidate_for_activity(activity)
+    required = ("external_id", "activity_name", "area", "work_type", "is_leaf")
+    if any(getattr(candidate, field) != getattr(expected, field) for field in required):
+        return False
+    optional = ("asset_tags", "wbs", "discipline", "aliases", "measurement_basis",
+                "planned_quantity", "unit", "planned_start", "planned_finish")
+    return all(
+        getattr(candidate, field) in (None, [])
+        or getattr(candidate, field) == getattr(expected, field)
+        for field in optional
+    )
+
+
 class AgentToolError(RuntimeError):
     """Stable, safe tool failure; never carries service exception text."""
 
@@ -255,11 +272,7 @@ class AgentTools:
                     or str(activity.schedule_version_id) != scope.schedule_version_id
                     or not activity.is_leaf
                     or candidate_id in by_id
-                    or candidate.external_id != activity.external_id
-                    or candidate.activity_name != activity.name
-                    or candidate.area != activity.area
-                    or candidate.work_type.value != activity.work_type
-                    or candidate.is_leaf != activity.is_leaf
+                    or not _candidate_metadata_matches(candidate, activity)
                 ):
                     raise AgentToolError(
                         "AGENT_CHECKPOINT_INCOMPATIBLE",
@@ -372,6 +385,7 @@ class AgentTools:
                     name: getattr(row, name) for name in (
                         "id", "schedule_version_id", "external_id", "name", "wbs", "discipline",
                         "work_type", "area", "asset_tags", "aliases", "is_leaf",
+                        "measurement_basis", "planned_quantity", "unit", "planned_start", "planned_finish",
                     )
                 }) for row in activity_rows}
                 self._report = SimpleNamespace(
@@ -502,6 +516,9 @@ class AgentTools:
                     raise AgentToolError("AGENT_TOOL_FAILED", "Retrieval returned an unknown or unsafe candidate.")
                 if str(self._activities[key].schedule_version_id) != scope.schedule_version_id:
                     raise AgentToolError("AGENT_TOOL_FAILED", "Retrieval returned an out-of-scope candidate.")
+                activity = self._activities[key]
+                if not _candidate_metadata_matches(candidate, activity):
+                    raise AgentToolError("AGENT_TOOL_FAILED", "Retrieval returned altered schedule data.")
                 seen.add(key)
                 candidates.append(candidate)
             self._returned_candidates[observation_key] = {str(item.candidate_id): item for item in candidates}

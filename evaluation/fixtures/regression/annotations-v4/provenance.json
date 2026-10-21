@@ -1,0 +1,12 @@
+{
+  "parents": {
+    "evaluation/fixtures/regression/annotations-v3/labels.json": "b88e7981f33d3ec212066587d1f36feff6e51dbe6509b4925b7995be83a9499e",
+    "evaluation/fixtures/paired-development-v2/inputs.json": "a5c5b2f5a78d907c7d84545af0c85b442ee00baa5966689ed0523837bf058627",
+    "evaluation/fixtures/paired-development-v2/labels.json": "7c03201829b410d5e91a7de2620e75db2aaa356c5815e83bb8ffd15684624f61",
+    "evaluation/fixtures/paired-development-v2/lineage.json": "aa48ea6005cb9d86952cf90e4de82555368367635cf104406b0cf96c3e32381d"
+  },
+  "authorship": "AI engineering proposal; subsequent AI review is not independent human adjudication",
+  "source_modifications": [],
+  "consumed": true,
+  "eligible_for_fresh_holdout": false
+}

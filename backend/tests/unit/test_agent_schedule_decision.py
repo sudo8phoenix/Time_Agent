@@ -74,6 +74,18 @@ def test_short_schedule_ids_remain_local_across_discovery_batches():
     assert all(str(candidate.candidate_id) in {row['id'] for row in rows} for candidate in result)
 
 
+@pytest.mark.parametrize("ids", [["same", "same"], [None]])
+def test_retrieval_rejects_ambiguous_or_missing_schedule_identity_before_model_call(ids):
+    rows = [activity(f"Task {index}", f"T-{index}", "other") for index in range(len(ids))]
+    for row, identifier in zip(rows, ids):
+        row["id"] = identifier
+    calls = []
+    with pytest.raises(AgentDecisionError, match="duplicate or missing supplied schedule IDs"):
+        shortlist_activities({}, "pinned", rows,
+            model_call=lambda **request: calls.append(request) or {"candidate_ids": []})
+    assert calls == []
+
+
 def test_short_selection_repair_uses_wire_ids_and_preserves_evidence_scope():
     row = activity('Install pump', 'P-1', 'equipment_installation')
     candidates = shortlist_activities({'summary': 'pump'}, 'pinned', [row],

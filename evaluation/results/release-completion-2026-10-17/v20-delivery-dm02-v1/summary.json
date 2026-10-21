@@ -1,7 +1,0 @@
-{
-  "cases": 1,
-  "passed": 1,
-  "failures": [],
-  "scope": "Development component matching with supplied observations, not unseen extraction or end-to-end acceptance",
-  "domain_writes": 0
-}

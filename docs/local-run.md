@@ -1,198 +1,97 @@
 # Local runbook
 
-This profile runs the application and PostgreSQL on this Mac. Current extraction is configured for Groq `openai/gpt-oss-20b`. Private Ollama remains a separately configured option; public hosting is deferred. Report processing uses the LangGraph worker. The local homepage on port 8001 returned HTTP 200 and liveness returned `status=ok` on 18 October. Reachability does not certify source freshness or model quality. See [current status](current-status.md).
+## Setup
 
-The default extraction prompt is V12; V20 remains an explicit, unaccepted candidate.
-The latest measured extraction spent 46.312 seconds waiting for admission and
-0.806 seconds in request/response transport. Waiting in the UI may reflect shared
-quota pacing. All three Groq keys share one organization quota. See
-[provider capacity](provider-capacity.md) for bounded failures and retry policy.
+Use Python 3.12, Node.js/npm, Docker with PostgreSQL 16, and Java for native
+schedule parsing. Run the [README quick start](../README.md#quick-start), edit
+`.env`, and apply all migrations before starting a worker. Keep `.env` private.
+`ENVIRONMENT=development` permits local HTTP; production cookies require HTTPS.
 
-## One-time setup
-
-Requirements: Python 3.12, Node.js/npm, Docker Desktop, and Java. From `site-progress-agent/`:
-
-```sh
-cp .env.example .env
-make bootstrap
-cd frontend && npm ci && cd ..
-make db-up
-make migrate
-make build-web
-```
-
-Edit `.env` before creating real data. Replace `SECRET_KEY` with a long random value. Keep `ENVIRONMENT=development` for plain `http://127.0.0.1`; production cookies require HTTPS.
-
-Create the local reviewer and demo schedule without resetting existing data:
-
-```sh
-DEMO_PASSWORD='choose-at-least-12-characters' make seed-demo
-```
-
-The username is `demo-reviewer`. Do not commit `.env` or share the password.
-
-## Remote Ollama configuration
-
-After the friend-host endpoint is ready, put its private Tailscale HTTPS URL and exact installed tag in `.env`:
+The default example uses Ollama. The owner-selected orchestrator profile is:
 
 ```dotenv
-OLLAMA_BASE_URL=https://model-host.example.ts.net
-OLLAMA_MODEL=exact-installed-tag
-OLLAMA_API_KEY=
+LLM_PROVIDER=groq
+GROQ_MODEL=openai/gpt-oss-20b
+AGENT_HIERARCHY_ENABLED=true
+ORCHESTRATOR_MODEL_ASSISTED=true
+ORCHESTRATOR_PROVIDER=groq
+ORCHESTRATOR_MODEL=openai/gpt-oss-120b
+ORCHESTRATOR_KEY_SLOT=1
+EXTRACTION_PROVIDER=groq
+EXTRACTION_MODEL=openai/gpt-oss-20b
+EXTRACTION_KEY_SLOT=2
+SELECTION_PROVIDER=groq
+SELECTION_MODEL=openai/gpt-oss-20b
+SELECTION_KEY_SLOT=2
+GROQ_ACCOUNT_SCOPES_ENABLED=false
 ```
 
-Then run the non-generating readiness check:
+Set `GROQ_API_KEY_1` and `GROQ_API_KEY_2` privately. Do not put secrets in commands,
+commits, browser configuration or screenshots. Slot 0 (`GROQ_API_KEY`) is optional
+for this profile and its account mapping is unverified. The API and workers read
+settings at startup. Flags affect new work; retained runs use pinned configuration.
+Do not enable account scopes without the explicit procedure in
+[provider capacity](provider-capacity.md).
 
-```sh
-make remote-check
-```
+`AGENT_HIERARCHY_ENABLED=false` selects the V1 report graph and synchronous new
+conversations. With hierarchy enabled, `ORCHESTRATOR_MODEL_ASSISTED=false` uses
+deterministic V2 routing. The model-assisted planner validates legal next actions;
+it cannot approve progress. The default extraction prompt is V12; V20 is opt-in.
 
-This check has a 10-second timeout, does not send report content, and does not print the endpoint or token. See [remote-ollama.md](remote-ollama.md) for the friend-host setup and network restrictions.
+## Development and diagnostics
 
-## Start the app
-
-Use two terminals from the project directory:
-
-```sh
-make serve
-```
-
-```sh
-make worker
-```
-
-The API serves the already-built frontend from `frontend/dist`; rerun `make build-web` after frontend changes. The ordinary `make serve` command uses port 8000. For a second local instance, run `make serve PORT=8001` and open `http://127.0.0.1:8001`.
-
-The normal laptop profile uses one worker process. Stop it with Ctrl-C; durable graph jobs may be reclaimed after their lease expires and resumed from checkpoint. Rehearsal workers and retained tasks are separate from normal app operation; inspect them explicitly before resume.
-
-Verify the local app after startup:
+The API serves the built frontend. Rebuild after UI changes with `make build-web`.
+For hot reload, run `make dev-api PORT=8001` and `make dev-web`; inspect the Vite
+configuration for its API proxy. Keep a worker running with `make worker`.
 
 ```sh
 curl --fail http://127.0.0.1:8001/api/v1/health/live
-```
-
-The homepage is `http://127.0.0.1:8001/`. There is no `/api/v1/health/ready`
-endpoint. Liveness does not exercise extraction, database health or approval.
-Read-only database/queue/cooldown inspection is available with
-`PYTHONPATH=backend .venv/bin/python ops/runtime_status.py`.
-
-## Report processing and recovery
-
-The report processor uses bounded LangGraph. There is no alternate processor or runtime-mode switch; the hierarchy flag selects versions within LangGraph. `.env` contains server-side model settings; keep endpoints and credentials out of reports and browser settings. The application database was inspected at `0018_hosted_admission`; the earlier 0015 backup is historical. Apply migrations through 0018 before using current hosted transports. The [release record](release.md) preserves dated browser/model smokes; these are bounded workflow checks, not unseen quality acceptance.
-
-To recover from an interrupted worker, stop or restart the worker and allow its lease to expire; the durable graph run resumes from its PostgreSQL checkpoint. For database recovery, use the separate restore verification procedure below. Do not delete run traces, checkpoints, proposals, or requested snapshots as part of recovery. Earlier dated W-39 verification records describe a rollback path that has since been removed; that path is not available in the current runtime.
-
-Report model calls allow one bounded request with `REPORT_MODEL_TIMEOUT_SECONDS`
-(default 360 seconds, configurable from 30 to 900). A reachable model inventory
-does not guarantee generation will finish within that limit. Model connection,
-timeout, and invalid-response failures appear on the job page.
-
-If a model assigns a report-context date without a trusted reviewer-entered report
-date, extraction keeps the evidence-backed observation for clarification and
-removes the unsupported dates and lifecycle effects. It cannot apply progress
-until the reviewer resolves the date. If all items fail evidence validation, the
-job reports an extraction failure instead of an empty successful review.
-
-Candidate discovery uses the configured model to shortlist rows from the pinned schedule through `backend/app/agent/schedule_decision.py`, then selects or abstains from the supplied candidates. It traverses leaf activities in batches of up to 48 and retains at most eight candidates. The current worker does not use the former hybrid/lexical embedding retrieval path. Historical W-10 evidence describes the earlier implementation.
-
-## Checks
-
-```sh
 make doctor
-make test-unit
-make test-integration
-make native-smoke
-cd frontend && npm run build && node tests/frontend-contracts.test.mjs
+PYTHONPATH=backend .venv/bin/python ops/runtime_status.py
 ```
 
-Unit tests create their own synthetic schedule files and do not require the
-large external Cambridge dataset or local GT10 workbooks. These parser contracts
-are separate from audited public-source verification and model-quality results.
-The [publication record](publication-2026-10-18.md#github-unit-test-portability-fix)
-records the clean-checkout check and the original GitHub failure.
+Liveness does not certify model quality or database readiness. There is no
+`/api/v1/health/ready` endpoint. Admission waits count toward model-request budgets.
+The report timeout defaults to 360 seconds; inspect `.env.example` for all settings.
+For Ollama, set `OLLAMA_BASE_URL`, the exact installed `OLLAMA_MODEL` and optional
+`OLLAMA_API_KEY`; `make remote-check` checks readiness without inference.
 
-`make doctor` checks the model endpoint and exact model tag configured for this local profile.
+## Recovery and cancellation
 
-## Backup and restore drill
+Stop workers with Ctrl-C. Ownership leases and PostgreSQL checkpoints support
+bounded recovery. Inspect queued work, original budgets and retained journals
+before restarting. The [durable configuration contract](durable-model-configuration.md)
+rejects source/dependency drift and unpinned legacy work before new model calls.
+Do not reset counters, deadlines or checkpoints to force a resume.
 
-Stop intake and the worker before the backup:
+An authorized reviewer can POST `/api/v1/jobs/{job_id}/cancel` using normal session
+and CSRF protections. Cancellation fences late publication. Terminal report
+reanalysis uses `POST /api/v1/projects/{project_id}/reports/{report_id}/reanalysis`
+with a reason and idempotency key, retaining prior decisions and lineage.
+Already accepted work must be corrected through audited correction controls.
 
-```sh
-make backup ARGS="--output /absolute/new/backup-directory --quiesced"
-make restore-verify ARGS="/absolute/backup-directory --database progress_restore_example --uploads /absolute/new/restore-uploads"
-```
+## Mock delivery
 
-Restore verification refuses to replace an existing database and leaves the separate restored database available for inspection.
-
-## Still requires a person
-
-- Independently review and adjudicate W-03/W-29 and the technical review suggestions before they become evaluation truth.
-- Rehearse the demo on the intended laptop/network and record its conditions.
-- Decide on hosting later; no public exposure is part of this runbook.
-
-## Audited reanalysis and prototype connector
-
-For a terminal report job, an authorized reviewer can open **Report reanalysis**, enter a reason, and create a linked run. Normal resubmission of identical report/date/mapping inputs reuses the base job. Reanalysis preserves prior decisions and cannot apply already accepted source work again; use the accepted event's correction controls to change it. The API is `POST /api/v1/projects/{project_id}/reports/{report_id}/reanalysis` with `reason` and `idempotency_key`. `GET .../reports/{report_id}/runs` lists run lineage. The worker uses the snapshotted model and the only supported LangGraph runtime; historical execution-mode metadata cannot switch processors. Arbitrary browser configuration overrides are rejected. Migration `0014` downgrade refuses while child runs exist.
-
-Run the explicitly labelled local mock receiver and connector in separate terminals:
+Run these in separate terminals with a writable persistent receiver path:
 
 ```sh
 PYTHONPATH=backend .venv/bin/python ops/mock_pmis_server.py --db /absolute/path/mock-pmis.sqlite3 --port 8091
 PYTHONPATH=backend .venv/bin/python ops/run_connector.py --url http://127.0.0.1:8091
 ```
 
-For a test restricted to one project, append `--project-id <project-UUID>` to the
-connector command. Other projects' pending deliveries remain queued. Without
-that option, the connector processes pending deliveries across all projects.
+Append `--project-id <project-UUID>` to restrict the connector to one project.
+Without it, the connector processes pending deliveries across projects.
+This receiver is explicitly a mock integration. Back up its SQLite state separately.
 
-Choose a writable persistent receiver database path before starting it. The outbox is part of the application backup; the receiver's separate persistent store must be backed up separately when preserving destination read-back state.
+## Backup and restore
 
-Backup/restore now verifies content hashes for lifecycle state/events, report-job lineage, conversations, graph records and outbox payloads. Use a new restore database and upload directory. The synthetic recovery fixture script refuses nonlocal/non-`progress_recovery_*` databases; see [release evidence](release.md) for the completed isolated drill.
-
-The older E02 manual capture utility stores operator-supplied observations and does not attest a browser/model workflow. The current frozen-report runner drives real worker capture and seals it before separate scoring; browser approval/delivery has its own runner. See [the evaluation guide](../evaluation/README.md). Keep labels out of inference, retain failures, use the approved review policy and freeze before capture. Both V19 splits are consumed.
-
-## Reproduce the compact model benchmark
-
-The [60-case Gemma record](../evaluation/RESULTS.md#gemma-4-12b-quality-evaluation--12-october-2026) and [evaluation guide](../evaluation/README.md) describe historical inputs, corrected table locators, draft prompt, failures and reruns. Runners and saved captures are included in the candidate publication; local databases, logs and imported schedule copies are excluded. Scoring saved captures does not contact Ollama:
+Stop intake and the worker, then use a new backup directory:
 
 ```sh
-.venv/bin/python -m evaluation.summarize_gemma \
-  --capture-dir evaluation/results/gemma4-12b-2026-10-12/combined-after-retry
+make backup ARGS="--output /absolute/new/backup-directory --quiesced"
+make restore-verify ARGS="/absolute/backup-directory --database progress_restore_example --uploads /absolute/new/restore-uploads"
 ```
 
-Live generation is a separate explicit command in that guide. The benchmark's 300-second timeout differs from the report worker's default 360 seconds. A reachable inventory is readiness evidence only; a request interrupted by a host crash must remain in the original record, with replacement captures and denominators identified.
-
-## 17 October candidate operation and rollback
-
-See [current status](current-status.md) before advancing
-either rollout flag. Both flags remain false. New work uses the current prompt;
-previous report/conversation runs retain their pinned versions and journals.
-Changing flags does not rewrite an existing run or change the only supported
-LangGraph execution runtime.
-
-`evaluation/mixed_workload.py` is restricted to an idle local
-`progress_rehearsal_*` database. It runs two real workers with a staged synthetic
-report/conversation mix and refuses automatic acceptance. Its predeclared stop
-criteria include failed work, readiness over 120 seconds, expired ownership,
-cooldown over 90 seconds, unexpected approved writes and worker exit. A stop
-prevents further admission and terminates only its own worker processes with a
-bounded drain, preserving pending work and checkpoints for explicit inspection.
-Do not restart a worker against retained queued work without reviewing that state.
-
-The latest runner explicitly pins conversation V20/provider assignments, supplies
-lifecycle-start messages and rejects empty-card/model-free task completions.
-That revision has not been live validated. Retained work from interrupted attempts
-exists in both `progress_rehearsal_20261016` and
-`progress_rehearsal_eval_20261017`; see [the follow-up](release-followup-2026-10-18.md).
-
-`evaluation/monitor_window.py --seconds 600 --output-dir <new-directory>` supplies
-a separate read-only monitoring window on the rehearsal database. It records
-stop conditions and does not kill workers, reset leases or change flags.
-Read-only monitor success alone does not certify sustained workload capacity.
-
-The main local prototype and isolated captures have separate configuration
-records. Main timeouts are preserved at restart; frozen report and mixed workload
-captures use 90-second request budgets, while component probes use 60 seconds.
-A source hash does not make those configurations
-equivalent. Restoring data requires a fresh database/upload destination and a
-verified backup manifest; disabling rollout flags is not a database rollback.
+Restore verification refuses an existing destination database and retains the
+restored copy for inspection. Preserve uploads alongside application state.
+See [testing](TESTING_AND_QUALITY.md) before running any evaluation or DB tests.

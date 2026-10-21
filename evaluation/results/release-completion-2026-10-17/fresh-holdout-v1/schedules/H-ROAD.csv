@@ -1,4 +1,0 @@
-activity_id,activity_name,aliases,area,asset_tags,discipline,is_leaf,measurement_basis,planned_finish,planned_quantity,planned_start,unit,wbs_path,work_type
-HCE,Place concrete Segment E,,Segment E,ROAD-E,civil,true,quantity_ratio,2026-12-20,100,2026-11-01,m3,SYNTHETIC/HCE,concrete_pour
-HCF,Compact Segment F,,Segment F,ROAD-F,civil,true,quantity_ratio,2026-12-20,100,2026-11-01,m3,SYNTHETIC/HCF,other
-HPF,Pave Segment F,,Segment F,ROAD-F,civil,true,quantity_ratio,2026-12-20,100,2026-11-01,m3,SYNTHETIC/HPF,other

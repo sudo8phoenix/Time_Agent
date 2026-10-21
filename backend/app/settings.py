@@ -15,6 +15,7 @@ class Settings(BaseSettings):
     groq_api_key: SecretStr | None = None
     groq_api_key_1: SecretStr | None = None
     groq_api_key_2: SecretStr | None = None
+    groq_account_scopes_enabled: bool = False
     groq_model: str = "openai/gpt-oss-20b"
     openrouter_api_key: SecretStr | None = None
     # Deliberately unset: OpenRouter model IDs must be selected explicitly.

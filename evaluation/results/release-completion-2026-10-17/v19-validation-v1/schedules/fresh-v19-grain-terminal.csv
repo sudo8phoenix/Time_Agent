@@ -1,4 +1,0 @@
-activity_id,activity_name,wbs_path,discipline,work_type,area,asset_tags,is_leaf,measurement_basis,planned_quantity,unit,planned_start,planned_finish,aliases
-GRAIN-TERMINAL-1,motor installation at Silo Birch,grain-terminal/1,mechanical,equipment_installation,Silo Birch,M-846,true,unsupported,,,2027-01-01,2027-04-30,
-GRAIN-TERMINAL-2,concrete placement at Silo Birch,grain-terminal/2,civil,concrete_pour,Silo Birch,,true,unsupported,,,2027-01-01,2027-04-30,
-GRAIN-TERMINAL-3,reinforcement fixing at Silo Birch,grain-terminal/3,civil,rebar_installation,Silo Birch,,true,unsupported,,,2027-01-01,2027-04-30,

@@ -1,4 +1,0 @@
-activity_id,activity_name,aliases,area,asset_tags,discipline,is_leaf,measurement_basis,planned_finish,planned_quantity,planned_start,unit,wbs_path,work_type
-VX12,Excavate Cut 12,,Cut 12,CUT-12,civil,true,quantity_ratio,2026-12-20,100,2026-11-01,m3,SYNTHETIC/VX12,excavation
-VX13,Excavate Cut 13,,Cut 13,CUT-13,civil,true,quantity_ratio,2026-12-20,100,2026-11-01,m3,SYNTHETIC/VX13,excavation
-VB12,Backfill Cut 12,,Cut 12,CUT-12,civil,true,quantity_ratio,2026-12-20,100,2026-11-01,m3,SYNTHETIC/VB12,backfill

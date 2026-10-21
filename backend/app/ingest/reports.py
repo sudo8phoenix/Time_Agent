@@ -2,7 +2,7 @@
 from __future__ import annotations
 import hashlib, io, json, re, uuid, zipfile
 from datetime import date
-from pathlib import Path
+from pathlib import Path, PurePosixPath
 from sqlalchemy import and_, or_, select
 from sqlalchemy.orm import Session
 from ..db.models import FileRecord, Fragment, Project, Report
@@ -13,10 +13,42 @@ MAX_PDF_PAGES = 20
 MAX_XLSX_ROWS = 5000
 MAX_EXTRACTED_CHARS = 2_000_000
 MAX_ZIP_EXPANDED_BYTES = 50 * 1024 * 1024
+MAX_ZIP_MEMBERS = 2048
+MAX_XLSX_COLUMNS = 200
+MAX_XLSX_SHEETS = 30
 SAFE_NAME = re.compile(r"^[A-Za-z0-9][A-Za-z0-9._ -]{0,254}$")
 
 def _normalise(text: str) -> str:
     return re.sub(r"\s+", " ", text).strip()
+
+
+def validate_document_archive(raw: bytes) -> None:
+    """Bound OOXML containers before a library opens individual members.
+
+    No archive member is extracted to disk. Reject ambiguous or escaping member
+    names anyway, so downstream readers see one canonical package inventory.
+    """
+    if len(raw) > MAX_BYTES:
+        raise ValueError("report exceeds 10 MB limit")
+    try:
+        with zipfile.ZipFile(io.BytesIO(raw)) as archive:
+            members = archive.infolist()
+            if len(members) > MAX_ZIP_MEMBERS:
+                raise ValueError("document contains too many archive members")
+            if sum(item.file_size for item in members) > MAX_ZIP_EXPANDED_BYTES:
+                raise ValueError("document expands beyond 50 MB limit")
+            seen = set()
+            for item in members:
+                name = item.filename
+                path = PurePosixPath(name)
+                if ("\\" in name or path.is_absolute() or ".." in path.parts
+                        or (path.parts and ":" in path.parts[0])
+                        or name in seen or item.flag_bits & 1
+                        or (item.external_attr >> 16) & 0o170000 == 0o120000):
+                    raise ValueError("unsafe or ambiguous document archive member")
+                seen.add(name)
+    except zipfile.BadZipFile as exc:
+        raise ValueError("invalid document archive") from exc
 
 def _filename(name: str | None) -> str:
     name = Path(name or "pasted-report.txt").name
@@ -63,6 +95,15 @@ def _remove_original(storage_key: str) -> None:
             pass
 
 def parse_bytes(raw: bytes, filename: str, mime: str) -> tuple[list[tuple[str, str]], list[str], str]:
+    from .report_parser import run_parser
+    result = run_parser('parse', raw, filename=filename, mime=mime)
+    return [tuple(part) for part in result['parts']], result['warnings'], result['kind']
+
+
+def _parse_bytes_local(raw: bytes, filename: str, mime: str) -> tuple[list[tuple[str, str]], list[str], str]:
+    """Pure parser implementation, called only inside the isolated worker."""
+    if len(raw) > MAX_BYTES:
+        raise ValueError("report exceeds 10 MB limit")
     suffix = Path(filename).suffix.lower()
     warnings: list[str] = []
     extracted_chars = 0
@@ -73,12 +114,7 @@ def parse_bytes(raw: bytes, filename: str, mime: str) -> tuple[list[tuple[str, s
             raise ValueError("extracted report text exceeds limit")
         parts.append((locator, value))
     if suffix in {".docx", ".xlsx"}:
-        try:
-            with zipfile.ZipFile(io.BytesIO(raw)) as archive:
-                if sum(item.file_size for item in archive.infolist()) > MAX_ZIP_EXPANDED_BYTES:
-                    raise ValueError("document expands beyond 50 MB limit")
-        except zipfile.BadZipFile as exc:
-            raise ValueError("invalid document archive") from exc
+        validate_document_archive(raw)
     if suffix in ("", ".txt") or (suffix not in {".pdf", ".xlsx", ".docx"} and mime.startswith("text/")):
         try: text = raw.decode("utf-8-sig")
         except UnicodeDecodeError as exc: raise ValueError("text file must be UTF-8") from exc
@@ -95,12 +131,19 @@ def parse_bytes(raw: bytes, filename: str, mime: str) -> tuple[list[tuple[str, s
         try: doc = Document(io.BytesIO(raw))
         except Exception as exc: raise ValueError("invalid DOCX document") from exc
         parts=[]
-        for i,p in enumerate(doc.paragraphs,1):
-            if p.text.strip(): add_part(parts, f"paragraph:{i}", p.text)
-        for ti, table in enumerate(doc.tables,1):
-            for ri,row in enumerate(table.rows,1):
-                text = " | ".join(c.text for c in row.cells)
-                if text.strip(): add_part(parts, f"table:{ti}/row:{ri}", text)
+        from docx.text.paragraph import Paragraph
+        paragraph_number = table_number = 0
+        for block in doc.iter_inner_content():
+            if isinstance(block, Paragraph):
+                paragraph_number += 1
+                if block.text.strip():
+                    add_part(parts, f"paragraph:{paragraph_number}", block.text)
+            else:
+                table_number += 1
+                for ri, row in enumerate(block.rows, 1):
+                    text = " | ".join(c.text for c in row.cells)
+                    if text.strip():
+                        add_part(parts, f"table:{table_number}/row:{ri}", text)
         if not parts: raise ValueError("DOCX contains no readable text")
         return parts, warnings, "docx"
     if suffix == ".pdf":
@@ -129,16 +172,23 @@ def parse_bytes(raw: bytes, filename: str, mime: str) -> tuple[list[tuple[str, s
         try: wb=load_workbook(io.BytesIO(raw), read_only=True, data_only=True)
         except Exception as exc: raise ValueError("invalid XLSX document") from exc
         parts=[]
-        for ws in wb.worksheets:
-            first_row = next(ws.iter_rows(), None)
-            if first_row is None: raise ValueError(f"sheet {ws.title} is empty")
-            headers=[str(x.value or "").strip() for x in first_row]
-            required={"report_date","area","asset_tag","work_description","quantity","unit","quantity_kind"}
-            if not required.issubset(set(headers)): raise ValueError(f"sheet {ws.title} missing required columns")
-            for ri,row in enumerate(ws.iter_rows(min_row=2),2):
-                if ri>MAX_XLSX_ROWS+1: raise ValueError("XLSX exceeds 5,000 row limit")
-                vals=[x.value for x in row]; text=" | ".join(f"{h}: {v}" for h,v in zip(headers,vals) if v is not None)
-                if text.strip(): add_part(parts, f"sheet:{ws.title}/row:{ri}",text)
+        try:
+            if len(wb.worksheets) > MAX_XLSX_SHEETS:
+                raise ValueError("XLSX exceeds 30 sheet limit")
+            for ws in wb.worksheets:
+                if (ws.max_column or 0) > MAX_XLSX_COLUMNS:
+                    raise ValueError("XLSX exceeds 200 column limit")
+                first_row = next(ws.iter_rows(max_row=1, max_col=MAX_XLSX_COLUMNS), None)
+                if first_row is None: raise ValueError(f"sheet {ws.title} is empty")
+                headers=[str(x.value or "").strip() for x in first_row]
+                required={"report_date","area","asset_tag","work_description","quantity","unit","quantity_kind"}
+                if not required.issubset(set(headers)): raise ValueError(f"sheet {ws.title} missing required columns")
+                for ri,row in enumerate(ws.iter_rows(min_row=2, max_col=MAX_XLSX_COLUMNS),2):
+                    if ri>MAX_XLSX_ROWS+1: raise ValueError("XLSX exceeds 5,000 row limit")
+                    vals=[x.value for x in row]; text=" | ".join(f"{h}: {v}" for h,v in zip(headers,vals) if v is not None)
+                    if text.strip(): add_part(parts, f"sheet:{ws.title}/row:{ri}",text)
+        finally:
+            wb.close()
         if not parts: raise ValueError("XLSX contains no report rows")
         return parts,warnings,"xlsx"
     raise ValueError("unsupported report format")

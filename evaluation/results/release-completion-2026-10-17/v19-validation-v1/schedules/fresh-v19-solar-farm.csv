@@ -1,4 +1,0 @@
-activity_id,activity_name,wbs_path,discipline,work_type,area,asset_tags,is_leaf,measurement_basis,planned_quantity,unit,planned_start,planned_finish,aliases
-SOLAR-FARM-1,inverter installation at Inverter court,solar-farm/1,electrical,equipment_installation,Inverter court,I-483,true,unsupported,,,2027-01-01,2027-04-30,
-SOLAR-FARM-2,trench excavation at Inverter court,solar-farm/2,civil,excavation,Inverter court,,true,unsupported,,,2027-01-01,2027-04-30,
-SOLAR-FARM-3,cable termination at Inverter court,solar-farm/3,electrical,cable_termination,Inverter court,,true,unsupported,,,2027-01-01,2027-04-30,

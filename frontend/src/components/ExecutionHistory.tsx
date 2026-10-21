@@ -1,3 +1,4 @@
+import { originalEvidenceUrl } from "../evidenceUrl";
 import { useEffect, useState } from "react";
 
 type Request = <T>(path: string) => Promise<T>;
@@ -65,7 +66,7 @@ export function ExecutionHistory({ projectId, version, request, activities }: { 
       <p>{event.discipline} / {event.work_type} · {event.wbs} · {event.scope || "Scope not specified"}</p>
       {event.blocker && <p>Blocker: {event.blocker} ({event.blocker_category})</p>}
       {event.evidence?.map((source, index) => <figure key={index}><blockquote>{source.quote}</blockquote><figcaption>{source.locator || event.source_locator}</figcaption></figure>)}
-      {event.provenance?.source?.original_url && <a href={event.provenance.source.original_url} target="_blank" rel="noreferrer">Open original evidence</a>}
+      {originalEvidenceUrl(event.provenance?.source?.original_url) && <a href={originalEvidenceUrl(event.provenance?.source?.original_url)} target="_blank" rel="noreferrer">Open original evidence</a>}
       <details><summary>Accepted event values</summary><pre>{JSON.stringify(event.accepted_values, null, 2)}</pre></details>
       <details><summary>Latest activity state</summary><pre>{JSON.stringify(event.latest_activity_state, null, 2)}</pre></details>
       <details><summary>Confidence, source and decisions</summary><pre>{JSON.stringify({ confidence: event.confidence, provenance: event.provenance, decisions: event.decisions }, null, 2)}</pre></details>

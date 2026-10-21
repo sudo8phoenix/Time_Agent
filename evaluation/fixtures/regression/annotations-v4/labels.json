@@ -1,0 +1,326 @@
+{
+  "version": "proposed-development-v4",
+  "split": "consumed-development",
+  "scope": "Opt-in date convention alternatives; no replacement of frozen labels or release truth",
+  "cases": {
+    "DEV-20261020-01": {
+      "review_status": "proposed_ai_reviewed_no_human_adjudication",
+      "alternatives": [
+        {
+          "id": "source-facts",
+          "events": [
+            {
+              "event_type": "actual_progress",
+              "work_date": "2026-10-20",
+              "area": "Zone Cedar",
+              "asset_tags": [
+                "TR-030"
+              ],
+              "quantity": "5",
+              "unit": "m3",
+              "quantity_kind": "delta",
+              "date_basis": "relative_resolved"
+            }
+          ]
+        }
+      ]
+    },
+    "DEV-20261020-02": {
+      "review_status": "proposed_ai_reviewed_no_human_adjudication",
+      "alternatives": [
+        {
+          "id": "source-facts",
+          "events": [
+            {
+              "event_type": "actual_progress",
+              "work_date": "2026-10-20",
+              "area": "Zone Cedar",
+              "asset_tags": [
+                "TR-030"
+              ],
+              "quantity": null,
+              "unit": null,
+              "quantity_kind": "none",
+              "date_basis": "relative_resolved"
+            }
+          ]
+        }
+      ]
+    },
+    "DEV-20261020-03": {
+      "review_status": "proposed_ai_reviewed_no_human_adjudication",
+      "alternatives": [
+        {
+          "id": "source-facts",
+          "events": [
+            {
+              "event_type": "actual_progress",
+              "work_date": "2026-10-20",
+              "area": "Zone Elm",
+              "asset_tags": [
+                "TR-017"
+              ],
+              "quantity": "4",
+              "unit": "m3",
+              "quantity_kind": "delta",
+              "date_basis": "relative_resolved"
+            }
+          ]
+        }
+      ]
+    },
+    "DEV-20261020-04": {
+      "review_status": "proposed_ai_reviewed_no_human_adjudication",
+      "alternatives": [
+        {
+          "id": "record-date",
+          "events": [
+            {
+              "event_type": "correction",
+              "work_date": "2026-10-19",
+              "area": "Zone Cedar",
+              "asset_tags": [
+                "TR-030"
+              ],
+              "quantity": null,
+              "unit": null,
+              "quantity_kind": "none",
+              "date_basis": "relative_resolved"
+            },
+            {
+              "event_type": "no_work",
+              "work_date": "2026-10-20",
+              "area": "Zone Cedar",
+              "asset_tags": [
+                "TR-030"
+              ],
+              "quantity": null,
+              "unit": null,
+              "quantity_kind": "none",
+              "date_basis": "relative_resolved"
+            }
+          ]
+        },
+        {
+          "id": "issuance-date",
+          "events": [
+            {
+              "event_type": "correction",
+              "work_date": "2026-10-20",
+              "area": "Zone Cedar",
+              "asset_tags": [
+                "TR-030"
+              ],
+              "quantity": null,
+              "unit": null,
+              "quantity_kind": "none",
+              "date_basis": "relative_resolved"
+            },
+            {
+              "event_type": "no_work",
+              "work_date": "2026-10-20",
+              "area": "Zone Cedar",
+              "asset_tags": [
+                "TR-030"
+              ],
+              "quantity": null,
+              "unit": null,
+              "quantity_kind": "none",
+              "date_basis": "relative_resolved"
+            }
+          ]
+        }
+      ]
+    },
+    "DEV-20261020-05": {
+      "review_status": "proposed_ai_reviewed_no_human_adjudication",
+      "alternatives": [
+        {
+          "id": "source-facts",
+          "events": [
+            {
+              "event_type": "actual_progress",
+              "work_date": "2026-10-20",
+              "area": "Zone Cedar",
+              "asset_tags": [
+                "TR-030"
+              ],
+              "quantity": "25",
+              "unit": "m3",
+              "quantity_kind": "cumulative",
+              "date_basis": "relative_resolved"
+            }
+          ]
+        }
+      ]
+    },
+    "DEV-20261020-06": {
+      "review_status": "proposed_ai_reviewed_no_human_adjudication",
+      "alternatives": [
+        {
+          "id": "source-facts",
+          "events": [
+            {
+              "event_type": "actual_progress",
+              "work_date": "2026-10-20",
+              "area": "Zone Cedar",
+              "asset_tags": [
+                "TR-030"
+              ],
+              "quantity": "2",
+              "unit": "m3",
+              "quantity_kind": "delta",
+              "date_basis": "relative_resolved"
+            },
+            {
+              "event_type": "no_work",
+              "work_date": "2026-10-20",
+              "area": "Zone Cedar",
+              "asset_tags": [
+                "TR-003"
+              ],
+              "quantity": null,
+              "unit": null,
+              "quantity_kind": "none",
+              "date_basis": "relative_resolved"
+            }
+          ]
+        }
+      ]
+    },
+    "DEV-20261020-07": {
+      "review_status": "proposed_ai_reviewed_no_human_adjudication",
+      "alternatives": [
+        {
+          "id": "source-facts",
+          "events": [
+            {
+              "event_type": "actual_progress",
+              "work_date": "2026-10-20",
+              "area": "Zone Pine",
+              "asset_tags": [
+                "TR-020"
+              ],
+              "quantity": "3",
+              "unit": "m3",
+              "quantity_kind": "delta",
+              "date_basis": "relative_resolved"
+            },
+            {
+              "event_type": "planned_work",
+              "work_date": "2026-10-21",
+              "area": "Zone Oak",
+              "asset_tags": [
+                "TR-021"
+              ],
+              "quantity": null,
+              "unit": null,
+              "quantity_kind": "none",
+              "date_basis": "relative_resolved"
+            },
+            {
+              "event_type": "no_work",
+              "work_date": "2026-10-20",
+              "area": "Zone Oak",
+              "asset_tags": [
+                "TR-021"
+              ],
+              "quantity": null,
+              "unit": null,
+              "quantity_kind": "none",
+              "date_basis": "relative_resolved"
+            }
+          ]
+        }
+      ]
+    },
+    "DEV-20261020-08": {
+      "review_status": "proposed_ai_reviewed_no_human_adjudication",
+      "alternatives": [
+        {
+          "id": "source-facts",
+          "events": [
+            {
+              "event_type": "actual_progress",
+              "work_date": "2026-10-20",
+              "area": null,
+              "asset_tags": [],
+              "quantity": "2",
+              "unit": "m3",
+              "quantity_kind": "delta",
+              "date_basis": "relative_resolved"
+            }
+          ]
+        }
+      ]
+    },
+    "DEV-20261020-09": {
+      "review_status": "proposed_ai_reviewed_no_human_adjudication",
+      "alternatives": [
+        {
+          "id": "source-facts",
+          "events": [
+            {
+              "event_type": "actual_progress",
+              "work_date": "2026-10-20",
+              "area": "Zone Cedar",
+              "asset_tags": [
+                "TR-030"
+              ],
+              "quantity": "5",
+              "unit": "m3",
+              "quantity_kind": "delta",
+              "date_basis": "relative_resolved"
+            }
+          ]
+        }
+      ]
+    },
+    "DEV-20261020-10": {
+      "review_status": "proposed_ai_reviewed_no_human_adjudication",
+      "alternatives": [
+        {
+          "id": "source-facts",
+          "events": [
+            {
+              "event_type": "actual_progress",
+              "work_date": "2026-10-20",
+              "area": "Zone Cedar",
+              "asset_tags": [
+                "TR-030"
+              ],
+              "quantity": "2",
+              "unit": "m3",
+              "quantity_kind": "delta",
+              "date_basis": "relative_resolved"
+            },
+            {
+              "event_type": "planned_work",
+              "work_date": "2026-10-21",
+              "area": "Zone Oak",
+              "asset_tags": [
+                "TR-021"
+              ],
+              "quantity": null,
+              "unit": null,
+              "quantity_kind": "none",
+              "date_basis": "relative_resolved"
+            },
+            {
+              "event_type": "no_work",
+              "work_date": "2026-10-20",
+              "area": "Zone Pine",
+              "asset_tags": [
+                "TR-020"
+              ],
+              "quantity": null,
+              "unit": null,
+              "quantity_kind": "none",
+              "date_basis": "relative_resolved"
+            }
+          ]
+        }
+      ]
+    }
+  }
+}

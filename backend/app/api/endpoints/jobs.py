@@ -13,7 +13,7 @@ from ...db.models import (
     FileRecord,
 )
 from ...db.session import get_session
-from ...jobs.service import retry_job
+from ...jobs.service import retry_job, cancel_job
 from ..dependencies import current_user, require_reviewer
 
 router = APIRouter(prefix="/jobs", tags=["jobs"])
@@ -127,6 +127,20 @@ def retry(
         raise HTTPException(404, "Job not found")
     try:
         retry_job(db, job)
+    except ValueError as exc:
+        raise HTTPException(409, detail={"code": str(exc)}) from exc
+    return {"job_id": str(job.id), "state": job.state, "attempts": job.attempts}
+
+
+@router.post("/{job_id}/cancel")
+def cancel(
+    job_id: UUID, db: Session = Depends(get_session), reviewer: User = Depends(require_reviewer)
+):
+    job = _job_for_user(db, job_id, reviewer, lock=True)
+    if not job:
+        raise HTTPException(404, "Job not found")
+    try:
+        cancel_job(db, job)
     except ValueError as exc:
         raise HTTPException(409, detail={"code": str(exc)}) from exc
     return {"job_id": str(job.id), "state": job.state, "attempts": job.attempts}

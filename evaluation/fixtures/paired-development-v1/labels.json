@@ -1,0 +1,199 @@
+{
+  "scope": "AI-authored selected-field development labels; independent review pending; correction policy provisional",
+  "cases": {
+    "DEV-20261020-01": [
+      {
+        "event_type": "actual_progress",
+        "work_date": "2026-10-20",
+        "area": "Zone Cedar",
+        "asset_tags": [
+          "TR-030"
+        ],
+        "quantity": "5",
+        "unit": "m3",
+        "quantity_kind": "delta"
+      }
+    ],
+    "DEV-20261020-02": [
+      {
+        "event_type": "actual_progress",
+        "work_date": "2026-10-20",
+        "area": "Zone Cedar",
+        "asset_tags": [
+          "TR-030"
+        ],
+        "quantity": null,
+        "unit": null,
+        "quantity_kind": "none"
+      }
+    ],
+    "DEV-20261020-03": [
+      {
+        "event_type": "actual_progress",
+        "work_date": "2026-10-20",
+        "area": "Zone Elm",
+        "asset_tags": [
+          "TR-017"
+        ],
+        "quantity": "4",
+        "unit": "m3",
+        "quantity_kind": "delta"
+      }
+    ],
+    "DEV-20261020-04": [
+      {
+        "event_type": "correction",
+        "work_date": "2026-10-19",
+        "area": "Zone Cedar",
+        "asset_tags": [
+          "TR-030"
+        ],
+        "quantity": null,
+        "unit": null,
+        "quantity_kind": "none"
+      },
+      {
+        "event_type": "no_work",
+        "work_date": "2026-10-20",
+        "area": "Zone Cedar",
+        "asset_tags": [
+          "TR-030"
+        ],
+        "quantity": null,
+        "unit": null,
+        "quantity_kind": "none"
+      }
+    ],
+    "DEV-20261020-05": [
+      {
+        "event_type": "actual_progress",
+        "work_date": "2026-10-20",
+        "area": "Zone Cedar",
+        "asset_tags": [
+          "TR-030"
+        ],
+        "quantity": "25",
+        "unit": "m3",
+        "quantity_kind": "cumulative"
+      }
+    ],
+    "DEV-20261020-06": [
+      {
+        "event_type": "actual_progress",
+        "work_date": "2026-10-20",
+        "area": "Zone Cedar",
+        "asset_tags": [
+          "TR-030"
+        ],
+        "quantity": "2",
+        "unit": "m3",
+        "quantity_kind": "delta"
+      },
+      {
+        "event_type": "no_work",
+        "work_date": "2026-10-20",
+        "area": "Zone Cedar",
+        "asset_tags": [
+          "TR-003"
+        ],
+        "quantity": null,
+        "unit": null,
+        "quantity_kind": "none"
+      }
+    ],
+    "DEV-20261020-07": [
+      {
+        "event_type": "actual_progress",
+        "work_date": "2026-10-20",
+        "area": "Zone Pine",
+        "asset_tags": [
+          "TR-020"
+        ],
+        "quantity": "3",
+        "unit": "m3",
+        "quantity_kind": "delta"
+      },
+      {
+        "event_type": "planned_work",
+        "work_date": "2026-10-21",
+        "area": "Zone Oak",
+        "asset_tags": [
+          "TR-021"
+        ],
+        "quantity": null,
+        "unit": null,
+        "quantity_kind": "none"
+      },
+      {
+        "event_type": "no_work",
+        "work_date": "2026-10-20",
+        "area": "Zone Oak",
+        "asset_tags": [
+          "TR-021"
+        ],
+        "quantity": null,
+        "unit": null,
+        "quantity_kind": "none"
+      }
+    ],
+    "DEV-20261020-08": [
+      {
+        "event_type": "actual_progress",
+        "work_date": "2026-10-20",
+        "area": null,
+        "asset_tags": [],
+        "quantity": "2",
+        "unit": "m3",
+        "quantity_kind": "delta"
+      }
+    ],
+    "DEV-20261020-09": [
+      {
+        "event_type": "actual_progress",
+        "work_date": "2026-10-20",
+        "area": "Zone Cedar",
+        "asset_tags": [
+          "TR-030"
+        ],
+        "quantity": "5",
+        "unit": "m3",
+        "quantity_kind": "delta"
+      }
+    ],
+    "DEV-20261020-10": [
+      {
+        "event_type": "actual_progress",
+        "work_date": "2026-10-20",
+        "area": "Zone Cedar",
+        "asset_tags": [
+          "TR-030"
+        ],
+        "quantity": "2",
+        "unit": "m3",
+        "quantity_kind": "delta"
+      },
+      {
+        "event_type": "planned_work",
+        "work_date": "2026-10-21",
+        "area": "Zone Oak",
+        "asset_tags": [
+          "TR-021"
+        ],
+        "quantity": null,
+        "unit": null,
+        "quantity_kind": "none"
+      },
+      {
+        "event_type": "no_work",
+        "work_date": "2026-10-20",
+        "area": "Zone Pine",
+        "asset_tags": [
+          "TR-020"
+        ],
+        "quantity": null,
+        "unit": null,
+        "quantity_kind": "none"
+      }
+    ]
+  }
+}

@@ -1,0 +1,15 @@
+{
+  "scheduled": 4,
+  "attempted": 4,
+  "ready": 4,
+  "unattempted": [],
+  "full_report_exact": 4,
+  "reserved_calls": 18,
+  "reserved_tokens": 169792,
+  "reserved_list_price_usd": 0.050352,
+  "elapsed_seconds": 652.501,
+  "stopped": false,
+  "metric_scope": "Selected normalized event/date/quantity/unit/location/asset fields, exact mapping and approval boundary; semantic summary/evidence entailment not independently reviewed",
+  "release_accepted": false,
+  "limitation": "Two consumed synthetic cases; no p95, confidence, representative or release claim"
+}

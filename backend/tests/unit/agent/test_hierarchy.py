@@ -54,6 +54,12 @@ def test_nested_hierarchy_preserves_repair_and_review(extraction_failures, selec
         assert {"root", "intake", "analysis", "extraction"} <= roles
         if expected == "ready_for_review":
             assert {"matching", "selection", "evidence", "review"} <= roles
+        matching = [task for task in tasks if task.agent_role == "matching"]
+        selections = [task for task in tasks if task.agent_role == "selection"]
+        if selections:
+            assert len(matching) == 1
+            assert {task.parent_task_id for task in selections} == {matching[0].id}
+            assert matching[0].status == ("succeeded" if expected == "ready_for_review" else "failed")
         usage = db.get(AgentRun, UUID(initial.run_id)).config_metadata["hierarchy_usage"]
         assert usage.get("model_calls", 0) == fixture.model_calls
 
@@ -133,6 +139,8 @@ def test_role_snapshot_does_not_carry_a_model_across_provider_boundaries(monkeyp
     fixture = Fixture()
     sessions = sessionmaker(fixture.engine, expire_on_commit=False)
     settings = get_settings()
+    # Exercise the unset-model fallback regardless of the developer's local role model.
+    monkeypatch.setattr(settings, "extraction_model", None)
     monkeypatch.setattr(settings, "agent_hierarchy_enabled", True)
     monkeypatch.setattr(settings, "selection_provider", "openrouter")
     monkeypatch.setattr(settings, "selection_model", None)

@@ -1,4 +1,0 @@
-activity_id,activity_name,wbs_path,discipline,work_type,area,asset_tags,is_leaf,measurement_basis,planned_quantity,unit,planned_start,planned_finish,aliases
-OBSERVATORY-1,drive installation at Dome annexe,observatory/1,mechanical,equipment_installation,Dome annexe,D-671,true,unsupported,,,2027-01-01,2027-04-30,
-OBSERVATORY-2,cable laying at Dome annexe,observatory/2,electrical,cable_laying,Dome annexe,,true,unsupported,,,2027-01-01,2027-04-30,
-OBSERVATORY-3,alignment inspection at Dome annexe,observatory/3,mechanical,other,Dome annexe,,true,unsupported,,,2027-01-01,2027-04-30,

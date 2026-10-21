@@ -84,6 +84,9 @@ def enqueue(db, conversation):
         model = assignment.model or getattr(settings, f"{provider}_model")
         config["roles"][role] = {"provider": provider, "model": model,
                                   "key_slot": assignment.key_slot}
+    from ..llm.durable_contract import source_contract
+    config["source_contract"] = source_contract(settings)
+    config["groq_account_scopes_enabled"] = settings.groq_account_scopes_enabled
     conversation.revision += 1
     conversation.status = "analyzing"
     draft = dict(conversation.draft or {})
@@ -215,6 +218,9 @@ class CallJournal:
     def model(self, role):
         def call(**kwargs):
             self.check_stop()
+            from ..llm.durable_contract import compatible_contract
+            if not compatible_contract(self.config, get_settings()):
+                raise TaskStopped("CONVERSATION_CHECKPOINT_CONFLICT")
             ordinal = self.ordinal
             self.ordinal += 1
             digest = fingerprint({"role": role, "request": kwargs})
@@ -241,6 +247,7 @@ class CallJournal:
             assignment = self.config["roles"][role]
             # Only non-secret role assignments are pinned. Credentials stay ephemeral.
             settings = settings.model_copy(update={
+                "groq_account_scopes_enabled": self.config.get("groq_account_scopes_enabled", False),
                 f"{role}_provider": assignment["provider"],
                 f"{role}_model": assignment["model"],
                 f"{role}_key_slot": assignment["key_slot"],

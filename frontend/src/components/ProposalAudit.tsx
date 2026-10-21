@@ -1,3 +1,4 @@
+import { originalEvidenceUrl } from "../evidenceUrl";
 import { useState } from "react";
 export type ProposalProvenance = {
   capture_status: string;
@@ -28,7 +29,7 @@ export function ProposalAudit({ provenance, history, onRefresh, disabled }: { pr
           <dd>{estimate?.score == null ? "Unavailable" : estimate.score} · {estimate?.validation_status || "unavailable"}</dd></div>;
       })}</dl>
       {provenance.capture_status !== "recorded" && <p className="helper">This older proposal has incomplete recorded metadata.</p>}
-      {provenance.source.original_url && <a href={provenance.source.original_url} target="_blank" rel="noreferrer">Open immutable original source</a>}
+      {originalEvidenceUrl(provenance.source.original_url) && <a href={originalEvidenceUrl(provenance.source.original_url)} target="_blank" rel="noreferrer">Open immutable original source</a>}
       {provenance.intake?.quality === "human_transcribed" && <p className="helper">Human transcription · transcriber {String(provenance.intake.transcriber_id)} · {String(provenance.intake.transcribed_at)}. Evidence retains original page numbers.</p>}
       <details><summary>Original extraction, link decision and source</summary>
         <pre>{JSON.stringify({ source: provenance.source, intake: provenance.intake, original_fields: provenance.original_fields,

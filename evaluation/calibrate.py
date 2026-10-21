@@ -1,7 +1,7 @@
 """Reproducible review-routing calibration using frozen, independently reviewed labels.
 
 This tool only reads validation labels. Thresholds prioritize review; they never
-permit automatic acceptance. See docs/confidence-calibration.md for the input contract.
+permit automatic acceptance. See evaluation/contracts/confidence-calibration.md for the input contract.
 """
 from __future__ import annotations
 import argparse
@@ -10,7 +10,7 @@ import json
 import math
 from pathlib import Path
 
-VERSION = "review-calibration-v2"
+VERSION = "review-calibration-v3-completion-fence"
 BANDS = ((0, .5), (.5, .8), (.8, .9), (.9, 1.0000001))
 
 
@@ -102,6 +102,12 @@ def assess(labels: list[dict], predictions: list[dict], *, target_precision=.95,
     extra = {name: 0 for name in targets}
     for case, label in truth.items():
         prediction = predicted.get(case, {})
+        # Legacy sealed rows omit lifecycle state. Explicit failure/pending state
+        # never supplies quality or confidence support, even with diagnostic gold.
+        verified = bool(prediction) and not prediction.get("failure") and all(
+            prediction.get(key) in {"completed", "succeeded", "success", "ready_for_review"}
+            for key in ("state", "status") if key in prediction
+        )
         actual = prediction.get("targets", {})
         confidence = prediction.get("confidence", {})
         for name, expected in label["targets"].items():
@@ -113,9 +119,9 @@ def assess(labels: list[dict], predictions: list[dict], *, target_precision=.95,
             if method:
                 methods[kind].add(method)
             emitted = name in actual and value is not None
-            targets[kind].append({"score": score if emitted else None,
-                                  "correct": emitted and value == expected,
-                                  "emitted": emitted, "correct_abstention": not emitted and expected is None})
+            targets[kind].append({"score": score if emitted and verified else None,
+                                  "correct": verified and emitted and value == expected,
+                                  "emitted": emitted, "correct_abstention": verified and name in actual and value is None and expected is None})
         for name in set(actual) - set(label["targets"]):
             kind = "field" if name.startswith("field:") else name
             if kind not in targets:
@@ -124,7 +130,7 @@ def assess(labels: list[dict], predictions: list[dict], *, target_precision=.95,
                 score, method = _score(confidence.get("linking" if kind == "link" else "extraction"))
                 if method:
                     methods[kind].add(method)
-                targets[kind].append({"score": score, "correct": False, "emitted": True,
+                targets[kind].append({"score": score if verified else None, "correct": False, "emitted": True,
                                       "correct_abstention": False, "extra": True})
                 extra[kind] += 1
     results = {}

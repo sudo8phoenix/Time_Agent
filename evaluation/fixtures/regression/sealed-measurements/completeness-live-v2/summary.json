@@ -1,0 +1,11 @@
+{
+  "scheduled": 12,
+  "attempted": 4,
+  "completed": 3,
+  "stop_reason": "request_or_budget_failure",
+  "reserved_calls": 4,
+  "reserved_tokens": 81998,
+  "reserved_list_price_usd": 0.0178293,
+  "elapsed_seconds": 196.406,
+  "quality_decision": "pending scoring; no release acceptance"
+}

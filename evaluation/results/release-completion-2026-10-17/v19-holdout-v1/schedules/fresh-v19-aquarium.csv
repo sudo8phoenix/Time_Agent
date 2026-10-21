@@ -1,4 +1,0 @@
-activity_id,activity_name,wbs_path,discipline,work_type,area,asset_tags,is_leaf,measurement_basis,planned_quantity,unit,planned_start,planned_finish,aliases
-AQUARIUM-1,filter installation at Service gallery,aquarium/1,mechanical,equipment_installation,Service gallery,FL-429,true,unsupported,,,2027-01-01,2027-04-30,
-AQUARIUM-2,trench excavation at Service gallery,aquarium/2,civil,excavation,Service gallery,,true,unsupported,,,2027-01-01,2027-04-30,
-AQUARIUM-3,painting at Service gallery,aquarium/3,civil,other,Service gallery,,true,unsupported,,,2027-01-01,2027-04-30,

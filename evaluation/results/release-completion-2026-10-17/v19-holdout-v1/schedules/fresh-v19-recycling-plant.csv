@@ -1,4 +1,0 @@
-activity_id,activity_name,wbs_path,discipline,work_type,area,asset_tags,is_leaf,measurement_basis,planned_quantity,unit,planned_start,planned_finish,aliases
-RECYCLING-PLANT-1,motor installation at Sorting court,recycling-plant/1,mechanical,equipment_installation,Sorting court,M-754,true,unsupported,,,2027-01-01,2027-04-30,
-RECYCLING-PLANT-2,structural erection at Sorting court,recycling-plant/2,structural,structural_erection,Sorting court,,true,unsupported,,,2027-01-01,2027-04-30,
-RECYCLING-PLANT-3,welding at Sorting court,recycling-plant/3,mechanical,welding,Sorting court,,true,unsupported,,,2027-01-01,2027-04-30,

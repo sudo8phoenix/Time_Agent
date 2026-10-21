@@ -50,13 +50,9 @@ class MappingSpec(BaseModel):
 
 
 def workbook(raw):
-    from .reports import MAX_BYTES, MAX_ZIP_EXPANDED_BYTES
-    if len(raw) > MAX_BYTES:
-        raise ValueError('report exceeds 10 MB limit')
+    from .reports import validate_document_archive
+    validate_document_archive(raw)
     try:
-        with zipfile.ZipFile(io.BytesIO(raw)) as archive:
-            if sum(i.file_size for i in archive.infolist()) > MAX_ZIP_EXPANDED_BYTES:
-                raise ValueError('document expands beyond 50 MB limit')
         return load_workbook(io.BytesIO(raw), read_only=True, data_only=False)
     except (zipfile.BadZipFile, KeyError) as exc:
         raise ValueError('invalid XLSX document') from exc
@@ -71,6 +67,11 @@ def signature(sheet, row, headers):
 
 
 def preview(raw):
+    from .report_parser import run_parser
+    return run_parser('preview', raw)['sheets']
+
+
+def _preview_local(raw):
     wb = workbook(raw)
     try:
         result = []
@@ -87,6 +88,12 @@ def preview(raw):
 
 
 def mapped_rows(raw, spec: MappingSpec):
+    from .report_parser import run_parser
+    result = run_parser('mapping', raw, mapping=spec.model_dump())
+    return [tuple(part) for part in result['parts']], result['errors'], result['metadata']
+
+
+def _mapped_rows_local(raw, spec: MappingSpec):
     from .reports import MAX_XLSX_ROWS, MAX_EXTRACTED_CHARS
     wb = workbook(raw)
     try:
@@ -111,6 +118,8 @@ def mapped_rows(raw, spec: MappingSpec):
             cells = [{'cell': f'{get_column_letter(i + 1)}{ri}', 'header': headers[i] if i < len(headers) else '',
                       'value': cell_value(c.value), 'type': getattr(c, 'data_type', 'n'), 'number_format': getattr(c, 'number_format', None)} for i, c in enumerate(row)]
             row_errors = []
+            if [cell_value(c.value) for c in row] == headers:
+                row_errors.append('repeated header row requires review; not a work observation')
             for key, col in spec.columns.items():
                 c = row[col - 1]
                 value = cell_value(c.value)

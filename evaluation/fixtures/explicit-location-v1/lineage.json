@@ -1,0 +1,8 @@
+{
+  "scope":"Retrospective lineage metadata for already-declared development variants; does not change frozen inputs, labels or scores",
+  "cases":{
+    "LOC-20261020-01":{"parent_case_ids":["BROAD-20261020-01"],"family":"excavation-negated-stoppage-explicit-identity","change":"Explicitly designate Zone Elm as site area and TR-017 as asset tag"},
+    "LOC-20261020-02":{"parent_case_ids":["BROAD-20261020-04"],"family":"excavation-mixed-actual-planned-no-work-explicit-identity","change":"Explicitly designate Zone Pine/Zone Oak as areas and TR-020/TR-021 as asset tags"}
+  },
+  "eligibility":"Consumed development family; never unseen validation or holdout"
+}

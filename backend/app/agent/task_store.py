@@ -8,6 +8,7 @@ from datetime import datetime, timezone
 from typing import Any, Callable, Mapping
 from uuid import UUID
 
+from sqlalchemy import select
 from sqlalchemy.orm import Session
 
 from app.db.models import AgentRun, AgentTask, Job
@@ -87,6 +88,20 @@ def _safe_summary(value: Mapping[str, Any] | None) -> dict[str, Any]:
     return clean
 
 
+def close_cancelled_run(session: Session, run: AgentRun, *, now=None) -> None:
+    """Close the journal within the caller's Job → Run → Task transaction."""
+    now = now or datetime.now(timezone.utc)
+    for task in session.scalars(select(AgentTask).where(
+        AgentTask.run_id == run.id, AgentTask.status == "running"
+    ).with_for_update()):
+        task.status, task.outcome = "failed", "failed"
+        task.error_code, task.finished_at = "JOB_CANCELLED", now
+    if run.state != "cancelled":
+        run.state, run.error_code = "cancelled", "JOB_CANCELLED"
+        run.error_message = "The job was cancelled."
+        run.updated_at = run.completed_at = now
+
+
 class TaskStore:
     """Persist task envelopes and results beneath an existing agent run.
 
@@ -112,8 +127,11 @@ class TaskStore:
         references = _references(envelope.input_references, "input_references")
         summary = _safe_summary(safe_summary)
         with self.session_factory() as session:
+            self.lock_active_job(session)
             self._validate_parent(session, envelope)
-            row = session.get(AgentTask, envelope.task_id)
+            row = session.scalar(select(AgentTask).where(
+                AgentTask.id == envelope.task_id
+            ).with_for_update())
             if row is not None:
                 self._assert_same_envelope(row, envelope, input_fingerprint)
                 session.commit()
@@ -164,7 +182,10 @@ class TaskStore:
             TaskOutcome.RETRYABLE_FAILURE, TaskOutcome.FAILED, TaskOutcome.STALE
         } else "succeeded"
         with self.session_factory() as session:
-            row = session.get(AgentTask, envelope.task_id)
+            self.lock_active_job(session)
+            row = session.scalar(select(AgentTask).where(
+                AgentTask.id == envelope.task_id
+            ).with_for_update())
             if row is None:
                 raise TaskStoreError("task must be begun before it can finish")
             self._assert_same_envelope(row, envelope, row.input_fingerprint)
@@ -183,6 +204,11 @@ class TaskStore:
                     session.commit()
                     return self._record(row, reused=True)
                 raise TaskStoreError("terminal task cannot be finished with a different result")
+            self._validate_parent(session, envelope)
+            if session.scalar(select(AgentTask.id).where(
+                AgentTask.parent_task_id == row.id, AgentTask.status == "running"
+            ).limit(1)) is not None:
+                raise TaskStoreError("task has unfinished children")
             row.output_references = output_refs
             row.evidence_references = evidence_refs
             row.warnings = warning_codes
@@ -196,6 +222,26 @@ class TaskStore:
             row.finished_at = datetime.now(timezone.utc)
             session.commit()
             return self._record(row)
+
+    def lock_active_job(self, session: Session) -> Job:
+        """Fence task writes against cancellation under the owning job row lock.
+
+        All task writers lock job, run, then task rows. Cancellation discovered
+        here closes every active descendant in the same transaction; successful
+        historical attempts and charged budgets remain unchanged. Call before
+        any other writes: the cancellation branch deliberately commits its
+        reconciliation before raising, so caller rollback cannot reopen work.
+        """
+        job_id = session.scalar(select(AgentRun.job_id).where(AgentRun.id == self.run_id))
+        job = session.scalar(select(Job).where(Job.id == job_id).with_for_update().execution_options(populate_existing=True))
+        run = session.scalar(select(AgentRun).where(AgentRun.id == self.run_id).with_for_update().execution_options(populate_existing=True))
+        if job is None or run is None:
+            raise TaskStoreError("agent run does not exist")
+        if job.state == "cancelled":
+            close_cancelled_run(session, run)
+            session.commit()
+            raise TaskStoreError("job is cancelled")
+        return job
 
     begin_task = begin
     finish_task = finish
@@ -260,9 +306,19 @@ class TaskStore:
             ):
                 raise TaskStoreError("root task scope does not match its pinned job")
             return
-        parent_row = session.get(AgentTask, envelope.parent_task_id)
+        # Serialize child creation with parent completion. `finish` locks the
+        # same row, so either the child commits while the parent is active or
+        # it observes the terminal parent and is rejected.
+        parent_row = session.scalar(select(AgentTask).where(
+            AgentTask.id == envelope.parent_task_id
+        ).with_for_update())
         if parent_row is None:
             raise TaskStoreError("parent task does not exist")
+        # A completed/failed parent has relinquished its delegation authority.
+        # In particular, a late child result must not be attached after the
+        # parent has already been merged or failed.
+        if parent_row.status != "running":
+            raise TaskStoreError("parent task is not active")
         parent = TaskEnvelope(
             task_id=parent_row.id,
             parent_task_id=parent_row.parent_task_id,

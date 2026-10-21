@@ -39,6 +39,7 @@ def model_assisted_runtime(monkeypatch):
         "orchestrator_model_assisted": True,
         "orchestrator_provider": "openrouter",
         "orchestrator_model": SUPERVL,
+        "orchestrator_key_slot": 0,
         "extraction_provider": "ollama",
         "selection_provider": "ollama",
     })}

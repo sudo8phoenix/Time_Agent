@@ -45,14 +45,20 @@ def actual_targets(observation, expected):
         return {}
     effects = observation.get("lifecycle_effects", [])
     endpoint = effects[0].get("endpoint", {}) if len(effects) == 1 else {}
-    value = {"event": observation.get("event_type"),
-        "field:area": (observation.get("area") or "").casefold() or None,
-        "field:quantity": number(observation.get("quantity")), "field:unit": observation.get("unit")}
-    if expected.get("work_date_scored", True):
-        value["field:work_date"] = observation.get("work_date")
+    value = {"event": observation.get("event_type")}
+    # A missing field is not an explicitly emitted JSON null, including in
+    # diagnostic captures that did not pass the runtime's domain validator.
+    if "area" in observation:
+        value["field:area"] = (observation["area"] or "").casefold() or None
+    if "quantity" in observation:
+        value["field:quantity"] = number(observation["quantity"])
+    if "unit" in observation:
+        value["field:unit"] = observation["unit"]
+    if expected.get("work_date_scored", True) and "work_date" in observation:
+        value["field:work_date"] = observation["work_date"]
     if expected.get("endpoint") and endpoint:
-        value.update({"field:endpoint_"+k: endpoint.get(k) for k,v in expected["endpoint"].items()
-                      if k != "timezone" or v is not None})
+        value.update({"field:endpoint_"+k: endpoint[k] for k,v in expected["endpoint"].items()
+                      if k in endpoint and (k != "timezone" or v is not None)})
     return value
 
 
@@ -62,8 +68,8 @@ def unmasked_targets(observation):
     effects = observation.get("lifecycle_effects", [])
     if len(effects) == 1:
         endpoint = effects[0].get("endpoint", {})
-        values.update({"field:endpoint_"+key: endpoint.get(key)
-            for key in ("local_date", "local_time", "precision")})
+        values.update({"field:endpoint_"+key: endpoint[key]
+            for key in ("local_date", "local_time", "precision") if key in endpoint})
         if endpoint.get("timezone") is not None:
             values["field:endpoint_timezone"] = endpoint["timezone"]
     elif effects:
@@ -104,18 +110,29 @@ def score(source_rows, label_rows, predictions, calls):
     source = {r["case_id"]: r for r in source_rows}
     truth = {r["case_id"]: r for r in label_rows}
     predicted = {r["case_id"]: r for r in predictions}
-    if len(truth) != len(label_rows) or len(predicted) != len(predictions) or set(predicted)-set(truth):
+    if (not truth or len(source) != len(source_rows) or
+            len(truth) != len(label_rows) or len(predicted) != len(predictions) or
+            set(predicted)-set(truth) or set(truth)-set(source)):
         raise ValueError("Duplicate or non-frozen prediction cases")
+    if any(call.get("case_id") not in truth for call in calls):
+        raise ValueError("Non-frozen stage call")
+    if any(row.get("group_id") != truth[case_id].get("group_id")
+           for case_id, row in predicted.items()):
+        raise ValueError("Prediction group does not match frozen labels")
     totals = Counter()
     detail = []
     calibration_labels, calibration_predictions = [], []
     for case_id, label in truth.items():
         row = predicted.get(case_id, {})
-        ready = row.get("state") == "ready_for_review"
+        ready = (row.get("state") == "ready_for_review" and not row.get("failure") and
+                 row.get("status", "completed") in {"completed", "success", "succeeded", "ready_for_review"})
         case_calls = [c for c in calls if c["case_id"] == case_id]
         extraction = next((c for c in case_calls if c["stage"] == "extraction"), {})
-        raw = extraction.get("value", {}).get("observations", [])
-        normalized = row.get("events", [])
+        raw = extraction.get("value", {}).get("observations", []) if extraction.get("ok") else []
+        # Failed persisted rows can retain diagnostic proposals. They are not
+        # completed application outputs and cannot earn normalized credit or
+        # enter calibration as successful events.
+        normalized = row.get("events", []) if ready else []
         expected = label["events"]
         initial_counts = atomic_counts(expected, raw)
         normalized_counts = atomic_counts(expected, [e["fields"] for e in normalized])
@@ -143,7 +160,7 @@ def score(source_rows, label_rows, predictions, calls):
                     selection_repairs += 1
                     continue
                 seen_selection_inputs.add(identity)
-                decision = call.get("value", {})
+                decision = call.get("value", {}) if call.get("ok") else {}
                 first_selections.setdefault(kind, decision)
                 selection_items.append((kind, decision))
         counters["selection_repair_calls"] = selection_repairs
@@ -183,7 +200,7 @@ def score(source_rows, label_rows, predictions, calls):
                 counters["matchable_events"] += 1
                 candidate_ids = norm_item["candidate_ids"] if norm_item else [
                     id_map.get(str(item)) for item in (discoveries[kind][-1] if discoveries[kind] else [])]
-                counters["candidate_hits"] += int(gold["link"] in candidate_ids)
+                counters["candidate_hits"] += int(gold["link"] in candidate_ids[:8])
                 decision = first_selections.get(kind, {})
                 linked = id_map.get(str(decision.get("candidate_id"))) == gold["link"]
                 counters["correct_selected_matchable"] += int(linked)
@@ -213,11 +230,13 @@ def score(source_rows, label_rows, predictions, calls):
         counters["reports_needing_initial_model_correction"] = int(needed or not ready)
         totals.update(counters)
         detail.append({"case_id": case_id, "group_id": label["group_id"], "state": row.get("state", "missing"),
-            "elapsed_seconds": row.get("elapsed_seconds"), "counts": dict(counters),
+            "elapsed_seconds": row.get("elapsed_seconds"), "ready": ready, "counts": dict(counters),
             "initial_atomic_f1": f1(initial_counts), "normalized_atomic_f1": f1(normalized_counts)})
     def ratio(numerator, denominator):
         return totals[numerator]/totals[denominator] if totals[denominator] else None
-    ready_times = [r["elapsed_seconds"] for r in detail if r["state"] == "ready_for_review"]
+    ready_times = [r["elapsed_seconds"] for r in detail if r["ready"] and
+                   isinstance(r["elapsed_seconds"], (int, float)) and not isinstance(r["elapsed_seconds"], bool)
+                   and math.isfinite(r["elapsed_seconds"]) and r["elapsed_seconds"] >= 0]
     def total_f1(prefix):
         return f1({k: totals[prefix+"_"+k] for k in ("true_positive", "false_positive", "false_negative")})
     project_f1 = []
@@ -256,6 +275,8 @@ def main():
     parser.add_argument("--labels", type=Path, required=True)
     parser.add_argument("--manifest", type=Path, required=True)
     parser.add_argument("--output-dir", type=Path, required=True)
+    parser.add_argument("--historical-diagnostic", action="store_true",
+                        help="Reanalyze consumed historical holdout; never fresh acceptance evidence")
     args = parser.parse_args()
     if args.output_dir.exists():
         parser.error("Output directory must be new")
@@ -265,6 +286,12 @@ def main():
             parser.error("Captured predictions/calls/config were modified after sealing")
     manifest = json.loads(args.manifest.read_text())
     config = json.loads((args.capture/"config.json").read_text())
+    from evaluation.study_controls import verify_holdout_result
+    try:
+        holdout_control = verify_holdout_result(config, manifest,
+            historical_diagnostic=args.historical_diagnostic)
+    except ValueError as error:
+        parser.error(str(error))
     if (manifest["hashes"].get(args.labels.name) != digest(args.labels) or
         manifest["hashes"].get(args.inputs.name) != digest(args.inputs) or
         config["manifest_sha256"] != digest(args.manifest)):
@@ -296,6 +323,7 @@ def main():
         predictions, rows(args.capture/"calls.jsonl"))
     summary["hashes"] = {"capture_manifest": digest(args.capture/"capture-manifest.json"),
         "labels": digest(args.labels), "inputs": digest(args.inputs), "split_manifest": digest(args.manifest)}
+    summary["holdout_control"] = holdout_control
     (args.output_dir/"summary.json").write_text(json.dumps(summary,indent=2)+"\n")
     for name, data in (("calibration-labels.jsonl",calibration_labels),("calibration-predictions.jsonl",calibration_predictions)):
         (args.output_dir/name).write_text("".join(json.dumps(r)+"\n" for r in data))

@@ -1,0 +1,12 @@
+{
+  "scope": "AI-authored development regression labels; pilot cases already consumed; no independent human adjudication",
+  "cases": {
+    "PAIR-20261020-01": [
+      {"event_type":"actual_progress","work_date":"2026-10-20","area":"Trench Cedar","quantity":"12","unit":"m3","quantity_kind":"delta"}
+    ],
+    "PAIR-20261020-02": [
+      {"event_type":"planned_work","work_date":"2026-10-21","area":"Trench Birch","quantity":null,"unit":null,"quantity_kind":"none"},
+      {"event_type":"no_work","work_date":"2026-10-20","area":"Trench Birch","quantity":null,"unit":null,"quantity_kind":"none"}
+    ]
+  }
+}

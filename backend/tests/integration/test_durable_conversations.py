@@ -497,3 +497,41 @@ def test_extraction_prompt_is_pinned_across_restart(fixture, monkeypatch, legacy
         task = db.get(ConversationTask, task_id)
         assert task.state == "succeeded" and task.model_calls == 1 and task.attempts == 2
     assert calls == [1]
+
+
+@pytest.mark.parametrize('kind,retryable,code', [
+    ('transport', True, 'MODEL_REQUEST_FAILED'),
+    ('rate', True, 'MODEL_RATE_LIMITED'),
+    ('capacity', True, 'MODEL_CAPACITY_TIMEOUT'),
+    ('quota', False, 'MODEL_QUOTA_EXHAUSTED'),
+    ('response', False, 'MODEL_RESPONSE_INVALID'),
+    ('configuration', False, 'CONVERSATION_ANALYSIS_FAILED'),
+])
+def test_provider_failure_policy_matrix_preserves_durable_assignment_and_budget(fixture, kind, retryable, code):
+    from copy import deepcopy
+    from app.llm.hosted import HostedCapacityError, HostedQuotaError, HostedRateLimitError
+    from app.llm.ollama import OllamaConfigurationError, OllamaResponseError
+
+    task_id = enqueue(fixture)
+    with sessions() as db:
+        original = db.get(ConversationTask, task_id)
+        config, deadline = deepcopy(original.config), original.deadline_at
+    errors = {'transport': OllamaTransportError, 'rate': HostedRateLimitError,
+              'capacity': HostedCapacityError, 'quota': HostedQuotaError,
+              'response': OllamaResponseError, 'configuration': OllamaConfigurationError}
+    calls = []
+    def fail(**kwargs):
+        calls.append(True)
+        raise errors[kind]('private synthetic diagnostic')
+    assert runtime.run_once(sessions, model_factory=lambda role: fail)
+    with sessions() as db:
+        task = db.get(ConversationTask, task_id)
+        assert task.state == ('queued' if retryable else 'failed')
+        assert task.error_code == code
+        assert task.config == config and task.deadline_at == deadline
+        assert task.model_calls == task.attempts == 1
+        assert task.lease_token is None
+        assert len(calls) == 1
+        if retryable:
+            assert task.next_attempt_at <= task.deadline_at
+        assert not db.get(Conversation, fixture['conversation']).draft.get('events')

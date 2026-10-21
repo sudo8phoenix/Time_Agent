@@ -31,7 +31,8 @@ class DatabaseAdmission:
         return gate
 
     def acquire(self, provider, payload, timeout):
-        if provider not in {"groq", "openrouter"}:
+        from .account_scopes import SCOPES, check_policy
+        if provider not in {"groq", "openrouter", *SCOPES}:
             raise HostedCapacityError("Unsupported hosted capacity scope")
         deadline = self.clock() + timeout
         while True:
@@ -47,6 +48,7 @@ class DatabaseAdmission:
                     db.execute(insert(HostedProviderAdmission).values(provider=provider, state={}).on_conflict_do_nothing())
                     row = db.scalar(select(HostedProviderAdmission).where(
                         HostedProviderAdmission.provider == provider).with_for_update())
+                    check_policy(db, provider)
                     now = db.scalar(select(func.clock_timestamp()))
                     gate = self._gate(row, now)
                     try:

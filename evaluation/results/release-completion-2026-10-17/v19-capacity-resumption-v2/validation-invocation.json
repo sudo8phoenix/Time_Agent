@@ -1,9 +1,0 @@
-{
-  "prompt_version": "extraction-v19-lifecycle-clause-completeness",
-  "inputs": "data/evaluation/prototype-v19-v2/inputs.jsonl",
-  "manifest": "data/evaluation/prototype-v19-v2/manifest.json",
-  "split": "validation",
-  "capture_directory": "evaluation/results/release-completion-2026-10-17/v19-validation-v1",
-  "labels_not_opened": true,
-  "next_step": "Run only after delivery capture completes; no provider concurrency between evaluation drivers."
-}

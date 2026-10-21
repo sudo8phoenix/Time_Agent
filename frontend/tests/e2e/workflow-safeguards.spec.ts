@@ -134,3 +134,59 @@ for (const width of [320, 768, 1024, 1440]) {
     await page.screenshot({ path: `test-results/queue-${width}.png`, fullPage: true });
   });
 }
+
+test("report and model text stays inert and evidence links use the original endpoint", async ({ page }) => {
+  const hostile = '<img src=x onerror="window.__sourceExecuted=true"><script>window.__sourceExecuted=true</script>';
+  let evidenceUrl = "javascript:window.__sourceExecuted=true";
+  const job = { job_id: "job", project_id: "one", state: "ready_for_review", proposal_ids: ["p1"], proposal_count: 1, agent_run_available: false };
+  await base(page, async (route, path) => {
+    if (path.endsWith("/reports") || path === "/jobs/job") return route.fulfill({ json: job });
+    if (path === "/proposals/p1") return route.fulfill({ json: {
+      ...proposal, observation: { ...proposal.observation, summary: hostile },
+      evidence: [{ quote: hostile, locator: "javascript:window.__sourceExecuted=true", fragment_id: "fragment" }],
+      candidates: [{ ...proposal.candidates[0], name: hostile }],
+      provenance: { capture_status: "recorded", confidence: {}, source: { original_url: evidenceUrl }, original_fields: {}, original_selection: {}, model_metadata: {}, validation: {} },
+    } });
+    throw new Error(path);
+  });
+  await page.goto("/");
+  await page.getByLabel("Paste report text").fill("Installed cables today.");
+  await page.getByRole("button", { name: /Create review job/ }).click();
+  await page.getByRole("button", { name: /Open review queue/ }).click();
+  await expect(page.locator("blockquote")).toContainText(hostile);
+  await expect(page.locator('img[src="x"], script:not([src]):not([type="module"])')).toHaveCount(0);
+  await expect(page.getByRole("link", { name: "Open immutable original source" })).toHaveCount(0);
+  expect(await page.evaluate(() => (window as Window & { __sourceExecuted?: boolean }).__sourceExecuted)).toBeUndefined();
+  for (const unsafe of ["data:text/html,<script>alert(1)</script>", "//untrusted.example/report", "https://untrusted.example/report", "/api/v1/projects/one/reports/../original"]) {
+    evidenceUrl = unsafe;
+    await page.getByRole("button", { name: "Refresh decision history" }).click();
+    await expect(page.getByRole("link", { name: "Open immutable original source" })).toHaveCount(0);
+  }
+  evidenceUrl = "/api/v1/projects/one/reports/report/original";
+  await page.getByRole("button", { name: "Refresh decision history" }).click();
+  await expect(page.getByRole("link", { name: "Open immutable original source" })).toHaveAttribute("href", evidenceUrl);
+});
+
+test("transcription does not embed an unsafe original report URL", async ({ page }) => {
+  let submissions = 0;
+  await base(page, async (route, path) => {
+    if (path.endsWith("/transcriptions")) { submissions++; return route.fulfill({ json: {} }); }
+    if (path.endsWith("/reports/report")) return route.fulfill({ json: {
+      report_id: "report", original_url: 'data:text/html,<script>window.__sourceExecuted=true</script>',
+      fragments: [{ locator: "page:1", original_text: '<img src=x onerror="alert(1)">', ocr_status: "NEEDS_TRANSCRIPTION" }],
+    } });
+    if (path.endsWith("/reports") || path === "/jobs/job") return route.fulfill({ json: {
+      job_id: "job", report_id: "report", project_id: "one", state: "needs_transcription", stage: "parse", proposal_count: 0, proposal_ids: [],
+    } });
+    throw new Error(path);
+  });
+  await page.goto("/");
+  await page.locator('input[type="file"]').setInputFiles({ name: "scan.pdf", mimeType: "application/pdf", buffer: Buffer.from("mock scanned report") });
+  await page.getByRole("button", { name: /Create review job/ }).click();
+  await expect(page.getByRole("alert")).toContainText("Original report link unavailable");
+  await expect(page.locator("iframe")).toHaveCount(0);
+  await expect(page.getByRole("link", { name: "Open immutable original PDF" })).toHaveCount(0);
+  await page.getByLabel("Reviewed transcription · page:1").fill("Installed cable.");
+  await expect(page.getByRole("button", { name: "Attach transcription and create review job" })).toBeDisabled();
+  expect(submissions).toBe(0);
+});

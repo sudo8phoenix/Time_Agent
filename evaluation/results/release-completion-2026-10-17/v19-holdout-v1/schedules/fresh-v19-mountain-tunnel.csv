@@ -1,5 +1,0 @@
-activity_id,activity_name,wbs_path,discipline,work_type,area,asset_tags,is_leaf,measurement_basis,planned_quantity,unit,planned_start,planned_finish,aliases
-MOUNTAIN-TUNNEL-1,hoist installation at Portal Spruce,mountain-tunnel/1,mechanical,equipment_installation,Portal Spruce,H-138,true,unsupported,,,2027-01-01,2027-04-30,
-MOUNTAIN-TUNNEL-2,rebar installation at Portal Spruce,mountain-tunnel/2,civil,rebar_installation,Portal Spruce,,true,unsupported,,,2027-01-01,2027-04-30,
-MOUNTAIN-TUNNEL-3,grouting inspection batch alpha at Portal Spruce,mountain-tunnel/3,civil,other,Portal Spruce,BATCH-ALPHA,true,unsupported,,,2027-01-01,2027-04-30,
-MOUNTAIN-TUNNEL-3B,grouting inspection batch beta at Portal Spruce,mountain-tunnel/3,civil,other,Portal Spruce,BATCH-BETA,true,unsupported,,,2027-01-01,2027-04-30,

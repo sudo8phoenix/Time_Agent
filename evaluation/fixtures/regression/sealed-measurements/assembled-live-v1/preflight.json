@@ -1,0 +1,74 @@
+{
+  "checked_at": "2026-10-20T09:20:40.055899+00:00",
+  "model": "openai/gpt-oss-120b",
+  "key_slot": 2,
+  "model_access_verified": true,
+  "price_verified": true,
+  "price_source": "https://console.groq.com/docs/model/openai/gpt-oss-120b",
+  "prices_per_million": {
+    "input": 0.15,
+    "output": 0.6
+  },
+  "no_pending_work": true,
+  "no_active_lease_or_cooldown": true,
+  "remaining_requests": 984,
+  "quota_evidence": "Latest shared admission observation; not verified slot-specific entitlement",
+  "capacity_snapshot": {
+    "remaining_requests": 984,
+    "remaining_tokens": 3308,
+    "request_reset_remaining_seconds": 1364,
+    "token_reset_remaining_seconds": 17,
+    "cooldown_remaining_seconds": 0,
+    "lease_remaining_seconds": null
+  },
+  "account_scope": "Owner-confirmed independent slot 2 organization",
+  "other_account_consumers": "unknown",
+  "runtime": {
+    "captured_at": "2026-10-20T09:20:39.734523+00:00",
+    "schema_revision": "0018_hosted_admission",
+    "rollout_configuration": {
+      "agent_hierarchy_enabled": true,
+      "orchestrator_model_assisted": true,
+      "meaning": "configured values only; does not attest running processes"
+    },
+    "unavailable_tables": [],
+    "jobs": {
+      "by_state": {
+        "failed": 9,
+        "ready_for_review": 46,
+        "stale": 1
+      },
+      "errors_by_code": {
+        "EXTRACTION_ITEMS_REJECTED": 2,
+        "PIPELINE_ERROR": 7,
+        "SCHEDULE_VERSION_STALE": 1
+      },
+      "oldest_queued_age_seconds": null,
+      "expired_running_ownership_count": 0
+    },
+    "agent_runs": {
+      "by_state": {
+        "ready_for_review": 10
+      },
+      "errors_by_code": {}
+    },
+    "conversation_tasks": {
+      "by_state": {},
+      "errors_by_code": {},
+      "oldest_queued_age_seconds": null,
+      "expired_running_ownership_count": 0
+    },
+    "hosted_provider_admission": {
+      "groq": {
+        "remaining_requests": 984,
+        "remaining_tokens": 3308,
+        "request_reset_remaining_seconds": 1364,
+        "token_reset_remaining_seconds": 17,
+        "cooldown_remaining_seconds": 0,
+        "lease_remaining_seconds": null
+      }
+    }
+  },
+  "price_verification": "Public model pricing checked on plan price_checked date; not billing evidence",
+  "permissions": "Catalog check verifies listed model; inference can still reject and will stop"
+}
