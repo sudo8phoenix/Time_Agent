@@ -12,7 +12,7 @@ Groq GPT-OSS 120B orchestrates and GPT-OSS 20B extracts and selects. Checked-in
 rollout defaults remain off so a fresh checkout requires explicit configuration.
 
 **Status:** public/synthetic local prototype; production acceptance is incomplete.
-The latest recorded backend runs passed 1,455 unit and 263 PostgreSQL integration
+The latest recorded backend runs passed 1,460 unit and 263 PostgreSQL integration
 tests. Those passes do not establish model accuracy or sustained capacity.
 See [testing and measured results](docs/TESTING_AND_QUALITY.md).
 

@@ -110,7 +110,10 @@ def _resident_memory(pid):
                     return int(line.split()[1]) * 1024
         except FileNotFoundError:
             return None
-        raise ValueError('memory monitoring unavailable')
+        # Exiting/zombie processes can still have a status file without VmRSS.
+        # Both callers re-poll the child before accepting an unavailable sample;
+        # a live child without memory telemetry still fails closed.
+        return None
     if sys.platform == 'darwin':
         result = subprocess.run(['/bin/ps', '-o', 'rss=', '-p', str(pid)],
                                 capture_output=True, text=True, timeout=1, check=False)

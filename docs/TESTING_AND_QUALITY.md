@@ -10,7 +10,7 @@ the executable evaluation contracts remain in Git.
 
 | Check | Most recent recorded result | Scope |
 |---|---|---|
-| Backend unit suite | 1,455 passed | Offline regression; last full batch-32 run |
+| Backend unit suite | 1,460 passed | Offline Mac regression after Linux parser exit-race fix |
 | PostgreSQL integration suite | 263 passed | Isolated rehearsal DB, injected models; last full batch-32 run |
 | Final batch-32 controls | 26 passed | Source fingerprints, scopes, journals and test execution guards after final source-contract expansion |
 | Scoped Python lint | Passed | New evaluation, admission, source-contract and guard modules; no repository-wide lint claim |
@@ -163,3 +163,23 @@ sealed capture bytes. Verification of the publication candidate:
 The restricted unit attempt initially failed process-monitor tests because the
 sandbox blocked `/bin/ps`; rerunning with process inspection enabled passed.
 No new live-model evaluation was run for this publication.
+
+## Linux parser exit-race correction
+
+A subsequent GitHub Linux unit run reported four parser failures: an exiting
+child could retain `/proc/<pid>/status` after its `VmRSS` field disappeared.
+The memory sampler treated this normal exit transition as unavailable supervision,
+masking document validation errors and rejecting valid schedule/spreadsheet parses.
+
+The shared sampler now returns an unavailable sample when `VmRSS` is absent.
+Both report and native callers recheck child liveness; a live child without
+telemetry still fails closed. No memory limit or validation check was removed.
+Added regressions cover missing RSS, live missing telemetry, RSS byte conversion
+and an actual unreaped Linux child (Linux-only test).
+
+Verification: the full Mac unit suite passed **1,460 tests** before the final
+Linux-only regression was added. A network-disabled Linux Python 3.12 container
+passed **200 unreaped-child exit checks and two live-memory checks** using the
+shared report/native samplers. The final affected parser suite passed **44 tests**,
+with the Linux-only test skipped on Mac; scoped Ruff also passed. This is targeted Linux verification, not a claim
+that the full Linux CI suite has passed. See the next CI run for that result.

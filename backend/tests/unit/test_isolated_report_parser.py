@@ -1,5 +1,6 @@
 """Real fixed-child transport, failure fences and process-group cleanup."""
 import json
+import os
 import subprocess
 import sys
 import time
@@ -76,16 +77,42 @@ def test_output_flood_is_bounded_and_rejected(stream, monkeypatch):
         parse_bytes(b'x', 'report.txt', 'text/plain')
 
 
-@pytest.mark.parametrize('monitor', ['over_limit', 'unavailable'])
+@pytest.mark.parametrize('monitor', ['over_limit', 'unavailable', 'missing_sample'])
 def test_memory_limit_or_missing_monitor_fails_closed(monitor, monkeypatch):
     inject_child(monkeypatch, 'import time; time.sleep(5)')
     def memory(_pid):
         if monitor == 'unavailable':
             raise ValueError('memory monitoring unavailable')
+        if monitor == 'missing_sample':
+            return None
         return report_parser.MAX_MEMORY_BYTES + 1
     monkeypatch.setattr(report_parser, '_resident_memory', memory)
     with pytest.raises(ValueError, match='memory'):
         parse_bytes(b'x', 'report.txt', 'text/plain')
+
+
+@pytest.mark.parametrize('state', ['Z (zombie)', 'X (dead)', 'R (running)'])
+def test_linux_status_without_rss_defers_to_child_liveness(monkeypatch, state):
+    monkeypatch.setattr(sys, 'platform', 'linux')
+    monkeypatch.setattr(report_parser.Path, 'read_text',
+                        lambda path: f'Name:\tparser\nState:\t{state}\n')
+    assert report_parser._resident_memory(12345) is None
+
+
+def test_linux_status_with_rss_returns_bytes(monkeypatch):
+    monkeypatch.setattr(sys, 'platform', 'linux')
+    monkeypatch.setattr(report_parser.Path, 'read_text',
+                        lambda path: 'State:\tR (running)\nVmRSS:\t1234 kB\n')
+    assert report_parser._resident_memory(12345) == 1234 * 1024
+
+
+@pytest.mark.skipif(not sys.platform.startswith('linux'), reason='Linux /proc exit race')
+def test_linux_unreaped_child_without_rss_is_recognized_as_exited():
+    with subprocess.Popen([sys.executable, '-c', 'pass']) as child:
+        # Wait for exit without reaping: /proc still exists but VmRSS is absent.
+        os.waitid(os.P_PID, child.pid, os.WEXITED | os.WNOWAIT)
+        assert report_parser._resident_memory(child.pid) is None
+        assert child.poll() == 0
 
 
 def test_process_group_cleanup_kills_descendants_after_leader_exit(monkeypatch, tmp_path):
