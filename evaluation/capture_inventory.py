@@ -33,7 +33,12 @@ def inventory(root: Path) -> dict:
                     mode = declared
             except (ValueError, UnicodeError, AttributeError, TypeError):
                 pass
-        for number, line in enumerate(data.decode("utf-8").splitlines(), 1):
+        try:
+            lines = data.decode("utf-8").splitlines()
+        except UnicodeError:
+            lines = []
+            errors.append({"line": None, "error": "invalid UTF-8; contents not exported"})
+        for number, line in enumerate(lines, 1):
             if not line.strip():
                 continue
             try:

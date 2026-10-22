@@ -66,7 +66,7 @@ def prepare(output):
         Path('evaluation/repeated_development.py'), Path('evaluation/prompt_ablation.py'),
         Path('evaluation/paired_pilot.py'), Path('evaluation/deployment_rehearsal.py'),
         Path('ops/runtime_status.py'), Path('evaluation/experiment_guard.py'),
-        Path('evaluation/error_taxonomy.py')})
+        Path('evaluation/error_taxonomy.py'), Path('evaluation/protocol_controls.py')})
     plan = dict(scope='Consumed AI-authored development; no acceptance or unseen-data claim',
                 model=MODEL, key_slot=2, prices_per_million=PRICES,
                 price_checked='2026-10-20', price_source='https://console.groq.com/docs/model/' + MODEL,
@@ -132,7 +132,9 @@ def full_case_score(row, label, report_date):
              observations[0].get('work_date') == report_date)
     mapping = (ready and row.get('mapping_states') == [label['expected_mapping_state']] and
                sorted(row.get('selected_activity_ids', [])) == sorted(label['expected_activity_ids']))
-    safety = row.get('ledger_writes') == 0 and all(r == 'pending' for r in row.get('review_states', []))
+    reviews = row.get('review_states')
+    safety = (type(row.get('ledger_writes')) is int and row['ledger_writes'] == 0
+              and isinstance(reviews, list) and all(r == 'pending' for r in reviews))
     return dict(facts_exact=facts, mapping_exact=mapping, approval_boundary_intact=safety,
                 full_report_exact=facts and mapping and safety,
                 ambiguity_success=mapping and facts if label['expected_mapping_state'] == 'ambiguous' else None)
@@ -243,10 +245,21 @@ class Recorder:
                 assessment='Affected results require review; no quality promotion',
                 preserved_artifacts=['reports.jsonl', 'calls.jsonl', 'reservations.jsonl'],
                 release_accepted=False))
+            if self.integrity is not None:
+                evidence = digest(self.output / 'stop-assessment.json')
+                if violation:
+                    self.integrity.report_safety(
+                        category='unapproved_progress_mutation', evidence_sha256=evidence,
+                        output=self.output / 'evaluation-stop.json')
+                else:
+                    self.integrity.report_defect(
+                        category='scorer', evidence_sha256=evidence,
+                        output=self.output / 'evaluation-stop.json')
 
 
 def run(prepared, output, database_url, preflight_path, *, transport=None):
     plan, inputs = verify(prepared)
+    integrity = FrozenExperimentGuard(prepared, plan)
     _validate_target(database_url)
     # Global app.db.session remains the main database for hosted admission.
     settings = get_settings()
@@ -266,7 +279,7 @@ def run(prepared, output, database_url, preflight_path, *, transport=None):
     secrets = [v.get_secret_value() for v in settings.__dict__.values() if isinstance(v, SecretStr)]
     mode = 'injected_transport' if transport is not None else 'live_groq'
     recorder = Recorder(plan, output, secrets=secrets, transport=transport or request,
-                        integrity=FrozenExperimentGuard(prepared, plan))
+                        integrity=integrity)
     write(output/'config.json', {**plan, 'execution_mode': mode,
                                'started_at': datetime.now(timezone.utc).isoformat(),
                                'isolated_database': engine.url.database,
@@ -299,6 +312,7 @@ def run(prepared, output, database_url, preflight_path, *, transport=None):
                        full_case_score=full_case_score(row, labels[cid], case['report_date']))
             append(output/'reports.jsonl', row)
             rows.append(row)
+            recorder.integrity.record_result(trial['trial_id'])
             recorder.observe_report(row)
             print(json.dumps({k: row[k] for k in ('trial_id', 'state', 'full_case_score')}), flush=True)
             if recorder.stopped or not row['full_case_score']['approval_boundary_intact']:
@@ -310,6 +324,8 @@ def run(prepared, output, database_url, preflight_path, *, transport=None):
               unattempted=[t['trial_id'] for t in plan['schedule'] if t['trial_id'] not in {r['trial_id'] for r in rows}],
               full_report_exact=sum(r['full_case_score']['full_report_exact'] for r in rows),
               **recorder.budget.snapshot(), stopped=recorder.stopped, stop_reason=recorder.stop_reason,
+              review_required=integrity.requires_review(),
+              affected_results=[r['trial_id'] for r in rows] if integrity.requires_review() else [],
               metric_scope=plan['metric_scope'],
               release_accepted=False, limitation='Two consumed synthetic cases; no p95, confidence, representative or release claim'))
         write(output/'capture-manifest.json', {p.name: digest(p) for p in output.iterdir() if p.is_file()})

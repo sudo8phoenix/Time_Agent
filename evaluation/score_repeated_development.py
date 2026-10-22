@@ -11,7 +11,7 @@ from evaluation.metrics import _prediction_failed
 from evaluation.score_paired_pilot import completed_event_scores, event_scores, fields_exact
 
 
-def score(capture, labels, lineage):
+def score(capture, labels, lineage, *, historical_diagnostic=False):
     manifest = json.loads((capture / 'capture-manifest.json').read_text())
     required = {'config.json', 'summary.json', 'preflight.json'}
     if not required.issubset(manifest):
@@ -20,6 +20,17 @@ def score(capture, labels, lineage):
         if Path(name).name != name or sha256((capture / name).read_bytes()).hexdigest() != digest:
             raise ValueError('Capture integrity failure')
     config = json.loads((capture / 'config.json').read_text())
+    summary = json.loads((capture / 'summary.json').read_text())
+    review_required = (summary.get('review_required') is not False
+                       if 'review_required' in summary else False)
+    review_required = review_required or summary.get('stop_reason') == 'evaluation_integrity_failure'
+    for name in ('evaluation-stop.json', 'stop-assessment.json'):
+        if (capture / name).exists():
+            if name not in manifest:
+                raise ValueError('Unsealed evaluation stop evidence')
+            review_required = True
+    if review_required and not historical_diagnostic:
+        raise ValueError('Quality scores withheld pending evaluation integrity/safety review')
     for path in (labels, lineage):
         if config['source_sha256'].get(str(path)) != sha256(path.read_bytes()).hexdigest():
             raise ValueError('Frozen labels/lineage changed')
@@ -94,8 +105,11 @@ def score(capture, labels, lineage):
                           exploratory_group_bootstrap_95=[boot[124], boot[4874]],
                           warning='Small synthetic consumed groups; repeated trials are correlated; no release assurance')
     return dict(scoring_version='repeated-development-v3-completion-fences', scheduled=len(details), arms=arms,
+                review_required=review_required, historical_diagnostic=historical_diagnostic,
+                quality_usable=not review_required,
                 paired_comparison=comparison, trials=details,
-                decision='inconclusive for production; development evidence only',
+                decision=('withheld pending review; historical diagnostic only' if review_required
+                          else 'inconclusive for production; development evidence only'),
                 unmeasured=['evidence entailment', 'correction summary', 'workflow safety/quality', 'latency gates'])
 
 
@@ -105,7 +119,9 @@ if __name__ == '__main__':
     parser.add_argument('--labels', type=Path, required=True)
     parser.add_argument('--lineage', type=Path, required=True)
     parser.add_argument('--output', type=Path, required=True)
+    parser.add_argument('--historical-diagnostic', action='store_true')
     args = parser.parse_args()
-    result = score(args.capture, args.labels, args.lineage)
+    result = score(args.capture, args.labels, args.lineage,
+                   historical_diagnostic=args.historical_diagnostic)
     with args.output.open('x') as stream:
         stream.write(json.dumps(result, indent=2) + '\n')

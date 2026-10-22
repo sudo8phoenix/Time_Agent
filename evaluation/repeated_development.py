@@ -301,13 +301,20 @@ def execute(prepared, output, preflight, *, token=None, transport=None, clock=ti
                        response_checks=checks, provider_metrics=metrics)
             append(output / 'predictions.jsonl', row)
             rows.append(row)
+            if not stopped:
+                integrity.record_result(trial['trial_id'])
             print(json.dumps({k: row[k] for k in ('trial_id', 'state', 'elapsed_ms')}), flush=True)
             if stopped:
                 break
     finally:
+        review_required = integrity.requires_review() or stopped == 'evaluation_integrity_failure'
         write(output / 'summary.json', dict(scheduled=len(plan['schedule']), attempted=len(rows),
               completed=sum(r['state'] == 'completed' for r in rows), stop_reason=stopped,
-              **budget.snapshot(), quality_decision='pending scoring; no release acceptance'))
+              review_required=review_required,
+              affected_results=[r['trial_id'] for r in rows] if review_required else [],
+              **budget.snapshot(), quality_decision=(
+                  'withheld pending integrity review; no release acceptance' if review_required
+                  else 'pending scoring; no release acceptance')))
         write(output / 'capture-manifest.json', {p.name: digest(p) for p in output.iterdir() if p.is_file()})
     return json.loads((output / 'summary.json').read_text())
 

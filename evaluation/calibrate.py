@@ -10,6 +10,8 @@ import json
 import math
 from pathlib import Path
 
+from evaluation.protocol_controls import split_contract
+
 VERSION = "review-calibration-v3-completion-fence"
 BANDS = ((0, .5), (.5, .8), (.8, .9), (.9, 1.0000001))
 
@@ -63,6 +65,7 @@ def freeze_gate(manifest: dict, labels: list[dict], labels_hash: str, *,
     if manifest.get("group_review_status") != review_status:
         raise ValueError("D05 project/scenario grouping must match the selected review policy")
     splits = manifest["splits"]
+    split_contract(splits)
     if set(splits) != {"development", "train", "validation", "holdout"}:
         raise ValueError("All four split inventories are required")
     seen_cases, seen_groups = set(), set()

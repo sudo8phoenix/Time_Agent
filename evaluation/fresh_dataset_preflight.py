@@ -10,6 +10,8 @@ import json
 from pathlib import Path
 import re
 
+from evaluation.content_overlap import cross_split_candidates, fingerprint
+
 
 def digest(path):
     return sha256(path.read_bytes()).hexdigest()
@@ -25,6 +27,7 @@ def known_exposure(inputs_path, lineage_path):
     return [dict(case_id=row['case_id'],
                  group_id=lineage[row['case_id']].get('group_id', lineage[row['case_id']].get('family')),
                  text_sha256=text_digest(row['text']),
+                 fingerprint=fingerprint(row['text']), split='consumed',
                  document_sha256=row.get('source_document_sha256'),
                  parent_group_ids=lineage[row['case_id']].get('parent_group_ids', [])) for row in rows]
 
@@ -53,6 +56,7 @@ def check(manifest_path, inputs_path, labels_path, review_path, configuration_pa
     membership = {}
     lineage_edges = []
     split_groups = []
+    overlap_rows = []
     allowed = {'case_id', 'group_id', 'split', 'text', 'report_date', 'source_document_sha256',
                'source_kind', 'provenance_locator', 'parent_group_ids'}
     if not isinstance(rows, list) or not rows:
@@ -91,6 +95,10 @@ def check(manifest_path, inputs_path, labels_path, review_path, configuration_pa
         split_groups.append((group, split))
         lineage_edges.extend((group, parent) for parent in row['parent_group_ids'])
         text = text_digest(row['text'])
+        try:
+            overlap_rows.append(dict(case_id=cid, split=split, fingerprint=fingerprint(row['text'])))
+        except ValueError:
+            failures.append('source_overlap_screening_unavailable')
         document = row['source_document_sha256']
         for collection, identity in [(texts, text), (documents, document)]:
             if identity in collection and collection[identity] != split:
@@ -135,10 +143,18 @@ def check(manifest_path, inputs_path, labels_path, review_path, configuration_pa
         failures.append('review_not_complete_for_frozen_cases')
     if review.get('kind') not in {'ai_assisted', 'independent_human'}:
         failures.append('review_kind_unavailable')
+    try:
+        overlap = cross_split_candidates(overlap_rows, [dict(r, split='consumed') for r in known])
+        if overlap['candidates']:
+            failures.append('cross_split_near_duplicate_requires_review')
+    except ValueError:
+        overlap = None
+        failures.append('source_overlap_screening_unavailable')
     return dict(version='fresh-dataset-preflight-v1', structurally_eligible=not failures,
                 failures=sorted(set(failures)), cases=len(rows), source_groups=len(group_splits),
                 labels_read=False, hashes=required_hashes, release_accepted=False,
                 review_kind=review.get('kind'),
+                lexical_overlap=overlap,
                 review_identity_verified=False,
                 limitations=['Only supplied exposure history is checked; missing history is not proof of freshness.',
                              'Lineage, review identity and representative sampling still need trusted evidence.',

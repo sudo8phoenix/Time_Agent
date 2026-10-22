@@ -93,6 +93,7 @@ def prepare(output, comparison='coverage', *, case_ids=None, repetitions=3, requ
               Path('evaluation/repeated_development.py'), Path('evaluation/score_repeated_development.py'),
               Path('evaluation/repeated_preflight.py'), Path('ops/runtime_status.py'),
               Path('evaluation/experiment_guard.py'), Path('evaluation/error_taxonomy.py'),
+              Path('evaluation/protocol_controls.py'),
               Path('evaluation/study_controls.py'),
               Path('evaluation/frozen_acceptance.py'), Path('evaluation/score_frozen_acceptance.py'),
               Path('evaluation/prompt_ablation.py'), Path('evaluation/source_units.py'),
