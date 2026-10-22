@@ -209,10 +209,11 @@ def test_native_reader_treats_shell_syntax_in_identifiers_as_literal_argv(tmp_pa
         seen.append((command, timeout))
         return subprocess.CompletedProcess(command, 0, '{"task_count": 1}', '')
     monkeypatch.setattr('app.ingest.native_schedule.runner._capture_child', run)
-    run_reader_module('app.ingest.native_schedule.p6_xer', source, '$(touch unauthorized)')
+    run_reader_module('app.ingest.native_schedule.primavera', source, '$(touch unauthorized)')
     command, timeout = seen[0]
     assert command[-1] == '$(touch unauthorized)'
-    assert command[-3] == str(source.resolve())
+    assert command[-3].endswith('/input.xer')
+    assert ';' not in command[-3]
     assert timeout == 30
     assert not (tmp_path / 'unauthorized').exists()
 

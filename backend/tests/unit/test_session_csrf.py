@@ -24,7 +24,7 @@ def test_session_restore_returns_stable_csrf_without_exposing_cookie():
     assert csrf_for_session("another-session") != restored["csrf_token"]
 
 
-def test_cookie_login_restore_csrf_logout_and_expiry():
+def test_cookie_login_restore_csrf_logout_and_expiry(shared_login_limiter):
     from datetime import datetime, timedelta, timezone
     from fastapi.testclient import TestClient
     from app.db.models import Session

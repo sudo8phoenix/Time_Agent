@@ -92,13 +92,18 @@ def test_real_child_timeout_kills_descendants(tmp_path):
 
 def test_exited_child_with_inherited_open_pipes_is_still_bounded():
     import sys
+    import time
     from app.ingest.native_schedule import runner
 
     command = [sys.executable, '-c',
                'import subprocess,sys; subprocess.Popen([sys.executable,"-c","import time; time.sleep(5)"])']
+    started = time.monotonic()
     with pytest.raises(ParserRuntimeError) as error:
         runner._run_json_child(command, 0.2)
-    assert error.value.code == 'SCHEDULE_PARSE_TIMEOUT'
+    # A PID namespace may reap the orphan immediately, yielding empty/invalid
+    # output instead of leaving the inherited pipe open until the deadline.
+    assert error.value.code in {'SCHEDULE_PARSE_TIMEOUT', 'SCHEDULE_PARSE_FAILED'}
+    assert time.monotonic() - started < 2
 
 
 @pytest.mark.parametrize('source', ['import sys; sys.stdout.buffer.write(b"\\xff")',
@@ -145,10 +150,24 @@ def test_missing_memory_sample_requires_bounded_confirmed_exit(monkeypatch, exit
     import sys
     from app.ingest.native_schedule import runner
 
-    monkeypatch.setattr(runner, '_resident_memory', lambda pid: None)
+    # Simulate telemetry disappearing after Python startup. The exit grace
+    # must remain only 250 ms regardless of runtime import latency.
+    directories = []
+    environment = runner._child_environment
+    sample = runner._resident_memory
+    def child_environment(directory):
+        directories.append(directory)
+        return environment(directory)
+    def memory(pid):
+        from pathlib import Path
+        if directories and (Path(directories[0]) / 'started').exists():
+            return None
+        return sample(pid)
+    monkeypatch.setattr(runner, '_child_environment', child_environment)
+    monkeypatch.setattr(runner, '_resident_memory', memory)
     delay = 0.05 if exits else 5
     command = [sys.executable, '-c',
-               f'import time; print(\'{{"task_count":4}}\', flush=True); time.sleep({delay})']
+               f'import time,os; from pathlib import Path; Path(os.environ["TMPDIR"]).joinpath("started").touch(); print(\'{{"task_count":4}}\', flush=True); time.sleep({delay})']
     if exits:
         assert runner._run_json_child(command, 2) == {'task_count': 4}
     else:

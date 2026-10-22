@@ -6,6 +6,29 @@ from sqlalchemy.pool import StaticPool
 from app.db.base import Base
 from app.db.session import get_session
 from app.main import app
+from app.settings import Settings
+
+
+def test_disabled_registration_rejects_before_database_writes(monkeypatch):
+    from app.api.endpoints import auth
+
+    monkeypatch.setattr(auth, "get_settings", lambda: Settings(
+        _env_file=None, environment="production",
+        secret_key="test-only-production-secret-with-32-characters",
+        registration_enabled=None,
+    ))
+
+    # Any attempt to query or write through this session fails the test.
+    app.dependency_overrides[get_session] = lambda: object()
+    try:
+        with TestClient(app) as client:
+            response = client.post("/api/v1/auth/register", json={
+                "username": "blocked-reviewer", "password": "correct horse battery",
+            })
+        assert response.status_code == 403
+        assert "set-cookie" not in response.headers
+    finally:
+        app.dependency_overrides.pop(get_session, None)
 
 
 def test_registration_creates_private_workspace_and_restores_session():

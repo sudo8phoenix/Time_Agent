@@ -1,5 +1,5 @@
 from datetime import datetime, timedelta, timezone
-import hashlib, hmac, secrets, threading, time
+import hashlib, hmac, secrets
 from fastapi import APIRouter, Cookie, Depends, HTTPException, Request, Response
 from pydantic import BaseModel, Field
 from sqlalchemy import select
@@ -7,16 +7,17 @@ from sqlalchemy.exc import IntegrityError
 from sqlalchemy.orm import Session as DBSession
 from ...db.models import Project, ProjectMembership, Session, User
 from ...db.passwords import hash_password, verify_password
-from ...db.session import get_session
+from ...db.session import get_session, session_factory
+from ...security.login_limiter import SharedLoginLimiter, LoginLimited, LoginLimiterUnavailable
 from ...settings import get_settings
 from ..dependencies import current_user, require_csrf
 
 router = APIRouter(prefix="/auth", tags=["auth"])
 COOKIE = "progress_session"
-_login_lock = threading.Lock()
-_login_failures: dict[tuple[str, str], tuple[int, float]] = {}
-LOGIN_WINDOW_SECONDS = 300
-LOGIN_MAX_FAILURES = 5
+login_limiter = SharedLoginLimiter(session_factory, get_settings().secret_key)
+_dummy_password_hash = hash_password(secrets.token_urlsafe(32))
+
+
 class LoginRequest(BaseModel):
     username: str = Field(min_length=1, max_length=120)
     password: str = Field(min_length=1, max_length=256)
@@ -35,6 +36,8 @@ def create_session(user: User, response: Response, db: DBSession):
 
 @router.post("/register", status_code=201)
 def register(body: RegisterRequest, response: Response, db: DBSession = Depends(get_session)):
+    if not get_settings().public_registration_enabled:
+        raise HTTPException(403, "Public registration is disabled")
     user = User(username=body.username, password_hash=hash_password(body.password), role="reviewer", is_active=True)
     try:
         db.add(user)
@@ -56,23 +59,25 @@ def csrf_for_session(token: str) -> str:
 
 @router.post("/login")
 def login(body: LoginRequest, response: Response, request: Request, db: DBSession = Depends(get_session)):
-    key = (request.client.host if request.client else "unknown", body.username.casefold())
-    now = time.monotonic()
-    with _login_lock:
-        if len(_login_failures) > 10_000:
-            for expired_key, (_, deadline) in list(_login_failures.items()):
-                if deadline <= now: _login_failures.pop(expired_key, None)
-        count, expires = _login_failures.get(key, (0, 0))
-        if expires <= now: count = 0
-        if count >= LOGIN_MAX_FAILURES:
-            raise HTTPException(429, "Too many sign-in attempts. Try again later.", headers={"Retry-After": str(max(1, int(expires - now)))})
+    try:
+        reservation = login_limiter.reserve(
+            request.client.host if request.client else "unknown", body.username,
+        )
+    except LoginLimited as exc:
+        raise HTTPException(429, "Too many sign-in attempts. Try again later.",
+                            headers={"Retry-After": str(exc.retry_after)}) from exc
+    except LoginLimiterUnavailable as exc:
+        raise HTTPException(503, "Sign-in is temporarily unavailable.",
+                            headers={"Retry-After": "5"}) from exc
     user = db.scalar(select(User).where(User.username == body.username, User.is_active.is_(True)))
-    if not user or not verify_password(body.password, user.password_hash):
-        with _login_lock:
-            count, expires = _login_failures.get(key, (0, 0))
-            _login_failures[key] = (count + 1 if expires > now else 1, expires if expires > now else now + LOGIN_WINDOW_SECONDS)
+    valid_password = verify_password(body.password, user.password_hash if user else _dummy_password_hash)
+    if not user or not valid_password:
         raise HTTPException(401, "Invalid credentials")
-    with _login_lock: _login_failures.pop(key, None)
+    try:
+        login_limiter.release_success(reservation)
+    except LoginLimiterUnavailable as exc:
+        raise HTTPException(503, "Sign-in is temporarily unavailable.",
+                            headers={"Retry-After": "5"}) from exc
     return create_session(user, response, db)
 
 @router.post("/logout", status_code=204)

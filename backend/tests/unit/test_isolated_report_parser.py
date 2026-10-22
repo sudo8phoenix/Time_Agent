@@ -39,7 +39,8 @@ def test_real_text_worker_round_trip_and_private_transport(monkeypatch):
     assert options['shell'] is False and options['start_new_session'] is True
     assert options['close_fds'] is True
     assert 'GROQ_API_KEY' not in options['env']
-    assert set(options['env']) == {'PYTHONPATH', 'PYTHONIOENCODING', 'PYTHONDONTWRITEBYTECODE', 'LANG'}
+    assert set(options['env']) == {'PYTHONPATH', 'PYTHONIOENCODING', 'PYTHONDONTWRITEBYTECODE', 'LANG',
+                                    'HOME', 'TMPDIR', 'TMP', 'TEMP'}
     for stream in ('stdin', 'stdout', 'stderr'):
         assert options[stream].closed
 

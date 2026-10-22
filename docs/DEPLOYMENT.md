@@ -11,6 +11,8 @@ flowchart LR
     H --> A[Uvicorn API and built frontend]
     A --> D[(PostgreSQL 16)]
     A --> U[(Persistent uploads)]
+    A -->|Unix socket and bounded bytes| S[No-network parser container]
+    W -->|Unix socket and bounded bytes| S
     W[Report/conversation worker] --> D
     W --> U
     W --> M[Configured model endpoint]
@@ -20,21 +22,49 @@ flowchart LR
 
 ## Prepare and start
 
-1. Install Python 3.12, Node 20-compatible build tooling, PostgreSQL 16 and Java
-   for native schedule parsing. Follow [local setup](local-run.md).
-2. Build the frontend and install locked dependencies. Store secrets outside Git.
-   Set `ENVIRONMENT=production`, a random `SECRET_KEY`, `DATABASE_URL`, persistent
-   `UPLOAD_DIR` and reviewed provider/model settings. See [configuration](CONFIGURATION.md).
-3. Restrict registration and network access according to the intended user population.
-   Current self-registration creates reviewer accounts and projects.
-4. Back up the existing database and uploads. Apply `make migrate` while intake and
-   affected workers are quiesced. Rehearse against an isolated restore first.
-5. Run `make serve PORT=8001` and `make worker` under the host's service supervisor,
-   with restart limits and separate logs. The API binds loopback; expose it through HTTPS.
-6. Start the connector only for an explicitly configured mock destination. A real PMIS
-   requires a separately implemented and accepted adapter.
+1. Install Docker Engine with Compose, or Docker Desktop using Linux containers.
+   Copy `.env.example` to `.env` if no private environment file exists. Configure
+   provider/model settings, a random secret, and `ENVIRONMENT=production` for shared
+   deployments. Production requires a random secret of at least 32 characters.
+2. Build the image and start storage plus the isolated parser:
+
+   ```sh
+   docker compose build parser
+   docker compose up -d --wait db parser
+   ```
+
+3. Keep `REGISTRATION_ENABLED=false` and restrict network access to the intended
+   users. Registration defaults to disabled in production. Explicitly enabling it
+   creates reviewer accounts and private workspaces.
+4. Back up existing database/upload volumes and apply migrations before starting
+   the updated API and workers:
+
+   ```sh
+   docker compose run --rm --no-deps api alembic upgrade head
+   docker compose up -d api worker
+   ```
+
+   Migration `0019_login_throttle` is required for sign-in. Every API worker must
+   use the same database and secret. The Compose database credentials are local
+   development defaults; use restricted private credentials for shared deployment.
+5. Expose the loopback API port through an HTTPS reverse proxy. Keep the parser's
+   no-network, read-only, non-root and resource restrictions intact. It has no
+   provider keys, application secret, uploads, host bind mounts or Docker socket.
+   See [parser security](SECURITY.md#document-parser-confinement).
+6. If using Ollama on the Docker host, set `OLLAMA_BASE_URL` to a reachable host
+   endpoint (for Docker Desktop, usually `http://host.docker.internal:11434`).
+   Container loopback refers to the container itself. Hosted providers use the
+   configured API/worker credentials; those credentials never reach the parser.
 7. Verify sign-in, import, analysis, review, approval, exports and restore recovery.
-   Record the tested revision and configuration. Do not infer capacity from liveness.
+   Run the [Docker confinement tests](SECURITY.md#deployment-controls-and-verification).
+   Record the tested revision/configuration. Do not infer capacity from liveness.
+   A real PMIS still requires a separately implemented and accepted adapter.
+
+The Dockerfile builds the frontend and installs Python/Java inside the image; the
+host does not need matching language runtimes. Native host development still
+requires the [local toolchain](local-run.md), and document parsing requires access
+to the parser socket. Run API/worker containers to share that socket portably;
+Docker Desktop named-volume Unix sockets are not host filesystem sockets.
 
 ## Reverse proxy requirements
 

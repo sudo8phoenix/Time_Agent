@@ -64,10 +64,30 @@ and instructions are in the [user guide](docs/USER_GUIDE.md).*
 
 ## Quick start
 
-### Requirements
+### Docker on Linux, macOS or Windows
+
+Use Docker Engine with Compose, or Docker Desktop in Linux-container mode. The
+image includes the frontend, Python and Java; parsing runs in a separate
+credential-free container with networking disabled.
+
+```sh
+cp .env.example .env
+# Configure a random SECRET_KEY and your model endpoint/credentials in .env.
+docker compose build parser
+docker compose up -d --wait db parser
+docker compose run --rm --no-deps api alembic upgrade head
+docker compose up -d api worker
+```
+
+Open `http://localhost:8000`. For host Ollama, use a host-reachable endpoint such
+as `http://host.docker.internal:11434` in `.env`. Production registration is
+disabled by default. See [deployment](docs/DEPLOYMENT.md) and
+[security controls](docs/SECURITY.md) before shared deployment.
+
+### Host development requirements
 
 - Python **3.12** and Node.js/npm; CI uses **Node 20**.
-- Docker for the supplied PostgreSQL **16** service.
+- Docker for PostgreSQL **16** and the isolated parser service.
 - Java for native schedule parsing.
 - A configured Ollama endpoint or supported hosted provider credentials.
 
@@ -98,7 +118,12 @@ make seed-demo
 
 ### Start the application
 
-Run the API and worker in separate terminals:
+Document parsing requires the shared parser socket. Run API and worker through
+Docker Compose for portable access, especially on Docker Desktop where named
+volume sockets are inside the Linux VM. Host-only API development supports routes
+that do not parse documents unless `PARSER_SOCKET_PATH` reaches the isolated service.
+
+For host-only development, run the API and worker in separate terminals:
 
 ```sh
 make serve PORT=8001

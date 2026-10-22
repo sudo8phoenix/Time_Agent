@@ -15,6 +15,8 @@ import sys
 import tempfile
 import time
 
+from app.ingest.parser_transport import request_parser
+
 MAX_INPUT_BYTES = 10 * 1024 * 1024
 MAX_REQUEST_BYTES = 15 * 1024 * 1024
 MAX_OUTPUT_BYTES = 32 * 1024 * 1024
@@ -41,6 +43,9 @@ _SAFE_ERRORS = frozenset({
     'report exceeds 200 columns', 'mapped column is missing',
     'invalid report parser request', 'report parser request exceeds limit',
     'report parser output exceeds limit',
+    'report parsing exceeded time limit', 'report parser memory monitoring unavailable',
+    'report parser memory exceeds limit', 'report parser unavailable or failed safely',
+    'report parser returned invalid output',
 })
 
 
@@ -108,7 +113,14 @@ def _resident_memory(pid):
             status = Path(f'/proc/{pid}/status').read_text()
             for line in status.splitlines():
                 if line.startswith('VmRSS:'):
-                    return int(line.split()[1]) * 1024
+                    resident = int(line.split()[1]) * 1024
+                    # Include descendants so unexpected parser subprocesses
+                    # cannot hide their memory from supervision.
+                    children = Path(f'/proc/{pid}/task/{pid}/children')
+                    if children.exists():
+                        for child_pid in children.read_text().split():
+                            resident += _resident_memory(int(child_pid)) or 0
+                    return resident
         except FileNotFoundError:
             return None
         # Exiting/zombie processes can still have a status file without VmRSS.
@@ -144,7 +156,33 @@ def _stop_group(child):
         child.wait()
 
 
+def parser_environment(workspace, *, native=False):
+    environment = {
+        'PYTHONPATH': str(Path(__file__).resolve().parents[2]),
+        'PYTHONIOENCODING': 'utf-8', 'PYTHONDONTWRITEBYTECODE': '1', 'LANG': 'C.UTF-8',
+        'HOME': str(workspace), 'TMPDIR': str(workspace), 'TMP': str(workspace), 'TEMP': str(workspace),
+    }
+    if native:
+        environment['PATH'] = '/usr/bin:/bin'
+        if os.environ.get('JAVA_HOME'):
+            environment['JAVA_HOME'] = os.environ['JAVA_HOME']
+    return environment
+
+
 def run_parser(operation, raw, *, filename='', mime='', mapping=None):
+    if operation not in OPERATIONS:
+        raise ValueError('unsupported report parser operation')
+    if len(raw) > MAX_INPUT_BYTES:
+        raise ValueError('report exceeds 10 MB limit')
+    response = request_parser({'kind': 'report', 'operation': operation,
+        'raw': base64.b64encode(raw).decode('ascii'),
+        'filename': filename, 'mime': mime, 'mapping': mapping})
+    if response['ok'] is not True:
+        raise ValueError(_safe_error(str(response['error'])))
+    return _validate_result(operation, response['result'])
+
+
+def run_parser_local(operation, raw, *, filename='', mime='', mapping=None):
     """Only named parser operations execute; no caller-supplied child command."""
     if operation not in OPERATIONS:
         raise ValueError('unsupported report parser operation')
@@ -155,12 +193,9 @@ def run_parser(operation, raw, *, filename='', mime='', mapping=None):
     payload = json.dumps(request, allow_nan=False).encode('utf-8')
     if len(payload) > MAX_REQUEST_BYTES:
         raise ValueError('report parser request exceeds limit')
-    environment = {'PYTHONPATH': str(Path(__file__).resolve().parents[2]),
-                   'PYTHONIOENCODING': 'utf-8', 'PYTHONDONTWRITEBYTECODE': '1',
-                   'LANG': 'C.UTF-8'}
-    # TemporaryFile is private/unlinked. No source filename becomes a disk path,
-    # and source bytes/errors are never included in the command or environment.
-    with tempfile.TemporaryFile() as source, tempfile.TemporaryFile() as output, tempfile.TemporaryFile() as errors:
+    # File descriptors carry the private request/result; source names never become paths.
+    with tempfile.TemporaryDirectory(prefix='report-parser-') as workspace, tempfile.TemporaryFile() as source, tempfile.TemporaryFile() as output, tempfile.TemporaryFile() as errors:
+        environment = parser_environment(workspace)
         source.write(payload)
         source.seek(0)
         child = None
@@ -168,7 +203,7 @@ def run_parser(operation, raw, *, filename='', mime='', mapping=None):
             child = subprocess.Popen(
                 [sys.executable, '-m', 'app.ingest.report_parser'],
                 stdin=source, stdout=output, stderr=errors, shell=False,
-                start_new_session=True, close_fds=True, cwd=tempfile.gettempdir(), env=environment,
+                start_new_session=True, close_fds=True, cwd=workspace, env=environment,
             )
             deadline = time.monotonic() + WALL_SECONDS
             while True:
@@ -178,7 +213,10 @@ def run_parser(operation, raw, *, filename='', mime='', mapping=None):
                     raise ValueError('report parsing exceeded time limit')
                 running = child.poll() is None
                 if running:
-                    resident = _resident_memory(child.pid)
+                    try:
+                        resident = _resident_memory(child.pid)
+                    except (OSError, ValueError, subprocess.SubprocessError) as exc:
+                        raise ValueError('report parser memory monitoring unavailable') from exc
                     if resident is None and not _exited_after_missing_sample(child, deadline):
                         raise ValueError('report parser memory monitoring unavailable')
                     if resident is not None and resident > MAX_MEMORY_BYTES:
@@ -246,6 +284,7 @@ def _execute(request):
 def _main():
     try:
         _apply_limits()
+
         payload = sys.stdin.buffer.read(MAX_REQUEST_BYTES + 1)
         if len(payload) > MAX_REQUEST_BYTES:
             raise ValueError('report parser request exceeds limit')

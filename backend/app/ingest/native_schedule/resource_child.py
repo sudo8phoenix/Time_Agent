@@ -1,7 +1,7 @@
 """Trusted Python entrypoint: apply kernel limits before importing native readers.
 
 RSS is sampled by the parent rather than limiting JVM virtual address reservations.
-This is process resource supervision, not filesystem or network confinement.
+The parent runs inside the network-disabled, read-only Docker parser service.
 """
 from __future__ import annotations
 

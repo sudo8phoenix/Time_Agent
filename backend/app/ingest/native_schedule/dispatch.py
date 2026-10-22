@@ -5,20 +5,26 @@ from __future__ import annotations
 from pathlib import Path
 from xml.etree import ElementTree
 
-from app.ingest.native_schedule.microsoft import read_schedule as read_microsoft
-from app.ingest.native_schedule.primavera import read_schedule as read_primavera
+from app.ingest.native_schedule.microsoft import _child_read as _read_microsoft
+from app.ingest.native_schedule.primavera import _child_read as _read_primavera
 from app.ingest.schedule_datasets.gt10_preview import read_schedule as read_gt10
 from app.ingest.schedule_datasets.cambridge_preview import read_schedule as read_cambridge
-from app.ingest.native_schedule.runner import ParserRuntimeError
+from app.ingest.native_schedule.runner import ParserRuntimeError, run_reader_module
 from app.schemas.native_schedule import SchedulePreview
 
 
 def preview_schedule(path: Path, source_project_id: str | None = None) -> SchedulePreview:
+    # Detection itself parses XML/XLSX/JSON, so it belongs inside the container too.
+    return SchedulePreview.model_validate(run_reader_module(
+        'app.ingest.native_schedule.dispatch', path, source_project_id))
+
+
+def _preview_schedule_local(path: Path, source_project_id: str | None = None) -> SchedulePreview:
     suffix = path.suffix.lower()
     if suffix == ".xer":
-        return read_primavera(path, source_project_id)
+        return SchedulePreview.model_validate(_read_primavera(path, source_project_id))
     if suffix == ".mpp":
-        return read_microsoft(path, source_project_id)
+        return SchedulePreview.model_validate(_read_microsoft(path, source_project_id))
     if suffix == ".xlsx":
         return read_gt10(path, source_project_id)
     if suffix == ".json":
@@ -38,13 +44,33 @@ def preview_schedule(path: Path, source_project_id: str | None = None) -> Schedu
     except ElementTree.ParseError as exc:
         raise ParserRuntimeError("SCHEDULE_PARSE_FAILED", "XML is not well formed.") from exc
     if root.tag == "{http://schemas.microsoft.com/project}Project":
-        return read_microsoft(path, source_project_id)
+        return SchedulePreview.model_validate(_read_microsoft(path, source_project_id))
     if (
         root.tag.endswith("Project")
         or root.tag.endswith("Projects")
         or root.tag.endswith("APIBusinessObjects")
     ):
-        return read_primavera(path, source_project_id)
+        return SchedulePreview.model_validate(_read_primavera(path, source_project_id))
     raise ParserRuntimeError(
         "SCHEDULE_FORMAT_MISMATCH", "XML root does not identify P6 PMXML or Microsoft MSPDI."
     )
+
+
+def main():
+    import argparse
+    import json
+    parser = argparse.ArgumentParser()
+    parser.add_argument('--child', action='store_true', required=True)
+    parser.add_argument('--input', type=Path, required=True)
+    parser.add_argument('--source-project-id')
+    args = parser.parse_args()
+    try:
+        print(_preview_schedule_local(args.input, args.source_project_id).model_dump_json())
+        return 0
+    except ParserRuntimeError as exc:
+        print(json.dumps({'code': exc.code}))
+        return 2
+
+
+if __name__ == '__main__':
+    raise SystemExit(main())

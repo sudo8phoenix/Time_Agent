@@ -1,7 +1,7 @@
 """Validated runtime configuration."""
 from functools import lru_cache
 from typing import Literal
-from pydantic import Field, SecretStr, ValidationError, field_validator
+from pydantic import Field, SecretStr, ValidationError, field_validator, model_validator
 from pydantic_settings import BaseSettings, SettingsConfigDict
 
 
@@ -33,11 +33,30 @@ class Settings(BaseSettings):
     conversation_model_timeout_seconds: int = Field(default=300, ge=30, le=900)
     ollama_api_key: SecretStr | None = None
     secret_key: str = Field(default="development-only-change-me", min_length=16)
+    registration_enabled: bool | None = None
     frontend_dist: str = "frontend/dist"
     upload_dir: str = "uploads"
     agent_execution_mode: Literal["graph"] = "graph"
     agent_hierarchy_enabled: bool = False
     orchestrator_model_assisted: bool = False
+
+    @model_validator(mode="after")
+    def validate_production_security(self):
+        if self.environment == "production" and (
+            self.secret_key in {
+                "development-only-change-me",
+                "replace-with-a-random-value-at-least-16-characters",
+            }
+            or len(self.secret_key) < 32
+        ):
+            raise ValueError("Production requires a random SECRET_KEY of at least 32 characters")
+        return self
+
+    @property
+    def public_registration_enabled(self) -> bool:
+        if self.registration_enabled is not None:
+            return self.registration_enabled
+        return self.environment != "production"
 
     @field_validator("orchestrator_key_slot", "extraction_key_slot", "selection_key_slot", mode="before")
     @classmethod

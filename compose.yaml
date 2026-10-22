@@ -15,5 +15,76 @@ services:
       interval: 5s
       timeout: 5s
       retries: 10
+  parser:
+    build: .
+    image: site-progress-agent:local
+    command: ["python", "-m", "app.ingest.parser_service"]
+    restart: unless-stopped
+    network_mode: none
+    read_only: true
+    cap_drop: [ALL]
+    security_opt: [no-new-privileges:true]
+    pids_limit: 256
+    mem_limit: 2g
+    cpus: 2
+    tmpfs:
+      - /tmp:size=256m,mode=1777
+    environment:
+      PARSER_SERVICE_ISOLATED: "1"
+      PARSER_SOCKET_PATH: /run/site-parser/parser.sock
+    volumes:
+      - parser_socket:/run/site-parser
+    healthcheck:
+      test: ["CMD", "python", "-c", "from app.ingest.parser_transport import request_parser; assert request_parser({'kind':'health'}, timeout=3)['ok']"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+  api:
+    build: .
+    image: site-progress-agent:local
+    restart: unless-stopped
+    extra_hosts:
+      - "host.docker.internal:host-gateway"
+    env_file:
+      - path: .env
+        required: false
+    environment:
+      DATABASE_URL: postgresql+psycopg://progress:progress@db:5432/progress
+      PARSER_SOCKET_PATH: /run/site-parser/parser.sock
+      FRONTEND_DIST: /app/frontend/dist
+      UPLOAD_DIR: /app/uploads
+    ports:
+      - "127.0.0.1:${PORT:-8000}:8000"
+    volumes:
+      - parser_socket:/run/site-parser
+      - uploads:/app/uploads
+    depends_on:
+      db:
+        condition: service_healthy
+      parser:
+        condition: service_healthy
+  worker:
+    image: site-progress-agent:local
+    command: ["python", "ops/run_worker.py"]
+    restart: unless-stopped
+    extra_hosts:
+      - "host.docker.internal:host-gateway"
+    env_file:
+      - path: .env
+        required: false
+    environment:
+      DATABASE_URL: postgresql+psycopg://progress:progress@db:5432/progress
+      PARSER_SOCKET_PATH: /run/site-parser/parser.sock
+      UPLOAD_DIR: /app/uploads
+    volumes:
+      - parser_socket:/run/site-parser
+      - uploads:/app/uploads
+    depends_on:
+      db:
+        condition: service_healthy
+      parser:
+        condition: service_healthy
 volumes:
+  parser_socket:
+  uploads:
   postgres_data:

@@ -36,9 +36,11 @@ base provider/model according to runtime resolution.
 | `REPORT_MODEL_TIMEOUT_SECONDS` | `360` | Server-side runtime setting; see related guide below |
 | `CONVERSATION_MODEL_TIMEOUT_SECONDS` | `300` | Server-side runtime setting; see related guide below |
 | `OLLAMA_API_KEY` | `unset` | Server-side runtime setting; see related guide below |
-| `SECRET_KEY` | `development-only-change-me` | Replace with a random private secret; do not use development default |
+| `SECRET_KEY` | `development-only-change-me` | Production requires a random private secret of at least 32 characters; shared login counters require the same secret across workers |
+| `REGISTRATION_ENABLED` | unset | Defaults to false in production and true otherwise; true permits reviewer self-registration |
 | `FRONTEND_DIST` | `frontend/dist` | Built frontend directory |
 | `UPLOAD_DIR` | `uploads` | Persistent original-file root |
+| `PARSER_SOCKET_PATH` | `/run/site-parser/parser.sock` | Bounded Unix-socket transport to the isolated Docker parser service; no local fallback |
 | `AGENT_EXECUTION_MODE` | `graph` | Server-side runtime setting; see related guide below |
 | `AGENT_HIERARCHY_ENABLED` | `False` | Select V2 and durable new conversations |
 | `ORCHESTRATOR_MODEL_ASSISTED` | `False` | Enable legal-action model planner |

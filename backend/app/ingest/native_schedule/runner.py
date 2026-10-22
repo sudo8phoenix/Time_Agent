@@ -12,10 +12,12 @@ import time
 import subprocess
 import sys
 import tempfile
+import base64
 from dataclasses import dataclass
 from pathlib import Path
 
-from app.ingest.report_parser import _exited_after_missing_sample
+from app.ingest.report_parser import _exited_after_missing_sample, parser_environment
+from app.ingest.parser_transport import request_parser, ParserServiceUnavailable
 
 MAX_OUTPUT_BYTES = 50 * 1024 * 1024
 DEFAULT_TIMEOUT_SECONDS = 30
@@ -25,13 +27,7 @@ JVM_OPTIONS = ("-Xmx512m", "-XX:MaxMetaspaceSize=256m", "-XX:MaxDirectMemorySize
 
 
 def _child_environment(directory: str) -> dict[str, str]:
-    """Do not forward service credentials or Python/Java injection options."""
-    directory = str(Path(directory).resolve())
-    env = {key: os.environ[key] for key in ("PATH", "JAVA_HOME", "LANG", "LC_ALL",
-           "SYSTEMROOT") if key in os.environ}
-    env.update(HOME=directory, TMPDIR=directory, TMP=directory, TEMP=directory,
-               PYTHONPATH=str(Path(__file__).resolve().parents[3]))
-    return env
+    return parser_environment(directory, native=True)
 
 
 def _resident_memory(pid: int) -> int | None:
@@ -58,10 +54,10 @@ def _capture_child(command: list[str], timeout_seconds: float) -> subprocess.Com
     if not math.isfinite(timeout_seconds) or timeout_seconds <= 0:
         raise ValueError("Parser timeout must be finite and positive")
     deadline = time.monotonic() + timeout_seconds
-    with tempfile.TemporaryDirectory(prefix="native-parser-") as directory, subprocess.Popen(
-                          [sys.executable, "-m", "app.ingest.native_schedule.resource_child",
-                           *command[1:]], shell=False, stdin=subprocess.DEVNULL,
-                          env=_child_environment(directory), cwd=directory,
+    parser_command = [sys.executable, "-m", "app.ingest.native_schedule.resource_child", *command[1:]]
+    with tempfile.TemporaryDirectory(prefix="native-parser-") as workspace, subprocess.Popen(
+                          parser_command, shell=False, stdin=subprocess.DEVNULL,
+                          env=_child_environment(workspace), cwd=workspace,
                           stdout=subprocess.PIPE, stderr=subprocess.PIPE,
                           start_new_session=True, close_fds=True) as child:
         buffers = {"stdout": bytearray(), "stderr": bytearray()}
@@ -134,6 +130,7 @@ def _run_json_child(command: list[str], timeout_seconds: int) -> dict[str, objec
             "SCHEDULE_FORMAT_UNSUPPORTED": "Native schedule format is unsupported.",
             "SCHEDULE_FORMAT_MISMATCH": "Native schedule format does not match the source.",
             "SCHEDULE_SOURCE_PROJECT_UNKNOWN": "Select a valid source project.",
+            "SCHEDULE_SOURCE_VERSION_UNREVIEWED": "Schedule source version is not reviewed.",
             "SCHEDULE_TOO_LARGE": "Native schedule exceeds supported limits.",
             "SCHEDULE_PARSE_FAILED": "Native schedule parsing failed safely.",
         }
@@ -179,10 +176,7 @@ def probe_schedule(
         raise ParserRuntimeError(
             "SCHEDULE_TOO_LARGE", "Native schedule input exceeds the 10 MiB limit."
         )
-    return _run_json_child(
-        [sys.executable, "-m", "app.ingest.native_schedule.runner", "--probe", str(path.resolve())],
-        timeout_seconds,
-    )
+    return _remote_native('probe', path, timeout_seconds=timeout_seconds)
 
 
 def run_reader_module(
@@ -201,10 +195,45 @@ def run_reader_module(
         raise ParserRuntimeError(
             "SCHEDULE_TOO_LARGE", "Native schedule input exceeds the 10 MiB limit."
         )
-    command = [sys.executable, "-m", module, "--child", "--input", str(path.resolve())]
-    if source_project_id is not None:
-        command.extend(["--source-project-id", source_project_id])
-    return _run_json_child(command, timeout_seconds)
+    return _remote_native(module, path, source_project_id, timeout_seconds=timeout_seconds)
+
+
+def _remote_native(module, path, source_project_id=None, *, timeout_seconds):
+    if module not in NATIVE_MODULES and module != 'probe':
+        raise ParserRuntimeError('SCHEDULE_FORMAT_UNSUPPORTED', 'Native reader is unsupported.')
+    with path.open('rb') as source:
+        raw = source.read(10 * 1024 * 1024 + 1)
+    if len(raw) > 10 * 1024 * 1024:
+        raise ParserRuntimeError('SCHEDULE_TOO_LARGE', 'Native schedule exceeds supported limits.')
+    try:
+        response = request_parser({'kind': 'native', 'module': module,
+            'raw': base64.b64encode(raw).decode('ascii'),
+            'suffix': path.suffix.lower(), 'source_project_id': source_project_id},
+            timeout=timeout_seconds + 15)
+    except ParserServiceUnavailable as exc:
+        raise ParserRuntimeError('SCHEDULE_PARSER_UNAVAILABLE', 'Isolated parser service is unavailable.') from exc
+    if response['ok'] is not True:
+        error = response['error']
+        messages = {
+            'SCHEDULE_FORMAT_UNSUPPORTED': 'Native schedule format is unsupported.',
+            'SCHEDULE_FORMAT_MISMATCH': 'Native schedule format does not match the source.',
+            'SCHEDULE_SOURCE_PROJECT_UNKNOWN': 'Select a valid source project.',
+            'SCHEDULE_SOURCE_VERSION_UNREVIEWED': 'Schedule source version is not reviewed.',
+            'SCHEDULE_TOO_LARGE': 'Native schedule exceeds supported limits.',
+            'SCHEDULE_PARSE_TIMEOUT': 'Native schedule parsing exceeded its time limit.',
+            'SCHEDULE_PARSER_UNAVAILABLE': 'Native schedule parser is unavailable.',
+        }
+        code = error if isinstance(error, str) and error in messages else 'SCHEDULE_PARSE_FAILED'
+        raise ParserRuntimeError(code, messages.get(code, 'Native schedule parsing failed safely.'))
+    if not isinstance(response['result'], dict):
+        raise ParserRuntimeError('SCHEDULE_PARSE_FAILED', 'Native parser returned an invalid result.')
+    return response['result']
+
+
+NATIVE_MODULES = frozenset({
+    'app.ingest.native_schedule.primavera', 'app.ingest.native_schedule.microsoft',
+    'app.ingest.native_schedule.dispatch',
+})
 
 
 def _child_probe(path: Path) -> dict[str, object]:
