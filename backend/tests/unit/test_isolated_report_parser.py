@@ -91,6 +91,32 @@ def test_memory_limit_or_missing_monitor_fails_closed(monitor, monkeypatch):
         parse_bytes(b'x', 'report.txt', 'text/plain')
 
 
+@pytest.mark.parametrize('valid', [True, False])
+def test_missing_memory_sample_waits_for_delayed_exit_and_preserves_output(monkeypatch, valid):
+    body = {'ok': valid,
+            'result': {'parts': [], 'warnings': [], 'kind': 'text'} if valid else None,
+            'error': None if valid else 'invalid document archive'}
+    inject_child(monkeypatch,
+                 f'import time; print({json.dumps(body)!r}, flush=True); time.sleep(0.05)')
+    monkeypatch.setattr(report_parser, '_resident_memory', lambda pid: None)
+    if valid:
+        assert parse_bytes(b'x', 'report.txt', 'text/plain') == ([], [], 'text')
+    else:
+        with pytest.raises(ValueError, match='invalid document archive'):
+            parse_bytes(b'broken', 'broken.docx', 'application/octet-stream')
+
+
+@pytest.mark.parametrize('remaining, expected', [(10, 0.25), (0.01, 0.01), (-1, 0)])
+def test_exit_grace_is_bounded_by_original_deadline(monkeypatch, remaining, expected):
+    class Child:
+        def wait(self, *, timeout):
+            assert timeout == pytest.approx(expected)
+            raise subprocess.TimeoutExpired('parser', timeout)
+
+    monkeypatch.setattr(report_parser.time, 'monotonic', lambda: 100)
+    assert not report_parser._exited_after_missing_sample(Child(), 100 + remaining)
+
+
 @pytest.mark.parametrize('state', ['Z (zombie)', 'X (dead)', 'R (running)'])
 def test_linux_status_without_rss_defers_to_child_liveness(monkeypatch, state):
     monkeypatch.setattr(sys, 'platform', 'linux')

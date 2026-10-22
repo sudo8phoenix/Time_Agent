@@ -21,6 +21,7 @@ MAX_OUTPUT_BYTES = 32 * 1024 * 1024
 MAX_MEMORY_BYTES = 768 * 1024 * 1024
 WALL_SECONDS = 30
 POLL_SECONDS = 0.05
+EXIT_GRACE_SECONDS = 0.25
 OPERATIONS = frozenset({'parse', 'preview', 'mapping'})
 
 
@@ -111,8 +112,8 @@ def _resident_memory(pid):
         except FileNotFoundError:
             return None
         # Exiting/zombie processes can still have a status file without VmRSS.
-        # Both callers re-poll the child before accepting an unavailable sample;
-        # a live child without memory telemetry still fails closed.
+        # Memory can disappear before waitpid reports exit. Both callers wait
+        # briefly for exit; a live child without telemetry still fails closed.
         return None
     if sys.platform == 'darwin':
         result = subprocess.run(['/bin/ps', '-o', 'rss=', '-p', str(pid)],
@@ -123,6 +124,15 @@ def _resident_memory(pid):
             raise ValueError('memory monitoring unavailable')
         return int(result.stdout.strip()) * 1024
     raise ValueError('memory monitoring unavailable')
+
+
+def _exited_after_missing_sample(child, deadline):
+    """Allow a bounded kernel exit transition, never unmonitored live work."""
+    try:
+        child.wait(timeout=min(EXIT_GRACE_SECONDS, max(0, deadline - time.monotonic())))
+    except subprocess.TimeoutExpired:
+        return False
+    return True
 
 
 def _stop_group(child):
@@ -169,7 +179,7 @@ def run_parser(operation, raw, *, filename='', mime='', mapping=None):
                 running = child.poll() is None
                 if running:
                     resident = _resident_memory(child.pid)
-                    if resident is None and child.poll() is None:
+                    if resident is None and not _exited_after_missing_sample(child, deadline):
                         raise ValueError('report parser memory monitoring unavailable')
                     if resident is not None and resident > MAX_MEMORY_BYTES:
                         raise ValueError('report parser memory exceeds limit')

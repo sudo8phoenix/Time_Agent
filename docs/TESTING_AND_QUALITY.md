@@ -10,7 +10,7 @@ the executable evaluation contracts remain in Git.
 
 | Check | Most recent recorded result | Scope |
 |---|---|---|
-| Backend unit suite | 1,460 passed | Offline Mac regression after Linux parser exit-race fix |
+| Backend unit suite | 1,467 passed, one skipped | Full Mac and Linux suites after bounded exit confirmation |
 | PostgreSQL integration suite | 263 passed | Isolated rehearsal DB, injected models; last full batch-32 run |
 | Final batch-32 controls | 26 passed | Source fingerprints, scopes, journals and test execution guards after final source-contract expansion |
 | Scoped Python lint | Passed | New evaluation, admission, source-contract and guard modules; no repository-wide lint claim |
@@ -183,3 +183,36 @@ passed **200 unreaped-child exit checks and two live-memory checks** using the
 shared report/native samplers. The final affected parser suite passed **44 tests**,
 with the Linux-only test skipped on Mac; scoped Ruff also passed. This is targeted Linux verification, not a claim
 that the full Linux CI suite has passed. See the next CI run for that result.
+
+## Linux exit-transition follow-up
+
+The next GitHub run still failed five parser tests. The first fix covered an
+already-exited zombie but missed the interval after Linux removes `VmRSS` and
+before `waitpid` can report termination. An immediate second poll was insufficient.
+
+Both parser paths now share a bounded exit confirmation: a missing sample waits
+up to 250 ms for termination, capped by the original parser deadline. Completed
+output and validation errors are then processed normally. A child that remains
+alive fails supervision and is terminated; no missing sample is treated as a
+successful memory measurement. The original memory and output limits remain.
+
+New regressions simulate that delayed exit in report/native paths, preserve both
+successful output and document-validation errors, reject a persistently live
+unmonitored child, and verify that the grace interval cannot extend the original
+deadline. The Mac full unit suite passed **1,467 tests**, with the Linux-only
+regression skipped. Scoped Ruff passed. Linux verification is recorded below.
+
+Linux verification used Python 3.12.13 on ARM64 with Java 17, the project-pinned
+requirements and working-environment transitive constraints, in a clean container
+without private `.env` or ignored archives. The complete unit suite passed
+**1,467 tests**, with the optional workspace `PROJECT.xer` fixture skipped.
+The initial container lacked Java and reported two dependency-unavailable failures;
+a rerun with Java resolved them. Two earlier PyPI download timeouts occurred
+before tests started and are not counted as test outcomes. GitHub's Ubuntu x86
+runner/Python patch version remains a separate verification environment.
+
+The affected Linux parser suite then passed **61 tests in each of five consecutive
+runs** (305 additional test executions), including native schedule normalization,
+report ingestion, mapping, delayed-exit handling and fail-closed supervision.
+Scoped Ruff, whitespace checks, tracked Markdown links and the tracked-file secret
+scan passed. No live model evaluation was run for this correction.

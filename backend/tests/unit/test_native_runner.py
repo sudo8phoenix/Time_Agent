@@ -138,3 +138,19 @@ def test_exact_output_cap_is_accepted(monkeypatch):
     assert runner._run_json_child(
         [sys.executable, '-c', f'import sys; sys.stdout.write({output!r})'], 2,
     ) == {'task_count': 4}
+
+
+@pytest.mark.parametrize('exits', [True, False])
+def test_missing_memory_sample_requires_bounded_confirmed_exit(monkeypatch, exits):
+    import sys
+    from app.ingest.native_schedule import runner
+
+    monkeypatch.setattr(runner, '_resident_memory', lambda pid: None)
+    delay = 0.05 if exits else 5
+    command = [sys.executable, '-c',
+               f'import time; print(\'{{"task_count":4}}\', flush=True); time.sleep({delay})']
+    if exits:
+        assert runner._run_json_child(command, 2) == {'task_count': 4}
+    else:
+        with pytest.raises(ParserRuntimeError, match='memory supervision failed'):
+            runner._run_json_child(command, 2)

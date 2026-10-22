@@ -15,6 +15,8 @@ import tempfile
 from dataclasses import dataclass
 from pathlib import Path
 
+from app.ingest.report_parser import _exited_after_missing_sample
+
 MAX_OUTPUT_BYTES = 50 * 1024 * 1024
 DEFAULT_TIMEOUT_SECONDS = 30
 MAX_MEMORY_BYTES = 1024 * 1024 * 1024
@@ -76,7 +78,7 @@ def _capture_child(command: list[str], timeout_seconds: float) -> subprocess.Com
                         except (OSError, ValueError, subprocess.SubprocessError) as exc:
                             raise ParserRuntimeError("SCHEDULE_PARSE_FAILED",
                                                      "Native parser memory supervision failed.") from exc
-                        if resident is None and child.poll() is None:
+                        if resident is None and not _exited_after_missing_sample(child, deadline):
                             raise ParserRuntimeError("SCHEDULE_PARSE_FAILED",
                                                      "Native parser memory supervision failed.")
                         if resident is not None and resident > MAX_MEMORY_BYTES:
