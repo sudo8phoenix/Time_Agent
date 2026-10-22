@@ -1,0 +1,26 @@
+[
+  {
+    "case": "DEV-20261020-01",
+    "arm": "qwen/qwen3.8-27b:key2",
+    "slot": 2,
+    "role": "orchestrator",
+    "stage": "planner",
+    "requested_model": "qwen/qwen3.8-27b",
+    "status": null,
+    "error_type": "URLError",
+    "usage": null,
+    "window": "qwen-orchestrator-graph-2026-10-22"
+  },
+  {
+    "case": "DEV-20261020-01",
+    "arm": "qwen/qwen3.8-27b:key1",
+    "slot": 2,
+    "role": "selection",
+    "stage": "selection",
+    "requested_model": "qwen/qwen3.8-27b",
+    "status": 503,
+    "error_type": "ExperimentStop",
+    "usage": null,
+    "window": "qwen-all-roles-graph-2026-10-22"
+  }
+]

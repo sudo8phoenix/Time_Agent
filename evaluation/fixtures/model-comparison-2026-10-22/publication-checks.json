@@ -1,0 +1,8 @@
+{
+  "backend_unit_passed": 1477,
+  "backend_unit_skipped": 1,
+  "scoped_ruff": "passed",
+  "offline_rescore": "All20B 4/4, 120B/20B 4/4, Qwen/20B 4/4, allQwen 2/4",
+  "new_live_inference_for_publication": false,
+  "release_accepted": false
+}

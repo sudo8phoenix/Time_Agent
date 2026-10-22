@@ -27,7 +27,9 @@ def create_planner(settings: Any, *, timeout: float,
     provider = getattr(settings, "orchestrator_provider", None)
     model = getattr(settings, "orchestrator_model", None)
     supported = ((provider == "openrouter" and model in ALLOWED_PLANNER_MODELS)
-                 or (provider == "groq" and model == "openai/gpt-oss-120b"))
+                 or (provider == "groq" and model in {
+                     "openai/gpt-oss-20b", "openai/gpt-oss-120b", "qwen/qwen3.8-27b",
+                 }))
     if not supported:
         raise PlannerConfigurationError("Unsupported planner configuration")
 

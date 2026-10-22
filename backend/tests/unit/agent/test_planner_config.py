@@ -14,19 +14,21 @@ class Adapter:
         return kwargs
 
 
-def test_groq_planner_preserves_separate_credential_assignment():
+@pytest.mark.parametrize("model", ["openai/gpt-oss-20b", "openai/gpt-oss-120b", "qwen/qwen3.8-27b"])
+@pytest.mark.parametrize("slot", [1, 2])
+def test_groq_planner_preserves_separate_credential_assignment(model, slot):
     settings = SimpleNamespace(orchestrator_provider="groq",
-                               orchestrator_model="openai/gpt-oss-120b",
-                               orchestrator_key_slot=1, extraction_key_slot=0,
+                               orchestrator_model=model,
+                               orchestrator_key_slot=slot, extraction_key_slot=0,
                                selection_key_slot=0)
     calls = []
 
     def factory(actual_settings, *, timeout, role):
-        calls.append((actual_settings.orchestrator_key_slot, role))
+        calls.append((actual_settings.orchestrator_model, actual_settings.orchestrator_key_slot, role))
         return Adapter()
 
     create_planner(settings, timeout=17, adapter_factory=factory)
-    assert calls == [(1, "orchestrator")]
+    assert calls == [(model, slot, "orchestrator")]
     assert settings.extraction_key_slot == settings.selection_key_slot == 0
 
 
@@ -49,6 +51,9 @@ def test_planner_accepts_allowlisted_openrouter_models_and_honors_pinned_model(m
 
 @pytest.mark.parametrize(("provider", "model"), [
     ("groq", "nvidia/nemotron-3-super-120b-a12b:free"),
+    ("groq", "qwen/qwen3.8-27b "),
+    ("groq", "qwen/unknown"),
+    ("openrouter", "qwen/qwen3.8-27b"),
     ("ollama", "nvidia/nemotron-3.5-super-vl:free"),
     ("openrouter", "nvidia/nemotron-3-ultra-550b-a55b"),
     ("openrouter", "nvidia/nemotron-3-super-120b-a12b"),

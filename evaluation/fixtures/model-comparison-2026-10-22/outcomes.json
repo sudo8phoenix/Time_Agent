@@ -1,0 +1,1098 @@
+[
+  {
+    "case_id": "DEV-20261020-01",
+    "arm": "qwen/qwen3.8-27b:key1",
+    "planner_model": "qwen/qwen3.8-27b",
+    "planner_slot": 1,
+    "worker_slot": 2,
+    "state": "ready_for_review",
+    "error_code": null,
+    "elapsed_ms": 298752,
+    "observations": [
+      {
+        "discipline": "civil",
+        "work_type": "excavation",
+        "event_type": "actual_progress",
+        "observed_status": "completed",
+        "area": "Zone Cedar",
+        "asset_tags": [
+          "TR-030"
+        ],
+        "explicit_activity_id": null,
+        "work_date": "2026-10-20",
+        "date_basis": "report_context",
+        "quantity": "5",
+        "quantity_kind": "delta",
+        "unit": "m3",
+        "raw_unit": "m3",
+        "reported_percent": null,
+        "actual_start": null,
+        "actual_finish": null,
+        "blocker": null,
+        "summary": "Today, excavated 5 m3 in site area Zone Cedar at asset tag TR-030.",
+        "evidence": [
+          {
+            "fields": [
+              "summary"
+            ],
+            "fragment_id": "<synthetic-uuid>",
+            "quote": "Today, excavated 5 m3 in site area Zone Cedar at asset tag TR-030."
+          }
+        ],
+        "warnings": [],
+        "lifecycle_effects": []
+      }
+    ],
+    "selected_activity_ids": [
+      "EXC-CEDAR"
+    ],
+    "mapping_states": [
+      "suggested"
+    ],
+    "review_states": [
+      "pending"
+    ],
+    "effects": [
+      {
+        "event_type": "actual_progress",
+        "quantity_semantics": "delta",
+        "quantity": "5",
+        "unit": "m3",
+        "effective_date": "2026-10-20"
+      }
+    ],
+    "ledger_writes": 0,
+    "full_case_score": {
+      "facts_exact": true,
+      "mapping_exact": true,
+      "approval_boundary_intact": true,
+      "full_report_exact": true,
+      "ambiguity_success": null
+    },
+    "window": "qwen-orchestrator-graph-2026-10-22",
+    "worker_model": "openai/gpt-oss-20b"
+  },
+  {
+    "case_id": "DEV-20261020-01",
+    "arm": "openai/gpt-oss-120b:key1",
+    "planner_model": "openai/gpt-oss-120b",
+    "planner_slot": 1,
+    "worker_slot": 2,
+    "state": "ready_for_review",
+    "error_code": null,
+    "elapsed_ms": 312302,
+    "observations": [
+      {
+        "discipline": "civil",
+        "work_type": "excavation",
+        "event_type": "actual_progress",
+        "observed_status": "completed",
+        "area": "Zone Cedar",
+        "asset_tags": [
+          "TR-030"
+        ],
+        "explicit_activity_id": null,
+        "work_date": "2026-10-20",
+        "date_basis": "report_context",
+        "quantity": "5",
+        "quantity_kind": "delta",
+        "unit": "m3",
+        "raw_unit": null,
+        "reported_percent": null,
+        "actual_start": null,
+        "actual_finish": null,
+        "blocker": null,
+        "summary": "Today, excavated 5 m3 in site area Zone Cedar at asset tag TR-030.",
+        "evidence": [
+          {
+            "fields": [
+              "summary"
+            ],
+            "fragment_id": "<synthetic-uuid>",
+            "quote": "Today, excavated 5 m3 in site area Zone Cedar at asset tag TR-030."
+          }
+        ],
+        "warnings": [],
+        "lifecycle_effects": []
+      }
+    ],
+    "selected_activity_ids": [
+      "EXC-CEDAR"
+    ],
+    "mapping_states": [
+      "suggested"
+    ],
+    "review_states": [
+      "pending"
+    ],
+    "effects": [
+      {
+        "event_type": "actual_progress",
+        "quantity_semantics": "delta",
+        "quantity": "5",
+        "unit": "m3",
+        "effective_date": "2026-10-20"
+      }
+    ],
+    "ledger_writes": 0,
+    "full_case_score": {
+      "facts_exact": true,
+      "mapping_exact": true,
+      "approval_boundary_intact": true,
+      "full_report_exact": true,
+      "ambiguity_success": null
+    },
+    "window": "qwen-orchestrator-graph-2026-10-22",
+    "worker_model": "openai/gpt-oss-20b"
+  },
+  {
+    "case_id": "DEV-20261020-01",
+    "arm": "openai/gpt-oss-120b:key2",
+    "planner_model": "openai/gpt-oss-120b",
+    "planner_slot": 2,
+    "worker_slot": 1,
+    "state": "ready_for_review",
+    "error_code": null,
+    "elapsed_ms": 337533,
+    "observations": [
+      {
+        "discipline": "civil",
+        "work_type": "excavation",
+        "event_type": "actual_progress",
+        "observed_status": "completed",
+        "area": "Zone Cedar",
+        "asset_tags": [
+          "TR-030"
+        ],
+        "explicit_activity_id": null,
+        "work_date": "2026-10-20",
+        "date_basis": "report_context",
+        "quantity": "5",
+        "quantity_kind": "delta",
+        "unit": "m3",
+        "raw_unit": "m3",
+        "reported_percent": null,
+        "actual_start": null,
+        "actual_finish": null,
+        "blocker": null,
+        "summary": "Today, excavated 5 m3 in site area Zone Cedar at asset tag TR-030.",
+        "evidence": [
+          {
+            "fields": [
+              "summary"
+            ],
+            "fragment_id": "<synthetic-uuid>",
+            "quote": "Today, excavated 5 m3 in site area Zone Cedar at asset tag TR-030."
+          }
+        ],
+        "warnings": [],
+        "lifecycle_effects": []
+      }
+    ],
+    "selected_activity_ids": [
+      "EXC-CEDAR"
+    ],
+    "mapping_states": [
+      "suggested"
+    ],
+    "review_states": [
+      "pending"
+    ],
+    "effects": [
+      {
+        "event_type": "actual_progress",
+        "quantity_semantics": "delta",
+        "quantity": "5",
+        "unit": "m3",
+        "effective_date": "2026-10-20"
+      }
+    ],
+    "ledger_writes": 0,
+    "full_case_score": {
+      "facts_exact": true,
+      "mapping_exact": true,
+      "approval_boundary_intact": true,
+      "full_report_exact": true,
+      "ambiguity_success": null
+    },
+    "window": "qwen-orchestrator-graph-2026-10-22",
+    "worker_model": "openai/gpt-oss-20b"
+  },
+  {
+    "case_id": "DEV-20261020-01",
+    "arm": "qwen/qwen3.8-27b:key2",
+    "planner_model": "qwen/qwen3.8-27b",
+    "planner_slot": 2,
+    "worker_slot": 1,
+    "state": "failed",
+    "error_code": "AGENT_PLANNER_FAILED",
+    "elapsed_ms": 118998,
+    "observations": [],
+    "selected_activity_ids": [],
+    "mapping_states": [],
+    "review_states": [],
+    "effects": [],
+    "ledger_writes": 0,
+    "full_case_score": {
+      "facts_exact": false,
+      "mapping_exact": false,
+      "approval_boundary_intact": true,
+      "full_report_exact": false,
+      "ambiguity_success": null
+    },
+    "window": "qwen-orchestrator-graph-2026-10-22",
+    "worker_model": "openai/gpt-oss-20b"
+  },
+  {
+    "case_id": "DEV-20261020-01",
+    "arm": "qwen/qwen3.8-27b:key2",
+    "planner_model": "qwen/qwen3.8-27b",
+    "planner_slot": 2,
+    "worker_slot": 1,
+    "state": "ready_for_review",
+    "error_code": null,
+    "elapsed_ms": 298384,
+    "observations": [
+      {
+        "discipline": "civil",
+        "work_type": "excavation",
+        "event_type": "actual_progress",
+        "observed_status": "completed",
+        "area": "Zone Cedar",
+        "asset_tags": [
+          "TR-030"
+        ],
+        "explicit_activity_id": null,
+        "work_date": "2026-10-20",
+        "date_basis": "report_context",
+        "quantity": "5",
+        "quantity_kind": "delta",
+        "unit": "m3",
+        "raw_unit": null,
+        "reported_percent": null,
+        "actual_start": null,
+        "actual_finish": null,
+        "blocker": null,
+        "summary": "Today, excavated 5 m3 in site area Zone Cedar at asset tag TR-030.",
+        "evidence": [
+          {
+            "fields": [
+              "summary"
+            ],
+            "fragment_id": "<synthetic-uuid>",
+            "quote": "Today, excavated 5 m3 in site area Zone Cedar at asset tag TR-030."
+          }
+        ],
+        "warnings": [],
+        "lifecycle_effects": []
+      }
+    ],
+    "selected_activity_ids": [
+      "EXC-CEDAR"
+    ],
+    "mapping_states": [
+      "suggested"
+    ],
+    "review_states": [
+      "pending"
+    ],
+    "effects": [
+      {
+        "event_type": "actual_progress",
+        "quantity_semantics": "delta",
+        "quantity": "5",
+        "unit": "m3",
+        "effective_date": "2026-10-20"
+      }
+    ],
+    "ledger_writes": 0,
+    "full_case_score": {
+      "facts_exact": true,
+      "mapping_exact": true,
+      "approval_boundary_intact": true,
+      "full_report_exact": true,
+      "ambiguity_success": null
+    },
+    "window": "qwen-orchestrator-graph-2026-10-22-rerun",
+    "worker_model": "openai/gpt-oss-20b"
+  },
+  {
+    "case_id": "DEV-20261020-08",
+    "arm": "qwen/qwen3.8-27b:key2",
+    "planner_model": "qwen/qwen3.8-27b",
+    "planner_slot": 2,
+    "worker_slot": 1,
+    "state": "ready_for_review",
+    "error_code": null,
+    "elapsed_ms": 311156,
+    "observations": [
+      {
+        "discipline": "civil",
+        "work_type": "excavation",
+        "event_type": "actual_progress",
+        "observed_status": "completed",
+        "area": null,
+        "asset_tags": [],
+        "explicit_activity_id": null,
+        "work_date": "2026-10-20",
+        "date_basis": "report_context",
+        "quantity": "2",
+        "quantity_kind": "delta",
+        "unit": "m3",
+        "raw_unit": "m3",
+        "reported_percent": null,
+        "actual_start": null,
+        "actual_finish": null,
+        "blocker": null,
+        "summary": "Today, excavated 2 m3.",
+        "evidence": [
+          {
+            "fields": [
+              "summary"
+            ],
+            "fragment_id": "<synthetic-uuid>",
+            "quote": "Today, excavated 2 m3."
+          }
+        ],
+        "warnings": [],
+        "lifecycle_effects": []
+      }
+    ],
+    "selected_activity_ids": [],
+    "mapping_states": [
+      "ambiguous"
+    ],
+    "review_states": [
+      "pending"
+    ],
+    "effects": [
+      {
+        "event_type": "actual_progress",
+        "quantity_semantics": "delta",
+        "quantity": "2",
+        "unit": "m3",
+        "effective_date": "2026-10-20"
+      }
+    ],
+    "ledger_writes": 0,
+    "full_case_score": {
+      "facts_exact": true,
+      "mapping_exact": true,
+      "approval_boundary_intact": true,
+      "full_report_exact": true,
+      "ambiguity_success": true
+    },
+    "window": "qwen-orchestrator-graph-2026-10-22-rerun",
+    "worker_model": "openai/gpt-oss-20b"
+  },
+  {
+    "case_id": "DEV-20261020-08",
+    "arm": "openai/gpt-oss-120b:key2",
+    "planner_model": "openai/gpt-oss-120b",
+    "planner_slot": 2,
+    "worker_slot": 1,
+    "state": "ready_for_review",
+    "error_code": null,
+    "elapsed_ms": 311138,
+    "observations": [
+      {
+        "discipline": "civil",
+        "work_type": "excavation",
+        "event_type": "actual_progress",
+        "observed_status": "completed",
+        "area": null,
+        "asset_tags": [],
+        "explicit_activity_id": null,
+        "work_date": "2026-10-20",
+        "date_basis": "report_context",
+        "quantity": "2",
+        "quantity_kind": "delta",
+        "unit": "m3",
+        "raw_unit": null,
+        "reported_percent": null,
+        "actual_start": null,
+        "actual_finish": null,
+        "blocker": null,
+        "summary": "Today, excavated 2 m3.",
+        "evidence": [
+          {
+            "fields": [
+              "summary"
+            ],
+            "fragment_id": "<synthetic-uuid>",
+            "quote": "Today, excavated 2 m3."
+          }
+        ],
+        "warnings": [],
+        "lifecycle_effects": []
+      }
+    ],
+    "selected_activity_ids": [],
+    "mapping_states": [
+      "ambiguous"
+    ],
+    "review_states": [
+      "pending"
+    ],
+    "effects": [
+      {
+        "event_type": "actual_progress",
+        "quantity_semantics": "delta",
+        "quantity": "2",
+        "unit": "m3",
+        "effective_date": "2026-10-20"
+      }
+    ],
+    "ledger_writes": 0,
+    "full_case_score": {
+      "facts_exact": true,
+      "mapping_exact": true,
+      "approval_boundary_intact": true,
+      "full_report_exact": true,
+      "ambiguity_success": true
+    },
+    "window": "qwen-orchestrator-graph-2026-10-22-rerun",
+    "worker_model": "openai/gpt-oss-20b"
+  },
+  {
+    "case_id": "DEV-20261020-08",
+    "arm": "openai/gpt-oss-120b:key1",
+    "planner_model": "openai/gpt-oss-120b",
+    "planner_slot": 1,
+    "worker_slot": 2,
+    "state": "ready_for_review",
+    "error_code": null,
+    "elapsed_ms": 340781,
+    "observations": [
+      {
+        "discipline": "civil",
+        "work_type": "excavation",
+        "event_type": "actual_progress",
+        "observed_status": "completed",
+        "area": null,
+        "asset_tags": [],
+        "explicit_activity_id": null,
+        "work_date": "2026-10-20",
+        "date_basis": "report_context",
+        "quantity": "2",
+        "quantity_kind": "delta",
+        "unit": "m3",
+        "raw_unit": "m3",
+        "reported_percent": null,
+        "actual_start": null,
+        "actual_finish": null,
+        "blocker": null,
+        "summary": "Today, excavated 2 m3.",
+        "evidence": [
+          {
+            "fields": [
+              "summary"
+            ],
+            "fragment_id": "<synthetic-uuid>",
+            "quote": "Today, excavated 2 m3."
+          }
+        ],
+        "warnings": [],
+        "lifecycle_effects": []
+      }
+    ],
+    "selected_activity_ids": [],
+    "mapping_states": [
+      "ambiguous"
+    ],
+    "review_states": [
+      "pending"
+    ],
+    "effects": [
+      {
+        "event_type": "actual_progress",
+        "quantity_semantics": "delta",
+        "quantity": "2",
+        "unit": "m3",
+        "effective_date": "2026-10-20"
+      }
+    ],
+    "ledger_writes": 0,
+    "full_case_score": {
+      "facts_exact": true,
+      "mapping_exact": true,
+      "approval_boundary_intact": true,
+      "full_report_exact": true,
+      "ambiguity_success": true
+    },
+    "window": "qwen-orchestrator-graph-2026-10-22-rerun",
+    "worker_model": "openai/gpt-oss-20b"
+  },
+  {
+    "case_id": "DEV-20261020-08",
+    "arm": "qwen/qwen3.8-27b:key1",
+    "planner_model": "qwen/qwen3.8-27b",
+    "planner_slot": 1,
+    "worker_slot": 2,
+    "state": "ready_for_review",
+    "error_code": null,
+    "elapsed_ms": 309997,
+    "observations": [
+      {
+        "discipline": "civil",
+        "work_type": "excavation",
+        "event_type": "actual_progress",
+        "observed_status": "completed",
+        "area": null,
+        "asset_tags": [],
+        "explicit_activity_id": null,
+        "work_date": "2026-10-20",
+        "date_basis": "report_context",
+        "quantity": "2",
+        "quantity_kind": "delta",
+        "unit": "m3",
+        "raw_unit": "m3",
+        "reported_percent": null,
+        "actual_start": null,
+        "actual_finish": null,
+        "blocker": null,
+        "summary": "Today, excavated 2 m3.",
+        "evidence": [
+          {
+            "fields": [
+              "summary"
+            ],
+            "fragment_id": "<synthetic-uuid>",
+            "quote": "Today, excavated 2 m3."
+          }
+        ],
+        "warnings": [],
+        "lifecycle_effects": []
+      }
+    ],
+    "selected_activity_ids": [],
+    "mapping_states": [
+      "ambiguous"
+    ],
+    "review_states": [
+      "pending"
+    ],
+    "effects": [
+      {
+        "event_type": "actual_progress",
+        "quantity_semantics": "delta",
+        "quantity": "2",
+        "unit": "m3",
+        "effective_date": "2026-10-20"
+      }
+    ],
+    "ledger_writes": 0,
+    "full_case_score": {
+      "facts_exact": true,
+      "mapping_exact": true,
+      "approval_boundary_intact": true,
+      "full_report_exact": true,
+      "ambiguity_success": true
+    },
+    "window": "qwen-orchestrator-graph-2026-10-22-rerun",
+    "worker_model": "openai/gpt-oss-20b"
+  },
+  {
+    "case_id": "DEV-20261020-01",
+    "arm": "qwen/qwen3.8-27b:key1",
+    "planner_model": "qwen/qwen3.8-27b",
+    "planner_slot": 1,
+    "worker_slot": 2,
+    "state": "failed",
+    "error_code": "AGENT_TOOL_FAILED",
+    "elapsed_ms": 308694,
+    "observations": [],
+    "selected_activity_ids": [],
+    "mapping_states": [],
+    "review_states": [],
+    "effects": [],
+    "ledger_writes": 0,
+    "full_case_score": {
+      "facts_exact": false,
+      "mapping_exact": false,
+      "approval_boundary_intact": true,
+      "full_report_exact": false,
+      "ambiguity_success": null
+    },
+    "window": "qwen-all-roles-graph-2026-10-22",
+    "worker_model": "qwen/qwen3.8-27b"
+  },
+  {
+    "case_id": "DEV-20261020-01",
+    "arm": "qwen/qwen3.8-27b:key1",
+    "planner_model": "qwen/qwen3.8-27b",
+    "planner_slot": 1,
+    "worker_slot": 2,
+    "state": "failed",
+    "error_code": "AGENT_TOOL_FAILED",
+    "elapsed_ms": 279240,
+    "observations": [],
+    "selected_activity_ids": [],
+    "mapping_states": [],
+    "review_states": [],
+    "effects": [],
+    "ledger_writes": 0,
+    "full_case_score": {
+      "facts_exact": false,
+      "mapping_exact": false,
+      "approval_boundary_intact": true,
+      "full_report_exact": false,
+      "ambiguity_success": null
+    },
+    "window": "qwen-all-roles-graph-2026-10-22-rerun",
+    "worker_model": "qwen/qwen3.8-27b"
+  },
+  {
+    "case_id": "DEV-20261020-01",
+    "arm": "qwen/qwen3.8-27b:key2",
+    "planner_model": "qwen/qwen3.8-27b",
+    "planner_slot": 2,
+    "worker_slot": 1,
+    "state": "failed",
+    "error_code": "AGENT_TOOL_FAILED",
+    "elapsed_ms": 336373,
+    "observations": [],
+    "selected_activity_ids": [],
+    "mapping_states": [],
+    "review_states": [],
+    "effects": [],
+    "ledger_writes": 0,
+    "full_case_score": {
+      "facts_exact": false,
+      "mapping_exact": false,
+      "approval_boundary_intact": true,
+      "full_report_exact": false,
+      "ambiguity_success": null
+    },
+    "window": "qwen-all-roles-graph-2026-10-22-rerun",
+    "worker_model": "qwen/qwen3.8-27b"
+  },
+  {
+    "case_id": "DEV-20261020-08",
+    "arm": "qwen/qwen3.8-27b:key2",
+    "planner_model": "qwen/qwen3.8-27b",
+    "planner_slot": 2,
+    "worker_slot": 1,
+    "state": "ready_for_review",
+    "error_code": null,
+    "elapsed_ms": 324806,
+    "observations": [
+      {
+        "discipline": "civil",
+        "work_type": "excavation",
+        "event_type": "actual_progress",
+        "observed_status": "completed",
+        "area": null,
+        "asset_tags": [],
+        "explicit_activity_id": null,
+        "work_date": "2026-10-20",
+        "date_basis": "relative_resolved",
+        "quantity": "2.0",
+        "quantity_kind": "delta",
+        "unit": "m3",
+        "raw_unit": "m3",
+        "reported_percent": null,
+        "actual_start": null,
+        "actual_finish": null,
+        "blocker": null,
+        "summary": "Excavated 2 m3 today.",
+        "evidence": [
+          {
+            "fields": [
+              "event_type",
+              "quantity",
+              "unit",
+              "work_date"
+            ],
+            "fragment_id": "<synthetic-uuid>",
+            "quote": "Today, excavated 2 m3. The site area and asset tag were not recorded."
+          }
+        ],
+        "warnings": [],
+        "lifecycle_effects": []
+      }
+    ],
+    "selected_activity_ids": [],
+    "mapping_states": [
+      "ambiguous"
+    ],
+    "review_states": [
+      "pending"
+    ],
+    "effects": [
+      {
+        "event_type": "actual_progress",
+        "quantity_semantics": "delta",
+        "quantity": "2.0",
+        "unit": "m3",
+        "effective_date": "2026-10-20"
+      }
+    ],
+    "ledger_writes": 0,
+    "full_case_score": {
+      "facts_exact": true,
+      "mapping_exact": true,
+      "approval_boundary_intact": true,
+      "full_report_exact": true,
+      "ambiguity_success": true
+    },
+    "window": "qwen-all-roles-graph-2026-10-22-rerun",
+    "worker_model": "qwen/qwen3.8-27b"
+  },
+  {
+    "case_id": "DEV-20261020-08",
+    "arm": "qwen/qwen3.8-27b:key1",
+    "planner_model": "qwen/qwen3.8-27b",
+    "planner_slot": 1,
+    "worker_slot": 2,
+    "state": "ready_for_review",
+    "error_code": null,
+    "elapsed_ms": 341412,
+    "observations": [
+      {
+        "discipline": "civil",
+        "work_type": "excavation",
+        "event_type": "actual_progress",
+        "observed_status": "completed",
+        "area": null,
+        "asset_tags": [],
+        "explicit_activity_id": null,
+        "work_date": "2026-10-20",
+        "date_basis": "relative_resolved",
+        "quantity": "2.0",
+        "quantity_kind": "delta",
+        "unit": "m3",
+        "raw_unit": "m3",
+        "reported_percent": null,
+        "actual_start": null,
+        "actual_finish": null,
+        "blocker": null,
+        "summary": "Excavated 2 m3 today.",
+        "evidence": [
+          {
+            "fields": [
+              "event_type",
+              "quantity",
+              "unit",
+              "work_date"
+            ],
+            "fragment_id": "<synthetic-uuid>",
+            "quote": "Today, excavated 2 m3. The site area and asset tag were not recorded."
+          }
+        ],
+        "warnings": [],
+        "lifecycle_effects": []
+      }
+    ],
+    "selected_activity_ids": [],
+    "mapping_states": [
+      "ambiguous"
+    ],
+    "review_states": [
+      "pending"
+    ],
+    "effects": [
+      {
+        "event_type": "actual_progress",
+        "quantity_semantics": "delta",
+        "quantity": "2.0",
+        "unit": "m3",
+        "effective_date": "2026-10-20"
+      }
+    ],
+    "ledger_writes": 0,
+    "full_case_score": {
+      "facts_exact": true,
+      "mapping_exact": true,
+      "approval_boundary_intact": true,
+      "full_report_exact": true,
+      "ambiguity_success": true
+    },
+    "window": "qwen-all-roles-graph-2026-10-22-rerun",
+    "worker_model": "qwen/qwen3.8-27b"
+  },
+  {
+    "case_id": "DEV-20261020-01",
+    "arm": "openai/gpt-oss-20b:key1",
+    "planner_model": "openai/gpt-oss-20b",
+    "planner_slot": 1,
+    "worker_slot": 2,
+    "state": "ready_for_review",
+    "error_code": null,
+    "elapsed_ms": 299424,
+    "observations": [
+      {
+        "discipline": "civil",
+        "work_type": "excavation",
+        "event_type": "actual_progress",
+        "observed_status": "completed",
+        "area": "Zone Cedar",
+        "asset_tags": [
+          "TR-030"
+        ],
+        "explicit_activity_id": null,
+        "work_date": "2026-10-20",
+        "date_basis": "report_context",
+        "quantity": "5",
+        "quantity_kind": "delta",
+        "unit": "m3",
+        "raw_unit": null,
+        "reported_percent": null,
+        "actual_start": null,
+        "actual_finish": null,
+        "blocker": null,
+        "summary": "Today, excavated 5 m3 in site area Zone Cedar at asset tag TR-030.",
+        "evidence": [
+          {
+            "fields": [
+              "summary"
+            ],
+            "fragment_id": "<synthetic-uuid>",
+            "quote": "Today, excavated 5 m3 in site area Zone Cedar at asset tag TR-030."
+          }
+        ],
+        "warnings": [],
+        "lifecycle_effects": []
+      }
+    ],
+    "selected_activity_ids": [
+      "EXC-CEDAR"
+    ],
+    "mapping_states": [
+      "suggested"
+    ],
+    "review_states": [
+      "pending"
+    ],
+    "effects": [
+      {
+        "event_type": "actual_progress",
+        "quantity_semantics": "delta",
+        "quantity": "5",
+        "unit": "m3",
+        "effective_date": "2026-10-20"
+      }
+    ],
+    "ledger_writes": 0,
+    "full_case_score": {
+      "facts_exact": true,
+      "mapping_exact": true,
+      "approval_boundary_intact": true,
+      "full_report_exact": true,
+      "ambiguity_success": null
+    },
+    "window": "gpt20-all-roles-graph-2026-10-22",
+    "worker_model": "openai/gpt-oss-20b"
+  },
+  {
+    "case_id": "DEV-20261020-01",
+    "arm": "openai/gpt-oss-20b:key2",
+    "planner_model": "openai/gpt-oss-20b",
+    "planner_slot": 2,
+    "worker_slot": 1,
+    "state": "ready_for_review",
+    "error_code": null,
+    "elapsed_ms": 337070,
+    "observations": [
+      {
+        "discipline": "civil",
+        "work_type": "excavation",
+        "event_type": "actual_progress",
+        "observed_status": "completed",
+        "area": "Zone Cedar",
+        "asset_tags": [
+          "TR-030"
+        ],
+        "explicit_activity_id": null,
+        "work_date": "2026-10-20",
+        "date_basis": "report_context",
+        "quantity": "5",
+        "quantity_kind": "delta",
+        "unit": "m3",
+        "raw_unit": "m3",
+        "reported_percent": null,
+        "actual_start": null,
+        "actual_finish": null,
+        "blocker": null,
+        "summary": "Today, excavated 5 m3 in site area Zone Cedar at asset tag TR-030.",
+        "evidence": [
+          {
+            "fields": [
+              "summary"
+            ],
+            "fragment_id": "<synthetic-uuid>",
+            "quote": "Today, excavated 5 m3 in site area Zone Cedar at asset tag TR-030."
+          }
+        ],
+        "warnings": [],
+        "lifecycle_effects": []
+      }
+    ],
+    "selected_activity_ids": [
+      "EXC-CEDAR"
+    ],
+    "mapping_states": [
+      "suggested"
+    ],
+    "review_states": [
+      "pending"
+    ],
+    "effects": [
+      {
+        "event_type": "actual_progress",
+        "quantity_semantics": "delta",
+        "quantity": "5",
+        "unit": "m3",
+        "effective_date": "2026-10-20"
+      }
+    ],
+    "ledger_writes": 0,
+    "full_case_score": {
+      "facts_exact": true,
+      "mapping_exact": true,
+      "approval_boundary_intact": true,
+      "full_report_exact": true,
+      "ambiguity_success": null
+    },
+    "window": "gpt20-all-roles-graph-2026-10-22",
+    "worker_model": "openai/gpt-oss-20b"
+  },
+  {
+    "case_id": "DEV-20261020-08",
+    "arm": "openai/gpt-oss-20b:key2",
+    "planner_model": "openai/gpt-oss-20b",
+    "planner_slot": 2,
+    "worker_slot": 1,
+    "state": "ready_for_review",
+    "error_code": null,
+    "elapsed_ms": 312117,
+    "observations": [
+      {
+        "discipline": "civil",
+        "work_type": "excavation",
+        "event_type": "actual_progress",
+        "observed_status": "completed",
+        "area": null,
+        "asset_tags": [],
+        "explicit_activity_id": null,
+        "work_date": "2026-10-20",
+        "date_basis": "report_context",
+        "quantity": "2",
+        "quantity_kind": "delta",
+        "unit": "m3",
+        "raw_unit": null,
+        "reported_percent": null,
+        "actual_start": null,
+        "actual_finish": null,
+        "blocker": null,
+        "summary": "Today, excavated 2 m3.",
+        "evidence": [
+          {
+            "fields": [
+              "summary"
+            ],
+            "fragment_id": "<synthetic-uuid>",
+            "quote": "Today, excavated 2 m3."
+          }
+        ],
+        "warnings": [],
+        "lifecycle_effects": []
+      }
+    ],
+    "selected_activity_ids": [],
+    "mapping_states": [
+      "ambiguous"
+    ],
+    "review_states": [
+      "pending"
+    ],
+    "effects": [
+      {
+        "event_type": "actual_progress",
+        "quantity_semantics": "delta",
+        "quantity": "2",
+        "unit": "m3",
+        "effective_date": "2026-10-20"
+      }
+    ],
+    "ledger_writes": 0,
+    "full_case_score": {
+      "facts_exact": true,
+      "mapping_exact": true,
+      "approval_boundary_intact": true,
+      "full_report_exact": true,
+      "ambiguity_success": true
+    },
+    "window": "gpt20-all-roles-graph-2026-10-22",
+    "worker_model": "openai/gpt-oss-20b"
+  },
+  {
+    "case_id": "DEV-20261020-08",
+    "arm": "openai/gpt-oss-20b:key1",
+    "planner_model": "openai/gpt-oss-20b",
+    "planner_slot": 1,
+    "worker_slot": 2,
+    "state": "ready_for_review",
+    "error_code": null,
+    "elapsed_ms": 340734,
+    "observations": [
+      {
+        "discipline": "civil",
+        "work_type": "excavation",
+        "event_type": "actual_progress",
+        "observed_status": "completed",
+        "area": null,
+        "asset_tags": [],
+        "explicit_activity_id": null,
+        "work_date": "2026-10-20",
+        "date_basis": "report_context",
+        "quantity": "2",
+        "quantity_kind": "delta",
+        "unit": "m3",
+        "raw_unit": "m3",
+        "reported_percent": null,
+        "actual_start": null,
+        "actual_finish": null,
+        "blocker": null,
+        "summary": "Today, excavated 2 m3.",
+        "evidence": [
+          {
+            "fields": [
+              "summary"
+            ],
+            "fragment_id": "<synthetic-uuid>",
+            "quote": "Today, excavated 2 m3."
+          }
+        ],
+        "warnings": [],
+        "lifecycle_effects": []
+      }
+    ],
+    "selected_activity_ids": [],
+    "mapping_states": [
+      "ambiguous"
+    ],
+    "review_states": [
+      "pending"
+    ],
+    "effects": [
+      {
+        "event_type": "actual_progress",
+        "quantity_semantics": "delta",
+        "quantity": "2",
+        "unit": "m3",
+        "effective_date": "2026-10-20"
+      }
+    ],
+    "ledger_writes": 0,
+    "full_case_score": {
+      "facts_exact": true,
+      "mapping_exact": true,
+      "approval_boundary_intact": true,
+      "full_report_exact": true,
+      "ambiguity_success": true
+    },
+    "window": "gpt20-all-roles-graph-2026-10-22",
+    "worker_model": "openai/gpt-oss-20b"
+  }
+]

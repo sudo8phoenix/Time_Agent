@@ -1,0 +1,354 @@
+[
+  {
+    "window": "gpt20-all-roles-graph-2026-10-22",
+    "case": "DEV-20261020-01",
+    "arm": "openai/gpt-oss-20b:key1",
+    "stage": "planner",
+    "valid": true,
+    "required_keys": [
+      "action"
+    ],
+    "actual_keys": [
+      "action"
+    ]
+  },
+  {
+    "window": "gpt20-all-roles-graph-2026-10-22",
+    "case": "DEV-20261020-01",
+    "arm": "openai/gpt-oss-20b:key1",
+    "stage": "planner",
+    "valid": true,
+    "required_keys": [
+      "action"
+    ],
+    "actual_keys": [
+      "action"
+    ]
+  },
+  {
+    "window": "gpt20-all-roles-graph-2026-10-22",
+    "case": "DEV-20261020-01",
+    "arm": "openai/gpt-oss-20b:key1",
+    "stage": "extraction",
+    "valid": true,
+    "required_keys": [
+      "observations"
+    ],
+    "actual_keys": [
+      "observations"
+    ]
+  },
+  {
+    "window": "gpt20-all-roles-graph-2026-10-22",
+    "case": "DEV-20261020-01",
+    "arm": "openai/gpt-oss-20b:key1",
+    "stage": "retrieval",
+    "valid": true,
+    "required_keys": [
+      "candidate_ids"
+    ],
+    "actual_keys": [
+      "candidate_ids"
+    ]
+  },
+  {
+    "window": "gpt20-all-roles-graph-2026-10-22",
+    "case": "DEV-20261020-01",
+    "arm": "openai/gpt-oss-20b:key1",
+    "stage": "selection",
+    "valid": true,
+    "required_keys": [
+      "candidate_id",
+      "mapping_state",
+      "evidence_fragment_ids",
+      "reason_codes",
+      "explanation",
+      "missing_information"
+    ],
+    "actual_keys": [
+      "candidate_id",
+      "evidence_fragment_ids",
+      "explanation",
+      "mapping_state",
+      "missing_information",
+      "reason_codes"
+    ]
+  },
+  {
+    "window": "gpt20-all-roles-graph-2026-10-22",
+    "case": "DEV-20261020-01",
+    "arm": "openai/gpt-oss-20b:key1",
+    "stage": "planner",
+    "valid": true,
+    "required_keys": [
+      "action"
+    ],
+    "actual_keys": [
+      "action"
+    ]
+  },
+  {
+    "window": "gpt20-all-roles-graph-2026-10-22",
+    "case": "DEV-20261020-01",
+    "arm": "openai/gpt-oss-20b:key2",
+    "stage": "planner",
+    "valid": true,
+    "required_keys": [
+      "action"
+    ],
+    "actual_keys": [
+      "action"
+    ]
+  },
+  {
+    "window": "gpt20-all-roles-graph-2026-10-22",
+    "case": "DEV-20261020-01",
+    "arm": "openai/gpt-oss-20b:key2",
+    "stage": "planner",
+    "valid": true,
+    "required_keys": [
+      "action"
+    ],
+    "actual_keys": [
+      "action"
+    ]
+  },
+  {
+    "window": "gpt20-all-roles-graph-2026-10-22",
+    "case": "DEV-20261020-01",
+    "arm": "openai/gpt-oss-20b:key2",
+    "stage": "extraction",
+    "valid": true,
+    "required_keys": [
+      "observations"
+    ],
+    "actual_keys": [
+      "observations"
+    ]
+  },
+  {
+    "window": "gpt20-all-roles-graph-2026-10-22",
+    "case": "DEV-20261020-01",
+    "arm": "openai/gpt-oss-20b:key2",
+    "stage": "retrieval",
+    "valid": true,
+    "required_keys": [
+      "candidate_ids"
+    ],
+    "actual_keys": [
+      "candidate_ids"
+    ]
+  },
+  {
+    "window": "gpt20-all-roles-graph-2026-10-22",
+    "case": "DEV-20261020-01",
+    "arm": "openai/gpt-oss-20b:key2",
+    "stage": "selection",
+    "valid": true,
+    "required_keys": [
+      "candidate_id",
+      "mapping_state",
+      "evidence_fragment_ids",
+      "reason_codes",
+      "explanation",
+      "missing_information"
+    ],
+    "actual_keys": [
+      "candidate_id",
+      "evidence_fragment_ids",
+      "explanation",
+      "mapping_state",
+      "missing_information",
+      "reason_codes"
+    ]
+  },
+  {
+    "window": "gpt20-all-roles-graph-2026-10-22",
+    "case": "DEV-20261020-01",
+    "arm": "openai/gpt-oss-20b:key2",
+    "stage": "planner",
+    "valid": true,
+    "required_keys": [
+      "action"
+    ],
+    "actual_keys": [
+      "action"
+    ]
+  },
+  {
+    "window": "gpt20-all-roles-graph-2026-10-22",
+    "case": "DEV-20261020-08",
+    "arm": "openai/gpt-oss-20b:key2",
+    "stage": "planner",
+    "valid": true,
+    "required_keys": [
+      "action"
+    ],
+    "actual_keys": [
+      "action"
+    ]
+  },
+  {
+    "window": "gpt20-all-roles-graph-2026-10-22",
+    "case": "DEV-20261020-08",
+    "arm": "openai/gpt-oss-20b:key2",
+    "stage": "planner",
+    "valid": true,
+    "required_keys": [
+      "action"
+    ],
+    "actual_keys": [
+      "action"
+    ]
+  },
+  {
+    "window": "gpt20-all-roles-graph-2026-10-22",
+    "case": "DEV-20261020-08",
+    "arm": "openai/gpt-oss-20b:key2",
+    "stage": "extraction",
+    "valid": true,
+    "required_keys": [
+      "observations"
+    ],
+    "actual_keys": [
+      "observations"
+    ]
+  },
+  {
+    "window": "gpt20-all-roles-graph-2026-10-22",
+    "case": "DEV-20261020-08",
+    "arm": "openai/gpt-oss-20b:key2",
+    "stage": "retrieval",
+    "valid": true,
+    "required_keys": [
+      "candidate_ids"
+    ],
+    "actual_keys": [
+      "candidate_ids"
+    ]
+  },
+  {
+    "window": "gpt20-all-roles-graph-2026-10-22",
+    "case": "DEV-20261020-08",
+    "arm": "openai/gpt-oss-20b:key2",
+    "stage": "selection",
+    "valid": true,
+    "required_keys": [
+      "candidate_id",
+      "mapping_state",
+      "evidence_fragment_ids",
+      "reason_codes",
+      "explanation",
+      "missing_information"
+    ],
+    "actual_keys": [
+      "candidate_id",
+      "evidence_fragment_ids",
+      "explanation",
+      "mapping_state",
+      "missing_information",
+      "reason_codes"
+    ]
+  },
+  {
+    "window": "gpt20-all-roles-graph-2026-10-22",
+    "case": "DEV-20261020-08",
+    "arm": "openai/gpt-oss-20b:key2",
+    "stage": "planner",
+    "valid": true,
+    "required_keys": [
+      "action"
+    ],
+    "actual_keys": [
+      "action"
+    ]
+  },
+  {
+    "window": "gpt20-all-roles-graph-2026-10-22",
+    "case": "DEV-20261020-08",
+    "arm": "openai/gpt-oss-20b:key1",
+    "stage": "planner",
+    "valid": true,
+    "required_keys": [
+      "action"
+    ],
+    "actual_keys": [
+      "action"
+    ]
+  },
+  {
+    "window": "gpt20-all-roles-graph-2026-10-22",
+    "case": "DEV-20261020-08",
+    "arm": "openai/gpt-oss-20b:key1",
+    "stage": "planner",
+    "valid": true,
+    "required_keys": [
+      "action"
+    ],
+    "actual_keys": [
+      "action"
+    ]
+  },
+  {
+    "window": "gpt20-all-roles-graph-2026-10-22",
+    "case": "DEV-20261020-08",
+    "arm": "openai/gpt-oss-20b:key1",
+    "stage": "extraction",
+    "valid": true,
+    "required_keys": [
+      "observations"
+    ],
+    "actual_keys": [
+      "observations"
+    ]
+  },
+  {
+    "window": "gpt20-all-roles-graph-2026-10-22",
+    "case": "DEV-20261020-08",
+    "arm": "openai/gpt-oss-20b:key1",
+    "stage": "retrieval",
+    "valid": true,
+    "required_keys": [
+      "candidate_ids"
+    ],
+    "actual_keys": [
+      "candidate_ids"
+    ]
+  },
+  {
+    "window": "gpt20-all-roles-graph-2026-10-22",
+    "case": "DEV-20261020-08",
+    "arm": "openai/gpt-oss-20b:key1",
+    "stage": "selection",
+    "valid": true,
+    "required_keys": [
+      "candidate_id",
+      "mapping_state",
+      "evidence_fragment_ids",
+      "reason_codes",
+      "explanation",
+      "missing_information"
+    ],
+    "actual_keys": [
+      "candidate_id",
+      "evidence_fragment_ids",
+      "explanation",
+      "mapping_state",
+      "missing_information",
+      "reason_codes"
+    ]
+  },
+  {
+    "window": "gpt20-all-roles-graph-2026-10-22",
+    "case": "DEV-20261020-08",
+    "arm": "openai/gpt-oss-20b:key1",
+    "stage": "planner",
+    "valid": true,
+    "required_keys": [
+      "action"
+    ],
+    "actual_keys": [
+      "action"
+    ]
+  }
+]

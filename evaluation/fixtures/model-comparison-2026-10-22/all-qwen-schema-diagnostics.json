@@ -1,0 +1,372 @@
+[
+  {
+    "window": "qwen-all-roles-graph-2026-10-22",
+    "case": "DEV-20261020-01",
+    "arm": "qwen/qwen3.8-27b:key1",
+    "stage": "planner",
+    "valid": true,
+    "required_keys": [
+      "action"
+    ],
+    "actual_keys": [
+      "action"
+    ]
+  },
+  {
+    "window": "qwen-all-roles-graph-2026-10-22",
+    "case": "DEV-20261020-01",
+    "arm": "qwen/qwen3.8-27b:key1",
+    "stage": "planner",
+    "valid": true,
+    "required_keys": [
+      "action"
+    ],
+    "actual_keys": [
+      "action"
+    ]
+  },
+  {
+    "window": "qwen-all-roles-graph-2026-10-22",
+    "case": "DEV-20261020-01",
+    "arm": "qwen/qwen3.8-27b:key1",
+    "stage": "extraction",
+    "valid": true,
+    "required_keys": [
+      "observations"
+    ],
+    "actual_keys": [
+      "observations"
+    ]
+  },
+  {
+    "window": "qwen-all-roles-graph-2026-10-22",
+    "case": "DEV-20261020-01",
+    "arm": "qwen/qwen3.8-27b:key1",
+    "stage": "retrieval",
+    "valid": true,
+    "required_keys": [
+      "candidate_ids"
+    ],
+    "actual_keys": [
+      "candidate_ids"
+    ]
+  },
+  {
+    "window": "qwen-all-roles-graph-2026-10-22-rerun",
+    "case": "DEV-20261020-01",
+    "arm": "qwen/qwen3.8-27b:key1",
+    "stage": "planner",
+    "valid": true,
+    "required_keys": [
+      "action"
+    ],
+    "actual_keys": [
+      "action"
+    ]
+  },
+  {
+    "window": "qwen-all-roles-graph-2026-10-22-rerun",
+    "case": "DEV-20261020-01",
+    "arm": "qwen/qwen3.8-27b:key1",
+    "stage": "planner",
+    "valid": true,
+    "required_keys": [
+      "action"
+    ],
+    "actual_keys": [
+      "action"
+    ]
+  },
+  {
+    "window": "qwen-all-roles-graph-2026-10-22-rerun",
+    "case": "DEV-20261020-01",
+    "arm": "qwen/qwen3.8-27b:key1",
+    "stage": "extraction",
+    "valid": true,
+    "required_keys": [
+      "observations"
+    ],
+    "actual_keys": [
+      "observations"
+    ]
+  },
+  {
+    "window": "qwen-all-roles-graph-2026-10-22-rerun",
+    "case": "DEV-20261020-01",
+    "arm": "qwen/qwen3.8-27b:key1",
+    "stage": "retrieval",
+    "valid": true,
+    "required_keys": [
+      "candidate_ids"
+    ],
+    "actual_keys": [
+      "candidate_ids"
+    ]
+  },
+  {
+    "window": "qwen-all-roles-graph-2026-10-22-rerun",
+    "case": "DEV-20261020-01",
+    "arm": "qwen/qwen3.8-27b:key1",
+    "stage": "selection",
+    "valid": false,
+    "required_keys": [
+      "candidate_id",
+      "mapping_state",
+      "evidence_fragment_ids",
+      "reason_codes",
+      "explanation",
+      "missing_information"
+    ],
+    "actual_keys": [
+      "suggested"
+    ]
+  },
+  {
+    "window": "qwen-all-roles-graph-2026-10-22-rerun",
+    "case": "DEV-20261020-01",
+    "arm": "qwen/qwen3.8-27b:key2",
+    "stage": "planner",
+    "valid": true,
+    "required_keys": [
+      "action"
+    ],
+    "actual_keys": [
+      "action"
+    ]
+  },
+  {
+    "window": "qwen-all-roles-graph-2026-10-22-rerun",
+    "case": "DEV-20261020-01",
+    "arm": "qwen/qwen3.8-27b:key2",
+    "stage": "planner",
+    "valid": true,
+    "required_keys": [
+      "action"
+    ],
+    "actual_keys": [
+      "action"
+    ]
+  },
+  {
+    "window": "qwen-all-roles-graph-2026-10-22-rerun",
+    "case": "DEV-20261020-01",
+    "arm": "qwen/qwen3.8-27b:key2",
+    "stage": "extraction",
+    "valid": true,
+    "required_keys": [
+      "observations"
+    ],
+    "actual_keys": [
+      "observations"
+    ]
+  },
+  {
+    "window": "qwen-all-roles-graph-2026-10-22-rerun",
+    "case": "DEV-20261020-01",
+    "arm": "qwen/qwen3.8-27b:key2",
+    "stage": "retrieval",
+    "valid": true,
+    "required_keys": [
+      "candidate_ids"
+    ],
+    "actual_keys": [
+      "candidate_ids"
+    ]
+  },
+  {
+    "window": "qwen-all-roles-graph-2026-10-22-rerun",
+    "case": "DEV-20261020-01",
+    "arm": "qwen/qwen3.8-27b:key2",
+    "stage": "selection",
+    "valid": false,
+    "required_keys": [
+      "candidate_id",
+      "mapping_state",
+      "evidence_fragment_ids",
+      "reason_codes",
+      "explanation",
+      "missing_information"
+    ],
+    "actual_keys": [
+      "decision",
+      "candidate_id",
+      "evidence"
+    ]
+  },
+  {
+    "window": "qwen-all-roles-graph-2026-10-22-rerun",
+    "case": "DEV-20261020-08",
+    "arm": "qwen/qwen3.8-27b:key2",
+    "stage": "planner",
+    "valid": true,
+    "required_keys": [
+      "action"
+    ],
+    "actual_keys": [
+      "action"
+    ]
+  },
+  {
+    "window": "qwen-all-roles-graph-2026-10-22-rerun",
+    "case": "DEV-20261020-08",
+    "arm": "qwen/qwen3.8-27b:key2",
+    "stage": "planner",
+    "valid": true,
+    "required_keys": [
+      "action"
+    ],
+    "actual_keys": [
+      "action"
+    ]
+  },
+  {
+    "window": "qwen-all-roles-graph-2026-10-22-rerun",
+    "case": "DEV-20261020-08",
+    "arm": "qwen/qwen3.8-27b:key2",
+    "stage": "extraction",
+    "valid": true,
+    "required_keys": [
+      "observations"
+    ],
+    "actual_keys": [
+      "observations"
+    ]
+  },
+  {
+    "window": "qwen-all-roles-graph-2026-10-22-rerun",
+    "case": "DEV-20261020-08",
+    "arm": "qwen/qwen3.8-27b:key2",
+    "stage": "retrieval",
+    "valid": true,
+    "required_keys": [
+      "candidate_ids"
+    ],
+    "actual_keys": [
+      "candidate_ids"
+    ]
+  },
+  {
+    "window": "qwen-all-roles-graph-2026-10-22-rerun",
+    "case": "DEV-20261020-08",
+    "arm": "qwen/qwen3.8-27b:key2",
+    "stage": "selection",
+    "valid": true,
+    "required_keys": [
+      "candidate_id",
+      "mapping_state",
+      "evidence_fragment_ids",
+      "reason_codes",
+      "explanation",
+      "missing_information"
+    ],
+    "actual_keys": [
+      "candidate_id",
+      "evidence_fragment_ids",
+      "explanation",
+      "mapping_state",
+      "missing_information",
+      "reason_codes"
+    ]
+  },
+  {
+    "window": "qwen-all-roles-graph-2026-10-22-rerun",
+    "case": "DEV-20261020-08",
+    "arm": "qwen/qwen3.8-27b:key2",
+    "stage": "planner",
+    "valid": true,
+    "required_keys": [
+      "action"
+    ],
+    "actual_keys": [
+      "action"
+    ]
+  },
+  {
+    "window": "qwen-all-roles-graph-2026-10-22-rerun",
+    "case": "DEV-20261020-08",
+    "arm": "qwen/qwen3.8-27b:key1",
+    "stage": "planner",
+    "valid": true,
+    "required_keys": [
+      "action"
+    ],
+    "actual_keys": [
+      "action"
+    ]
+  },
+  {
+    "window": "qwen-all-roles-graph-2026-10-22-rerun",
+    "case": "DEV-20261020-08",
+    "arm": "qwen/qwen3.8-27b:key1",
+    "stage": "planner",
+    "valid": true,
+    "required_keys": [
+      "action"
+    ],
+    "actual_keys": [
+      "action"
+    ]
+  },
+  {
+    "window": "qwen-all-roles-graph-2026-10-22-rerun",
+    "case": "DEV-20261020-08",
+    "arm": "qwen/qwen3.8-27b:key1",
+    "stage": "extraction",
+    "valid": true,
+    "required_keys": [
+      "observations"
+    ],
+    "actual_keys": [
+      "observations"
+    ]
+  },
+  {
+    "window": "qwen-all-roles-graph-2026-10-22-rerun",
+    "case": "DEV-20261020-08",
+    "arm": "qwen/qwen3.8-27b:key1",
+    "stage": "retrieval",
+    "valid": true,
+    "required_keys": [
+      "candidate_ids"
+    ],
+    "actual_keys": [
+      "candidate_ids"
+    ]
+  },
+  {
+    "window": "qwen-all-roles-graph-2026-10-22-rerun",
+    "case": "DEV-20261020-08",
+    "arm": "qwen/qwen3.8-27b:key1",
+    "stage": "selection",
+    "valid": true,
+    "required_keys": [
+      "candidate_id",
+      "mapping_state",
+      "evidence_fragment_ids",
+      "reason_codes",
+      "explanation",
+      "missing_information"
+    ],
+    "actual_keys": [
+      "candidate_id",
+      "evidence_fragment_ids",
+      "explanation",
+      "mapping_state",
+      "missing_information",
+      "reason_codes"
+    ]
+  },
+  {
+    "window": "qwen-all-roles-graph-2026-10-22-rerun",
+    "case": "DEV-20261020-08",
+    "arm": "qwen/qwen3.8-27b:key1",
+    "stage": "planner",
+    "valid": true,
+    "required_keys": [
+      "action"
+    ],
+    "actual_keys": [
+      "action"
+    ]
+  }
+]

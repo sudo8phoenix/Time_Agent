@@ -1,0 +1,3 @@
+activity_id,activity_name,wbs_path,discipline,work_type,area,asset_tags,is_leaf,measurement_basis,planned_quantity,unit,planned_start,planned_finish,aliases
+EXC-CEDAR,Excavation Zone Cedar TR-030,1.1,civil,excavation,Zone Cedar,TR-030,true,quantity_ratio,100,m3,2026-10-01,2026-11-30,excavation
+EXC-OAK,Excavation Zone Oak TR-021,1.2,civil,excavation,Zone Oak,TR-021,true,quantity_ratio,100,m3,2026-10-01,2026-11-30,excavation

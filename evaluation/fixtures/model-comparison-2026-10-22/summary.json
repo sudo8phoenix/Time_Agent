@@ -1,0 +1,401 @@
+{
+  "scope": "Descriptive historical-window comparison on two consumed synthetic cases repeated across two key assignments; no independent population ranking",
+  "configurations": [
+    {
+      "name": "All 20B",
+      "planner": "openai/gpt-oss-20b",
+      "worker": "openai/gpt-oss-20b",
+      "planned": 4,
+      "tested": 4,
+      "exact": 4,
+      "ready": 4,
+      "stage_checks": {
+        "planner": {
+          "accepted": 12,
+          "attempted": 12,
+          "median_success_request_seconds": 0.5310266045271419
+        },
+        "extraction": {
+          "accepted": 4,
+          "attempted": 4,
+          "median_success_request_seconds": 13.497395124519244
+        },
+        "retrieval": {
+          "accepted": 4,
+          "attempted": 4,
+          "median_success_request_seconds": 0.6740997500019148
+        },
+        "selection": {
+          "accepted": 4,
+          "attempted": 4,
+          "median_success_request_seconds": 0.8367849999631289
+        }
+      },
+      "known_latest_cohort_cost_usd": 0.002656425,
+      "latest_cohort_unknown_usage": 0,
+      "latest_cohort_http_attempts": 24,
+      "all_attempts": 4,
+      "retained_failed_attempts": 0,
+      "latest_schema_error_reports": 0,
+      "median_success_report_seconds": 324.5935,
+      "readiness_under_120s": 0,
+      "all_approval_boundaries_intact": true,
+      "terminal_replay_reused": 4,
+      "terminal_replay_duplicate_free": 4,
+      "cases": [
+        {
+          "case": "DEV-20261020-01",
+          "planner_slot": 1,
+          "worker_slot": 2,
+          "state": "ready_for_review",
+          "seconds": 299.424,
+          "exact": true,
+          "error": null,
+          "window": "gpt20-all-roles-graph-2026-10-22"
+        },
+        {
+          "case": "DEV-20261020-01",
+          "planner_slot": 2,
+          "worker_slot": 1,
+          "state": "ready_for_review",
+          "seconds": 337.07,
+          "exact": true,
+          "error": null,
+          "window": "gpt20-all-roles-graph-2026-10-22"
+        },
+        {
+          "case": "DEV-20261020-08",
+          "planner_slot": 2,
+          "worker_slot": 1,
+          "state": "ready_for_review",
+          "seconds": 312.117,
+          "exact": true,
+          "error": null,
+          "window": "gpt20-all-roles-graph-2026-10-22"
+        },
+        {
+          "case": "DEV-20261020-08",
+          "planner_slot": 1,
+          "worker_slot": 2,
+          "state": "ready_for_review",
+          "seconds": 340.734,
+          "exact": true,
+          "error": null,
+          "window": "gpt20-all-roles-graph-2026-10-22"
+        }
+      ]
+    },
+    {
+      "name": "120B + 20B",
+      "planner": "openai/gpt-oss-120b",
+      "worker": "openai/gpt-oss-20b",
+      "planned": 4,
+      "tested": 4,
+      "exact": 4,
+      "ready": 4,
+      "stage_checks": {
+        "planner": {
+          "accepted": 12,
+          "attempted": 12,
+          "median_success_request_seconds": 0.7863043959951028
+        },
+        "extraction": {
+          "accepted": 4,
+          "attempted": 4,
+          "median_success_request_seconds": 13.411365437495988
+        },
+        "retrieval": {
+          "accepted": 4,
+          "attempted": 4,
+          "median_success_request_seconds": 0.7230999170278665
+        },
+        "selection": {
+          "accepted": 4,
+          "attempted": 4,
+          "median_success_request_seconds": 0.8019076880009379
+        }
+      },
+      "known_latest_cohort_cost_usd": 0.003036375,
+      "latest_cohort_unknown_usage": 0,
+      "latest_cohort_http_attempts": 24,
+      "all_attempts": 4,
+      "retained_failed_attempts": 0,
+      "latest_schema_error_reports": 0,
+      "median_success_report_seconds": 324.9175,
+      "readiness_under_120s": 0,
+      "all_approval_boundaries_intact": true,
+      "terminal_replay_reused": 4,
+      "terminal_replay_duplicate_free": 4,
+      "cases": [
+        {
+          "case": "DEV-20261020-01",
+          "planner_slot": 1,
+          "worker_slot": 2,
+          "state": "ready_for_review",
+          "seconds": 312.302,
+          "exact": true,
+          "error": null,
+          "window": "qwen-orchestrator-graph-2026-10-22"
+        },
+        {
+          "case": "DEV-20261020-01",
+          "planner_slot": 2,
+          "worker_slot": 1,
+          "state": "ready_for_review",
+          "seconds": 337.533,
+          "exact": true,
+          "error": null,
+          "window": "qwen-orchestrator-graph-2026-10-22"
+        },
+        {
+          "case": "DEV-20261020-08",
+          "planner_slot": 2,
+          "worker_slot": 1,
+          "state": "ready_for_review",
+          "seconds": 311.138,
+          "exact": true,
+          "error": null,
+          "window": "qwen-orchestrator-graph-2026-10-22-rerun"
+        },
+        {
+          "case": "DEV-20261020-08",
+          "planner_slot": 1,
+          "worker_slot": 2,
+          "state": "ready_for_review",
+          "seconds": 340.781,
+          "exact": true,
+          "error": null,
+          "window": "qwen-orchestrator-graph-2026-10-22-rerun"
+        }
+      ]
+    },
+    {
+      "name": "Qwen + 20B",
+      "planner": "qwen/qwen3.8-27b",
+      "worker": "openai/gpt-oss-20b",
+      "planned": 4,
+      "tested": 4,
+      "exact": 4,
+      "ready": 4,
+      "stage_checks": {
+        "planner": {
+          "accepted": 12,
+          "attempted": 12,
+          "median_success_request_seconds": 0.32400510399020277
+        },
+        "extraction": {
+          "accepted": 4,
+          "attempted": 4,
+          "median_success_request_seconds": 13.746135541499825
+        },
+        "retrieval": {
+          "accepted": 4,
+          "attempted": 4,
+          "median_success_request_seconds": 0.7710961880220566
+        },
+        "selection": {
+          "accepted": 4,
+          "attempted": 4,
+          "median_success_request_seconds": 0.8956310625071637
+        }
+      },
+      "known_latest_cohort_cost_usd": 0.0031107,
+      "latest_cohort_unknown_usage": 0,
+      "latest_cohort_http_attempts": 24,
+      "all_attempts": 5,
+      "retained_failed_attempts": 1,
+      "latest_schema_error_reports": 0,
+      "median_success_report_seconds": 304.3745,
+      "readiness_under_120s": 0,
+      "all_approval_boundaries_intact": true,
+      "terminal_replay_reused": 4,
+      "terminal_replay_duplicate_free": 4,
+      "cases": [
+        {
+          "case": "DEV-20261020-01",
+          "planner_slot": 1,
+          "worker_slot": 2,
+          "state": "ready_for_review",
+          "seconds": 298.752,
+          "exact": true,
+          "error": null,
+          "window": "qwen-orchestrator-graph-2026-10-22"
+        },
+        {
+          "case": "DEV-20261020-01",
+          "planner_slot": 2,
+          "worker_slot": 1,
+          "state": "ready_for_review",
+          "seconds": 298.384,
+          "exact": true,
+          "error": null,
+          "window": "qwen-orchestrator-graph-2026-10-22-rerun"
+        },
+        {
+          "case": "DEV-20261020-08",
+          "planner_slot": 2,
+          "worker_slot": 1,
+          "state": "ready_for_review",
+          "seconds": 311.156,
+          "exact": true,
+          "error": null,
+          "window": "qwen-orchestrator-graph-2026-10-22-rerun"
+        },
+        {
+          "case": "DEV-20261020-08",
+          "planner_slot": 1,
+          "worker_slot": 2,
+          "state": "ready_for_review",
+          "seconds": 309.997,
+          "exact": true,
+          "error": null,
+          "window": "qwen-orchestrator-graph-2026-10-22-rerun"
+        }
+      ]
+    },
+    {
+      "name": "All Qwen",
+      "planner": "qwen/qwen3.8-27b",
+      "worker": "qwen/qwen3.8-27b",
+      "planned": 4,
+      "tested": 4,
+      "exact": 2,
+      "ready": 2,
+      "stage_checks": {
+        "planner": {
+          "accepted": 10,
+          "attempted": 10,
+          "median_success_request_seconds": 0.3465216460172087
+        },
+        "extraction": {
+          "accepted": 4,
+          "attempted": 4,
+          "median_success_request_seconds": 13.413625041517662
+        },
+        "retrieval": {
+          "accepted": 4,
+          "attempted": 4,
+          "median_success_request_seconds": 0.3337325835309457
+        },
+        "selection": {
+          "accepted": 2,
+          "attempted": 4,
+          "median_success_request_seconds": 0.5174588329973631
+        }
+      },
+      "known_latest_cohort_cost_usd": 0.0191384,
+      "latest_cohort_unknown_usage": 0,
+      "latest_cohort_http_attempts": 22,
+      "all_attempts": 5,
+      "retained_failed_attempts": 3,
+      "latest_schema_error_reports": 2,
+      "median_success_report_seconds": 333.109,
+      "readiness_under_120s": 0,
+      "all_approval_boundaries_intact": true,
+      "terminal_replay_reused": 2,
+      "terminal_replay_duplicate_free": 2,
+      "cases": [
+        {
+          "case": "DEV-20261020-01",
+          "planner_slot": 1,
+          "worker_slot": 2,
+          "state": "failed",
+          "seconds": 279.24,
+          "exact": false,
+          "error": "AGENT_TOOL_FAILED",
+          "window": "qwen-all-roles-graph-2026-10-22-rerun"
+        },
+        {
+          "case": "DEV-20261020-01",
+          "planner_slot": 2,
+          "worker_slot": 1,
+          "state": "failed",
+          "seconds": 336.373,
+          "exact": false,
+          "error": "AGENT_TOOL_FAILED",
+          "window": "qwen-all-roles-graph-2026-10-22-rerun"
+        },
+        {
+          "case": "DEV-20261020-08",
+          "planner_slot": 2,
+          "worker_slot": 1,
+          "state": "ready_for_review",
+          "seconds": 324.806,
+          "exact": true,
+          "error": null,
+          "window": "qwen-all-roles-graph-2026-10-22-rerun"
+        },
+        {
+          "case": "DEV-20261020-08",
+          "planner_slot": 1,
+          "worker_slot": 2,
+          "state": "ready_for_review",
+          "seconds": 341.412,
+          "exact": true,
+          "error": null,
+          "window": "qwen-all-roles-graph-2026-10-22-rerun"
+        }
+      ]
+    }
+  ],
+  "accounting": [
+    {
+      "family": "mixed",
+      "http_attempts": 50,
+      "http200": 49,
+      "unknown_usage": 1,
+      "known_tokens": 51369,
+      "known_list_price_usd": 0.0062134749999999996,
+      "reserved_usd": 0.5079488000000001,
+      "reserved_calls": 50
+    },
+    {
+      "family": "all_qwen",
+      "http_attempts": 27,
+      "http200": 26,
+      "unknown_usage": 1,
+      "known_tokens": 20151,
+      "known_list_price_usd": 0.0228312,
+      "reserved_usd": 0.2856639999999999,
+      "reserved_calls": 27
+    },
+    {
+      "family": "all_20b",
+      "http_attempts": 24,
+      "http200": 24,
+      "unknown_usage": 0,
+      "known_tokens": 26515,
+      "known_list_price_usd": 0.002656425,
+      "reserved_usd": 0.020359499999999996,
+      "reserved_calls": 24
+    }
+  ],
+  "identical_fixture_sha256": {
+    "cases.json": "4c1a686d5df3030bbd35593c90cb77362583c77f2dbd9115a393189143b3c0c9",
+    "labels.json": "4795b27b20ca1299ca404a6e60e7f3296601a9eb5e101a8d829c30c4af77cafc",
+    "schedule.csv": "df00132dac5695d153f760ca80ef398897e0926424ae05969e606d5a655691f6"
+  },
+  "evidence": {
+    "qwen-orchestrator-graph-2026-10-22": {
+      "plan_sha256": "cb03f6db9e7c2ce1102638a2b439469712be77de1a398d1a521047feec17bb19",
+      "capture_manifest_sha256": "b968a94ce8f3393f7dea2d8e26c86c5da91899f645f7d43cb19aae8308bc5369"
+    },
+    "qwen-orchestrator-graph-2026-10-22-rerun": {
+      "plan_sha256": "003b33ddfb2042c93582ba4170054b95114cf7eec2259bfe10e690cbc554dc2c",
+      "capture_manifest_sha256": "e0dc6a64606855a6643e80d10b24e737ddd2780813ddbc105fe2fbddf1c4ac14"
+    },
+    "qwen-all-roles-graph-2026-10-22": {
+      "plan_sha256": "91016c9b16a0d50240eeb621e65dc2189fd64a2d136394917327bb34727d899d",
+      "capture_manifest_sha256": "288314c007faf117e64595e58310371d495f9f5563b63de89db644d3605273a0"
+    },
+    "qwen-all-roles-graph-2026-10-22-rerun": {
+      "plan_sha256": "8426ab9f965d85a778598b3dd853034c5ea41fec36ff0fe8e84727f636c24fd9",
+      "capture_manifest_sha256": "421f5a86524528cdb08e42c721cb9a5cb324d43a7f3f12e9df31f81e42a44421"
+    },
+    "gpt20-all-roles-graph-2026-10-22": {
+      "plan_sha256": "cfdd9134a5ed485f52bc8cf7b7d1bf12e0521c33b4748542042f968df4f3b2fa",
+      "capture_manifest_sha256": "27a86d5cec8b786331ec873f42012b919b277152fff5c3d462c490113137f3a9"
+    }
+  },
+  "release_accepted": false
+}

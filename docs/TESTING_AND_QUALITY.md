@@ -6,11 +6,24 @@ Full raw captures, execution logs, screenshots, handoffs and the detailed histor
 checklist remain local under ignored paths. Small consumed regression fixtures and
 the executable evaluation contracts remain in Git.
 
+## Latest model configuration and prompting comparison
+
+| Configuration | Exact planned reports | Key1 / key2 exact | All report attempts | Median completed report time | Known latest-cohort cost | Below 120s |
+|---|---:|---:|---:|---:|---:|---:|
+| All 20B | 4/4 | 2/2 / 2/2 | 4 | 324.594s (4 completed) | $0.00265643 | 0/4 |
+| 120B + 20B | 4/4 | 2/2 / 2/2 | 4 | 324.918s (4 completed) | $0.00303638 | 0/4 |
+| Qwen + 20B | 4/4 | 2/2 / 2/2 | 5 | 304.375s (4 completed) | $0.00311070 | 0/4 |
+| All Qwen | 2/4 | 1/2 / 1/2 | 5 | 333.109s (2 completed) | $0.01913840 | 0/4 |
+
+Costs cover the latest result for each of four planned comparisons, including failures. Earlier failed/recovery attempts remain in separate total-window accounting. All-Qwen timing includes only its two ambiguity successes. These are known list-price estimates, not complete billing or an equal completed-report timing population.
+
+The [complete model/prompt report](MODEL_AND_PROMPT_COMPARISON_REPORT.md) and [exact prompt catalog](MODEL_PROMPT_CATALOG.md) explain full-schema failures, stage versus graph metrics, quotas, known costs and limits. 226 focused checks passed after adding 20B planner compatibility; this is not a new full unit/integration-suite run. All-Qwen failures remain retained. Active assignments unchanged; no release decision. Historical batch-32 studies below keep their original timings/source.
+
 ## Recorded software verification
 
 | Check | Most recent recorded result | Scope |
 |---|---|---|
-| Backend unit suite | 1,467 passed, one skipped | Full Mac and Linux suites after bounded exit confirmation |
+| Backend unit suite | 1,477 passed, one skipped | Latest local publication check; earlier Linux exit-confirmation run retained |
 | PostgreSQL integration suite | 263 passed | Isolated rehearsal DB, injected models; last full batch-32 run |
 | Final batch-32 controls | 26 passed | Source fingerprints, scopes, journals and test execution guards after final source-contract expansion |
 | Scoped Python lint | Passed | New evaluation, admission, source-contract and guard modules; no repository-wide lint claim |
@@ -26,7 +39,7 @@ durable reports/conversations, recovery/cancellation, outbox delivery and isolat
 quota-policy activation. These use deterministic/injected responses; passing them
 does not measure a live model's accuracy.
 
-## Model and prompt studies
+## Historical batch-32 model and prompt studies
 
 The latest bounded study used consumed public/synthetic development examples.
 Its six-case component task used a projected event schema, not the complete
@@ -46,7 +59,7 @@ using the same model is correlated AI review, not independent human adjudication
 Earlier development work also retained schema failures, HTTP400s, incomplete
 comparisons and original consumed labels. None is promoted into fresh holdout truth.
 
-## Actual V2 graph study
+## Historical batch-32 V2 graph study
 
 The study seeded reports directly in an isolated database, bypassing upload/OCR.
 It exercised extraction, schedule matching, planner calls and the pending-review

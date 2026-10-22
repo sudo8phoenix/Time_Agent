@@ -1,0 +1,53 @@
+{
+  "scope": "Two consumed synthetic inputs, both planner keys, actual V2 graph, GPT-OSS 20B in every model role, distinct planner/worker keys",
+  "planned_unique_comparisons": 4,
+  "completed_unique_comparisons": 4,
+  "tested_unique_comparisons": 4,
+  "schema_failures": [],
+  "valid_http200_schemas": 24,
+  "attempted_reports": 4,
+  "retained_failed_reports": 0,
+  "recovery_policy": "No automatic model/key fallback; retain every attempt",
+  "groups": [
+    {
+      "model": "openai/gpt-oss-20b",
+      "attempted_reports": 4,
+      "completed_reports": 4,
+      "exact_reports": 4,
+      "planner_attempts": 12,
+      "valid_planner_responses": 12,
+      "median_planner_request_seconds": 0.5310266045271419,
+      "report_seconds": [
+        299.424,
+        337.07,
+        312.117,
+        340.734
+      ],
+      "readiness_under_120s": 0,
+      "per_key": {
+        "1": {
+          "completed": 2,
+          "exact": 2
+        },
+        "2": {
+          "completed": 2,
+          "exact": 2
+        }
+      }
+    }
+  ],
+  "http_attempts": 24,
+  "http200": 24,
+  "unknown_usage_attempts": 0,
+  "known_tokens": 26515,
+  "known_list_price_usd": 0.002656425,
+  "cumulative_reserved_calls": 24,
+  "cumulative_reserved_tokens": 160868,
+  "cumulative_reserved_usd": 0.020359499999999996,
+  "all_approval_boundaries_intact": true,
+  "terminal_replays_reused": 4,
+  "terminal_replays_duplicate_free": 4,
+  "frozen_sources_and_captures_verified": true,
+  "all_gpt20_models_and_separate_role_keys_verified": true,
+  "release_accepted": false
+}

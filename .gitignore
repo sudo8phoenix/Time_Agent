@@ -53,3 +53,12 @@ mock-pmis.sqlite3*
 frontend/playwright-report/
 frontend/.playwright-compat-*/
 *.sqlite3-*
+
+# Maintained model-comparison documentation and exact prompt contracts.
+!/docs/MODEL_AND_PROMPT_COMPARISON_REPORT.md
+!/docs/MODEL_QUALITY_SUMMARY.md
+!/docs/MODEL_PROMPT_CATALOG.md
+!/docs/MODEL_COMPARISON_CHECKLIST.md
+!/docs/model-generation-settings.md
+!/docs/stage-specification-v1.md
+!/docs/model-call-authority-inventory.md

@@ -58,3 +58,14 @@ inside them remain part of the original contracts.
 sealed captures kept for offline tests. Full run logs, screenshots and source
 snapshots are intentionally excluded from Git. They remain local without being
 required by a fresh checkout.
+
+
+## Published model-configuration comparison
+
+[The maintained report](../docs/MODEL_AND_PROMPT_COMPARISON_REPORT.md) compares all-20B, 120B/20B, Qwen/20B and all-Qwen. [Sanitized synthetic evidence](fixtures/model-comparison-2026-10-22/README.md) retains all 18 report attempts and historical prompt-ablation records. Verify/rescore it without provider credentials or a database:
+
+```sh
+PYTHONPATH=backend:. .venv/bin/python -m evaluation.published_model_comparison
+```
+
+The new live `gpt20_all_roles_graph`, `qwen_all_roles_graph` and `qwen_orchestrator_graph` runners require an explicit `--output`, two configured keys and `DATABASE_URL` naming a new, migrated local `progress_rehearsal_*` database. Read `--help` first. They consume provider quota and do not approve work or change active settings. Their fixtures are already consumed development data. Published runner copies have portability/formatting changes after the captured runs; exact original source hashes/snapshots remain local. Historical continuation and raw-capture summarizers require those archives and are not fresh-study entrypoints.

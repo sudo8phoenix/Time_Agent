@@ -1,0 +1,26 @@
+{
+  "DEV-20261020-01": {
+    "expected_activity_ids": [
+      "EXC-CEDAR"
+    ],
+    "expected_mapping_state": "suggested",
+    "expected_event_type": "actual_progress",
+    "expected_quantity": "5",
+    "expected_quantity_kind": "delta",
+    "expected_unit": "m3",
+    "expected_area": "Zone Cedar",
+    "expected_asset_tags": [
+      "TR-030"
+    ]
+  },
+  "DEV-20261020-08": {
+    "expected_activity_ids": [],
+    "expected_mapping_state": "ambiguous",
+    "expected_event_type": "actual_progress",
+    "expected_quantity": "2",
+    "expected_quantity_kind": "delta",
+    "expected_unit": "m3",
+    "expected_area": null,
+    "expected_asset_tags": []
+  }
+}

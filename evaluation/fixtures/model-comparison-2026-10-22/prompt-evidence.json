@@ -1,0 +1,706 @@
+{
+  "PROMPT-02": {
+    "source": "evaluation/results/prompting-checklist-2026-10-20/batch-30/items/PROMPT-02.json",
+    "sha256": "d5547885810d4823eefce0bd737fa965f13915237c4fe345ba469f6bfe163ed2",
+    "record": {
+      "item_id": "PROMPT-02",
+      "evaluation_complete": true,
+      "primary_call_ids": [
+        "zero:DEV-20261020-01",
+        "few:DEV-20261020-01",
+        "zero:DEV-20261020-02",
+        "few:DEV-20261020-02",
+        "zero:DEV-20261020-04",
+        "few:DEV-20261020-04",
+        "zero:DEV-20261020-06",
+        "few:DEV-20261020-06",
+        "zero:DEV-20261020-07",
+        "few:DEV-20261020-07",
+        "zero:DEV-20261020-08",
+        "few:DEV-20261020-08",
+        "zero:DEV-20261020-09",
+        "few:DEV-20261020-09",
+        "zero:administrative",
+        "few:administrative"
+      ],
+      "supplement_call_ids": [],
+      "measurements": {
+        "scheduled": 16,
+        "attempted": 16,
+        "wire_valid": 16,
+        "domain_valid": 16,
+        "grounded_exact": 4,
+        "prompt_tokens": 32244,
+        "completion_tokens": 5515,
+        "elapsed_seconds": 569.7856523338705,
+        "admission_ms": 550263,
+        "transport_ms": 19320,
+        "unknown_usage": 0
+      },
+      "finding": "Paired zero-shot and three-example comparison on eight consumed development cases.",
+      "decision": "No production adoption; assess exact fields and evidence separately from schema validity.",
+      "details": {
+        "paired_arms": {
+          "zero": {
+            "scheduled": 8,
+            "attempted": 8,
+            "wire_valid": 8,
+            "domain_valid": 8,
+            "grounded_exact": 1,
+            "prompt_tokens": 11890,
+            "completion_tokens": 2805,
+            "elapsed_seconds": 282.8827309178887,
+            "admission_ms": 273350,
+            "transport_ms": 9432,
+            "unknown_usage": 0
+          },
+          "few": {
+            "scheduled": 8,
+            "attempted": 8,
+            "wire_valid": 8,
+            "domain_valid": 8,
+            "grounded_exact": 3,
+            "prompt_tokens": 20354,
+            "completion_tokens": 2710,
+            "elapsed_seconds": 286.90292141598184,
+            "admission_ms": 276913,
+            "transport_ms": 9888,
+            "unknown_usage": 0
+          }
+        },
+        "demonstration_count": 3
+      },
+      "release_accepted": false,
+      "original_requirement": ":** Compare zero-shot with 2\u20134 examples; add more only if the marginal quality gain justifies the token cost.",
+      "evidence_sources": [
+        "evaluation/results/prompting-checklist-2026-10-20/batch-29/live/calls.jsonl"
+      ]
+    }
+  },
+  "PROMPT-03": {
+    "source": "evaluation/results/prompting-checklist-2026-10-20/batch-30/items/PROMPT-03.json",
+    "sha256": "4d79d61b7527aef72fe09b7c29f2e8e8d6c84c4c0f16dae6c6f1ae04ab45256a",
+    "record": {
+      "item_id": "PROMPT-03",
+      "evaluation_complete": true,
+      "primary_call_ids": [
+        "zero:DEV-20261020-01",
+        "few:DEV-20261020-01",
+        "zero:DEV-20261020-02",
+        "few:DEV-20261020-02",
+        "zero:DEV-20261020-04",
+        "few:DEV-20261020-04",
+        "zero:DEV-20261020-06",
+        "few:DEV-20261020-06",
+        "zero:DEV-20261020-07",
+        "few:DEV-20261020-07",
+        "zero:DEV-20261020-08",
+        "few:DEV-20261020-08",
+        "zero:DEV-20261020-09",
+        "few:DEV-20261020-09",
+        "zero:administrative",
+        "few:administrative"
+      ],
+      "supplement_call_ids": [
+        "demos:DEV-20261020-08:ordinary",
+        "demos:DEV-20261020-08:difficult",
+        "demos:administrative:ordinary",
+        "demos:administrative:difficult"
+      ],
+      "measurements": {
+        "scheduled": 20,
+        "attempted": 20,
+        "wire_valid": 20,
+        "domain_valid": 20,
+        "grounded_exact": 7,
+        "prompt_tokens": 40298,
+        "completion_tokens": 6087,
+        "elapsed_seconds": 692.7116213748232,
+        "admission_ms": 666934,
+        "transport_ms": 25530,
+        "unknown_usage": 0
+      },
+      "finding": "Ordinary/measured/unquantified and hard/multi-event/correction/abstention inputs plus separately measured ordinary and difficult demonstration sets.",
+      "decision": "Do not infer a universal demonstration policy from this small authored set.",
+      "details": {
+        "input_slices": {
+          "ordinary": [
+            "DEV-20261020-01",
+            "DEV-20261020-02"
+          ],
+          "hard": [
+            "DEV-20261020-04",
+            "DEV-20261020-06",
+            "DEV-20261020-07",
+            "DEV-20261020-08",
+            "DEV-20261020-09"
+          ],
+          "abstention": [
+            "administrative"
+          ]
+        },
+        "demonstration_groups": {
+          "ordinary": 2,
+          "difficult": 2
+        },
+        "ordinary_demonstrations": {
+          "scheduled": 2,
+          "attempted": 2,
+          "wire_valid": 2,
+          "domain_valid": 2,
+          "grounded_exact": 2,
+          "prompt_tokens": 4014,
+          "completion_tokens": 288,
+          "elapsed_seconds": 73.12188387400238,
+          "admission_ms": 70830,
+          "transport_ms": 2273,
+          "unknown_usage": 0
+        },
+        "difficult_demonstrations": {
+          "scheduled": 2,
+          "attempted": 2,
+          "wire_valid": 2,
+          "domain_valid": 2,
+          "grounded_exact": 1,
+          "prompt_tokens": 4040,
+          "completion_tokens": 284,
+          "elapsed_seconds": 49.804085166950244,
+          "admission_ms": 45841,
+          "transport_ms": 3937,
+          "unknown_usage": 0
+        }
+      },
+      "release_accepted": false,
+      "original_requirement": ":** Test representative and difficult demonstrations separately, including correct abstention and missing-data cases.",
+      "evidence_sources": [
+        "evaluation/results/prompting-checklist-2026-10-20/batch-29/live/calls.jsonl",
+        "evaluation/results/prompting-checklist-2026-10-20/batch-30/live/calls.jsonl"
+      ]
+    }
+  },
+  "PROMPT-04": {
+    "source": "evaluation/results/prompting-checklist-2026-10-20/batch-30/items/PROMPT-04.json",
+    "sha256": "dd42c91eb315eb20f90f92fdc0a208672ff592647e19098bdb579066ba521e64",
+    "record": {
+      "item_id": "PROMPT-04",
+      "evaluation_complete": true,
+      "primary_call_ids": [
+        "few:DEV-20261020-01",
+        "reverse:DEV-20261020-01",
+        "few:DEV-20261020-04",
+        "reverse:DEV-20261020-04",
+        "few:DEV-20261020-08",
+        "reverse:DEV-20261020-08"
+      ],
+      "supplement_call_ids": [],
+      "measurements": {
+        "scheduled": 6,
+        "attempted": 6,
+        "wire_valid": 6,
+        "domain_valid": 6,
+        "grounded_exact": 2,
+        "prompt_tokens": 15250,
+        "completion_tokens": 1763,
+        "elapsed_seconds": 145.74432620801963,
+        "admission_ms": 139234,
+        "transport_ms": 6433,
+        "unknown_usage": 0
+      },
+      "finding": "Same three demonstrations compared forward/reverse, with exact-value contamination audit.",
+      "decision": "Retain order sensitivity and suspicious values; do not expand example count.",
+      "details": {
+        "copy_audit": [
+          {
+            "id": "zero:DEV-20261020-01",
+            "suspicious_values": []
+          },
+          {
+            "id": "few:DEV-20261020-01",
+            "suspicious_values": []
+          },
+          {
+            "id": "zero:DEV-20261020-02",
+            "suspicious_values": []
+          },
+          {
+            "id": "few:DEV-20261020-02",
+            "suspicious_values": []
+          },
+          {
+            "id": "zero:DEV-20261020-04",
+            "suspicious_values": []
+          },
+          {
+            "id": "few:DEV-20261020-04",
+            "suspicious_values": []
+          },
+          {
+            "id": "zero:DEV-20261020-06",
+            "suspicious_values": []
+          },
+          {
+            "id": "few:DEV-20261020-06",
+            "suspicious_values": []
+          },
+          {
+            "id": "zero:DEV-20261020-07",
+            "suspicious_values": []
+          },
+          {
+            "id": "few:DEV-20261020-07",
+            "suspicious_values": []
+          },
+          {
+            "id": "zero:DEV-20261020-08",
+            "suspicious_values": []
+          },
+          {
+            "id": "few:DEV-20261020-08",
+            "suspicious_values": []
+          },
+          {
+            "id": "zero:DEV-20261020-09",
+            "suspicious_values": []
+          },
+          {
+            "id": "few:DEV-20261020-09",
+            "suspicious_values": []
+          },
+          {
+            "id": "zero:administrative",
+            "suspicious_values": []
+          },
+          {
+            "id": "few:administrative",
+            "suspicious_values": []
+          },
+          {
+            "id": "reverse:DEV-20261020-01",
+            "suspicious_values": []
+          },
+          {
+            "id": "reverse:DEV-20261020-04",
+            "suspicious_values": []
+          },
+          {
+            "id": "reverse:DEV-20261020-08",
+            "suspicious_values": []
+          }
+        ]
+      },
+      "release_accepted": false,
+      "original_requirement": ":** Compare example ordering on a development subset; watch for copying example quantities, areas, dates or IDs into unrelated answers.",
+      "evidence_sources": [
+        "evaluation/results/prompting-checklist-2026-10-20/batch-29/live/calls.jsonl"
+      ]
+    }
+  },
+  "PROMPT-05": {
+    "source": "evaluation/results/prompting-checklist-2026-10-20/batch-30/items/PROMPT-05.json",
+    "sha256": "8fcad4904fd0c94428406b3ddca4dd4ad6e5b50e56fdedf8f5cc897515abe914",
+    "record": {
+      "item_id": "PROMPT-05",
+      "evaluation_complete": true,
+      "primary_call_ids": [
+        "zero:DEV-20261020-01",
+        "long:DEV-20261020-01",
+        "zero:DEV-20261020-04",
+        "long:DEV-20261020-04",
+        "zero:DEV-20261020-08",
+        "long:DEV-20261020-08"
+      ],
+      "supplement_call_ids": [],
+      "measurements": {
+        "scheduled": 6,
+        "attempted": 6,
+        "wire_valid": 6,
+        "domain_valid": 6,
+        "grounded_exact": 2,
+        "prompt_tokens": 13195,
+        "completion_tokens": 1929,
+        "elapsed_seconds": 253.06884716788772,
+        "admission_ms": 245708,
+        "transport_ms": 7284,
+        "unknown_usage": 0
+      },
+      "finding": "Current V12 long prompt compared with consolidated zero-shot specification under the same wire and domain schema.",
+      "decision": "Production prompt unchanged; failures in protected event/date/quantity/location/evidence fields prohibit adoption.",
+      "details": {
+        "prompt_characters": {
+          "zero": 2554,
+          "long": 8944
+        }
+      },
+      "release_accepted": false,
+      "original_requirement": ":** Compare the current long prompt with a consolidated specification. Remove duplicated rules only after checking the protected behaviors. **Status: partial \u2014 see \u00a71.3.**",
+      "evidence_sources": [
+        "evaluation/results/prompting-checklist-2026-10-20/batch-29/live/calls.jsonl"
+      ]
+    }
+  },
+  "PROMPT-06": {
+    "source": "evaluation/results/prompting-checklist-2026-10-20/batch-30/items/PROMPT-06.json",
+    "sha256": "1eeb0983d215a7e1362bf1b7d863b5fcb01cf08e95810d26a1a9aa558a841240",
+    "record": {
+      "item_id": "PROMPT-06",
+      "evaluation_complete": true,
+      "primary_call_ids": [
+        "zero:DEV-20261020-04",
+        "medium:DEV-20261020-04",
+        "zero:DEV-20261020-07",
+        "medium:DEV-20261020-07"
+      ],
+      "supplement_call_ids": [],
+      "measurements": {
+        "scheduled": 4,
+        "attempted": 4,
+        "wire_valid": 4,
+        "domain_valid": 4,
+        "grounded_exact": 0,
+        "prompt_tokens": 6128,
+        "completion_tokens": 4868,
+        "elapsed_seconds": 146.83868033299223,
+        "admission_ms": 139093,
+        "transport_ms": 7692,
+        "unknown_usage": 0
+      },
+      "finding": "Low versus medium reasoning on identical correction/multi-event inputs.",
+      "decision": "No higher-effort escalation or production setting change.",
+      "details": {
+        "zero": {
+          "scheduled": 2,
+          "attempted": 2,
+          "wire_valid": 2,
+          "domain_valid": 2,
+          "grounded_exact": 0,
+          "prompt_tokens": 3016,
+          "completion_tokens": 1222,
+          "elapsed_seconds": 84.18862220796291,
+          "admission_ms": 81770,
+          "transport_ms": 2393,
+          "unknown_usage": 0
+        },
+        "medium": {
+          "scheduled": 2,
+          "attempted": 2,
+          "wire_valid": 2,
+          "domain_valid": 2,
+          "grounded_exact": 0,
+          "prompt_tokens": 3112,
+          "completion_tokens": 3646,
+          "elapsed_seconds": 62.65005812502932,
+          "admission_ms": 57323,
+          "transport_ms": 5299,
+          "unknown_usage": 0
+        }
+      },
+      "release_accepted": false,
+      "original_requirement": ":** Compare low versus medium reasoning effort on the hard-case slice while holding the task and context fixed. High effort is a later candidate if measurable benefit remains.",
+      "evidence_sources": [
+        "evaluation/results/prompting-checklist-2026-10-20/batch-29/continuation-live-v2/calls.jsonl",
+        "evaluation/results/prompting-checklist-2026-10-20/batch-29/live/calls.jsonl"
+      ]
+    }
+  },
+  "PROMPT-07": {
+    "source": "evaluation/results/prompting-checklist-2026-10-20/batch-30/items/PROMPT-07.json",
+    "sha256": "d2bf27548cc350500b1cf1d4b583efe29daf7af21bddd9d4749258daaf80e230",
+    "record": {
+      "item_id": "PROMPT-07",
+      "evaluation_complete": true,
+      "primary_call_ids": [
+        "native-False:DEV-20261020-04",
+        "native-True:DEV-20261020-04",
+        "strict-union:DEV-20261020-04"
+      ],
+      "supplement_call_ids": [],
+      "measurements": {
+        "scheduled": 3,
+        "attempted": 3,
+        "wire_valid": 2,
+        "domain_valid": 2,
+        "grounded_exact": 0,
+        "prompt_tokens": 3044,
+        "completion_tokens": 996,
+        "elapsed_seconds": 44.613467667018995,
+        "admission_ms": 41189,
+        "transport_ms": 3385,
+        "unknown_usage": 1
+      },
+      "finding": "Identical explicit-union schema and correction input tested under best-effort and strict; strict succeeds in one separate grammar diagnostic and rejects the later matched request. Domain and selected-field results remain separate from HTTP/schema validity.",
+      "decision": "Inconclusive/do not adopt strict. Both HTTP400s and all unattempted trials stay retained; a successful strict probe does not establish reliability or the cause of rejection.",
+      "details": {
+        "legacy_failure": {
+          "id": "strict:DEV-20261020-04",
+          "status": 400,
+          "cause": "unknown; error body excluded"
+        },
+        "grammar_probes": [
+          "canary:20b",
+          "canary:120b",
+          "strict-union:DEV-20261020-04"
+        ],
+        "retired_unattempted_pairs": [
+          "native-True:DEV-20261020-07",
+          "native-False:DEV-20261020-07"
+        ],
+        "paired_arms": {
+          "False": {
+            "scheduled": 2,
+            "attempted": 1,
+            "wire_valid": 1,
+            "domain_valid": 1,
+            "grounded_exact": 0,
+            "prompt_tokens": 1522,
+            "completion_tokens": 498,
+            "elapsed_seconds": 1.2049039169796742,
+            "admission_ms": 5,
+            "transport_ms": 1185,
+            "unknown_usage": 0
+          },
+          "True": {
+            "scheduled": 2,
+            "attempted": 1,
+            "wire_valid": 0,
+            "domain_valid": 0,
+            "grounded_exact": 0,
+            "prompt_tokens": 0,
+            "completion_tokens": 0,
+            "elapsed_seconds": 42.4181929170154,
+            "admission_ms": 41171,
+            "transport_ms": 1236,
+            "unknown_usage": 1
+          }
+        },
+        "separate_successful_strict_diagnostic": {
+          "domain_valid": true,
+          "quotes_grounded": true,
+          "selected_fields_exact": false,
+          "wire_valid": true,
+          "complete": true
+        }
+      },
+      "release_accepted": false,
+      "original_requirement": ":** Compare strict schema output with the existing best-effort mode using equivalent supported schemas; measure semantic accuracy separately from format validity. **Status: partial \u2014 see \u00a71.3.**",
+      "evidence_sources": [
+        "evaluation/results/prompting-checklist-2026-10-20/batch-29/continuation-live/calls.jsonl",
+        "evaluation/results/prompting-checklist-2026-10-20/batch-29/strict-union-live/calls.jsonl"
+      ]
+    }
+  },
+  "PROMPT-09": {
+    "source": "evaluation/results/prompting-checklist-2026-10-20/batch-30/items/PROMPT-09.json",
+    "sha256": "90be791eee966de5783d1f29a924b041f7185f45c773276a7909290ee3686ebe",
+    "record": {
+      "item_id": "PROMPT-09",
+      "evaluation_complete": true,
+      "primary_call_ids": [
+        "zero:DEV-20261020-01",
+        "repair:DEV-20261020-01",
+        "zero:DEV-20261020-04",
+        "repair:DEV-20261020-04",
+        "zero:DEV-20261020-08",
+        "repair:DEV-20261020-08"
+      ],
+      "supplement_call_ids": [
+        "correct-repair:administrative"
+      ],
+      "measurements": {
+        "scheduled": 7,
+        "attempted": 7,
+        "wire_valid": 7,
+        "domain_valid": 7,
+        "grounded_exact": 1,
+        "prompt_tokens": 11215,
+        "completion_tokens": 2370,
+        "elapsed_seconds": 228.1595347499824,
+        "admission_ms": 219900,
+        "transport_ms": 8176,
+        "unknown_usage": 0
+      },
+      "finding": "Exactly one domain/evidence-validator feedback repair per input; gold never enters feedback.",
+      "decision": "No unconditional repair adoption; retain fixed, damaged and unresolved answers and marginal resource cost.",
+      "details": {
+        "transitions": [
+          {
+            "case": "DEV-20261020-01",
+            "before": false,
+            "after": false,
+            "fixed": false,
+            "damaged": false
+          },
+          {
+            "case": "DEV-20261020-04",
+            "before": false,
+            "after": false,
+            "fixed": false,
+            "damaged": false
+          },
+          {
+            "case": "DEV-20261020-08",
+            "before": false,
+            "after": false,
+            "fixed": false,
+            "damaged": false
+          }
+        ],
+        "correct_control": {
+          "before": true,
+          "after": true,
+          "source": "zero:administrative",
+          "id": "correct-repair:administrative"
+        },
+        "added_resources": {
+          "scheduled": 4,
+          "attempted": 4,
+          "wire_valid": 4,
+          "domain_valid": 4,
+          "grounded_exact": 1,
+          "prompt_tokens": 6764,
+          "completion_tokens": 1358,
+          "elapsed_seconds": 132.12894849904114,
+          "admission_ms": 128188,
+          "transport_ms": 3897,
+          "unknown_usage": 0
+        }
+      },
+      "release_accepted": false,
+      "original_requirement": ":** Evaluate one validator-feedback repair. Record incorrect answers fixed and correct answers damaged, plus added tokens and latency.",
+      "evidence_sources": [
+        "evaluation/results/prompting-checklist-2026-10-20/batch-29/live/calls.jsonl",
+        "evaluation/results/prompting-checklist-2026-10-20/batch-30/live/calls.jsonl"
+      ]
+    }
+  },
+  "PROMPT-10": {
+    "source": "evaluation/results/prompting-checklist-2026-10-20/batch-30/items/PROMPT-10.json",
+    "sha256": "889cd4bfbedff75dee7147f4aec30eae827e65576bd732c37591a1d1cd64b5a9",
+    "record": {
+      "item_id": "PROMPT-10",
+      "evaluation_complete": true,
+      "primary_call_ids": [
+        "zero:DEV-20261020-04",
+        "repeat2:DEV-20261020-04",
+        "repeat3:DEV-20261020-04",
+        "critic:DEV-20261020-04"
+      ],
+      "supplement_call_ids": [],
+      "measurements": {
+        "scheduled": 4,
+        "attempted": 4,
+        "wire_valid": 4,
+        "domain_valid": 4,
+        "grounded_exact": 0,
+        "prompt_tokens": 6329,
+        "completion_tokens": 1710,
+        "elapsed_seconds": 127.64250220794929,
+        "admission_ms": 123019,
+        "transport_ms": 4552,
+        "unknown_usage": 0
+      },
+      "finding": "Preregistered three-sample self-consistency and separate 120B review on the correction hard case, at most four calls.",
+      "decision": "No best-of-N credit or consensus-as-truth; retain majority decision and original errors.",
+      "details": {
+        "majority_votes": 2,
+        "distinct_decisions": 2,
+        "samples": [
+          {
+            "domain_valid": true,
+            "quotes_grounded": false,
+            "selected_fields_exact": false,
+            "wire_valid": true,
+            "complete": true
+          },
+          {
+            "domain_valid": true,
+            "quotes_grounded": false,
+            "selected_fields_exact": false,
+            "wire_valid": true,
+            "complete": true
+          },
+          {
+            "domain_valid": true,
+            "quotes_grounded": false,
+            "selected_fields_exact": false,
+            "wire_valid": true,
+            "complete": true
+          }
+        ]
+      },
+      "release_accepted": false,
+      "original_requirement": ":** Test self-consistency or a second-model critic only on a predefined hard subset, with a fixed maximum call budget.",
+      "evidence_sources": [
+        "evaluation/results/prompting-checklist-2026-10-20/batch-29/live/calls.jsonl",
+        "evaluation/results/prompting-checklist-2026-10-20/batch-30/live/calls.jsonl"
+      ]
+    }
+  },
+  "MODEL-03": {
+    "source": "evaluation/results/prompting-checklist-2026-10-20/batch-30/items/MODEL-03.json",
+    "sha256": "087cc15683d6f4a0fea715236ced6189672d7dbc4ca8baf9b2157814649d6e63",
+    "record": {
+      "item_id": "MODEL-03",
+      "evaluation_complete": true,
+      "primary_call_ids": [
+        "zero:DEV-20261020-01",
+        "large:DEV-20261020-01",
+        "zero:DEV-20261020-02",
+        "large:DEV-20261020-02",
+        "zero:DEV-20261020-04",
+        "large:DEV-20261020-04",
+        "zero:DEV-20261020-06",
+        "large:DEV-20261020-06"
+      ],
+      "supplement_call_ids": [],
+      "measurements": {
+        "scheduled": 8,
+        "attempted": 8,
+        "wire_valid": 8,
+        "domain_valid": 7,
+        "grounded_exact": 1,
+        "prompt_tokens": 11892,
+        "completion_tokens": 3486,
+        "elapsed_seconds": 314.0230937509332,
+        "admission_ms": 303408,
+        "transport_ms": 10508,
+        "unknown_usage": 0
+      },
+      "finding": "20B and 120B receive identical four extraction inputs, prompt, schema, settings and credential slot.",
+      "decision": "No claims about selection/planner superiority or population model ranking.",
+      "details": {
+        "zero": {
+          "scheduled": 4,
+          "attempted": 4,
+          "wire_valid": 4,
+          "domain_valid": 4,
+          "grounded_exact": 0,
+          "prompt_tokens": 5946,
+          "completion_tokens": 1455,
+          "elapsed_seconds": 146.4495178349316,
+          "admission_ms": 142271,
+          "transport_ms": 4123,
+          "unknown_usage": 0
+        },
+        "large": {
+          "scheduled": 4,
+          "attempted": 4,
+          "wire_valid": 4,
+          "domain_valid": 3,
+          "grounded_exact": 1,
+          "prompt_tokens": 5946,
+          "completion_tokens": 2031,
+          "elapsed_seconds": 167.57357591600157,
+          "admission_ms": 161137,
+          "transport_ms": 6385,
+          "unknown_usage": 0
+        }
+      },
+      "release_accepted": false,
+      "original_requirement": ":** Run identical role-level cases through 20B and 120B before claiming one is better at extraction, selection or orchestration.",
+      "evidence_sources": [
+        "evaluation/results/prompting-checklist-2026-10-20/batch-29/continuation-live-v2/calls.jsonl",
+        "evaluation/results/prompting-checklist-2026-10-20/batch-29/live/calls.jsonl"
+      ]
+    }
+  }
+}

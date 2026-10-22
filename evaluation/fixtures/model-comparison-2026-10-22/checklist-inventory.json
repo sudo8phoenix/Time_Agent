@@ -1,0 +1,7 @@
+{
+  "checkbox_rows": 269,
+  "checked": 231,
+  "open": 38,
+  "unique_ids": 269,
+  "correction": "Additional Qwen checkbox was omitted from old consolidated count and duplicated MODEL-10. Qwen is MODEL-11; old lifecycle remains MODEL-10. No new closure."
+}

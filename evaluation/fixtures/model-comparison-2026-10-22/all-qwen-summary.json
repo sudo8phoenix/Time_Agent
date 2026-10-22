@@ -1,0 +1,90 @@
+{
+  "scope": "Two consumed synthetic inputs, both planner keys, actual V2 graph, Qwen in every model role, distinct planner/worker keys",
+  "planned_unique_comparisons": 4,
+  "completed_unique_comparisons": 2,
+  "tested_unique_comparisons": 4,
+  "schema_failures": [
+    {
+      "window": "qwen-all-roles-graph-2026-10-22-rerun",
+      "case": "DEV-20261020-01",
+      "arm": "qwen/qwen3.8-27b:key1",
+      "stage": "selection",
+      "valid": false,
+      "required_keys": [
+        "candidate_id",
+        "mapping_state",
+        "evidence_fragment_ids",
+        "reason_codes",
+        "explanation",
+        "missing_information"
+      ],
+      "actual_keys": [
+        "suggested"
+      ]
+    },
+    {
+      "window": "qwen-all-roles-graph-2026-10-22-rerun",
+      "case": "DEV-20261020-01",
+      "arm": "qwen/qwen3.8-27b:key2",
+      "stage": "selection",
+      "valid": false,
+      "required_keys": [
+        "candidate_id",
+        "mapping_state",
+        "evidence_fragment_ids",
+        "reason_codes",
+        "explanation",
+        "missing_information"
+      ],
+      "actual_keys": [
+        "decision",
+        "candidate_id",
+        "evidence"
+      ]
+    }
+  ],
+  "valid_http200_schemas": 24,
+  "attempted_reports": 5,
+  "retained_failed_reports": 3,
+  "retained_endpoint_failure": "Initial selection HTTP503 retained; single same-key recovery after cooldown; no root cause inferred",
+  "groups": [
+    {
+      "model": "qwen/qwen3.8-27b",
+      "attempted_reports": 5,
+      "completed_reports": 2,
+      "exact_reports": 2,
+      "planner_attempts": 12,
+      "valid_planner_responses": 12,
+      "median_planner_request_seconds": 0.25864177048788406,
+      "report_seconds": [
+        324.806,
+        341.412
+      ],
+      "readiness_under_120s": 0,
+      "per_key": {
+        "1": {
+          "completed": 1,
+          "exact": 1
+        },
+        "2": {
+          "completed": 1,
+          "exact": 1
+        }
+      }
+    }
+  ],
+  "http_attempts": 27,
+  "http200": 26,
+  "unknown_usage_attempts": 1,
+  "known_tokens": 20151,
+  "known_list_price_usd": 0.0228312,
+  "cumulative_reserved_calls": 27,
+  "cumulative_reserved_tokens": 191192,
+  "cumulative_reserved_usd": 0.2856639999999999,
+  "all_approval_boundaries_intact": true,
+  "terminal_replays_reused": 2,
+  "terminal_replays_duplicate_free": 2,
+  "frozen_sources_and_captures_verified": true,
+  "all_qwen_models_and_separate_role_keys_verified": true,
+  "release_accepted": false
+}

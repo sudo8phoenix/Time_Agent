@@ -1,0 +1,24 @@
+{
+  "checked": "2026-10-22",
+  "currency": "USD per million tokens",
+  "prices": {
+    "openai/gpt-oss-20b": [
+      0.075,
+      0.3
+    ],
+    "openai/gpt-oss-120b": [
+      0.15,
+      0.6
+    ],
+    "qwen/qwen3.8-27b": [
+      0.8,
+      4
+    ]
+  },
+  "sources": [
+    "https://console.groq.com/docs/model/openai/gpt-oss-20b",
+    "https://console.groq.com/docs/model/openai/gpt-oss-120b",
+    "https://console.groq.com/docs/model/qwen/qwen3.8-27b"
+  ],
+  "cache_discount_assumed": false
+}

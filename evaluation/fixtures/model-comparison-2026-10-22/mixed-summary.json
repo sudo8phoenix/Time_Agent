@@ -1,0 +1,75 @@
+{
+  "scope": "Two consumed synthetic inputs, both planner keys, actual V2 graph and live fixed 20B workers",
+  "planned_unique_comparisons": 8,
+  "completed_unique_comparisons": 8,
+  "attempted_reports": 9,
+  "retained_failed_reports": 1,
+  "owner_network_issue": "Owner attributes initial timeout to an issue on their side and explicitly requests rerun; not independently diagnosed",
+  "groups": [
+    {
+      "model": "qwen/qwen3.8-27b",
+      "attempted_reports": 5,
+      "completed_reports": 4,
+      "exact_reports": 4,
+      "planner_attempts": 14,
+      "valid_planner_responses": 13,
+      "median_planner_request_seconds": 0.3244554999982938,
+      "report_seconds": [
+        298.752,
+        298.384,
+        311.156,
+        309.997
+      ],
+      "readiness_under_120s": 0,
+      "per_key": {
+        "1": {
+          "completed": 2,
+          "exact": 2
+        },
+        "2": {
+          "completed": 2,
+          "exact": 2
+        }
+      }
+    },
+    {
+      "model": "openai/gpt-oss-120b",
+      "attempted_reports": 4,
+      "completed_reports": 4,
+      "exact_reports": 4,
+      "planner_attempts": 12,
+      "valid_planner_responses": 12,
+      "median_planner_request_seconds": 0.7863043959951028,
+      "report_seconds": [
+        312.302,
+        337.533,
+        311.138,
+        340.781
+      ],
+      "readiness_under_120s": 0,
+      "per_key": {
+        "1": {
+          "completed": 2,
+          "exact": 2
+        },
+        "2": {
+          "completed": 2,
+          "exact": 2
+        }
+      }
+    }
+  ],
+  "http_attempts": 50,
+  "http200": 49,
+  "unknown_usage_attempts": 1,
+  "known_tokens": 51369,
+  "known_list_price_usd": 0.0062134749999999996,
+  "cumulative_reserved_calls": 50,
+  "cumulative_reserved_tokens": 327736,
+  "cumulative_reserved_usd": 0.5079488000000001,
+  "all_approval_boundaries_intact": true,
+  "terminal_replays_reused": 8,
+  "terminal_replays_duplicate_free": 8,
+  "frozen_sources_and_captures_verified": true,
+  "release_accepted": false
+}
