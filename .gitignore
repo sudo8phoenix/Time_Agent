@@ -62,3 +62,21 @@ frontend/.playwright-compat-*/
 !/docs/model-generation-settings.md
 !/docs/stage-specification-v1.md
 !/docs/model-call-authority-inventory.md
+!/docs/EVALUATION_RESEARCH_REPORT.md
+
+# Maintained API, user, engineering and operational guides.
+!/docs/AGENT_ARCHITECTURE.md
+!/docs/API_REFERENCE.md
+!/docs/CONFIGURATION.md
+!/docs/CONTRIBUTING.md
+!/docs/DATA_FLOW.md
+!/docs/DATA_MODEL.md
+!/docs/DEPLOYMENT.md
+!/docs/INTEGRATIONS.md
+!/docs/OBSERVABILITY.md
+!/docs/SCHEDULE_MATCHING.md
+!/docs/SECURITY.md
+!/docs/TROUBLESHOOTING.md
+!/docs/USER_GUIDE.md
+!/docs/api-contract.json
+!/docs/assets/

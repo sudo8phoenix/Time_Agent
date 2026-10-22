@@ -59,6 +59,9 @@ Credentials, uploads and runtime databases stay local.
 
 ## Documentation
 
+Browse the [complete documentation hub](docs/README.md) for illustrated user instructions,
+API and database references, agent diagrams, deployment and security guides.
+
 | Guide | What it covers |
 |---|---|
 | [System](docs/SYSTEM.md) | Architecture, versions, workflow and source map |
@@ -89,3 +92,8 @@ Integration tests require an isolated local test database and block uninjected
 hosted-provider HTTP. Live evaluation is separate and consumes provider quota.
 Report bugs through the repository's GitHub Issues with reproduction steps and
 sanitized logs; never include keys or private reports.
+
+## License
+
+Proprietary; all rights reserved. See [LICENSE](LICENSE). Third-party materials
+retain their respective licenses. Contribution guidance: [CONTRIBUTING](docs/CONTRIBUTING.md).

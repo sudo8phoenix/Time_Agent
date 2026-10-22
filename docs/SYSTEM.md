@@ -115,3 +115,7 @@ unpinned legacy work stops before new inference. See
 See [document support](document-input-capabilities.md) for exact format limits,
 [provider capacity](provider-capacity.md) for quotas, and
 [testing](TESTING_AND_QUALITY.md) for verified behavior and open acceptance gates.
+
+---
+
+[Documentation index](README.md) · [Project overview](../README.md)

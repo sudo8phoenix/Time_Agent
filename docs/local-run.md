@@ -95,3 +95,7 @@ make restore-verify ARGS="/absolute/backup-directory --database progress_restore
 Restore verification refuses an existing destination database and retains the
 restored copy for inspection. Preserve uploads alongside application state.
 See [testing](TESTING_AND_QUALITY.md) before running any evaluation or DB tests.
+
+---
+
+[Documentation index](README.md) · [Project overview](../README.md)

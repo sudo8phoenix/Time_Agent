@@ -20,3 +20,7 @@ contract with the current hash just to bypass the guard. No automatic legacy
 migration or production restart was performed in batch 32.
 
 See [testing and quality](TESTING_AND_QUALITY.md) for verification and limitations.
+
+---
+
+[Documentation index](README.md) · [Project overview](../README.md)

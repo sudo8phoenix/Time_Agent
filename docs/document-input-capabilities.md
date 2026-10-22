@@ -70,3 +70,14 @@ remains partial. Finite controls/tests do not prove safety against every malicio
 
 Regression coverage and remaining acceptance limits are summarized in
 [testing and quality](TESTING_AND_QUALITY.md). Raw historical captures stay local.
+
+
+## Batch thirty-five transcription/OCR disposition — 22 October 2026
+
+DOC-02 is not applicable to the current text/document prototype: no OCR processor exists. A blank-PDF parser test returns a transcription-required marker; PNG/JPEG input is unsupported. Reopen the optical quality tests before OCR is planned or added. This is not an OCR-quality pass.
+
+DOC-03 now has a separate literal number/unit/tag and source-location scorer. The actual isolated TXT, DOCX paragraph/table and XLSX parser fixtures preserve 15 authored critical spans. Six controlled corruptions/missing/wrong-location outputs exercise the error accounting. Model extraction is not invoked. References are AI-authored, not independently reviewed; handwritten/scanned and representative human transcription quality remain unmeasured. See batch thirty-five (local archive: `../evaluation/results/prompting-checklist-2026-10-20/batch-35/review.md`; not published).
+
+---
+
+[Documentation index](README.md) · [Project overview](../README.md)

@@ -284,3 +284,7 @@ The published offline command verifies curated outcomes, prompt digests and summ
 - [Batch-32 study — local archive](../evaluation/fixtures/model-comparison-2026-10-22/README.md#historical-evidence), [batch-30 study — local archive](../evaluation/fixtures/model-comparison-2026-10-22/README.md#historical-evidence) and [historical evaluation results — local archive](../evaluation/fixtures/model-comparison-2026-10-22/README.md#historical-evidence).
 
 For quick reading, use [model quality summary](MODEL_QUALITY_SUMMARY.md). For per-requirement status, use the [testing checklist](MODEL_COMPARISON_CHECKLIST.md). The [execution log](../evaluation/fixtures/model-comparison-2026-10-22/README.md) retains the dated sequence; this report consolidates the final measured interpretation.
+
+---
+
+[Documentation index](README.md) · [Project overview](../README.md)

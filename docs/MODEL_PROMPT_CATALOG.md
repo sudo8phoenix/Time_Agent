@@ -153,3 +153,7 @@ Choose the schedule activity supported by the exact report evidence. The extract
 ~~~~
 
 The production extraction prompt is versioned in [extraction_v1.py](../backend/app/prompts/extraction_v1.py); discovery and selection in [schedule_decision.py](../backend/app/agent/schedule_decision.py); supervisor validation in [hierarchy.py](../backend/app/agent/hierarchy.py).
+
+---
+
+[Documentation index](README.md) · [Project overview](../README.md)

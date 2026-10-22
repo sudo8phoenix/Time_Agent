@@ -24,3 +24,7 @@ Qwen extraction 12/12 versus 20B 10/12; Qwen selection 8/8 successful outputs ve
 On a six-case projected task, fixed and training-only dynamic examples both reached 6/6; plain 20B was 3/6, tailored rules 4/6 and plain 120B 6/6. On a different eight-case full-schema metric, three demonstrations improved 1/8 to 3/8 but did not reach acceptance. Medium reasoning, one feedback repair and bounded consistency/critic trials showed no general quality gain. Strict-mode compatibility remains schema-dependent. The full report preserves denominators, prompt settings, evidence links and limitations.
 
 No production release or best overall semantic model is established. All configuration decisions require broader reviewed data, security/abstention testing, fresh validation/holdout and readiness checks. See the [checklist](MODEL_COMPARISON_CHECKLIST.md) and [execution history](../evaluation/fixtures/model-comparison-2026-10-22/README.md).
+
+---
+
+[Documentation index](README.md) · [Project overview](../README.md)

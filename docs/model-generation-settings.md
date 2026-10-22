@@ -25,3 +25,7 @@ Existing repeated-plan/runtime tests pin experiment settings. SPEC-15 is complet
 for this current source's settings inventory; choosing budgets from measured
 valid response sizes (SPEC-14), caching (SPEC-16), capability support, reasoning
 ablations and model quality remain open.
+
+---
+
+[Documentation index](README.md) · [Project overview](../README.md)

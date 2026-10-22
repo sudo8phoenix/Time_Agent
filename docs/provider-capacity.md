@@ -51,3 +51,7 @@ This policy has isolated PostgreSQL regression coverage and has **not** been
 activated on the main application database. No production throughput improvement
 is claimed. Rollback requires reviewed reconciliation of balances and workers;
 do not delete the marker or reset usage. See [testing](TESTING_AND_QUALITY.md).
+
+---
+
+[Documentation index](README.md) · [Project overview](../README.md)

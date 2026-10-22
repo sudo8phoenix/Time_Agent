@@ -58,3 +58,7 @@ identified as gaps above. Thirteen consumed examples and nineteen compatibility
 checks exercise the actual schemas/extraction/matching. The original audit and
 legacy prompt text/hashes remain unchanged: this definition does not establish
 uniform model compliance, independently settle old labels or promote a prompt.
+
+---
+
+[Documentation index](README.md) · [Project overview](../README.md)

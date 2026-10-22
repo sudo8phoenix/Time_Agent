@@ -122,3 +122,7 @@ does not establish semantic attribution to the correct event.
 These rules define safe review behavior when interpretation is unresolved;
 independent semantic adjudication and representative model tests remain required
 under DATA-06/07, QUAL and NEXT-01. Definition completion is not those tests.
+
+---
+
+[Documentation index](README.md) · [Project overview](../README.md)

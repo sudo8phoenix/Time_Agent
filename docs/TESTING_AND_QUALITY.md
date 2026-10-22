@@ -229,3 +229,7 @@ runs** (305 additional test executions), including native schedule normalization
 report ingestion, mapping, delayed-exit handling and fail-closed supervision.
 Scoped Ruff, whitespace checks, tracked Markdown links and the tracked-file secret
 scan passed. No live model evaluation was run for this correction.
+
+---
+
+[Documentation index](README.md) · [Project overview](../README.md)

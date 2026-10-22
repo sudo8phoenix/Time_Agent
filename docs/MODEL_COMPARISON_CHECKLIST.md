@@ -26,3 +26,7 @@ This maintained public checklist records the latest study dispositions. The full
 All-20B is a cost-focused development baseline on these cases, not an established universal quality winner. Earlier 20B injection/negation errors remain relevant. All-Qwen passed 2/4 and has a current selection-contract limitation.
 
 [Complete comparison](MODEL_AND_PROMPT_COMPARISON_REPORT.md) · [Quality summary](MODEL_QUALITY_SUMMARY.md) · [Published evidence](../evaluation/fixtures/model-comparison-2026-10-22/README.md) · [Inventory record](../evaluation/fixtures/model-comparison-2026-10-22/checklist-inventory.json).
+
+---
+
+[Documentation index](README.md) · [Project overview](../README.md)
