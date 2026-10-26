@@ -483,11 +483,19 @@ def approve(proposal_id: UUID, body: ApprovalRequest, user: User = Depends(requi
             raise HTTPException(422, detail={"code": "QUANTITY_REQUIRED"})
     try:
         supersedes = UUID(str(effects["supersedes_event_id"])) if effects.get("supersedes_event_id") else None
+        correction_of = UUID(str(effects["correction_of"])) if effects.get("correction_of") else None
     except ValueError as exc:
         raise HTTPException(422, detail={"code": "INVALID_CORRECTION_REFERENCE"}) from exc
-    prior = db.scalars(select(ProgressEvent).where(ProgressEvent.activity_id == activity.id).with_for_update()).all()
-    if is_lifecycle and effects.get("correction_of") and str(effects["correction_of"]) != str(supersedes):
+    if supersedes and correction_of and supersedes != correction_of:
         raise HTTPException(422, detail={"code": "INVALID_CORRECTION_REFERENCE"})
+    # Both input spellings must produce the same persisted lineage used by
+    # recomputation, history, and exports.
+    supersedes = supersedes or correction_of
+    if supersedes:
+        effects["supersedes_event_id"] = str(supersedes)
+        if correction_of:
+            effects["correction_of"] = str(supersedes)
+    prior = db.scalars(select(ProgressEvent).where(ProgressEvent.activity_id == activity.id).with_for_update()).all()
     if supersedes:
         replaced = next((event for event in prior if event.id == supersedes), None)
         if replaced is None or replaced.effect_kind != effects.get("event_type", "actual_progress"):
@@ -580,6 +588,7 @@ def approve(proposal_id: UUID, body: ApprovalRequest, user: User = Depends(requi
             (event.approved_values or {}).get("correction_of"),
             (event.approved_values or {}).get("reported_percent"),
         ) for event in prior
+        if event.effect_kind not in {"actual_start", "actual_finish", "lifecycle_retraction"}
     ]
     candidate = LedgerEvent(
         "candidate", effective_date, effects.get("quantity"), effects.get("unit"),

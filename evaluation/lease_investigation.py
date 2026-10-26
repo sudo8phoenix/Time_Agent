@@ -77,7 +77,7 @@ def scenario(fixture, *, hierarchical, worker, replace_lease):
                 "result_state": result.get("state"), "error_code": result.get("error_code"),
                 "persisted_job_state": job.state, "proposals": proposals, "ledger_writes": ledger,
                 "ownership_checks": ownership}
-        expected_code = "JOB_LEASE_LOST" if replace_lease else "AGENT_TOOL_FAILED"
+        expected_code = "JOB_LEASE_LOST" if replace_lease else "MODEL_REQUEST_FAILED"
         assert row["error_code"] == expected_code, row
         assert row["proposals"] == row["ledger_writes"] == 0
         assert any(e["phase"] == "check_failed" for e in ownership) == replace_lease

@@ -1,4 +1,5 @@
 import sys
+from pathlib import Path
 
 import pytest
 
@@ -19,10 +20,10 @@ print(json.dumps({'secret': os.getenv('DATABASE_URL'),
                   'core': resource.getrlimit(resource.RLIMIT_CORE)[0]}))
 '''], 3)
     assert result['secret'] is result['java'] is result['startup'] is None
-    assert result['home'] == result['cwd']
+    # macOS can report /var/... and /private/var/... for the same directory.
+    assert Path(result['home']).resolve() == Path(result['cwd']).resolve()
     assert result['cpu'] == runner.DEFAULT_TIMEOUT_SECONDS
     assert result['core'] == 0
-    from pathlib import Path
     assert not Path(result['home']).exists()
 
 

@@ -7,6 +7,7 @@ activate paid orchestration during the database suite.
 
 import os
 import sys
+from uuid import uuid4
 
 import pytest
 from sqlalchemy.engine import make_url
@@ -40,3 +41,37 @@ def block_uninjected_provider_http(monkeypatch):
         raise AssertionError("Provider HTTP is disabled in integration tests; inject a transport")
 
     monkeypatch.setattr(hosted, "urlopen", blocked)
+
+
+@pytest.fixture(autouse=True)
+def isolated_login_admission(monkeypatch):
+    """Keep real database admission, with a separate HMAC namespace per test.
+
+    Successful logins still consume the IP budget. Without isolation, unrelated
+    TestClients sharing the default host exhaust that budget across the suite.
+    Rate-limit tests retain the same enforcement within each individual test.
+    """
+    from sqlalchemy import delete
+    from app.api.endpoints import auth
+    from app.db.models import LoginThrottleBucket
+    from app.db.session import session_factory
+    from app.security.login_limiter import SharedLoginLimiter
+
+    limiter = SharedLoginLimiter(session_factory, f"integration-login-{uuid4().hex}")
+    keys = set()
+    original_key = limiter._key
+
+    def tracked_key(kind, value):
+        key = original_key(kind, value)
+        keys.add(key)
+        return key
+
+    monkeypatch.setattr(limiter, "_key", tracked_key)
+    monkeypatch.setattr(auth, "login_limiter", limiter)
+    try:
+        yield limiter
+    finally:
+        if keys:
+            with session_factory.begin() as db:
+                db.execute(delete(LoginThrottleBucket).where(
+                    LoginThrottleBucket.key_hash.in_(keys)))
