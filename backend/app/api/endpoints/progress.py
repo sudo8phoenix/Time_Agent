@@ -26,6 +26,7 @@ from ...db.models import (
     User,
 )
 from ...db.session import get_session
+from ...progress.baseline import baseline_state
 from ..dependencies import current_user, project_access
 
 router = APIRouter(prefix="/projects/{project_id}", tags=["progress"])
@@ -118,6 +119,9 @@ def progress_view(
         if activities
         else {}
     )
+    for activity in activities:
+        if activity.id not in states:
+            states[activity.id] = baseline_state(activity)
     pending = (
         db.scalar(
             select(func.count(Proposal.id)).where(

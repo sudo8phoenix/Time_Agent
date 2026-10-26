@@ -1,4 +1,6 @@
 from pathlib import Path
+import csv
+import io
 
 import pytest
 
@@ -6,6 +8,21 @@ from app.ingest.schedules import parse_schedule_csv
 
 
 FIXTURE = Path(__file__).resolve().parents[3] / "data/synthetic/schedules/demo-utility-01.csv"
+
+
+@pytest.mark.parametrize("field", ["planned_quantity", "baseline_quantity"])
+@pytest.mark.parametrize("value", ["NaN", "sNaN", "Infinity", "-Infinity"])
+def test_nonfinite_quantities_return_row_errors(field, value):
+    reader = csv.DictReader(io.StringIO(FIXTURE.read_text()))
+    rows = list(reader)
+    rows[0][field] = value
+    output = io.StringIO()
+    writer = csv.DictWriter(output, fieldnames=reader.fieldnames)
+    writer.writeheader()
+    writer.writerows(rows)
+    parsed, _, errors = parse_schedule_csv(output.getvalue())
+    assert parsed is None
+    assert any(error["field"] == field and "finite" in error["message"] for error in errors)
 
 
 def test_canonical_schedule_parses_and_preserves_identifiers():

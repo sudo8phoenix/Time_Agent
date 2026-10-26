@@ -52,7 +52,7 @@ def create_project(
 ):
     try:
         ZoneInfo(body.timezone)
-    except ZoneInfoNotFoundError as exc:
+    except (ZoneInfoNotFoundError, ValueError) as exc:
         raise HTTPException(422, detail={"code": "PROJECT_TIMEZONE_INVALID"}) from exc
     project = Project(name=body.name, timezone=body.timezone)
     db.add(project)

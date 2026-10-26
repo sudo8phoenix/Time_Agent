@@ -21,6 +21,7 @@ from ...integrations.outbox import enqueue
 from ...confidence.provenance import capture
 from ...progress.acceptance import lifecycle_effect, project_lifecycle, apply_lifecycle_state
 from ...progress.lifecycle import LifecycleEvent
+from ...progress.baseline import baseline_state
 from ..dependencies import current_reviewer, require_reviewer
 
 router = APIRouter(prefix="/proposals", tags=["review"])
@@ -44,7 +45,7 @@ class ApprovalRequest(BaseModel):
 
 def _proposal(db: DBSession, proposal_id: UUID, user: User, *, lock: bool = False, allow_stale: bool = False) -> Proposal:
     statement = select(Proposal).where(Proposal.id == proposal_id)
-    proposal = db.scalar(statement.with_for_update() if lock else statement)
+    proposal = db.scalar(statement)
     if proposal is None:
         raise HTTPException(404, "Proposal not found")
     membership = db.scalar(select(ProjectMembership).where(
@@ -53,6 +54,15 @@ def _proposal(db: DBSession, proposal_id: UUID, user: User, *, lock: bool = Fals
     ))
     if membership is None:
         raise HTTPException(403, "Project access denied")
+    if lock:
+        # Activation takes Project before updating proposals. Use that order
+        # here too, so its rebase check and the first approval cannot race.
+        db.scalar(select(Project).where(Project.id == proposal.project_id)
+                  .with_for_update().execution_options(populate_existing=True))
+        proposal = db.scalar(statement.with_for_update()
+                             .execution_options(populate_existing=True))
+        if proposal is None:
+            raise HTTPException(404, "Proposal not found")
     _validate_proposal_sources(db, proposal)
     if proposal.chosen_activity_id is not None:
         _validate_pinned_activity(db, proposal, proposal.chosen_activity_id, require_active=not allow_stale)
@@ -433,7 +443,7 @@ def approve(proposal_id: UUID, body: ApprovalRequest, user: User = Depends(requi
     db.scalar(select(Activity).where(Activity.id == activity.id).with_for_update())
     state = db.scalar(select(ActivityState).where(ActivityState.activity_id == activity.id).with_for_update())
     if state is None:
-        state = ActivityState(activity_id=activity.id, revision=0)
+        state = baseline_state(activity)
         db.add(state)
         db.flush()
     if state.revision != body.expected_activity_revision:

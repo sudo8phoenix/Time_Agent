@@ -58,9 +58,12 @@ def parse_schedule_csv(raw: bytes | str):
         nums = {}
         for field in ("planned_quantity", "baseline_quantity"):
             if row.get(field):
-                try: nums[field] = Decimal(row[field])
+                try: value = Decimal(row[field])
                 except (InvalidOperation, ValueError): errors.append({"row": number, "field": field, "message": "must be a finite decimal"}); continue
-                if not nums[field].is_finite() or nums[field] < 0: errors.append({"row": number, "field": field, "message": "must be finite and non-negative"})
+                if not value.is_finite() or value < 0:
+                    errors.append({"row": number, "field": field, "message": "must be finite and non-negative"})
+                    continue
+                nums[field] = value
         if basis == "quantity_ratio":
             if "planned_quantity" not in nums or nums["planned_quantity"] <= 0: errors.append({"row": number, "field": "planned_quantity", "message": "required and greater than zero"})
             if row.get("unit") not in UNITS: errors.append({"row": number, "field": "unit", "message": "recognised unit required"})
