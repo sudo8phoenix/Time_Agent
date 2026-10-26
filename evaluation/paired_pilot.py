@@ -201,6 +201,9 @@ def run(output, *, execute=False, comparison="model"):
 
         def call(**kwargs):
             kwargs["system"] += suffix
+            # The adapter defaults to 8112 output tokens; this pilot reserves
+            # at most 1536 per call before any provider request is made.
+            kwargs["settings"] = {**kwargs.get("settings", {}), "num_predict": 1536}
             if comparison == "strict-schema":
                 kwargs["schema"] = wire_schema
             return adapter.chat(**kwargs)
