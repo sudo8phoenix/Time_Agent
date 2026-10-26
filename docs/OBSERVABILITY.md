@@ -51,6 +51,21 @@ Operators must configure monitoring and retention for their hosting environment.
 See [troubleshooting](TROUBLESHOOTING.md), [testing](TESTING_AND_QUALITY.md) and
 [telemetry implementation](../backend/app/agent/telemetry.py).
 
+## Provider failures and coverage
+
+Planner calls are recorded through the same durable tool telemetry as specialist
+calls. Groq output failures distinguish `MODEL_OUTPUT_TRUNCATED`,
+`MODEL_JSON_INVALID`, `MODEL_SCHEMA_MISMATCH`, `MODEL_REFUSED` and
+`MODEL_ENVELOPE_INVALID`. HTTP rejection remains `MODEL_REQUEST_FAILED`;
+daily quotas use `MODEL_QUOTA_EXHAUSTED`. Failed extraction/selection jobs retain
+the failing operation as their stage rather than always reporting persistence.
+
+Groq/OpenRouter numeric provider metrics retain HTTP-status counts, allowlisted
+error/finish labels and bounded numeric quota diagnostics. Provider messages,
+failed generations and credentials are not retained in those metrics. Gonka
+currently has no entry in this numeric collector; the standalone comparison's
+safe call audit is separate evidence and does not imply durable metric coverage.
+
 ---
 
 [Documentation index](README.md) · [Project overview](../README.md)

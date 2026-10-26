@@ -44,6 +44,20 @@ Source: [adapter contract](../backend/app/integrations/base.py),
 [outbox](../backend/app/integrations/outbox.py),
 [native format dispatch](../backend/app/ingest/native_schedule/dispatch.py).
 
+## Model providers
+
+Ollama, Groq, OpenRouter and Gonka are server-side model providers. Each role may
+pin a different provider/model; credentials remain private. Gonka uses its Broker
+OpenAI-compatible endpoint through the bounded JSON adapter, with an explicit
+model ID, a 4096-token ceiling and complete-fence normalization followed by local
+schema validation. The planner separately requests only 128 tokens.
+
+See [configuration](CONFIGURATION.md), [generation settings](model-generation-settings.md)
+and [capacity coverage](provider-capacity.md). DeepSeek selection passed all 30
+saved identity decisions in the [four-model comparison](FOUR_MODEL_ROLE_COMPARISON.md),
+but its updated-adapter planner passed 0/3 legal transitions. Configuration support
+and a successful role rehearsal do not establish end-to-end integration readiness.
+
 ---
 
 [Documentation index](README.md) · [Project overview](../README.md)

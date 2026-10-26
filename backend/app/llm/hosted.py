@@ -22,6 +22,14 @@ from .ollama import OllamaResponseError, OllamaTransportError
 MAX_RESPONSE_BYTES = 2 * 1024 * 1024
 
 
+class HostedGenerationError(OllamaResponseError):
+    """Provider generated output that failed its JSON-schema validation."""
+
+
+class HostedRequestError(OllamaResponseError):
+    """An HTTP rejection, distinct from malformed successful model output."""
+
+
 class HostedRateLimitError(OllamaTransportError):
     """Retryable by an owning task, never by rotating credentials."""
     code = "MODEL_RATE_LIMITED"
@@ -108,7 +116,7 @@ class ProviderState:
 
 class HostedAdmission:
     def __init__(self, *, intervals=None, clock=time.monotonic):
-        self.intervals = intervals if intervals is not None else {"groq": 2.1, "openrouter": 3.2}
+        self.intervals = intervals if intervals is not None else {"groq": 2.1, "openrouter": 3.2, "gonka": 10.5}
         self.clock = clock
         self.condition = Condition()
         self.states = {}
@@ -222,10 +230,10 @@ def raise_for_status(provider, status, *, scope=None):
             wait = max(0, state.cooldown - ADMISSION.clock()) if state else 60
         raise HostedRateLimitError(f"{provider} rate limit reached", retry_after_seconds=wait)
     if status >= 400:
-        raise OllamaResponseError(f"{provider} request failed ({status})")
+        raise HostedRequestError(f"{provider} request failed ({status})")
 
 
-def _read_response(response, deadline):
+def _read_response(response, deadline, *, max_bytes=MAX_RESPONSE_BYTES):
     """Bound both decoded JSON size and total body-read time, including trickles."""
     chunks, size = [], 0
     while True:
@@ -239,15 +247,42 @@ def _read_response(response, deadline):
         if sock is not None:
             sock.settimeout(remaining)
         read1 = getattr(response, "read1", None)
-        chunk = read1(min(65536, MAX_RESPONSE_BYTES + 1 - size)) if read1 else response.read(MAX_RESPONSE_BYTES + 1)
+        chunk = read1(min(65536, max_bytes + 1 - size)) if read1 else response.read(max_bytes + 1)
         if time.monotonic() >= deadline:
             raise TimeoutError("Provider response exceeded its request deadline")
         size += len(chunk)
-        if size > MAX_RESPONSE_BYTES:
+        if size > max_bytes:
             raise OllamaResponseError("Provider response exceeds its size limit")
         chunks.append(chunk)
         if not chunk or read1 is None:
             return b"".join(chunks)
+
+
+def _safe_rejection_details(detail):
+    """Convert provider messages to fixed labels and numeric quota diagnostics."""
+    if not isinstance(detail, dict) or not isinstance(detail.get("message"), str):
+        return {}
+    message = detail["message"].lower()
+    result = {}
+    for phrase, label in (("tokens per day", "tokens_per_day"),
+                          ("tokens per minute", "tokens_per_minute"),
+                          ("requests per day", "requests_per_day"),
+                          ("requests per minute", "requests_per_minute")):
+        if phrase in message:
+            result["quota_kind"] = label
+            for field in ("limit", "used", "requested"):
+                match = re.search(r"\b" + field + r"\s*:?\s*(\d+)", message)
+                if match:
+                    result["quota_" + field] = int(match.group(1)[:15])
+            break
+    if detail.get("code") == "json_validate_failed":
+        result["reason"] = "json_generation_failed"
+    elif "schema" in message:
+        result["reason"] = "schema_rejected"
+        result["schema_features"] = [name for name in (
+            "anyof", "oneof", "type", "enum", "required", "additionalproperties",
+            "pattern", "format", "$ref", "null") if name in message]
+    return result
 
 
 def request(provider, method, url, payload, timeout, headers, *, capacity_scope=None):
@@ -255,6 +290,8 @@ def request(provider, method, url, payload, timeout, headers, *, capacity_scope=
     started = time.monotonic()
     admitted_at = None
     status, response_headers = None, {}
+    error_code = None
+    rejection_details = {}
     if capacity_scope is not None:
         from .account_scopes import SCOPES
         if provider != "groq" or capacity_scope not in SCOPES:
@@ -273,7 +310,26 @@ def request(provider, method, url, payload, timeout, headers, *, capacity_scope=
                     return status, json.loads(raw)
             except HTTPError as error:
                 status, response_headers = error.code, error.headers
-                error.close()  # Error bodies may echo private input; never read them.
+                try:
+                    # Parse only a bounded envelope. Never retain messages,
+                    # failed generations, headers or arbitrary provider strings.
+                    raw = _read_response(error, started + timeout, max_bytes=65536)
+                    envelope = json.loads(raw)
+                    detail = envelope.get("error", {}) if isinstance(envelope, dict) else {}
+                    rejection_details = _safe_rejection_details(detail)
+                    code = detail.get("code") if isinstance(detail, dict) else None
+                    if code in {"json_validate_failed", "invalid_api_key", "invalid_request_error",
+                                "model_not_found", "context_length_exceeded", "rate_limit_exceeded"}:
+                        error_code = code
+                except (ValueError, TypeError, OSError, TimeoutError, OllamaResponseError):
+                    pass
+                finally:
+                    error.close()
+                if status == 429 and rejection_details.get("quota_kind") in {
+                        "tokens_per_day", "requests_per_day"}:
+                    raise HostedQuotaError("Provider daily quota is exhausted")
+                if provider == "groq" and status == 400 and error_code == "json_validate_failed":
+                    raise HostedGenerationError("The provider output failed JSON-schema validation")
                 return status, {}
         finally:
             transport_finished = time.monotonic()
@@ -283,4 +339,4 @@ def request(provider, method, url, payload, timeout, headers, *, capacity_scope=
         record_provider_request(provider,
             admission_ms=1000 * ((admitted_at if admitted_at is not None else finished) - started),
             transport_ms=1000 * (transport_finished - admitted_at) if admitted_at is not None else 0,
-            admitted=admitted_at is not None, status=status)
+            admitted=admitted_at is not None, status=status, error_code=error_code, rejection_details=rejection_details)

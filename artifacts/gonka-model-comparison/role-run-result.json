@@ -1,0 +1,170 @@
+{
+  "input": "artifacts/gonka-model-comparison/input.txt",
+  "schedule": "data/review/gt10-five-entry/schedule.csv",
+  "extraction": {
+    "source": "saved validated DeepSeek extraction",
+    "observations": 6,
+    "live_request": false
+  },
+  "roles": {
+    "orchestrator": "MiniMaxAI/MiniMax-M2.7",
+    "selection": "deepseek-ai/DeepSeek-V4-Flash-0731"
+  },
+  "calls": [
+    {
+      "role": "orchestrator",
+      "model": "MiniMaxAI/MiniMax-M2.7",
+      "ok": true,
+      "elapsed_seconds": 3.084
+    },
+    {
+      "role": "orchestrator",
+      "model": "MiniMaxAI/MiniMax-M2.7",
+      "ok": true,
+      "elapsed_seconds": 11.057
+    },
+    {
+      "role": "orchestrator",
+      "model": "MiniMaxAI/MiniMax-M2.7",
+      "ok": false,
+      "error": "OllamaResponseError: OpenRouter response was incomplete",
+      "elapsed_seconds": 14.202
+    },
+    {
+      "role": "selection",
+      "model": "deepseek-ai/DeepSeek-V4-Flash-0731",
+      "ok": true,
+      "elapsed_seconds": 59.319
+    },
+    {
+      "role": "selection",
+      "model": "deepseek-ai/DeepSeek-V4-Flash-0731",
+      "ok": true,
+      "elapsed_seconds": 45.367
+    },
+    {
+      "role": "selection",
+      "model": "deepseek-ai/DeepSeek-V4-Flash-0731",
+      "ok": true,
+      "elapsed_seconds": 1.971
+    },
+    {
+      "role": "selection",
+      "model": "deepseek-ai/DeepSeek-V4-Flash-0731",
+      "ok": true,
+      "elapsed_seconds": 10.502
+    },
+    {
+      "role": "selection",
+      "model": "deepseek-ai/DeepSeek-V4-Flash-0731",
+      "ok": true,
+      "elapsed_seconds": 10.445
+    },
+    {
+      "role": "selection",
+      "model": "deepseek-ai/DeepSeek-V4-Flash-0731",
+      "ok": true,
+      "elapsed_seconds": 10.718
+    }
+  ],
+  "outputs": [
+    {
+      "stage": "intake",
+      "action": "intake"
+    },
+    {
+      "stage": "analysis",
+      "action": "analysis"
+    },
+    {
+      "stage": "review",
+      "action": null,
+      "validation_error": "incomplete model response"
+    },
+    {
+      "observation": 1,
+      "event_type": "actual_progress",
+      "quantity": "300",
+      "unit": "kg",
+      "activity": "SUP-GF-01",
+      "mapping_state": "suggested",
+      "reason_codes": [
+        "explicit_activity_id_match",
+        "work_type_match",
+        "unit_match"
+      ],
+      "explanation": "The report explicitly identifies 'Column Reinforcement \u2014 SUP-GF-01' and describes installing 300 kg of column reinforcement, matching row1's external_id, work_type, and unit."
+    },
+    {
+      "observation": 2,
+      "event_type": "actual_progress",
+      "quantity": "60",
+      "unit": "m2",
+      "activity": "SUP-GF-03",
+      "mapping_state": "suggested",
+      "reason_codes": [
+        "work_type_match",
+        "explicit_activity_id_match",
+        "unit_match"
+      ],
+      "explanation": "The report explicitly identifies 'Slab Shuttering \u2014 SUP-GF-03' with work type formwork and quantity 60 m2, matching candidate row3 (SUP-GF-03, Slab Shuttering - GF, formwork, m2)."
+    },
+    {
+      "observation": 3,
+      "event_type": "no_work",
+      "quantity": null,
+      "unit": null,
+      "activity": "SUP-GF-02",
+      "mapping_state": "suggested",
+      "reason_codes": [
+        "explicit_activity_id_match",
+        "work_type_match"
+      ],
+      "explanation": "The report explicitly identifies SUP-GF-02 as column concreting, matching row2's external_id and work_type."
+    },
+    {
+      "observation": 4,
+      "event_type": "no_work",
+      "quantity": null,
+      "unit": null,
+      "activity": "SUP-GF-04",
+      "mapping_state": "suggested",
+      "reason_codes": [
+        "explicit_activity_id_match",
+        "work_type_match",
+        "discipline_match"
+      ],
+      "explanation": "The observation explicitly references SUP-GF-04 and describes slab reinforcement installation not started, matching row4's activity name and work type."
+    },
+    {
+      "observation": 5,
+      "event_type": "no_work",
+      "quantity": null,
+      "unit": null,
+      "activity": "SUP-GF-05",
+      "mapping_state": "suggested",
+      "reason_codes": [
+        "explicit_activity_id_match",
+        "work_type_match"
+      ],
+      "explanation": "The report explicitly identifies 'Slab Concreting \u2014 SUP-GF-05' and the work type is concrete_pour, matching candidate row5."
+    },
+    {
+      "observation": 6,
+      "event_type": "inspection",
+      "quantity": null,
+      "unit": null,
+      "activity": "SUP-GF-01",
+      "mapping_state": "suggested",
+      "reason_codes": [
+        "work_type_match",
+        "asset_tag_match",
+        "activity_id_match"
+      ],
+      "explanation": "The report describes inspection of column reinforcement, matching row1's activity name and external ID. The summary explicitly notes the inspection does not establish completion, so the activity remains in progress."
+    }
+  ],
+  "validation_errors": [
+    "OllamaResponseError: OpenRouter response was incomplete"
+  ]
+}

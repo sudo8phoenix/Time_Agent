@@ -1,5 +1,6 @@
 """Durable queue primitives. Pipeline work is deliberately injected by the worker."""
 from __future__ import annotations
+from collections.abc import Callable
 from datetime import datetime, timedelta, timezone
 from uuid import UUID, uuid4
 from sqlalchemy import or_, select, update
@@ -64,7 +65,8 @@ def enqueue_reanalysis(db: Session, project: Project, report: Report, *, actor_i
     db.flush()
     return job, False
 
-def claim_job(db: Session, *, now: datetime | None = None) -> tuple[Job, str] | None:
+def claim_job(db: Session, *, now: datetime | None = None,
+              admission_check: Callable[[Session, Job], bool] | None = None) -> tuple[Job, str] | None:
     """Atomically claim one queued or expired-running job with a fresh random token."""
     now = now or _now()
     # Exhausted leases must become visible as failed before looking for work.
@@ -76,6 +78,8 @@ def claim_job(db: Session, *, now: datetime | None = None) -> tuple[Job, str] | 
         or_(Job.state == "queued", (Job.state == "running") & (Job.lease_expires_at < now)),
         Job.attempts < MAX_ATTEMPTS).order_by(Job.created_at).with_for_update(skip_locked=True))
     if not job:
+        return None
+    if admission_check is not None and not admission_check(db, job):
         return None
     token = uuid4().hex
     job.state = "running"; job.attempts += 1; job.lease_token = token

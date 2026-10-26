@@ -151,3 +151,36 @@ def test_role_snapshot_does_not_carry_a_model_across_provider_boundaries(monkeyp
         run = _create_or_load_run(db, job, clock=fixture.context.clock)
         assert run.config_metadata["roles"]["selection"]["model"] == "catalog/free:free"
         assert run.config_metadata["roles"]["extraction"]["model"] == "baseline-groq"
+
+
+@pytest.mark.parametrize('error,code', [
+    ('capacity', 'MODEL_CAPACITY_TIMEOUT'),
+    ('rate', 'MODEL_RATE_LIMITED'),
+    ('quota', 'MODEL_QUOTA_EXHAUSTED'),
+    ('unknown', 'AGENT_PLANNER_FAILED'),
+])
+def test_planner_preserves_safe_provider_failure_before_extraction(error, code):
+    from app.llm.hosted import HostedCapacityError, HostedRateLimitError, HostedQuotaError
+    fixture, initial, execution = setup(True)
+    errors = {'capacity': HostedCapacityError, 'rate': HostedRateLimitError,
+              'quota': HostedQuotaError, 'unknown': RuntimeError}
+    def fail(**kwargs):
+        raise errors[error]('private credentials and report contents')
+    execution.planner = fail
+    graph = build_hierarchical_report_graph(MemorySaver(), fixture.tools(), execution)
+    result = graph.invoke(initial.model_dump(mode='json'), {'configurable': {'thread_id': initial.run_id}})
+    state = HierarchicalAgentState.model_validate(result)
+    assert state.terminal_state == 'failed'
+    assert state.validation_errors[0].code == code
+    assert 'private' not in state.validation_errors[0].message
+    assert state.counters.extraction_calls == 0
+    assert fixture.persist_calls == []
+
+
+def test_planner_routing_uses_small_output_reservation():
+    seen = {}
+    def planner(**kwargs):
+        seen.update(kwargs)
+        return {'action': 'intake'}
+    assert validated_decision(planner, 'intake') == 'intake'
+    assert seen['settings']['num_predict'] == 128

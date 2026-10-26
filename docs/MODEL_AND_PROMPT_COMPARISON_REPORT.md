@@ -1,5 +1,9 @@
 # Model configurations, prompting techniques and measured comparison
 
+26 October follow-up: [Four-model role comparison](FOUR_MODEL_ROLE_COMPARISON.md) records the saved role matrix and
+updated-adapter DeepSeek planner retest. It is a single-report contract rehearsal,
+not 64 durable graph runs or a replacement for repeated workflow evaluation.
+
 Updated 22 October 2026. This is the consolidated development report for the construction site progress agent. It brings together the latest full-graph configurations, the earlier component studies, prompt ablations, costs, failures and current recommendations. The frozen captures remain the evidence; this document does not rewrite old scores or labels.
 
 ## 1. Decision and scope

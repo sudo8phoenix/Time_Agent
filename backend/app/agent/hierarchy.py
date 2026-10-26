@@ -17,7 +17,7 @@ from .contracts import AgentRole, TaskEnvelope, TaskResult, TaskOutcome, TaskErr
 from .nodes import _nodes, conditional_routers
 from .state import HierarchicalAgentState, parse_agent_state, ValidationErrorRecord
 from .task_store import TaskStore
-from .tools import AgentToolError
+from .tools import AgentToolError, _failure_category
 
 GRAPH_VERSION = "report-analysis-v2"
 STATE_SCHEMA_VERSION = "agent-state-v2"
@@ -31,7 +31,8 @@ class SupervisorDecision(BaseModel):
 def validated_decision(model_call, expected: str) -> str:
     """A planner can only confirm the one legal next supervisor; fail closed."""
     response = model_call(system="Choose only the supplied legal next supervisor. Return JSON with action.",
-        user={"legal_actions": [expected]}, schema=SupervisorDecision.model_json_schema())
+        user={"legal_actions": [expected]}, schema=SupervisorDecision.model_json_schema(),
+        settings={"temperature": 0.0, "num_predict": 128})
     value = response.value if hasattr(response, "value") else response
     try:
         decision = SupervisorDecision.model_validate(value)
@@ -194,8 +195,23 @@ class HierarchyExecution:
                         validated_decision(self.planner, role)
                     except AgentToolError:
                         raise
-                    except Exception:
-                        raise AgentToolError("AGENT_PLANNER_FAILED", "The planner failed safely.") from None
+                    except Exception as exc:
+                        category = _failure_category(exc)
+                        messages = {
+                            "MODEL_CAPACITY_TIMEOUT": "The planner is waiting for provider capacity. Retry after the provider cooldown.",
+                            "MODEL_RATE_LIMITED": "The planner provider is rate limited. Retry after its cooldown.",
+                            "MODEL_QUOTA_EXHAUSTED": "The planner provider quota is exhausted. Wait for the quota reset.",
+                            "MODEL_REQUEST_FAILED": "The planner could not reach the model provider.",
+                            "MODEL_RESPONSE_INVALID": "The planner provider returned an invalid response.",
+                            "MODEL_OUTPUT_TRUNCATED": "The planner response reached its output limit.",
+                            "MODEL_JSON_INVALID": "The planner returned invalid JSON.",
+                            "MODEL_SCHEMA_MISMATCH": "The planner response did not match its schema.",
+                            "MODEL_REFUSED": "The planner provider refused the request.",
+                            "MODEL_ENVELOPE_INVALID": "The planner provider returned an invalid response envelope.",
+                        }
+                        raise AgentToolError(category or "AGENT_PLANNER_FAILED",
+                            messages.get(category, "The planner failed safely."),
+                            failure_category=category) from None
                 return graph.invoke(state.model_dump(mode="json"), config)
             # Pin to identity: nested checkpoint input evolves during resume.
             try:

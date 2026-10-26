@@ -19,7 +19,7 @@ def test_groq_effective_reasoning_is_fixed_and_temperature_is_recorded(model, ef
                           settings={'reasoning_effort': 'medium', 'num_predict': 9000})
     assert seen['temperature'] == 0
     assert seen.get('reasoning_effort') == effort
-    assert seen['max_completion_tokens'] == 1536
+    assert seen['max_completion_tokens'] == 8112
     assert 'num_ctx' not in seen
     assert adapter.max_retries == 0 and result.settings_hash
 

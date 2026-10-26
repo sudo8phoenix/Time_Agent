@@ -12,6 +12,7 @@ from app.db.session import session_factory  # noqa: E402
 from app.agent.runtime import process_job_with_graph  # noqa: E402
 from app.jobs.service import heartbeat  # noqa: E402
 from app.jobs.worker import run_loop, run_once  # noqa: E402
+from app.jobs.admission import report_admission_ready  # noqa: E402
 from app.settings import get_settings  # noqa: E402
 from app.conversation.runtime import run_once as run_conversation_once  # noqa: E402
 
@@ -58,10 +59,11 @@ def main() -> int:
         return stopping
     if args.once:
         with session_factory() as db:
-            worked = run_once(db, pipeline, should_stop=should_stop, heartbeat_callback=beat)
+            worked = run_once(db, pipeline, should_stop=should_stop, heartbeat_callback=beat,
+                              admission_check=report_admission_ready)
         return 0 if worked or run_conversation_once(session_factory, should_stop=should_stop) else 3
     run_loop(session_factory, pipeline, should_stop=should_stop,
-             poll_seconds=args.poll_seconds,
+             poll_seconds=args.poll_seconds, admission_check=report_admission_ready,
              additional_work=lambda: run_conversation_once(session_factory, should_stop=should_stop))
     return 0
 

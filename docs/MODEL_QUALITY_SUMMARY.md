@@ -1,5 +1,12 @@
 # Model quality summary
 
+26 October follow-up: [Four-model role comparison](FOUR_MODEL_ROLE_COMPARISON.md) records the saved role matrix and
+updated-adapter DeepSeek planner retest. It is a single-report contract rehearsal,
+not 64 durable graph runs or a replacement for repeated workflow evaluation.
+DeepSeek and GPT-OSS 120B selectors each scored 30/30 identities across extractor
+outputs; Qwen and GPT-OSS 20B each scored 29/30. The compactness-first ranking
+therefore does not mean DeepSeek lacks a role advantage.
+
 Updated 22 October 2026. The [complete model and prompting report](MODEL_AND_PROMPT_COMPARISON_REPORT.md) is the consolidated reference; [exact prompts](MODEL_PROMPT_CATALOG.md) are retained separately.
 
 **All GPT-OSS 20B is the strongest cost-focused baseline among the configurations that completed every planned report correctly in this test.** It matches the 4/4 scoped outcomes of both mixed configurations at the lowest listed token rates. **All-Qwen passed 2/4** and failed the full selection schema on both unambiguous cases. This changes the practical interpretation of the earlier simplified Qwen worker wins: Qwen is a promising component challenger, but its current full worker configuration needs compatibility work. Observed lowest known latest-cohort spend among fully passing configurations: **All 20B**, $0.00265643 for four comparisons; this small descriptive cost result is not a billing guarantee.

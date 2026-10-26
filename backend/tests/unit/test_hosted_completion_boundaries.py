@@ -1,7 +1,7 @@
 """Production hosted-completion parsing boundaries with injected responses."""
 import pytest
 
-from app.llm.groq import GroqChatAdapter
+from app.llm.groq import GroqChatAdapter, GroqTruncatedResponseError
 from app.llm.ollama import OllamaResponseError
 from app.llm.openrouter import OpenRouterChatAdapter
 
@@ -73,5 +73,7 @@ def test_single_complete_schema_valid_object_is_accepted(adapter_type):
 def test_every_non_stop_finish_reason_is_rejected_as_incomplete(adapter_type, finish_reason):
     adapter = adapter_type("fixture-model", bearer_token="test-key", transport=lambda *args: (
         200, completion(finish_reason=finish_reason)))
-    with pytest.raises(OllamaResponseError, match="incomplete"):
+    truncated = adapter_type is GroqChatAdapter and finish_reason == "length"
+    error = GroqTruncatedResponseError if truncated else OllamaResponseError
+    with pytest.raises(error, match="output limit" if truncated else "incomplete"):
         adapter.chat(system="system", user="synthetic", schema=SCHEMA)

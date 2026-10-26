@@ -9,6 +9,10 @@
 | XLSX mapping rejected | Sheet/header signature and mapping revision | Preview again and confirm a new mapping |
 | Job queued without progress | Worker process, leases, queue age, provider admission | Start the correctly configured worker; inspect job/run state |
 | Provider timeout/rate limit | Configured model, account scope, remaining budget | Honor limits; do not reset consumed deadlines to force retries |
+| `MODEL_QUOTA_EXHAUSTED` | Safe quota kind/limit/used/requested diagnostics | Wait for provider reset; do not rotate keys or reset usage |
+| `MODEL_SCHEMA_MISMATCH` | Generated-output rejection versus request-schema rejection | Groq `json_validate_failed` permits one existing graph correction; repeated rejection stops safely |
+| Planner JSON/truncation failure | Exact model, 128-token planner budget and safe finish/error label | Preserve the failed run; choose a validated configuration for new work |
+| Missing Gonka timing metrics | Collector currently covers Groq/OpenRouter | Treat usage as unknown; see the separate role-comparison audit |
 | Resume rejects source drift | Pinned build/dependency/schema identity | Follow durable configuration contract; preserve the original run |
 | 401 after sign-in | Cookie, expiry and HTTPS | Sign in again; use HTTPS when production Secure cookies are enabled |
 | 403 on write | Membership, reviewer role and CSRF token | Refresh `/auth/me`; send session cookie and `X-CSRF-Token` |

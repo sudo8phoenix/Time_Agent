@@ -32,7 +32,7 @@ class DatabaseAdmission:
 
     def acquire(self, provider, payload, timeout):
         from .account_scopes import SCOPES, check_policy
-        if provider not in {"groq", "openrouter", *SCOPES}:
+        if provider not in {"groq", "openrouter", "gonka", *SCOPES}:
             raise HostedCapacityError("Unsupported hosted capacity scope")
         deadline = self.clock() + timeout
         while True:

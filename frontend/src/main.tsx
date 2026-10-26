@@ -65,7 +65,12 @@ function canLeave() { if (pendingOperations.size) return false; return !document
 function notifyAuth() { try { localStorage.setItem("spa-auth-change", `${Date.now()}:${crypto.randomUUID()}`); } catch { /* Cookie auth works without local storage. */ } }
 class ApiError extends Error { constructor(message: string, public status: number, public code?: string) { super(message); } }
 const errorMessages: Record<string, string> = {
-  MODEL_REQUEST_FAILED: "The model request timed out or could not connect. Check the model service and retry.",
+  MODEL_REQUEST_FAILED: "The model request failed or was rejected by the provider. Check the analysis details before retrying.",
+  MODEL_SCHEMA_MISMATCH: "The model output did not match the required schema. Analysis stopped after its bounded validation attempts.",
+  MODEL_JSON_INVALID: "The model returned invalid JSON. No progress was applied.",
+  MODEL_OUTPUT_TRUNCATED: "The model response reached its output limit. No progress was applied.",
+  MODEL_QUOTA_EXHAUSTED: "The model provider quota is exhausted. Wait for the provider reset before starting a new analysis.",
+  MODEL_RATE_LIMITED: "The model provider is rate limited. Wait for its cooldown before starting a new analysis.",
   MODEL_RESPONSE_INVALID: "The model returned an invalid response. Retry the report or check the model service.",
   EXTRACTION_ITEMS_REJECTED: "The model returned observations, but none passed source evidence or date validation. Check the report date and retry or reanalyse the report.",
   NO_ACTIVE_SCHEDULE: "Import and activate a schedule before viewing progress.",

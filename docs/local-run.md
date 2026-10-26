@@ -7,7 +7,8 @@ schedule parsing. Run the [README quick start](../README.md#quick-start), edit
 `.env`, and apply all migrations before starting a worker. Keep `.env` private.
 `ENVIRONMENT=development` permits local HTTP; production cookies require HTTPS.
 
-The default example uses Ollama. The owner-selected orchestrator profile is:
+The default example uses Ollama. The private configuration checked on 26 October
+2026 uses this profile (settings are read at startup):
 
 ```dotenv
 LLM_PROVIDER=groq
@@ -15,10 +16,10 @@ GROQ_MODEL=openai/gpt-oss-20b
 AGENT_HIERARCHY_ENABLED=true
 ORCHESTRATOR_MODEL_ASSISTED=true
 ORCHESTRATOR_PROVIDER=groq
-ORCHESTRATOR_MODEL=openai/gpt-oss-120b
+ORCHESTRATOR_MODEL=qwen/qwen3.8-27b
 ORCHESTRATOR_KEY_SLOT=1
 EXTRACTION_PROVIDER=groq
-EXTRACTION_MODEL=openai/gpt-oss-20b
+EXTRACTION_MODEL=openai/gpt-oss-120b
 EXTRACTION_KEY_SLOT=2
 SELECTION_PROVIDER=groq
 SELECTION_MODEL=openai/gpt-oss-20b
@@ -32,6 +33,12 @@ for this profile and its account mapping is unverified. The API and workers read
 settings at startup. Flags affect new work; retained runs use pinned configuration.
 Do not enable account scopes without the explicit procedure in
 [provider capacity](provider-capacity.md).
+
+The [four-model comparison](FOUR_MODEL_ROLE_COMPARISON.md) records all 16 worker
+pairs and 64 composed assignments, including DeepSeek’s updated-adapter planner
+retest. The [earlier Gonka comparison](gonka-role-comparison.md) retains historical
+MiniMax and DeepSeek trials. Recommendations are trials pending full graph
+validation. Gonka reads `GONKA_BROKER_LLM` from the private environment; new role assignments are pinned when a job starts.
 
 `AGENT_HIERARCHY_ENABLED=false` selects the V1 report graph and synchronous new
 conversations. With hierarchy enabled, `ORCHESTRATOR_MODEL_ASSISTED=false` uses
@@ -57,6 +64,15 @@ For Ollama, set `OLLAMA_BASE_URL`, the exact installed `OLLAMA_MODEL` and option
 `OLLAMA_API_KEY`; `make remote-check` checks readiness without inference.
 
 ## Recovery and cancellation
+
+The report worker keeps new jobs queued while a configured Groq/OpenRouter provider has a
+known shared cooldown or exhausted request quota awaiting reset. Waiting does not
+claim a lease, spend a job attempt, or start the analysis deadline. The transport
+still enforces admission for every request; a new provider limit during an active
+run can still terminate that attempt. Planner failures now retain safe capacity,
+quota, transport and response error codes instead of only AGENT_PLANNER_FAILED.
+Planner routing reserves 128 output tokens; extraction retains its larger budget.
+
 
 Stop workers with Ctrl-C. Ownership leases and PostgreSQL checkpoints support
 bounded recovery. Inspect queued work, original budgets and retained journals

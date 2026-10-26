@@ -410,6 +410,15 @@ def _terminal_error(state: AgentState) -> tuple[str | None, str | None]:
     return code, SAFE_ERRORS[code]
 
 
+def _terminal_stage(state: AgentState, fallback: str = "parse") -> str:
+    if state.terminal_state == "ready_for_review":
+        return "persist"
+    stage = state.validation_errors[0].stage if state.validation_errors else fallback
+    stage = {"extraction": "extract", "selection": "select", "intake": "parse",
+             "analysis": "extract", "review": "validate"}.get(stage, stage)
+    return stage if stage in {"parse", "extract", "retrieve", "select", "validate", "persist"} else fallback
+
+
 def _finalize(session_factory, job_id: UUID, token: str, run_id: UUID, state: AgentState) -> dict[str, Any]:
     now = _now()
     with session_factory.begin() as db:
@@ -431,11 +440,12 @@ def _finalize(session_factory, job_id: UUID, token: str, run_id: UUID, state: Ag
         ).where(DBObservation.job_id == job_id)) or 0)
         terminal = state.terminal_state or "failed"
         error_code, error_message = _terminal_error(state)
+        stage = _terminal_stage(state, job.stage or "parse")
         published = publish_stage(
             db,
             job_id,
             token,
-            stage="persist",
+            stage=stage,
             state=terminal,
             extracted_count=observations,
             proposal_count=proposals,
@@ -472,7 +482,7 @@ def _finalize(session_factory, job_id: UUID, token: str, run_id: UUID, state: Ag
         job.prompt_version = metadata.selection_prompt_version or metadata.extraction_prompt_version
         job.config_version = metadata.settings_hash
         return {
-            "stage": "persist",
+            "stage": published.stage,
             "state": terminal,
             "extracted_count": observations,
             "proposal_count": proposals,
@@ -656,6 +666,12 @@ def process_job_with_graph(
         recorder.step_task_provider = lambda node: next((
             envelope.task_id for envelope in hierarchy_execution.envelopes.values()
             if envelope.agent_role.value == {"persist": "review", "finalize": "root", "record_failure": "root"}.get(node, node)), None)
+    if hierarchy_execution and hierarchy_execution.planner:
+        # Planner requests run outside specialist tools but need the same durable,
+        # sanitized provider diagnostics, including requests that are rejected.
+        raw_planner = hierarchy_execution.planner
+        hierarchy_execution.planner = lambda **kwargs: recorder.call_tool(
+            "planner", raw_planner, **kwargs)
     tools = TelemetryTools(base_tools, recorder)
     config = {"configurable": {"thread_id": str(run.id)}}
     current = initial

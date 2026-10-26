@@ -1,6 +1,7 @@
 from app.llm.groq import GroqChatAdapter
 from app.llm.ollama import OllamaChatAdapter
 from app.llm.openrouter import OpenRouterChatAdapter
+from app.llm.gonka import GonkaChatAdapter
 from app.llm.provider import create_adapter, role_provider_config
 from app.settings import Settings
 
@@ -35,3 +36,61 @@ def test_role_provider_override_wins_over_global_default():
                         selection_provider="groq", selection_key_slot=0)
     adapter = create_adapter(settings, timeout=30, role="selection")
     assert isinstance(adapter, GroqChatAdapter)
+
+
+def test_gonka_roles_use_the_same_broker_key_and_pinned_models():
+    settings = Settings(_env_file=None, gonka_broker_llm="broker-mock",
+        orchestrator_provider="gonka", orchestrator_model="MiniMaxAI/MiniMax-M2.7",
+        selection_provider="gonka", selection_model="deepseek-ai/DeepSeek-V4-Flash-0731")
+    planner = create_adapter(settings, timeout=30, role="orchestrator")
+    selector = create_adapter(settings, timeout=30, role="selection")
+    assert isinstance(planner, GonkaChatAdapter)
+    assert isinstance(selector, GonkaChatAdapter)
+    assert planner.model == "MiniMaxAI/MiniMax-M2.7"
+    assert selector.model == "deepseek-ai/DeepSeek-V4-Flash-0731"
+    assert planner._token == selector._token == "broker-mock"
+
+
+def test_gonka_adapter_targets_broker_and_reports_runtime():
+    observed = {}
+
+    def transport(method, url, payload, timeout, headers):
+        observed.update(url=url, model=payload["model"], headers=headers)
+        return 200, {"choices": [{"finish_reason": "stop",
+                                 "message": {"content": '{"action":"intake"}'}}]}
+
+    adapter = GonkaChatAdapter("MiniMaxAI/MiniMax-M2.7", bearer_token="broker-mock",
+                               transport=transport)
+    result = adapter.chat(system="choose", user={"legal_actions": ["intake"]},
+                          schema={"type": "object", "properties": {"action": {"type": "string"}},
+                                  "required": ["action"]})
+    assert observed["url"] == "https://proxy.gonkabroker.com/v1/chat/completions"
+    assert observed["model"] == "MiniMaxAI/MiniMax-M2.7"
+    assert observed["headers"] == {"Authorization": "Bearer broker-mock"}
+    assert result.runtime == "gonka"
+
+
+def test_gonka_adapter_has_room_for_full_report_extraction():
+    observed = {}
+
+    def transport(method, url, payload, timeout, headers):
+        observed.update(payload)
+        return 200, {"choices": [{"finish_reason": "stop",
+                                 "message": {"content": '{"ok":true}'}}]}
+
+    adapter = GonkaChatAdapter("deepseek-ai/DeepSeek-V4-Flash-0731",
+                               bearer_token="broker-mock", transport=transport)
+    adapter.chat(system="extract", user="report",
+                 schema={"type": "object", "properties": {"ok": {"type": "boolean"}},
+                         "required": ["ok"]}, settings={"num_predict": 15000})
+    assert observed["max_tokens"] == 4096
+
+
+def test_gonka_adapter_accepts_only_a_complete_json_fence():
+    adapter = GonkaChatAdapter("deepseek-ai/DeepSeek-V4-Flash-0731",
+        bearer_token="broker-mock", transport=lambda *args: (200, {
+            "choices": [{"finish_reason": "stop", "message": {
+                "content": '```json\n{"ok":true}\n```'}}]}))
+    schema = {"type": "object", "properties": {"ok": {"type": "boolean"}},
+              "required": ["ok"]}
+    assert adapter.chat(system="s", user="u", schema=schema).value == {"ok": True}

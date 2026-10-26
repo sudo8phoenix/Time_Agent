@@ -29,6 +29,8 @@ def create_planner(settings: Any, *, timeout: float,
     supported = ((provider == "openrouter" and model in ALLOWED_PLANNER_MODELS)
                  or (provider == "groq" and model in {
                      "openai/gpt-oss-20b", "openai/gpt-oss-120b", "qwen/qwen3.8-27b",
+                 }) or (provider == "gonka" and model in {
+                     "MiniMaxAI/MiniMax-M2.7", "deepseek-ai/DeepSeek-V4-Flash-0731",
                  }))
     if not supported:
         raise PlannerConfigurationError("Unsupported planner configuration")

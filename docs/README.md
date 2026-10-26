@@ -58,6 +58,7 @@ flowchart LR
 | [Model Quality Summary](MODEL_QUALITY_SUMMARY.md) | Quality and latency summary |
 | [Model Prompt Catalog](MODEL_PROMPT_CATALOG.md) | Exact prompts |
 | [Model Comparison Checklist](MODEL_COMPARISON_CHECKLIST.md) | Comparison coverage |
+| [Four-model role comparison](FOUR_MODEL_ROLE_COMPARISON.md) | Qwen, GPT-OSS 120B/20B and DeepSeek: 16 worker pairs, 64 composed assignments |
 | [Model Generation Settings](model-generation-settings.md) | Request generation settings |
 | [Stage Specification V1](stage-specification-v1.md) | Stage contracts |
 | [Model Call Authority Inventory](model-call-authority-inventory.md) | Model authority inventory |
@@ -68,6 +69,7 @@ flowchart LR
 | Guide | Contents |
 |---|---|
 | [Contributing](CONTRIBUTING.md) | Development workflow and verification |
+| [Branch push checklist](BRANCH_PUSH_CHECKLIST.md) | Exact reviewed source, test, documentation and evidence file set |
 | [Changelog](../CHANGELOG.md) | User-visible changes |
 | [License](../LICENSE) | Proprietary terms; third-party licenses remain separate |
 
@@ -75,6 +77,8 @@ flowchart LR
 
 All guides linked above are maintained for the remote repository. The
 [OpenAPI snapshot](api-contract.json) is generated from the application.
-Historical handoffs, raw captures, operator notes, private uploads and detailed
-execution archives remain local and ignored. Research references labeled as local
+The curated four-model result files and runners listed in the
+[push checklist](BRANCH_PUSH_CHECKLIST.md) accompany their report. Historical
+handoffs, other raw captures, operator notes, private uploads and detailed
+execution archives remain local; many are ignored. Research references labeled as local
 archives are provenance descriptions, not downloadable public evidence.

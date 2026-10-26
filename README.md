@@ -141,14 +141,17 @@ backup and recovery, or [troubleshooting](docs/TROUBLESHOOTING.md) for blocked s
 ### Optional hierarchical profile
 
 Checked-in defaults disable hierarchical and model-assisted routing. The documented
-selected local profile enables V2, with Groq GPT-OSS 120B for orchestration and
-GPT-OSS 20B for extraction/selection. It requires explicit configuration and private
+selected local profile, checked on 26 October 2026, enables V2 with Groq Qwen
+3.8 27B for orchestration, GPT-OSS 120B for extraction and GPT-OSS 20B for selection. It requires explicit configuration and private
 provider keys; it is not automatically enabled by installation.
 
 Follow the [profile configuration](docs/local-run.md#setup),
 [settings reference](docs/CONFIGURATION.md) and
 [provider capacity rules](docs/provider-capacity.md). Existing runs retain pinned
 versions and budgets; configuration changes require deliberate process restarts.
+The [four-model role comparison](docs/FOUR_MODEL_ROLE_COMPARISON.md) records
+16 worker pairs and 64 composed assignments; these are single-report trials, not
+64 database-backed graph runs.
 
 ## Documentation
 

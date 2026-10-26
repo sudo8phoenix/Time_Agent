@@ -1,0 +1,173 @@
+{
+  "input": "artifacts/gonka-model-comparison/input.txt",
+  "extraction": "saved DeepSeek V4 Flash; six validated observations",
+  "selection": "saved DeepSeek V4 Flash; six valid activity proposals",
+  "selection_outputs": [
+    {
+      "observation": 1,
+      "event_type": "actual_progress",
+      "quantity": "300",
+      "unit": "kg",
+      "activity": "SUP-GF-01",
+      "mapping_state": "suggested",
+      "reason_codes": [
+        "explicit_activity_id_match",
+        "work_type_match",
+        "unit_match"
+      ],
+      "explanation": "The report explicitly identifies 'Column Reinforcement \u2014 SUP-GF-01' and describes installing 300 kg of column reinforcement, matching row1's external_id, work_type, and unit."
+    },
+    {
+      "observation": 2,
+      "event_type": "actual_progress",
+      "quantity": "60",
+      "unit": "m2",
+      "activity": "SUP-GF-03",
+      "mapping_state": "suggested",
+      "reason_codes": [
+        "work_type_match",
+        "explicit_activity_id_match",
+        "unit_match"
+      ],
+      "explanation": "The report explicitly identifies 'Slab Shuttering \u2014 SUP-GF-03' with work type formwork and quantity 60 m2, matching candidate row3 (SUP-GF-03, Slab Shuttering - GF, formwork, m2)."
+    },
+    {
+      "observation": 3,
+      "event_type": "no_work",
+      "quantity": null,
+      "unit": null,
+      "activity": "SUP-GF-02",
+      "mapping_state": "suggested",
+      "reason_codes": [
+        "explicit_activity_id_match",
+        "work_type_match"
+      ],
+      "explanation": "The report explicitly identifies SUP-GF-02 as column concreting, matching row2's external_id and work_type."
+    },
+    {
+      "observation": 4,
+      "event_type": "no_work",
+      "quantity": null,
+      "unit": null,
+      "activity": "SUP-GF-04",
+      "mapping_state": "suggested",
+      "reason_codes": [
+        "explicit_activity_id_match",
+        "work_type_match",
+        "discipline_match"
+      ],
+      "explanation": "The observation explicitly references SUP-GF-04 and describes slab reinforcement installation not started, matching row4's activity name and work type."
+    },
+    {
+      "observation": 5,
+      "event_type": "no_work",
+      "quantity": null,
+      "unit": null,
+      "activity": "SUP-GF-05",
+      "mapping_state": "suggested",
+      "reason_codes": [
+        "explicit_activity_id_match",
+        "work_type_match"
+      ],
+      "explanation": "The report explicitly identifies 'Slab Concreting \u2014 SUP-GF-05' and the work type is concrete_pour, matching candidate row5."
+    },
+    {
+      "observation": 6,
+      "event_type": "inspection",
+      "quantity": null,
+      "unit": null,
+      "activity": "SUP-GF-01",
+      "mapping_state": "suggested",
+      "reason_codes": [
+        "work_type_match",
+        "asset_tag_match",
+        "activity_id_match"
+      ],
+      "explanation": "The report describes inspection of column reinforcement, matching row1's activity name and external ID. The summary explicitly notes the inspection does not establish completion, so the activity remains in progress."
+    }
+  ],
+  "orchestrator_key_slot": 1,
+  "calls": [
+    {
+      "model": "qwen/qwen3.8-27b",
+      "role": "orchestrator",
+      "stage": "intake",
+      "started_at": "2026-10-26T11:21:36.447453+00:00",
+      "action": "intake",
+      "ok": true,
+      "elapsed_seconds": 0.184
+    },
+    {
+      "model": "openai/gpt-oss-120b",
+      "role": "orchestrator",
+      "stage": "intake",
+      "started_at": "2026-10-26T11:21:36.632056+00:00",
+      "action": "intake",
+      "ok": true,
+      "elapsed_seconds": 2.7
+    },
+    {
+      "model": "openai/gpt-oss-20b",
+      "role": "orchestrator",
+      "stage": "intake",
+      "started_at": "2026-10-26T11:21:39.333268+00:00",
+      "action": "intake",
+      "ok": true,
+      "elapsed_seconds": 2.516
+    },
+    {
+      "model": "qwen/qwen3.8-27b",
+      "role": "orchestrator",
+      "stage": "analysis",
+      "started_at": "2026-10-26T11:21:41.850673+00:00",
+      "action": "analysis",
+      "ok": true,
+      "elapsed_seconds": 2.422
+    },
+    {
+      "model": "openai/gpt-oss-120b",
+      "role": "orchestrator",
+      "stage": "analysis",
+      "started_at": "2026-10-26T11:21:44.273873+00:00",
+      "action": "analysis",
+      "ok": true,
+      "elapsed_seconds": 2.813
+    },
+    {
+      "model": "openai/gpt-oss-20b",
+      "role": "orchestrator",
+      "stage": "analysis",
+      "started_at": "2026-10-26T11:21:47.088171+00:00",
+      "action": "analysis",
+      "ok": true,
+      "elapsed_seconds": 2.466
+    },
+    {
+      "model": "qwen/qwen3.8-27b",
+      "role": "orchestrator",
+      "stage": "review",
+      "started_at": "2026-10-26T11:21:49.555364+00:00",
+      "action": "review",
+      "ok": true,
+      "elapsed_seconds": 2.18
+    },
+    {
+      "model": "openai/gpt-oss-120b",
+      "role": "orchestrator",
+      "stage": "review",
+      "started_at": "2026-10-26T11:21:51.736534+00:00",
+      "action": "review",
+      "ok": true,
+      "elapsed_seconds": 2.998
+    },
+    {
+      "model": "openai/gpt-oss-20b",
+      "role": "orchestrator",
+      "stage": "review",
+      "started_at": "2026-10-26T11:21:54.735854+00:00",
+      "action": "review",
+      "ok": true,
+      "elapsed_seconds": 2.512
+    }
+  ]
+}

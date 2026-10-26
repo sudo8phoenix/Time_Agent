@@ -5,7 +5,7 @@ from typing import Literal, NamedTuple
 
 
 Role = Literal["orchestrator", "extraction", "selection"]
-Provider = Literal["ollama", "groq", "openrouter"]
+Provider = Literal["ollama", "groq", "openrouter", "gonka"]
 KeySlot = Literal[0, 1, 2]
 
 
@@ -52,6 +52,12 @@ def create_adapter(settings, *, timeout, model_name=None, provider=None, role: R
         token = getattr(settings, "openrouter_api_key", None)
         model = model_name or getattr(settings, "openrouter_model", None)
         return OpenRouterChatAdapter(model,
+            bearer_token=token.get_secret_value() if token else None,
+            timeout=timeout, max_retries=0)
+    if provider == "gonka":
+        from .gonka import GonkaChatAdapter
+        token = getattr(settings, "gonka_broker_llm", None)
+        return GonkaChatAdapter(model_name or settings.gonka_model,
             bearer_token=token.get_secret_value() if token else None,
             timeout=timeout, max_retries=0)
     if provider != "ollama":

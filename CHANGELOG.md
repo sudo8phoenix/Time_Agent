@@ -5,6 +5,15 @@ is a prototype identifier, not evidence of a tagged production release.
 
 ## Unreleased
 
+### Model providers and recovery
+
+- Add explicit Gonka role configuration, bounded JSON handling and shared transport admission.
+- Add Groq structured-output compatibility, safe failure diagnostics and a bounded
+  graph correction for generated-schema rejections; surface actionable UI errors.
+- Defer report claims during known Groq/OpenRouter cooldowns and retain failing stages.
+- Document the four-model rehearsal, including DeepSeek selection strengths and
+  planner failures, current configuration and remaining Gonka telemetry/pre-claim limits.
+
 ### Documentation
 
 - Add API/OpenAPI reference, agent architecture, database entity reference, security

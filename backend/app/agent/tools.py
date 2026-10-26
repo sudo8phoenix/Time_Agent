@@ -50,6 +50,8 @@ class AgentToolError(RuntimeError):
             "MODEL_RATE_LIMITED", "MODEL_QUOTA_EXHAUSTED", "MODEL_CAPACITY_TIMEOUT",
             "MODEL_REQUEST_FAILED", "MODEL_RESPONSE_INVALID", "MODEL_DECISION_INVALID",
             "EXTRACTION_VALIDATION_FAILED",
+            "MODEL_OUTPUT_TRUNCATED", "MODEL_JSON_INVALID", "MODEL_SCHEMA_MISMATCH",
+            "MODEL_REFUSED", "MODEL_ENVELOPE_INVALID",
         } else None
         super().__init__(safe_message)
 
@@ -68,12 +70,21 @@ class _ToolModel(StrictModel):
 
 def _failure_category(error: Exception) -> str | None:
     """Retain only known exception categories, never upstream messages/attributes."""
-    from ..llm.hosted import HostedRateLimitError, HostedQuotaError, HostedCapacityError
+    from ..llm.hosted import HostedRateLimitError, HostedQuotaError, HostedCapacityError, HostedRequestError, HostedGenerationError
     from ..llm.ollama import OllamaTransportError, OllamaResponseError
+    from ..llm.groq import (GroqTruncatedResponseError, GroqInvalidJSONError,
+                            GroqSchemaMismatchError, GroqRefusalError, GroqEnvelopeError)
     for kind, code in (
+        (GroqTruncatedResponseError, "MODEL_OUTPUT_TRUNCATED"),
+        (GroqInvalidJSONError, "MODEL_JSON_INVALID"),
+        (GroqSchemaMismatchError, "MODEL_SCHEMA_MISMATCH"),
+        (GroqRefusalError, "MODEL_REFUSED"),
+        (GroqEnvelopeError, "MODEL_ENVELOPE_INVALID"),
         (HostedRateLimitError, "MODEL_RATE_LIMITED"),
         (HostedQuotaError, "MODEL_QUOTA_EXHAUSTED"),
         (HostedCapacityError, "MODEL_CAPACITY_TIMEOUT"),
+        (HostedGenerationError, "MODEL_SCHEMA_MISMATCH"),
+        (HostedRequestError, "MODEL_REQUEST_FAILED"),
         (OllamaTransportError, "MODEL_REQUEST_FAILED"),
         (OllamaResponseError, "MODEL_RESPONSE_INVALID"),
         (AgentDecisionError, "MODEL_DECISION_INVALID"),
@@ -431,7 +442,13 @@ class AgentTools:
             raise AgentToolError("AGENT_TOOL_FAILED", "Extraction output failed validation.", stage="extraction", retryable=True,
                                  failure_category=_failure_category(exc)) from None
         except Exception as exc:
-            raise AgentToolError("AGENT_TOOL_FAILED", "The requested agent operation failed safely.",
+            from ..llm.hosted import HostedGenerationError
+            rejected_generation = isinstance(exc, HostedGenerationError)
+            raise AgentToolError("AGENT_TOOL_FAILED",
+                                 "The model output did not match the required schema." if rejected_generation else
+                                 "The requested agent operation failed safely.",
+                                 stage="extraction" if rejected_generation else None,
+                                 retryable=rejected_generation,
                                  failure_category=_failure_category(exc)) from None
         try:
             observations = list(deduplicate_results(results))
@@ -599,7 +616,13 @@ class AgentTools:
         except ValidationError:
             raise AgentToolError("AGENT_TOOL_FAILED", "Selection output failed validation.", stage="selection", retryable=True) from None
         except Exception as exc:
-            raise AgentToolError("AGENT_TOOL_FAILED", "The requested agent operation failed safely.",
+            from ..llm.hosted import HostedGenerationError
+            rejected_generation = isinstance(exc, HostedGenerationError)
+            raise AgentToolError("AGENT_TOOL_FAILED",
+                                 "The model output did not match the required schema." if rejected_generation else
+                                 "The requested agent operation failed safely.",
+                                 stage="selection" if rejected_generation else None,
+                                 retryable=rejected_generation,
                                  failure_category=_failure_category(exc)) from None
         try:
             result = proposal if isinstance(proposal, Proposal) else Proposal.model_validate(proposal)

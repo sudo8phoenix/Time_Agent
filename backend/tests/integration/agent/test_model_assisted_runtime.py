@@ -167,3 +167,85 @@ def test_model_assisted_runtime_builds_all_role_adapters_without_injected_model(
         assert fixture.calls == ["extraction", "schedule", "selection"]
     finally:
         fixture.cleanup()
+
+
+def test_planner_http_rejection_has_durable_safe_diagnostics(model_assisted_runtime, monkeypatch):
+    from app.db.models import AgentStep, AgentToolCall
+    from app.llm.hosted import HostedRequestError
+    from app.llm.metrics import record_provider_request
+    def reject(_kwargs):
+        record_provider_request('groq', admission_ms=1, transport_ms=2, admitted=True,
+                                status=400, error_code='json_validate_failed')
+        raise HostedRequestError('private provider response')
+    _install_planner(monkeypatch, reject)
+    fixture = RuntimeFixture()
+    try:
+        result = _run(fixture, model_assisted_runtime, checkpointer=MemorySaver())
+        assert result['state'] == 'failed'
+        assert result['error_code'] == 'MODEL_REQUEST_FAILED'
+        with session_factory() as db:
+            run = db.scalar(select(AgentRun).where(AgentRun.job_id == fixture.job_id))
+            call = db.scalar(select(AgentToolCall).join(AgentStep).where(
+                AgentStep.run_id == run.id, AgentToolCall.tool_name == 'planner'))
+            assert call.state == 'failed'
+            metrics = call.sanitized_output_summary['provider_metrics']['groq']
+            assert metrics['http_status_counts'] == {'400': 1}
+            assert metrics['last_error_code'] == 'json_validate_failed'
+            assert 'private' not in str(call.sanitized_output_summary)
+            assert fixture.calls == []
+    finally:
+        fixture.cleanup()
+
+
+def test_daily_quota_failure_preserves_category_and_extraction_stage(model_assisted_runtime, monkeypatch):
+    from app.llm.hosted import HostedQuotaError
+    _install_planner(monkeypatch, lambda kwargs: kwargs['user']['legal_actions'][0])
+    fixture = RuntimeFixture()
+    def exhausted(**kwargs):
+        raise HostedQuotaError('private provider quota detail')
+    fixture.model = exhausted
+    try:
+        result = _run(fixture, model_assisted_runtime, checkpointer=MemorySaver())
+        assert result['state'] == 'failed'
+        assert result['error_code'] == 'MODEL_QUOTA_EXHAUSTED'
+        assert result['stage'] == 'extract'
+        with session_factory() as db:
+            job = db.get(Job, fixture.job_id)
+            assert job.stage == 'extract'
+            assert job.error_code == 'MODEL_QUOTA_EXHAUSTED'
+            assert job.proposal_count == job.extracted_count == 0
+    finally:
+        fixture.cleanup()
+
+
+def test_provider_generation_rejection_is_retried_as_a_charged_child_task(model_assisted_runtime, monkeypatch):
+    from app.db.models import AgentTask
+    from app.llm.hosted import HostedGenerationError
+    _install_planner(monkeypatch, lambda kwargs: kwargs['user']['legal_actions'][0])
+    fixture = RuntimeFixture()
+    original = fixture.model
+    attempts = []
+    def model(**kwargs):
+        if 'observations' in kwargs.get('schema', {}).get('properties', {}):
+            attempts.append(1)
+            if len(attempts) == 1:
+                raise HostedGenerationError('private rejected generation')
+        return original(**kwargs)
+    fixture.model = model
+    try:
+        result = _run(fixture, model_assisted_runtime, checkpointer=MemorySaver())
+        assert result['state'] == 'ready_for_review'
+        assert len(attempts) == 2
+        with session_factory() as db:
+            run = db.scalar(select(AgentRun).where(AgentRun.job_id == fixture.job_id))
+            tasks = list(db.scalars(select(AgentTask).where(
+                AgentTask.run_id == run.id, AgentTask.agent_role == 'extraction').order_by(AgentTask.attempt)))
+            assert [(t.attempt, t.status) for t in tasks] == [(1, 'failed'), (2, 'succeeded')]
+            assert [t.actual_usage['model_calls'] for t in tasks] == [1, 1]
+            assert run.counters['extraction_calls'] == 2
+            assert run.counters['corrective_retries'] == 1
+            assert db.scalar(select(func.count()).select_from(ProgressEvent).join(
+                Observation, ProgressEvent.observation_id == Observation.id).where(
+                Observation.job_id == fixture.job_id)) == 0
+    finally:
+        fixture.cleanup()

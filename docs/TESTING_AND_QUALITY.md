@@ -1,12 +1,28 @@
 # Testing and measured quality
 
-Maintained testing record, updated 22 October 2026. Results below distinguish
+Maintained testing record, updated 26 October 2026. Results below distinguish
 software regression checks, small model studies and incomplete release acceptance.
 Full raw captures, execution logs, screenshots, handoffs and the detailed historical
-checklist remain local under ignored paths. Small consumed regression fixtures and
+checklist remain local. The curated four-model evidence listed in the
+[push checklist](BRANCH_PUSH_CHECKLIST.md) is the publication exception. Small consumed regression fixtures and
 the executable evaluation contracts remain in Git.
 
-## Latest model configuration and prompting comparison
+## Four-model role rehearsal — 26 October 2026
+
+The [role comparison](FOUR_MODEL_ROLE_COMPARISON.md) completed 120 selections
+across 16 worker pairs and ranks 64 composed assignments. All 120 proposals
+passed validation; 118 matched the declared identity/abstention targets. DeepSeek
+and GPT-OSS 120B selection each scored 30/30; Qwen and GPT-OSS 20B scored 29/30.
+DeepSeek's updated-adapter planner passed 0/3 stages; the Groq planners passed
+3/3 each. These are single-report role results, not 64 independent graph runs.
+
+The branch audit ran 204 focused unit checks for provider boundaries, planner,
+failure categories, metrics, queue admission and hierarchy. Frontend typecheck is
+reported in the [push checklist](BRANCH_PUSH_CHECKLIST.md). No database-backed
+integration suite or live provider call was rerun during this documentation audit.
+Historical full-suite counts below retain their original scope and date.
+
+## Earlier model configuration and prompting workflow comparison
 
 | Configuration | Exact planned reports | Key1 / key2 exact | All report attempts | Median completed report time | Known latest-cohort cost | Below 120s |
 |---|---:|---:|---:|---:|---:|---:|

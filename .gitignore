@@ -60,6 +60,9 @@ frontend/.playwright-compat-*/
 !/docs/MODEL_PROMPT_CATALOG.md
 !/docs/MODEL_COMPARISON_CHECKLIST.md
 !/docs/model-generation-settings.md
+!/docs/BRANCH_PUSH_CHECKLIST.md
+!/docs/FOUR_MODEL_ROLE_COMPARISON.md
+!/docs/gonka-role-comparison.md
 !/docs/stage-specification-v1.md
 !/docs/model-call-authority-inventory.md
 !/docs/EVALUATION_RESEARCH_REPORT.md

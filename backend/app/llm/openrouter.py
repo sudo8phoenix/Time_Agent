@@ -18,6 +18,14 @@ _MAX_TIMEOUT_SECONDS = 900
 
 
 class OpenRouterChatAdapter:
+    endpoint = _ENDPOINT
+    provider_name = "openrouter"
+    provider_label = "OpenRouter"
+    max_output_tokens = _MAX_OUTPUT_TOKENS
+
+    @staticmethod
+    def _normalize_content(content: str) -> str:
+        return content
     def __init__(self, model: str | None, *, bearer_token: str | None,
                  timeout: float = 120, max_retries: int = 0,
                  transport: Transport | None = None):
@@ -53,7 +61,7 @@ class OpenRouterChatAdapter:
             "model": self.model,
             "messages": [{"role": "system", "content": system + "\nReturn only JSON matching this schema: " + json.dumps(schema)}, {"role": "user", "content": user}],
             "temperature": temperature,
-            "max_tokens": min(requested_output, _MAX_OUTPUT_TOKENS),
+            "max_tokens": min(requested_output, self.max_output_tokens),
             "stream": False,
         }
         prompt_hash = _hash({"system": system, "user": user})
@@ -61,38 +69,38 @@ class OpenRouterChatAdapter:
         started = time.monotonic()
         for attempt in range(self.max_retries + 1):
             try:
-                status, body = self._transport("POST", _ENDPOINT, payload, self.timeout,
+                status, body = self._transport("POST", self.endpoint, payload, self.timeout,
                     {"Authorization": f"Bearer {self._token}"})
             except (TimeoutError, OSError, ValueError) as exc:
                 if attempt < self.max_retries:
                     continue
-                raise OllamaTransportError("OpenRouter request timed out or failed") from exc
+                raise OllamaTransportError(f"{self.provider_label} request timed out or failed") from exc
             if status >= 500 and attempt < self.max_retries:
                 continue
             from .hosted import raise_for_status
-            raise_for_status("openrouter", status)
+            raise_for_status(self.provider_name, status)
             try:
                 if (not isinstance(body, Mapping) or not isinstance(body.get("choices"), list)
                         or len(body["choices"]) != 1):
-                    raise OllamaResponseError("OpenRouter returned an invalid JSON response")
+                    raise OllamaResponseError(f"{self.provider_label} returned an invalid JSON response")
                 choice = body["choices"][0]
                 if not isinstance(choice, Mapping) or not isinstance(choice.get("message"), Mapping):
-                    raise OllamaResponseError("OpenRouter returned an invalid JSON response")
+                    raise OllamaResponseError(f"{self.provider_label} returned an invalid JSON response")
                 if choice.get("message", {}).get("refusal"):
-                    raise OllamaResponseError("OpenRouter refused the request")
+                    raise OllamaResponseError(f"{self.provider_label} refused the request")
                 if choice.get("finish_reason") != "stop":
-                    raise OllamaResponseError("OpenRouter response was incomplete")
-                value = json.loads(choice["message"]["content"])
+                    raise OllamaResponseError(f"{self.provider_label} response was incomplete")
+                value = json.loads(self._normalize_content(choice["message"]["content"]))
                 if not isinstance(value, dict):
                     raise ValueError("Expected JSON object")
                 _validate_schema(value, schema)
             except OllamaResponseError:
                 raise
             except (KeyError, IndexError, TypeError, ValueError) as exc:
-                raise OllamaResponseError("OpenRouter returned an invalid JSON response") from exc
-            return LLMResult(value, str(body.get("model", self.model)), None, "openrouter",
+                raise OllamaResponseError(f"{self.provider_label} returned an invalid JSON response") from exc
+            return LLMResult(value, str(body.get("model", self.model)), None, self.provider_name,
                 int((time.monotonic() - started) * 1000), settings_hash, prompt_hash)
-        raise OllamaTransportError("OpenRouter request failed")
+        raise OllamaTransportError(f"{self.provider_label} request failed")
 
 
 def _validate_schema(value: dict[str, Any], schema: Mapping[str, Any]) -> None:

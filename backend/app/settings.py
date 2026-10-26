@@ -11,22 +11,24 @@ class Settings(BaseSettings):
     database_url: str = "postgresql+psycopg://progress:progress@127.0.0.1:5432/progress"
     ollama_base_url: str = "http://127.0.0.1:11434"
     ollama_model: str = "qwen3.5:4b"
-    llm_provider: Literal["ollama", "groq", "openrouter"] = "ollama"
+    llm_provider: Literal["ollama", "groq", "openrouter", "gonka"] = "ollama"
     groq_api_key: SecretStr | None = None
     groq_api_key_1: SecretStr | None = None
     groq_api_key_2: SecretStr | None = None
     groq_account_scopes_enabled: bool = False
     groq_model: str = "openai/gpt-oss-20b"
     openrouter_api_key: SecretStr | None = None
+    gonka_broker_llm: SecretStr | None = None
+    gonka_model: str | None = None
     # Deliberately unset: OpenRouter model IDs must be selected explicitly.
     openrouter_model: str | None = None
-    orchestrator_provider: Literal["ollama", "groq", "openrouter"] | None = None
+    orchestrator_provider: Literal["ollama", "groq", "openrouter", "gonka"] | None = None
     orchestrator_model: str | None = None
     orchestrator_key_slot: Literal[0, 1, 2] = 0
-    extraction_provider: Literal["ollama", "groq", "openrouter"] | None = None
+    extraction_provider: Literal["ollama", "groq", "openrouter", "gonka"] | None = None
     extraction_model: str | None = None
     extraction_key_slot: Literal[0, 1, 2] = 0
-    selection_provider: Literal["ollama", "groq", "openrouter"] | None = None
+    selection_provider: Literal["ollama", "groq", "openrouter", "gonka"] | None = None
     selection_model: str | None = None
     selection_key_slot: Literal[0, 1, 2] = 0
     report_model_timeout_seconds: int = Field(default=360, ge=30, le=900)

@@ -15,8 +15,9 @@ class WorkerShutdown(Exception):
     pass
 
 def run_once(db: Session, pipeline: Pipeline, *, should_stop: Callable[[], bool] | None = None,
-             heartbeat_callback: Callable[[object, str], bool] | None = None) -> bool:
-    claimed = claim_job(db)
+             heartbeat_callback: Callable[[object, str], bool] | None = None,
+             admission_check: Callable | None = None) -> bool:
+    claimed = claim_job(db, admission_check=admission_check)
     if not claimed:
         return False
     job, token = claimed
@@ -103,7 +104,8 @@ def run_once(db: Session, pipeline: Pipeline, *, should_stop: Callable[[], bool]
 
 def run_loop(session_factory: Callable[[], Session], pipeline: Pipeline, *,
              should_stop: Callable[[], bool], poll_seconds: float = 2.0,
-             additional_work: Callable[[], bool] | None = None) -> None:
+             additional_work: Callable[[], bool] | None = None,
+             admission_check: Callable | None = None) -> None:
     """Poll durably; heartbeat sessions stay independent from job processing."""
     import time
 
@@ -116,7 +118,7 @@ def run_loop(session_factory: Callable[[], Session], pipeline: Pipeline, *,
     while not should_stop():
         with session_factory() as db:
             worked = run_once(db, pipeline, should_stop=should_stop,
-                              heartbeat_callback=beat)
+                              heartbeat_callback=beat, admission_check=admission_check)
         if additional_work and not should_stop():
             worked = additional_work() or worked
         if not worked and not should_stop():

@@ -16,14 +16,16 @@ base provider/model according to runtime resolution.
 | `DATABASE_URL` | `postgresql+psycopg://progress:progress@127.0.0.1:5432/progress` | Application PostgreSQL connection; use isolated URLs for tests |
 | `OLLAMA_BASE_URL` | `http://127.0.0.1:11434` | Server-side runtime setting; see related guide below |
 | `OLLAMA_MODEL` | `qwen3.5:4b` | Server-side runtime setting; see related guide below |
-| `LLM_PROVIDER` | `ollama` | Server-side runtime setting; see related guide below |
+| `LLM_PROVIDER` | `ollama` | Base provider: ollama, groq, openrouter or gonka |
 | `GROQ_API_KEY` | `unset` | Server-side runtime setting; see related guide below |
 | `GROQ_API_KEY_1` | `unset` | Server-side runtime setting; see related guide below |
 | `GROQ_API_KEY_2` | `unset` | Server-side runtime setting; see related guide below |
 | `GROQ_ACCOUNT_SCOPES_ENABLED` | `False` | Opt-in reviewed account-scope admission policy |
 | `GROQ_MODEL` | `openai/gpt-oss-20b` | Server-side runtime setting; see related guide below |
 | `OPENROUTER_API_KEY` | `unset` | Server-side runtime setting; see related guide below |
-| `OPENROUTER_MODEL` | `unset` | Server-side runtime setting; see related guide below |
+| `OPENROUTER_MODEL` | `unset` | Explicit OpenRouter model ID |
+| `GONKA_BROKER_LLM` | `unset` | Private Gonka Broker key; shared across Gonka roles |
+| `GONKA_MODEL` | `unset` | Explicit Gonka model ID; no implicit model default |
 | `ORCHESTRATOR_PROVIDER` | `unset` | Server-side runtime setting; see related guide below |
 | `ORCHESTRATOR_MODEL` | `unset` | Server-side runtime setting; see related guide below |
 | `ORCHESTRATOR_KEY_SLOT` | `0` | Server-side runtime setting; see related guide below |
@@ -45,13 +47,19 @@ base provider/model according to runtime resolution.
 | `AGENT_HIERARCHY_ENABLED` | `False` | Select V2 and durable new conversations |
 | `ORCHESTRATOR_MODEL_ASSISTED` | `False` | Enable legal-action model planner |
 
+Gonka targets `https://proxy.gonkabroker.com/v1/chat/completions`. Its planner
+allowlist is `MiniMaxAI/MiniMax-M2.7` and `deepseek-ai/DeepSeek-V4-Flash-0731`.
+Groq planners support `openai/gpt-oss-20b`, `openai/gpt-oss-120b` and
+`qwen/qwen3.8-27b`. An allowed configuration is not evidence of successful model
+behavior; see the [role comparison](FOUR_MODEL_ROLE_COMPARISON.md).
+
 ## Operational relationships
 
 `GROQ_API_KEY` is slot 0; `_1` and `_2` are slots 1 and 2. Different slots do not
 prove independent account quota. Do not enable account scopes without the reviewed
 procedure in [provider capacity](provider-capacity.md).
 
-Provider keys stay on the server. OpenRouter requires an explicit model ID; the
+Provider keys stay on the server. OpenRouter and Gonka require an explicit model ID; the
 planner has an allowlist distinct from extraction/selection support. Report and
 conversation timeouts include admission waits. Ollama model names must match an
 installed endpoint model. See [generation settings](model-generation-settings.md)

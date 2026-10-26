@@ -81,3 +81,17 @@ def test_planner_requires_exact_pinned_model_id():
                                orchestrator_model=" nvidia/nemotron-3-super-120b-a12b:free ")
     with pytest.raises(PlannerConfigurationError):
         create_planner(settings, timeout=17, adapter_factory=lambda *args, **kwargs: Adapter())
+
+
+def test_gonka_planner_accepts_only_pinned_models():
+    settings = SimpleNamespace(orchestrator_provider="gonka",
+                               orchestrator_model="MiniMaxAI/MiniMax-M2.7")
+    assert create_planner(settings, timeout=17,
+        adapter_factory=lambda *args, **kwargs: Adapter()) is not None
+    settings.orchestrator_model = "deepseek-ai/DeepSeek-V4-Flash-0731"
+    assert create_planner(settings, timeout=17,
+        adapter_factory=lambda *args, **kwargs: Adapter()) is not None
+    settings.orchestrator_model = "zai-org/GLM-5.3-Flash"
+    with pytest.raises(PlannerConfigurationError):
+        create_planner(settings, timeout=17,
+            adapter_factory=lambda *args, **kwargs: Adapter())

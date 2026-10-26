@@ -1,6 +1,6 @@
 # Provider capacity and account scopes
 
-Groq and OpenRouter use database-backed admission shared by roles and processes
+Groq, OpenRouter and Gonka use database-backed admission shared by roles and processes
 using the same PostgreSQL database. Waits and transport fit within finite request
 budgets. There are no automatic transport retries or provider/model fallback.
 External clients and separate databases are outside this coordinator.
@@ -51,6 +51,28 @@ This policy has isolated PostgreSQL regression coverage and has **not** been
 activated on the main application database. No production throughput improvement
 is claimed. Rollback requires reviewed reconciliation of balances and workers;
 do not delete the marker or reset usage. See [testing](TESTING_AND_QUALITY.md).
+
+## Queue admission and Gonka
+
+The report worker checks known Groq/OpenRouter cooldown and exhausted-request
+reset state before claiming a queued job. A deferred claim does not acquire a
+lease, spend an attempt or start the analysis deadline. The check uses retained
+role assignments when available. It does not predict every provider quota, and
+the earliest queued job can delay later jobs while its provider is cooling down.
+
+Gonka shares transport admission across roles/processes using the same database,
+with a configured 10.5-second interval. The process-local coordinator uses the
+same interval. These intervals are engineering pacing, not verified account
+entitlements. Gonka is currently absent from the report queue pre-check, so its
+waits occur after a claim and consume the request budget. The detailed numeric
+provider-metrics collector also currently covers Groq/OpenRouter only; do not
+interpret absent Gonka metrics as zero usage or zero wait.
+
+Groq HTTP 400 with `json_validate_failed` is a generation validation failure;
+extraction/selection may use the existing single corrective graph attempt. This
+is distinct from an automatic transport retry. Generic HTTP rejection, rate
+limits and daily quotas do not enter this correction path. Preserve original
+attempts, deadlines and provider balances. See [generation settings](model-generation-settings.md).
 
 ---
 

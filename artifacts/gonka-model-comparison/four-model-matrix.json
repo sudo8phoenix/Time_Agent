@@ -1,0 +1,5584 @@
+{
+  "input": "artifacts/gonka-model-comparison/input.txt",
+  "schedule": "data/review/gt10-five-entry/schedule.csv",
+  "models": {
+    "qwen": [
+      "groq",
+      "qwen/qwen3.8-27b"
+    ],
+    "gpt120": [
+      "groq",
+      "openai/gpt-oss-120b"
+    ],
+    "gpt20": [
+      "groq",
+      "openai/gpt-oss-20b"
+    ],
+    "deepseek": [
+      "gonka",
+      "deepseek-ai/DeepSeek-V4-Flash-0731"
+    ]
+  },
+  "planner": {
+    "qwen": {
+      "intake": {
+        "action": "intake",
+        "elapsed_seconds": 0.16
+      },
+      "analysis": {
+        "action": "analysis",
+        "elapsed_seconds": 0.323
+      },
+      "review": {
+        "action": "review",
+        "elapsed_seconds": 0.38
+      }
+    },
+    "gpt120": {
+      "intake": {
+        "action": "intake",
+        "elapsed_seconds": 2.883
+      },
+      "analysis": {
+        "action": "analysis",
+        "elapsed_seconds": 2.569
+      },
+      "review": {
+        "action": "review",
+        "elapsed_seconds": 2.678
+      }
+    },
+    "gpt20": {
+      "intake": {
+        "action": "intake",
+        "elapsed_seconds": 2.531
+      },
+      "analysis": {
+        "action": "analysis",
+        "elapsed_seconds": 2.589
+      },
+      "review": {
+        "action": "review",
+        "elapsed_seconds": 2.472
+      }
+    },
+    "deepseek": {
+      "intake": {
+        "error": "OllamaResponseError: Gonka returned an invalid JSON response",
+        "elapsed_seconds": 2.094
+      },
+      "analysis": {
+        "error": "OllamaResponseError: Gonka response was incomplete",
+        "elapsed_seconds": 6.965
+      },
+      "review": {
+        "error": "OllamaResponseError: Gonka returned an invalid JSON response",
+        "elapsed_seconds": 2.964
+      }
+    }
+  },
+  "extraction": {
+    "qwen": {
+      "observations": [
+        {
+          "discipline": "structural",
+          "work_type": "rebar_installation",
+          "event_type": "actual_progress",
+          "observed_status": "in_progress",
+          "area": null,
+          "asset_tags": [
+            "SUP-GF-01"
+          ],
+          "explicit_activity_id": null,
+          "work_date": null,
+          "date_basis": "unknown",
+          "quantity": "300",
+          "quantity_kind": "delta",
+          "unit": "kg",
+          "raw_unit": "kg",
+          "reported_percent": null,
+          "actual_start": null,
+          "actual_finish": null,
+          "blocker": null,
+          "summary": "Installed 300 kg of column reinforcement at SUP-GF-01; activity remains in progress.",
+          "evidence": [
+            {
+              "fields": [
+                "event_type",
+                "quantity",
+                "unit",
+                "asset_tags",
+                "work_date"
+              ],
+              "fragment_id": "f1",
+              "quote": "1. Column Reinforcement \u2014 SUP-GF-01:\nThe steel fixing crew installed an additional 300 kg of column reinforcement today. This is today's quantity, not the cumulative total. Bar spacing and concrete cover were checked by the site engineer. Column reinforcement remains in progress; the entire activity is not complete."
+            }
+          ],
+          "warnings": [
+            "Work date needs reviewer clarification; unsupported report-context dates were removed.",
+            "Source-stated work constraint has no separate blocker observation; reviewer clarification required."
+          ],
+          "lifecycle_effects": []
+        },
+        {
+          "discipline": "structural",
+          "work_type": "formwork",
+          "event_type": "actual_progress",
+          "observed_status": "in_progress",
+          "area": null,
+          "asset_tags": [
+            "SUP-GF-03"
+          ],
+          "explicit_activity_id": null,
+          "work_date": null,
+          "date_basis": "unknown",
+          "quantity": "60",
+          "quantity_kind": "delta",
+          "unit": "m2",
+          "raw_unit": "m2",
+          "reported_percent": null,
+          "actual_start": null,
+          "actual_finish": null,
+          "blocker": null,
+          "summary": "Installed 60 m2 of slab shuttering at SUP-GF-03; activity remains in progress.",
+          "evidence": [
+            {
+              "fields": [
+                "event_type",
+                "quantity",
+                "unit",
+                "asset_tags",
+                "work_date"
+              ],
+              "fragment_id": "f1",
+              "quote": "2. Slab Shuttering \u2014 SUP-GF-03:\nThe formwork crew installed an additional 60 m2 of ground-floor slab shuttering today. This is today's installed area. The crew checked panel alignment and support stability in the completed portion. Shuttering remains in progress, with further areas pending installation."
+            }
+          ],
+          "warnings": [
+            "Work date needs reviewer clarification; unsupported report-context dates were removed.",
+            "Source-stated work constraint has no separate blocker observation; reviewer clarification required."
+          ],
+          "lifecycle_effects": []
+        },
+        {
+          "discipline": "structural",
+          "work_type": "concrete_pour",
+          "event_type": "no_work",
+          "observed_status": "not_started",
+          "area": null,
+          "asset_tags": [
+            "SUP-GF-02"
+          ],
+          "explicit_activity_id": null,
+          "work_date": null,
+          "date_basis": "unknown",
+          "quantity": null,
+          "quantity_kind": "none",
+          "unit": null,
+          "raw_unit": null,
+          "reported_percent": null,
+          "actual_start": null,
+          "actual_finish": null,
+          "blocker": "Remaining column reinforcement and formwork were not ready for inspection",
+          "summary": "No column concrete placed at SUP-GF-02; pour postponed due to reinforcement and formwork not ready for inspection.",
+          "evidence": [
+            {
+              "fields": [
+                "event_type",
+                "blocker",
+                "asset_tags",
+                "work_date"
+              ],
+              "fragment_id": "f1",
+              "quote": "3. Column Concreting \u2014 SUP-GF-02:\nNo column concrete was placed today. The planned pour was postponed because the remaining column reinforcement and formwork were not ready for inspection. No actual start or finish is reported for column concreting."
+            }
+          ],
+          "warnings": [
+            "Work date needs reviewer clarification; unsupported report-context dates were removed.",
+            "Source-stated work constraint has no separate blocker observation; reviewer clarification required."
+          ],
+          "lifecycle_effects": []
+        },
+        {
+          "discipline": "structural",
+          "work_type": "rebar_installation",
+          "event_type": "no_work",
+          "observed_status": "not_started",
+          "area": null,
+          "asset_tags": [
+            "SUP-GF-04"
+          ],
+          "explicit_activity_id": null,
+          "work_date": null,
+          "date_basis": "unknown",
+          "quantity": null,
+          "quantity_kind": "none",
+          "unit": null,
+          "raw_unit": null,
+          "reported_percent": null,
+          "actual_start": null,
+          "actual_finish": null,
+          "blocker": null,
+          "summary": "Slab reinforcement installation at SUP-GF-04 has not started; 800 kg of bars moved to staging area but not installed.",
+          "evidence": [
+            {
+              "fields": [
+                "event_type",
+                "asset_tags",
+                "work_date"
+              ],
+              "fragment_id": "f1",
+              "quote": "4. Slab Reinforcement \u2014 SUP-GF-04:\nSlab reinforcement installation has not started. Workers moved 800 kg of reinforcement bars from the laydown yard to a temporary staging area near the ground floor. These bars have not been fixed in the slab and must not be counted as installed reinforcement."
+            }
+          ],
+          "warnings": [
+            "Work date needs reviewer clarification; unsupported report-context dates were removed.",
+            "Source-stated work constraint has no separate blocker observation; reviewer clarification required."
+          ],
+          "lifecycle_effects": []
+        },
+        {
+          "discipline": "structural",
+          "work_type": "concrete_pour",
+          "event_type": "no_work",
+          "observed_status": "not_started",
+          "area": null,
+          "asset_tags": [
+            "SUP-GF-05"
+          ],
+          "explicit_activity_id": null,
+          "work_date": null,
+          "date_basis": "unknown",
+          "quantity": null,
+          "quantity_kind": "none",
+          "unit": null,
+          "raw_unit": null,
+          "reported_percent": null,
+          "actual_start": null,
+          "actual_finish": null,
+          "blocker": "Transit mixer access path remained waterlogged throughout the shift",
+          "summary": "No slab concrete placed at SUP-GF-05; pour prevented by waterlogged access path.",
+          "evidence": [
+            {
+              "fields": [
+                "event_type",
+                "blocker",
+                "asset_tags",
+                "work_date"
+              ],
+              "fragment_id": "f1",
+              "quote": "5. Slab Concreting \u2014 SUP-GF-05:\nThe transit mixer access path remained waterlogged throughout the shift. This prevented the planned ground-floor slab concrete pour. No slab concrete was placed today."
+            }
+          ],
+          "warnings": [
+            "Work date needs reviewer clarification; unsupported report-context dates were removed.",
+            "Source-stated work constraint has no separate blocker observation; reviewer clarification required."
+          ],
+          "lifecycle_effects": []
+        },
+        {
+          "discipline": "structural",
+          "work_type": "other",
+          "event_type": "actual_progress",
+          "observed_status": "in_progress",
+          "area": null,
+          "asset_tags": [
+            "SUP-GF-01"
+          ],
+          "explicit_activity_id": null,
+          "work_date": null,
+          "date_basis": "unknown",
+          "quantity": null,
+          "quantity_kind": "none",
+          "unit": null,
+          "raw_unit": null,
+          "reported_percent": null,
+          "actual_start": null,
+          "actual_finish": null,
+          "blocker": null,
+          "summary": "Engineer inspected column reinforcement at SUP-GF-01; no first-floor work performed.",
+          "evidence": [
+            {
+              "fields": [
+                "event_type",
+                "asset_tags",
+                "work_date"
+              ],
+              "fragment_id": "f1",
+              "quote": "6. Inspection and Handover:\nThe engineer inspected the column reinforcement installed during today's shift. This inspection does not establish completion of the whole column reinforcement activity. A subcontractor verbally suggested that first-floor work could begin tomorrow, but no first-floor work was performed or measured today."
+            }
+          ],
+          "warnings": [
+            "Work date needs reviewer clarification; unsupported report-context dates were removed.",
+            "Source-stated work constraint has no separate blocker observation; reviewer clarification required."
+          ],
+          "lifecycle_effects": []
+        }
+      ],
+      "validation_errors": [],
+      "elapsed_seconds": 3.953
+    },
+    "gpt120": {
+      "observations": [
+        {
+          "discipline": "civil",
+          "work_type": "rebar_installation",
+          "event_type": "actual_progress",
+          "observed_status": "in_progress",
+          "area": null,
+          "asset_tags": [
+            "SUP-GF-01"
+          ],
+          "explicit_activity_id": null,
+          "work_date": null,
+          "date_basis": "unknown",
+          "quantity": "300",
+          "quantity_kind": "delta",
+          "unit": "kg",
+          "raw_unit": null,
+          "reported_percent": null,
+          "actual_start": null,
+          "actual_finish": null,
+          "blocker": null,
+          "summary": "The steel fixing crew installed an additional 300 kg of column reinforcement today. This is today's quantity, not the cumulative total. Bar spacing and concrete cover were checked by the site engineer. Column reinforcement remains in progress; the entire activity is not complete.",
+          "evidence": [
+            {
+              "fields": [
+                "kind",
+                "endpoint"
+              ],
+              "fragment_id": "f1",
+              "quote": "1. Column Reinforcement \u2014 SUP-GF-01:\nThe steel fixing crew installed an additional 300 kg of column reinforcement today. This is today's quantity, not the cumulative total. Bar spacing and concrete cover were checked by the site engineer. Column reinforcement remains in progress; the entire activity is not complete."
+            }
+          ],
+          "warnings": [],
+          "lifecycle_effects": []
+        },
+        {
+          "discipline": "civil",
+          "work_type": "formwork",
+          "event_type": "actual_progress",
+          "observed_status": "in_progress",
+          "area": null,
+          "asset_tags": [
+            "SUP-GF-03"
+          ],
+          "explicit_activity_id": null,
+          "work_date": null,
+          "date_basis": "unknown",
+          "quantity": "60",
+          "quantity_kind": "delta",
+          "unit": "m2",
+          "raw_unit": null,
+          "reported_percent": null,
+          "actual_start": null,
+          "actual_finish": null,
+          "blocker": null,
+          "summary": "2. Slab Shuttering \u2014 SUP-GF-03:\nThe formwork crew installed an additional 60 m2 of ground-floor slab shuttering today. This is today's installed area. The crew checked panel alignment and support stability in the completed portion. Shuttering remains in progress, with further areas pending installation.",
+          "evidence": [
+            {
+              "fields": [
+                "kind",
+                "endpoint"
+              ],
+              "fragment_id": "f1",
+              "quote": "2. Slab Shuttering \u2014 SUP-GF-03:\nThe formwork crew installed an additional 60 m2 of ground-floor slab shuttering today. This is today's installed area. The crew checked panel alignment and support stability in the completed portion. Shuttering remains in progress, with further areas pending installation."
+            }
+          ],
+          "warnings": [],
+          "lifecycle_effects": []
+        },
+        {
+          "discipline": "civil",
+          "work_type": "concrete_pour",
+          "event_type": "no_work",
+          "observed_status": "not_started",
+          "area": null,
+          "asset_tags": [
+            "SUP-GF-02"
+          ],
+          "explicit_activity_id": null,
+          "work_date": null,
+          "date_basis": "unknown",
+          "quantity": null,
+          "quantity_kind": "none",
+          "unit": null,
+          "raw_unit": null,
+          "reported_percent": null,
+          "actual_start": null,
+          "actual_finish": null,
+          "blocker": null,
+          "summary": "3. Column Concreting \u2014 SUP-GF-02:\nNo column concrete was placed today. The planned pour was postponed because the remaining column reinforcement and formwork were not ready for inspection. No actual start or finish is reported for column concreting.",
+          "evidence": [
+            {
+              "fields": [
+                "kind",
+                "endpoint"
+              ],
+              "fragment_id": "f1",
+              "quote": "3. Column Concreting \u2014 SUP-GF-02:\nNo column concrete was placed today. The planned pour was postponed because the remaining column reinforcement and formwork were not ready for inspection. No actual start or finish is reported for column concreting."
+            }
+          ],
+          "warnings": [],
+          "lifecycle_effects": []
+        },
+        {
+          "discipline": "civil",
+          "work_type": "rebar_installation",
+          "event_type": "blocker",
+          "observed_status": "blocked",
+          "area": null,
+          "asset_tags": [
+            "SUP-GF-02"
+          ],
+          "explicit_activity_id": null,
+          "work_date": null,
+          "date_basis": "unknown",
+          "quantity": null,
+          "quantity_kind": "none",
+          "unit": null,
+          "raw_unit": null,
+          "reported_percent": null,
+          "actual_start": null,
+          "actual_finish": null,
+          "blocker": "remaining column reinforcement and formwork were not ready for inspection",
+          "summary": "3. Column Concreting \u2014 SUP-GF-02:\nNo column concrete was placed today. The planned pour was postponed because the remaining column reinforcement and formwork were not ready for inspection. No actual start or finish is reported for column concreting.",
+          "evidence": [
+            {
+              "fields": [
+                "kind",
+                "endpoint"
+              ],
+              "fragment_id": "f1",
+              "quote": "3. Column Concreting \u2014 SUP-GF-02:\nNo column concrete was placed today. The planned pour was postponed because the remaining column reinforcement and formwork were not ready for inspection. No actual start or finish is reported for column concreting."
+            }
+          ],
+          "warnings": [],
+          "lifecycle_effects": []
+        },
+        {
+          "discipline": "civil",
+          "work_type": "rebar_installation",
+          "event_type": "no_work",
+          "observed_status": "not_started",
+          "area": null,
+          "asset_tags": [
+            "SUP-GF-04"
+          ],
+          "explicit_activity_id": null,
+          "work_date": null,
+          "date_basis": "unknown",
+          "quantity": null,
+          "quantity_kind": "none",
+          "unit": null,
+          "raw_unit": null,
+          "reported_percent": null,
+          "actual_start": null,
+          "actual_finish": null,
+          "blocker": null,
+          "summary": "4. Slab Reinforcement \u2014 SUP-GF-04:\nSlab reinforcement installation has not started. Workers moved 800 kg of reinforcement bars from the laydown yard to a temporary staging area near the ground floor. These bars have not been fixed in the slab and must not be counted as installed reinforcement.",
+          "evidence": [
+            {
+              "fields": [
+                "kind",
+                "endpoint"
+              ],
+              "fragment_id": "f1",
+              "quote": "4. Slab Reinforcement \u2014 SUP-GF-04:\nSlab reinforcement installation has not started. Workers moved 800 kg of reinforcement bars from the laydown yard to a temporary staging area near the ground floor. These bars have not been fixed in the slab and must not be counted as installed reinforcement."
+            }
+          ],
+          "warnings": [],
+          "lifecycle_effects": []
+        },
+        {
+          "discipline": "civil",
+          "work_type": "concrete_pour",
+          "event_type": "no_work",
+          "observed_status": "not_started",
+          "area": null,
+          "asset_tags": [
+            "SUP-GF-05"
+          ],
+          "explicit_activity_id": null,
+          "work_date": null,
+          "date_basis": "unknown",
+          "quantity": null,
+          "quantity_kind": "none",
+          "unit": null,
+          "raw_unit": null,
+          "reported_percent": null,
+          "actual_start": null,
+          "actual_finish": null,
+          "blocker": null,
+          "summary": "5. Slab Concreting \u2014 SUP-GF-05:\nThe transit mixer access path remained waterlogged throughout the shift. This prevented the planned ground-floor slab concrete pour. No slab concrete was placed today.",
+          "evidence": [
+            {
+              "fields": [
+                "kind",
+                "endpoint"
+              ],
+              "fragment_id": "f1",
+              "quote": "5. Slab Concreting \u2014 SUP-GF-05:\nThe transit mixer access path remained waterlogged throughout the shift. This prevented the planned ground-floor slab concrete pour. No slab concrete was placed today."
+            }
+          ],
+          "warnings": [],
+          "lifecycle_effects": []
+        },
+        {
+          "discipline": "civil",
+          "work_type": "concrete_pour",
+          "event_type": "blocker",
+          "observed_status": "blocked",
+          "area": null,
+          "asset_tags": [
+            "SUP-GF-05"
+          ],
+          "explicit_activity_id": null,
+          "work_date": null,
+          "date_basis": "unknown",
+          "quantity": null,
+          "quantity_kind": "none",
+          "unit": null,
+          "raw_unit": null,
+          "reported_percent": null,
+          "actual_start": null,
+          "actual_finish": null,
+          "blocker": "transit mixer access path remained waterlogged",
+          "summary": "5. Slab Concreting \u2014 SUP-GF-05:\nThe transit mixer access path remained waterlogged throughout the shift. This prevented the planned ground-floor slab concrete pour. No slab concrete was placed today.",
+          "evidence": [
+            {
+              "fields": [
+                "kind",
+                "endpoint"
+              ],
+              "fragment_id": "f1",
+              "quote": "5. Slab Concreting \u2014 SUP-GF-05:\nThe transit mixer access path remained waterlogged throughout the shift. This prevented the planned ground-floor slab concrete pour. No slab concrete was placed today."
+            }
+          ],
+          "warnings": [],
+          "lifecycle_effects": []
+        },
+        {
+          "discipline": "civil",
+          "work_type": "other",
+          "event_type": "inspection",
+          "observed_status": "completed",
+          "area": null,
+          "asset_tags": [
+            "SUP-GF-01"
+          ],
+          "explicit_activity_id": null,
+          "work_date": null,
+          "date_basis": "unknown",
+          "quantity": null,
+          "quantity_kind": "none",
+          "unit": null,
+          "raw_unit": null,
+          "reported_percent": null,
+          "actual_start": null,
+          "actual_finish": null,
+          "blocker": null,
+          "summary": "6. Inspection and Handover:\nThe engineer inspected the column reinforcement installed during today's shift. This inspection does not establish completion of the whole column reinforcement activity. A subcontractor verbally suggested that first-floor work could begin tomorrow, but no first-floor work was performed or measured today.",
+          "evidence": [
+            {
+              "fields": [
+                "kind",
+                "endpoint"
+              ],
+              "fragment_id": "f1",
+              "quote": "6. Inspection and Handover:\nThe engineer inspected the column reinforcement installed during today's shift. This inspection does not establish completion of the whole column reinforcement activity. A subcontractor verbally suggested that first-floor work could begin tomorrow, but no first-floor work was performed or measured today."
+            }
+          ],
+          "warnings": [],
+          "lifecycle_effects": []
+        }
+      ],
+      "validation_errors": [],
+      "elapsed_seconds": 78.224
+    },
+    "gpt20": {
+      "observations": [
+        {
+          "discipline": "structural",
+          "work_type": "rebar_installation",
+          "event_type": "actual_progress",
+          "observed_status": "in_progress",
+          "area": null,
+          "asset_tags": [
+            "SUP-GF-01"
+          ],
+          "explicit_activity_id": null,
+          "work_date": null,
+          "date_basis": "unknown",
+          "quantity": "300",
+          "quantity_kind": "delta",
+          "unit": "kg",
+          "raw_unit": null,
+          "reported_percent": null,
+          "actual_start": null,
+          "actual_finish": null,
+          "blocker": null,
+          "summary": "Column reinforcement installed 300 kg today",
+          "evidence": [
+            {
+              "fields": [
+                "summary"
+              ],
+              "fragment_id": "f1",
+              "quote": "The steel fixing crew installed an additional 300 kg of column reinforcement today. This is today's quantity, not the cumulative total. Bar spacing and concrete cover were checked by the site engineer. Column reinforcement remains in progress; the entire activity is not complete."
+            }
+          ],
+          "warnings": [],
+          "lifecycle_effects": []
+        },
+        {
+          "discipline": "civil",
+          "work_type": "formwork",
+          "event_type": "actual_progress",
+          "observed_status": "in_progress",
+          "area": null,
+          "asset_tags": [
+            "SUP-GF-03"
+          ],
+          "explicit_activity_id": null,
+          "work_date": null,
+          "date_basis": "unknown",
+          "quantity": "60",
+          "quantity_kind": "delta",
+          "unit": "m2",
+          "raw_unit": null,
+          "reported_percent": null,
+          "actual_start": null,
+          "actual_finish": null,
+          "blocker": null,
+          "summary": "Shuttering installed 60 m2 today",
+          "evidence": [
+            {
+              "fields": [
+                "summary"
+              ],
+              "fragment_id": "f1",
+              "quote": "The formwork crew installed an additional 60 m2 of ground-floor slab shuttering today. This is today's installed area. The crew checked panel alignment and support stability in the completed portion. Shuttering remains in progress, with further areas pending installation."
+            }
+          ],
+          "warnings": [],
+          "lifecycle_effects": []
+        },
+        {
+          "discipline": "civil",
+          "work_type": "concrete_pour",
+          "event_type": "no_work",
+          "observed_status": "not_started",
+          "area": null,
+          "asset_tags": [
+            "SUP-GF-02"
+          ],
+          "explicit_activity_id": null,
+          "work_date": null,
+          "date_basis": "unknown",
+          "quantity": null,
+          "quantity_kind": "none",
+          "unit": null,
+          "raw_unit": null,
+          "reported_percent": null,
+          "actual_start": null,
+          "actual_finish": null,
+          "blocker": null,
+          "summary": "No column concrete placed today; planned pour postponed",
+          "evidence": [
+            {
+              "fields": [
+                "summary"
+              ],
+              "fragment_id": "f1",
+              "quote": "No column concrete was placed today. The planned pour was postponed because the remaining column reinforcement and formwork were not ready for inspection. No actual start or finish is reported for column concreting."
+            }
+          ],
+          "warnings": [],
+          "lifecycle_effects": []
+        },
+        {
+          "discipline": "civil",
+          "work_type": "rebar_installation",
+          "event_type": "no_work",
+          "observed_status": "not_started",
+          "area": null,
+          "asset_tags": [
+            "SUP-GF-04"
+          ],
+          "explicit_activity_id": null,
+          "work_date": null,
+          "date_basis": "unknown",
+          "quantity": null,
+          "quantity_kind": "none",
+          "unit": null,
+          "raw_unit": null,
+          "reported_percent": null,
+          "actual_start": null,
+          "actual_finish": null,
+          "blocker": null,
+          "summary": "Slab reinforcement not started; bars moved but not fixed",
+          "evidence": [
+            {
+              "fields": [
+                "summary"
+              ],
+              "fragment_id": "f1",
+              "quote": "Slab reinforcement installation has not started. Workers moved 800 kg of reinforcement bars from the laydown yard to a temporary staging area near the ground floor. These bars have not been fixed in the slab and must not be counted as installed reinforcement."
+            }
+          ],
+          "warnings": [],
+          "lifecycle_effects": []
+        },
+        {
+          "discipline": "civil",
+          "work_type": "concrete_pour",
+          "event_type": "no_work",
+          "observed_status": "not_started",
+          "area": null,
+          "asset_tags": [
+            "SUP-GF-05"
+          ],
+          "explicit_activity_id": null,
+          "work_date": null,
+          "date_basis": "unknown",
+          "quantity": null,
+          "quantity_kind": "none",
+          "unit": null,
+          "raw_unit": null,
+          "reported_percent": null,
+          "actual_start": null,
+          "actual_finish": null,
+          "blocker": null,
+          "summary": "No slab concrete placed due to waterlogged path",
+          "evidence": [
+            {
+              "fields": [
+                "summary"
+              ],
+              "fragment_id": "f1",
+              "quote": "The transit mixer access path remained waterlogged throughout the shift. This prevented the planned ground-floor slab concrete pour. No slab concrete was placed today."
+            }
+          ],
+          "warnings": [],
+          "lifecycle_effects": []
+        },
+        {
+          "discipline": "civil",
+          "work_type": "other",
+          "event_type": "inspection",
+          "observed_status": "completed",
+          "area": null,
+          "asset_tags": [
+            "SUP-GF-01"
+          ],
+          "explicit_activity_id": null,
+          "work_date": null,
+          "date_basis": "unknown",
+          "quantity": null,
+          "quantity_kind": "none",
+          "unit": null,
+          "raw_unit": null,
+          "reported_percent": null,
+          "actual_start": null,
+          "actual_finish": null,
+          "blocker": null,
+          "summary": "Engineer inspected column reinforcement installed today",
+          "evidence": [
+            {
+              "fields": [
+                "summary"
+              ],
+              "fragment_id": "f1",
+              "quote": "The engineer inspected the column reinforcement installed during today's shift. This inspection does not establish completion of the whole column reinforcement activity."
+            }
+          ],
+          "warnings": [],
+          "lifecycle_effects": []
+        }
+      ],
+      "validation_errors": [],
+      "elapsed_seconds": 70.905
+    },
+    "deepseek": {
+      "observations": [
+        {
+          "discipline": "structural",
+          "work_type": "rebar_installation",
+          "event_type": "actual_progress",
+          "observed_status": "in_progress",
+          "area": null,
+          "asset_tags": [
+            "SUP-GF-01"
+          ],
+          "explicit_activity_id": null,
+          "work_date": null,
+          "date_basis": "unknown",
+          "quantity": "300",
+          "quantity_kind": "delta",
+          "unit": "kg",
+          "raw_unit": "kg",
+          "reported_percent": null,
+          "actual_start": null,
+          "actual_finish": null,
+          "blocker": null,
+          "summary": "The steel fixing crew installed an additional 300 kg of column reinforcement today. Column reinforcement remains in progress; the entire activity is not complete.",
+          "evidence": [
+            {
+              "fields": [
+                "discipline",
+                "work_type",
+                "event_type",
+                "observed_status",
+                "quantity",
+                "quantity_kind",
+                "unit",
+                "raw_unit",
+                "summary"
+              ],
+              "fragment_id": "f1",
+              "quote": "The steel fixing crew installed an additional 300 kg of column reinforcement today. This is today's quantity, not the cumulative total. Bar spacing and concrete cover were checked by the site engineer. Column reinforcement remains in progress; the entire activity is not complete."
+            }
+          ],
+          "warnings": [
+            "Source-stated work constraint has no separate blocker observation; reviewer clarification required."
+          ],
+          "lifecycle_effects": []
+        },
+        {
+          "discipline": "structural",
+          "work_type": "rebar_installation",
+          "event_type": "inspection",
+          "observed_status": "completed",
+          "area": null,
+          "asset_tags": [
+            "SUP-GF-01"
+          ],
+          "explicit_activity_id": null,
+          "work_date": null,
+          "date_basis": "unknown",
+          "quantity": null,
+          "quantity_kind": "none",
+          "unit": null,
+          "raw_unit": null,
+          "reported_percent": null,
+          "actual_start": null,
+          "actual_finish": null,
+          "blocker": null,
+          "summary": "Bar spacing and concrete cover were checked by the site engineer.",
+          "evidence": [
+            {
+              "fields": [
+                "event_type",
+                "observed_status",
+                "summary"
+              ],
+              "fragment_id": "f1",
+              "quote": "The steel fixing crew installed an additional 300 kg of column reinforcement today. This is today's quantity, not the cumulative total. Bar spacing and concrete cover were checked by the site engineer. Column reinforcement remains in progress; the entire activity is not complete."
+            }
+          ],
+          "warnings": [
+            "Source-stated work constraint has no separate blocker observation; reviewer clarification required."
+          ],
+          "lifecycle_effects": []
+        },
+        {
+          "discipline": "structural",
+          "work_type": "formwork",
+          "event_type": "actual_progress",
+          "observed_status": "in_progress",
+          "area": null,
+          "asset_tags": [
+            "SUP-GF-03"
+          ],
+          "explicit_activity_id": null,
+          "work_date": null,
+          "date_basis": "unknown",
+          "quantity": "60",
+          "quantity_kind": "delta",
+          "unit": "m2",
+          "raw_unit": "m2",
+          "reported_percent": null,
+          "actual_start": null,
+          "actual_finish": null,
+          "blocker": null,
+          "summary": "The formwork crew installed an additional 60 m2 of ground-floor slab shuttering today. Shuttering remains in progress, with further areas pending installation.",
+          "evidence": [
+            {
+              "fields": [
+                "discipline",
+                "work_type",
+                "event_type",
+                "observed_status",
+                "quantity",
+                "quantity_kind",
+                "unit",
+                "raw_unit",
+                "summary"
+              ],
+              "fragment_id": "f1",
+              "quote": "The formwork crew installed an additional 60 m2 of ground-floor slab shuttering today. This is today's installed area. The crew checked panel alignment and support stability in the completed portion. Shuttering remains in progress, with further areas pending installation."
+            }
+          ],
+          "warnings": [
+            "Source-stated work constraint has no separate blocker observation; reviewer clarification required."
+          ],
+          "lifecycle_effects": []
+        },
+        {
+          "discipline": "structural",
+          "work_type": "formwork",
+          "event_type": "inspection",
+          "observed_status": "completed",
+          "area": null,
+          "asset_tags": [
+            "SUP-GF-03"
+          ],
+          "explicit_activity_id": null,
+          "work_date": null,
+          "date_basis": "unknown",
+          "quantity": null,
+          "quantity_kind": "none",
+          "unit": null,
+          "raw_unit": null,
+          "reported_percent": null,
+          "actual_start": null,
+          "actual_finish": null,
+          "blocker": null,
+          "summary": "The crew checked panel alignment and support stability in the completed portion.",
+          "evidence": [
+            {
+              "fields": [
+                "event_type",
+                "observed_status",
+                "summary"
+              ],
+              "fragment_id": "f1",
+              "quote": "The formwork crew installed an additional 60 m2 of ground-floor slab shuttering today. This is today's installed area. The crew checked panel alignment and support stability in the completed portion. Shuttering remains in progress, with further areas pending installation."
+            }
+          ],
+          "warnings": [
+            "Source-stated work constraint has no separate blocker observation; reviewer clarification required."
+          ],
+          "lifecycle_effects": []
+        },
+        {
+          "discipline": "structural",
+          "work_type": "concrete_pour",
+          "event_type": "no_work",
+          "observed_status": "not_started",
+          "area": null,
+          "asset_tags": [
+            "SUP-GF-02"
+          ],
+          "explicit_activity_id": null,
+          "work_date": null,
+          "date_basis": "unknown",
+          "quantity": null,
+          "quantity_kind": "none",
+          "unit": null,
+          "raw_unit": null,
+          "reported_percent": null,
+          "actual_start": null,
+          "actual_finish": null,
+          "blocker": "The planned pour was postponed because the remaining column reinforcement and formwork were not ready for inspection.",
+          "summary": "No column concrete was placed today. The planned pour was postponed because the remaining column reinforcement and formwork were not ready for inspection.",
+          "evidence": [
+            {
+              "fields": [
+                "event_type",
+                "observed_status",
+                "blocker",
+                "summary"
+              ],
+              "fragment_id": "f1",
+              "quote": "No column concrete was placed today. The planned pour was postponed because the remaining column reinforcement and formwork were not ready for inspection. No actual start or finish is reported for column concreting."
+            }
+          ],
+          "warnings": [
+            "Source-stated work constraint has no separate blocker observation; reviewer clarification required."
+          ],
+          "lifecycle_effects": []
+        },
+        {
+          "discipline": "structural",
+          "work_type": "rebar_installation",
+          "event_type": "no_work",
+          "observed_status": "not_started",
+          "area": null,
+          "asset_tags": [
+            "SUP-GF-04"
+          ],
+          "explicit_activity_id": null,
+          "work_date": null,
+          "date_basis": "unknown",
+          "quantity": null,
+          "quantity_kind": "none",
+          "unit": null,
+          "raw_unit": null,
+          "reported_percent": null,
+          "actual_start": null,
+          "actual_finish": null,
+          "blocker": null,
+          "summary": "Slab reinforcement installation has not started. Workers moved 800 kg of reinforcement bars from the laydown yard to a temporary staging area near the ground floor. These bars have not been fixed in the slab and must not be counted as installed reinforcement.",
+          "evidence": [
+            {
+              "fields": [
+                "event_type",
+                "observed_status",
+                "summary"
+              ],
+              "fragment_id": "f1",
+              "quote": "Slab reinforcement installation has not started. Workers moved 800 kg of reinforcement bars from the laydown yard to a temporary staging area near the ground floor. These bars have not been fixed in the slab and must not be counted as installed reinforcement."
+            }
+          ],
+          "warnings": [
+            "Source-stated work constraint has no separate blocker observation; reviewer clarification required."
+          ],
+          "lifecycle_effects": []
+        },
+        {
+          "discipline": "structural",
+          "work_type": "rebar_installation",
+          "event_type": "material_delivery",
+          "observed_status": "completed",
+          "area": null,
+          "asset_tags": [
+            "SUP-GF-04"
+          ],
+          "explicit_activity_id": null,
+          "work_date": null,
+          "date_basis": "unknown",
+          "quantity": null,
+          "quantity_kind": "none",
+          "unit": null,
+          "raw_unit": "kg",
+          "reported_percent": null,
+          "actual_start": null,
+          "actual_finish": null,
+          "blocker": null,
+          "summary": "Workers moved 800 kg of reinforcement bars from the laydown yard to a temporary staging area near the ground floor.",
+          "evidence": [
+            {
+              "fields": [
+                "event_type",
+                "observed_status",
+                "quantity",
+                "quantity_kind",
+                "unit",
+                "raw_unit",
+                "summary"
+              ],
+              "fragment_id": "f1",
+              "quote": "Slab reinforcement installation has not started. Workers moved 800 kg of reinforcement bars from the laydown yard to a temporary staging area near the ground floor. These bars have not been fixed in the slab and must not be counted as installed reinforcement."
+            }
+          ],
+          "warnings": [
+            "Source-stated work constraint has no separate blocker observation; reviewer clarification required."
+          ],
+          "lifecycle_effects": []
+        },
+        {
+          "discipline": "civil",
+          "work_type": "concrete_pour",
+          "event_type": "no_work",
+          "observed_status": "not_started",
+          "area": null,
+          "asset_tags": [
+            "SUP-GF-05"
+          ],
+          "explicit_activity_id": null,
+          "work_date": null,
+          "date_basis": "unknown",
+          "quantity": null,
+          "quantity_kind": "none",
+          "unit": null,
+          "raw_unit": null,
+          "reported_percent": null,
+          "actual_start": null,
+          "actual_finish": null,
+          "blocker": "The transit mixer access path remained waterlogged throughout the shift. This prevented the planned ground-floor slab concrete pour.",
+          "summary": "The transit mixer access path remained waterlogged throughout the shift. This prevented the planned ground-floor slab concrete pour. No slab concrete was placed today.",
+          "evidence": [
+            {
+              "fields": [
+                "event_type",
+                "observed_status",
+                "blocker",
+                "summary"
+              ],
+              "fragment_id": "f1",
+              "quote": "The transit mixer access path remained waterlogged throughout the shift. This prevented the planned ground-floor slab concrete pour. No slab concrete was placed today."
+            }
+          ],
+          "warnings": [
+            "Source-stated work constraint has no separate blocker observation; reviewer clarification required."
+          ],
+          "lifecycle_effects": []
+        },
+        {
+          "discipline": "structural",
+          "work_type": "rebar_installation",
+          "event_type": "inspection",
+          "observed_status": "completed",
+          "area": null,
+          "asset_tags": [
+            "SUP-GF-01"
+          ],
+          "explicit_activity_id": null,
+          "work_date": null,
+          "date_basis": "unknown",
+          "quantity": null,
+          "quantity_kind": "none",
+          "unit": null,
+          "raw_unit": null,
+          "reported_percent": null,
+          "actual_start": null,
+          "actual_finish": null,
+          "blocker": null,
+          "summary": "The engineer inspected the column reinforcement installed during today's shift. This inspection does not establish completion of the whole column reinforcement activity.",
+          "evidence": [
+            {
+              "fields": [
+                "event_type",
+                "observed_status",
+                "summary"
+              ],
+              "fragment_id": "f1",
+              "quote": "The engineer inspected the column reinforcement installed during today's shift. This inspection does not establish completion of the whole column reinforcement activity. A subcontractor verbally suggested that first-floor work could begin tomorrow, but no first-floor work was performed or measured today."
+            }
+          ],
+          "warnings": [
+            "Source-stated work constraint has no separate blocker observation; reviewer clarification required."
+          ],
+          "lifecycle_effects": []
+        },
+        {
+          "discipline": "structural",
+          "work_type": "other",
+          "event_type": "planned_work",
+          "observed_status": "unknown",
+          "area": null,
+          "asset_tags": [],
+          "explicit_activity_id": null,
+          "work_date": null,
+          "date_basis": "unknown",
+          "quantity": null,
+          "quantity_kind": "none",
+          "unit": null,
+          "raw_unit": null,
+          "reported_percent": null,
+          "actual_start": null,
+          "actual_finish": null,
+          "blocker": null,
+          "summary": "A subcontractor verbally suggested that first-floor work could begin tomorrow, but no first-floor work was performed or measured today.",
+          "evidence": [
+            {
+              "fields": [
+                "event_type",
+                "summary"
+              ],
+              "fragment_id": "f1",
+              "quote": "The engineer inspected the column reinforcement installed during today's shift. This inspection does not establish completion of the whole column reinforcement activity. A subcontractor verbally suggested that first-floor work could begin tomorrow, but no first-floor work was performed or measured today."
+            }
+          ],
+          "warnings": [
+            "Source-stated work constraint has no separate blocker observation; reviewer clarification required."
+          ],
+          "lifecycle_effects": []
+        }
+      ],
+      "validation_errors": [],
+      "elapsed_seconds": 49.361
+    }
+  },
+  "selection": {
+    "qwen::qwen": [
+      {
+        "observation": 1,
+        "event_type": "actual_progress",
+        "quantity": "300",
+        "unit": "kg",
+        "activity": "SUP-GF-01",
+        "mapping_state": "suggested",
+        "error": null,
+        "elapsed_seconds": 0.504
+      },
+      {
+        "observation": 2,
+        "event_type": "actual_progress",
+        "quantity": "60",
+        "unit": "m2",
+        "activity": "SUP-GF-03",
+        "mapping_state": "suggested",
+        "error": null,
+        "elapsed_seconds": 22.518
+      },
+      {
+        "observation": 3,
+        "event_type": "no_work",
+        "quantity": null,
+        "unit": null,
+        "activity": "SUP-GF-02",
+        "mapping_state": "suggested",
+        "error": null,
+        "elapsed_seconds": 22.04
+      },
+      {
+        "observation": 4,
+        "event_type": "no_work",
+        "quantity": null,
+        "unit": null,
+        "activity": "SUP-GF-04",
+        "mapping_state": "suggested",
+        "error": null,
+        "elapsed_seconds": 22.301
+      },
+      {
+        "observation": 5,
+        "event_type": "no_work",
+        "quantity": null,
+        "unit": null,
+        "activity": "SUP-GF-05",
+        "mapping_state": "suggested",
+        "error": null,
+        "elapsed_seconds": 22.002
+      },
+      {
+        "observation": 6,
+        "event_type": "actual_progress",
+        "quantity": null,
+        "unit": null,
+        "activity": "SUP-GF-01",
+        "mapping_state": "suggested",
+        "error": null,
+        "elapsed_seconds": 22.152
+      }
+    ],
+    "qwen::gpt120": [
+      {
+        "observation": 1,
+        "event_type": "actual_progress",
+        "quantity": "300",
+        "unit": "kg",
+        "activity": "SUP-GF-01",
+        "mapping_state": "suggested",
+        "error": null,
+        "elapsed_seconds": 22.456
+      },
+      {
+        "observation": 2,
+        "event_type": "actual_progress",
+        "quantity": "60",
+        "unit": "m2",
+        "activity": "SUP-GF-03",
+        "mapping_state": "suggested",
+        "error": null,
+        "elapsed_seconds": 22.425
+      },
+      {
+        "observation": 3,
+        "event_type": "no_work",
+        "quantity": null,
+        "unit": null,
+        "activity": "SUP-GF-02",
+        "mapping_state": "suggested",
+        "error": null,
+        "elapsed_seconds": 22.156
+      },
+      {
+        "observation": 4,
+        "event_type": "no_work",
+        "quantity": null,
+        "unit": null,
+        "activity": "SUP-GF-04",
+        "mapping_state": "suggested",
+        "error": null,
+        "elapsed_seconds": 22.451
+      },
+      {
+        "observation": 5,
+        "event_type": "no_work",
+        "quantity": null,
+        "unit": null,
+        "activity": "SUP-GF-05",
+        "mapping_state": "suggested",
+        "error": null,
+        "elapsed_seconds": 22.185
+      },
+      {
+        "observation": 6,
+        "event_type": "actual_progress",
+        "quantity": null,
+        "unit": null,
+        "activity": "SUP-GF-01",
+        "mapping_state": "suggested",
+        "error": null,
+        "elapsed_seconds": 22.154
+      }
+    ],
+    "qwen::gpt20": [
+      {
+        "observation": 1,
+        "event_type": "actual_progress",
+        "quantity": "300",
+        "unit": "kg",
+        "activity": "SUP-GF-01",
+        "mapping_state": "suggested",
+        "error": null,
+        "elapsed_seconds": 21.931
+      },
+      {
+        "observation": 2,
+        "event_type": "actual_progress",
+        "quantity": "60",
+        "unit": "m2",
+        "activity": "SUP-GF-03",
+        "mapping_state": "suggested",
+        "error": null,
+        "elapsed_seconds": 22.241
+      },
+      {
+        "observation": 3,
+        "event_type": "no_work",
+        "quantity": null,
+        "unit": null,
+        "activity": "SUP-GF-02",
+        "mapping_state": "suggested",
+        "error": null,
+        "elapsed_seconds": 22.363
+      },
+      {
+        "observation": 4,
+        "event_type": "no_work",
+        "quantity": null,
+        "unit": null,
+        "activity": "SUP-GF-04",
+        "mapping_state": "suggested",
+        "error": null,
+        "elapsed_seconds": 22.435
+      },
+      {
+        "observation": 5,
+        "event_type": "no_work",
+        "quantity": null,
+        "unit": null,
+        "activity": "SUP-GF-05",
+        "mapping_state": "suggested",
+        "error": null,
+        "elapsed_seconds": 22.309
+      },
+      {
+        "observation": 6,
+        "event_type": "actual_progress",
+        "quantity": null,
+        "unit": null,
+        "activity": "SUP-GF-01",
+        "mapping_state": "suggested",
+        "error": null,
+        "elapsed_seconds": 22.278
+      }
+    ],
+    "qwen::deepseek": [
+      {
+        "observation": 1,
+        "event_type": "actual_progress",
+        "quantity": "300",
+        "unit": "kg",
+        "activity": "SUP-GF-01",
+        "mapping_state": "suggested",
+        "error": null,
+        "elapsed_seconds": 2.839
+      },
+      {
+        "observation": 2,
+        "event_type": "actual_progress",
+        "quantity": "60",
+        "unit": "m2",
+        "activity": "SUP-GF-03",
+        "mapping_state": "suggested",
+        "error": null,
+        "elapsed_seconds": 43.937
+      },
+      {
+        "observation": 3,
+        "event_type": "no_work",
+        "quantity": null,
+        "unit": null,
+        "activity": "SUP-GF-02",
+        "mapping_state": "suggested",
+        "error": null,
+        "elapsed_seconds": 2.336
+      },
+      {
+        "observation": 4,
+        "event_type": "no_work",
+        "quantity": null,
+        "unit": null,
+        "activity": "SUP-GF-04",
+        "mapping_state": "suggested",
+        "error": null,
+        "elapsed_seconds": 37.125
+      },
+      {
+        "observation": 5,
+        "event_type": "no_work",
+        "quantity": null,
+        "unit": null,
+        "activity": "SUP-GF-05",
+        "mapping_state": "suggested",
+        "error": null,
+        "elapsed_seconds": 33.007
+      },
+      {
+        "observation": 6,
+        "event_type": "actual_progress",
+        "quantity": null,
+        "unit": null,
+        "activity": "SUP-GF-01",
+        "mapping_state": "suggested",
+        "error": null,
+        "elapsed_seconds": 46.6
+      }
+    ],
+    "gpt120::qwen": [
+      {
+        "observation": 1,
+        "event_type": "actual_progress",
+        "quantity": "300",
+        "unit": "kg",
+        "activity": "SUP-GF-01",
+        "mapping_state": "suggested",
+        "error": null,
+        "elapsed_seconds": 0.615
+      },
+      {
+        "observation": 2,
+        "event_type": "actual_progress",
+        "quantity": "60",
+        "unit": "m2",
+        "activity": "SUP-GF-03",
+        "mapping_state": "suggested",
+        "error": null,
+        "elapsed_seconds": 22.153
+      },
+      {
+        "observation": 3,
+        "event_type": "no_work",
+        "quantity": null,
+        "unit": null,
+        "activity": "SUP-GF-02",
+        "mapping_state": "suggested",
+        "error": null,
+        "elapsed_seconds": 21.907
+      },
+      {
+        "observation": 4,
+        "event_type": "blocker",
+        "quantity": null,
+        "unit": null,
+        "activity": "SUP-GF-02",
+        "mapping_state": "suggested",
+        "error": null,
+        "elapsed_seconds": 21.876
+      },
+      {
+        "observation": 5,
+        "event_type": "no_work",
+        "quantity": null,
+        "unit": null,
+        "activity": "SUP-GF-04",
+        "mapping_state": "suggested",
+        "error": null,
+        "elapsed_seconds": 23.055
+      },
+      {
+        "observation": 6,
+        "event_type": "no_work",
+        "quantity": null,
+        "unit": null,
+        "activity": "SUP-GF-05",
+        "mapping_state": "suggested",
+        "error": null,
+        "elapsed_seconds": 22.172
+      },
+      {
+        "observation": 7,
+        "event_type": "blocker",
+        "quantity": null,
+        "unit": null,
+        "activity": "SUP-GF-05",
+        "mapping_state": "suggested",
+        "error": null,
+        "elapsed_seconds": 21.214
+      },
+      {
+        "observation": 8,
+        "event_type": "inspection",
+        "quantity": null,
+        "unit": null,
+        "activity": "SUP-GF-01",
+        "mapping_state": "suggested",
+        "error": null,
+        "elapsed_seconds": 23.792
+      }
+    ],
+    "gpt120::gpt120": [
+      {
+        "observation": 1,
+        "event_type": "actual_progress",
+        "quantity": "300",
+        "unit": "kg",
+        "activity": "SUP-GF-01",
+        "mapping_state": "suggested",
+        "error": null,
+        "elapsed_seconds": 21.382
+      },
+      {
+        "observation": 2,
+        "event_type": "actual_progress",
+        "quantity": "60",
+        "unit": "m2",
+        "activity": "SUP-GF-03",
+        "mapping_state": "suggested",
+        "error": null,
+        "elapsed_seconds": 23.06
+      },
+      {
+        "observation": 3,
+        "event_type": "no_work",
+        "quantity": null,
+        "unit": null,
+        "activity": "SUP-GF-02",
+        "mapping_state": "suggested",
+        "error": null,
+        "elapsed_seconds": 21.486
+      },
+      {
+        "observation": 4,
+        "event_type": "blocker",
+        "quantity": null,
+        "unit": null,
+        "activity": "SUP-GF-02",
+        "mapping_state": "suggested",
+        "error": null,
+        "elapsed_seconds": 21.744
+      },
+      {
+        "observation": 5,
+        "event_type": "no_work",
+        "quantity": null,
+        "unit": null,
+        "activity": "SUP-GF-04",
+        "mapping_state": "suggested",
+        "error": null,
+        "elapsed_seconds": 22.998
+      },
+      {
+        "observation": 6,
+        "event_type": "no_work",
+        "quantity": null,
+        "unit": null,
+        "activity": "SUP-GF-05",
+        "mapping_state": "suggested",
+        "error": null,
+        "elapsed_seconds": 22.181
+      },
+      {
+        "observation": 7,
+        "event_type": "blocker",
+        "quantity": null,
+        "unit": null,
+        "activity": "SUP-GF-05",
+        "mapping_state": "suggested",
+        "error": null,
+        "elapsed_seconds": 21.479
+      },
+      {
+        "observation": 8,
+        "event_type": "inspection",
+        "quantity": null,
+        "unit": null,
+        "activity": "SUP-GF-01",
+        "mapping_state": "suggested",
+        "error": null,
+        "elapsed_seconds": 22.919
+      }
+    ],
+    "gpt120::gpt20": [
+      {
+        "observation": 1,
+        "event_type": "actual_progress",
+        "quantity": "300",
+        "unit": "kg",
+        "activity": "SUP-GF-01",
+        "mapping_state": "suggested",
+        "error": null,
+        "elapsed_seconds": 21.985
+      },
+      {
+        "observation": 2,
+        "event_type": "actual_progress",
+        "quantity": "60",
+        "unit": "m2",
+        "activity": "SUP-GF-03",
+        "mapping_state": "suggested",
+        "error": null,
+        "elapsed_seconds": 22.107
+      },
+      {
+        "observation": 3,
+        "event_type": "no_work",
+        "quantity": null,
+        "unit": null,
+        "activity": "SUP-GF-02",
+        "mapping_state": "suggested",
+        "error": null,
+        "elapsed_seconds": 22.226
+      },
+      {
+        "observation": 4,
+        "event_type": "blocker",
+        "quantity": null,
+        "unit": null,
+        "activity": "SUP-GF-02",
+        "mapping_state": "suggested",
+        "error": null,
+        "elapsed_seconds": 22.004
+      },
+      {
+        "observation": 5,
+        "event_type": "no_work",
+        "quantity": null,
+        "unit": null,
+        "activity": "SUP-GF-04",
+        "mapping_state": "suggested",
+        "error": null,
+        "elapsed_seconds": 22.931
+      },
+      {
+        "observation": 6,
+        "event_type": "no_work",
+        "quantity": null,
+        "unit": null,
+        "activity": "SUP-GF-05",
+        "mapping_state": "suggested",
+        "error": null,
+        "elapsed_seconds": 22.749
+      },
+      {
+        "observation": 7,
+        "event_type": "blocker",
+        "quantity": null,
+        "unit": null,
+        "activity": "SUP-GF-05",
+        "mapping_state": "suggested",
+        "error": null,
+        "elapsed_seconds": 20.75
+      },
+      {
+        "observation": 8,
+        "event_type": "inspection",
+        "quantity": null,
+        "unit": null,
+        "activity": "SUP-GF-01",
+        "mapping_state": "suggested",
+        "error": null,
+        "elapsed_seconds": 23.184
+      }
+    ],
+    "gpt120::deepseek": [
+      {
+        "observation": 1,
+        "event_type": "actual_progress",
+        "quantity": "300",
+        "unit": "kg",
+        "activity": "SUP-GF-01",
+        "mapping_state": "suggested",
+        "error": null,
+        "elapsed_seconds": 3.185
+      },
+      {
+        "observation": 2,
+        "event_type": "actual_progress",
+        "quantity": "60",
+        "unit": "m2",
+        "activity": "SUP-GF-03",
+        "mapping_state": "suggested",
+        "error": null,
+        "elapsed_seconds": 10.288
+      },
+      {
+        "observation": 3,
+        "event_type": "no_work",
+        "quantity": null,
+        "unit": null,
+        "activity": "SUP-GF-02",
+        "mapping_state": "suggested",
+        "error": null,
+        "elapsed_seconds": 11.362
+      },
+      {
+        "observation": 4,
+        "event_type": "blocker",
+        "quantity": null,
+        "unit": null,
+        "activity": "SUP-GF-02",
+        "mapping_state": "suggested",
+        "error": null,
+        "elapsed_seconds": 39.082
+      },
+      {
+        "observation": 5,
+        "event_type": "no_work",
+        "quantity": null,
+        "unit": null,
+        "activity": "SUP-GF-04",
+        "mapping_state": "suggested",
+        "error": null,
+        "elapsed_seconds": 36.686
+      },
+      {
+        "observation": 6,
+        "event_type": "no_work",
+        "quantity": null,
+        "unit": null,
+        "activity": "SUP-GF-05",
+        "mapping_state": "suggested",
+        "error": null,
+        "elapsed_seconds": 39.582
+      },
+      {
+        "observation": 7,
+        "event_type": "blocker",
+        "quantity": null,
+        "unit": null,
+        "activity": "SUP-GF-05",
+        "mapping_state": "suggested",
+        "error": null,
+        "elapsed_seconds": 43.474
+      },
+      {
+        "observation": 8,
+        "event_type": "inspection",
+        "quantity": null,
+        "unit": null,
+        "activity": "SUP-GF-01",
+        "mapping_state": "suggested",
+        "error": null,
+        "elapsed_seconds": 2.174
+      }
+    ],
+    "gpt20::qwen": [
+      {
+        "observation": 1,
+        "event_type": "actual_progress",
+        "quantity": "300",
+        "unit": "kg",
+        "activity": "SUP-GF-01",
+        "mapping_state": "suggested",
+        "error": null,
+        "elapsed_seconds": 0.426
+      },
+      {
+        "observation": 2,
+        "event_type": "actual_progress",
+        "quantity": "60",
+        "unit": "m2",
+        "activity": "SUP-GF-03",
+        "mapping_state": "suggested",
+        "error": null,
+        "elapsed_seconds": 21.376
+      },
+      {
+        "observation": 3,
+        "event_type": "no_work",
+        "quantity": null,
+        "unit": null,
+        "activity": "SUP-GF-02",
+        "mapping_state": "suggested",
+        "error": null,
+        "elapsed_seconds": 21.341
+      },
+      {
+        "observation": 4,
+        "event_type": "no_work",
+        "quantity": null,
+        "unit": null,
+        "activity": "SUP-GF-04",
+        "mapping_state": "suggested",
+        "error": null,
+        "elapsed_seconds": 21.121
+      },
+      {
+        "observation": 5,
+        "event_type": "no_work",
+        "quantity": null,
+        "unit": null,
+        "activity": "SUP-GF-05",
+        "mapping_state": "suggested",
+        "error": null,
+        "elapsed_seconds": 21.733
+      },
+      {
+        "observation": 6,
+        "event_type": "inspection",
+        "quantity": null,
+        "unit": null,
+        "activity": "SUP-GF-01",
+        "mapping_state": "suggested",
+        "error": null,
+        "elapsed_seconds": 20.871
+      }
+    ],
+    "gpt20::gpt120": [
+      {
+        "observation": 1,
+        "event_type": "actual_progress",
+        "quantity": "300",
+        "unit": "kg",
+        "activity": "SUP-GF-01",
+        "mapping_state": "suggested",
+        "error": null,
+        "elapsed_seconds": 22.067
+      },
+      {
+        "observation": 2,
+        "event_type": "actual_progress",
+        "quantity": "60",
+        "unit": "m2",
+        "activity": "SUP-GF-03",
+        "mapping_state": "suggested",
+        "error": null,
+        "elapsed_seconds": 21.45
+      },
+      {
+        "observation": 3,
+        "event_type": "no_work",
+        "quantity": null,
+        "unit": null,
+        "activity": "SUP-GF-02",
+        "mapping_state": "suggested",
+        "error": null,
+        "elapsed_seconds": 20.294
+      },
+      {
+        "observation": 4,
+        "event_type": "no_work",
+        "quantity": null,
+        "unit": null,
+        "activity": "SUP-GF-04",
+        "mapping_state": "suggested",
+        "error": null,
+        "elapsed_seconds": 21.278
+      },
+      {
+        "observation": 5,
+        "event_type": "no_work",
+        "quantity": null,
+        "unit": null,
+        "activity": "SUP-GF-05",
+        "mapping_state": "suggested",
+        "error": null,
+        "elapsed_seconds": 0.701
+      },
+      {
+        "observation": 6,
+        "event_type": "inspection",
+        "quantity": null,
+        "unit": null,
+        "activity": "SUP-GF-01",
+        "mapping_state": "suggested",
+        "error": null,
+        "elapsed_seconds": 21.157
+      }
+    ],
+    "gpt20::gpt20": [
+      {
+        "observation": 1,
+        "event_type": "actual_progress",
+        "quantity": "300",
+        "unit": "kg",
+        "activity": "SUP-GF-01",
+        "mapping_state": "suggested",
+        "error": null,
+        "elapsed_seconds": 22.286
+      },
+      {
+        "observation": 2,
+        "event_type": "actual_progress",
+        "quantity": "60",
+        "unit": "m2",
+        "activity": "SUP-GF-03",
+        "mapping_state": "suggested",
+        "error": null,
+        "elapsed_seconds": 20.464
+      },
+      {
+        "observation": 3,
+        "event_type": "no_work",
+        "quantity": null,
+        "unit": null,
+        "activity": "SUP-GF-02",
+        "mapping_state": "suggested",
+        "error": null,
+        "elapsed_seconds": 22.82
+      },
+      {
+        "observation": 4,
+        "event_type": "no_work",
+        "quantity": null,
+        "unit": null,
+        "activity": "SUP-GF-04",
+        "mapping_state": "suggested",
+        "error": null,
+        "elapsed_seconds": 19.555
+      },
+      {
+        "observation": 5,
+        "event_type": "no_work",
+        "quantity": null,
+        "unit": null,
+        "activity": "SUP-GF-05",
+        "mapping_state": "suggested",
+        "error": null,
+        "elapsed_seconds": 22.566
+      },
+      {
+        "observation": 6,
+        "event_type": "inspection",
+        "quantity": null,
+        "unit": null,
+        "activity": "SUP-GF-01",
+        "mapping_state": "suggested",
+        "error": null,
+        "elapsed_seconds": 20.674
+      }
+    ],
+    "gpt20::deepseek": [
+      {
+        "observation": 1,
+        "event_type": "actual_progress",
+        "quantity": "300",
+        "unit": "kg",
+        "activity": "SUP-GF-01",
+        "mapping_state": "suggested",
+        "error": null,
+        "elapsed_seconds": 27.498
+      },
+      {
+        "observation": 2,
+        "event_type": "actual_progress",
+        "quantity": "60",
+        "unit": "m2",
+        "activity": "SUP-GF-03",
+        "mapping_state": "suggested",
+        "error": null,
+        "elapsed_seconds": 2.435
+      },
+      {
+        "observation": 3,
+        "event_type": "no_work",
+        "quantity": null,
+        "unit": null,
+        "activity": "SUP-GF-02",
+        "mapping_state": "suggested",
+        "error": null,
+        "elapsed_seconds": 47.723
+      },
+      {
+        "observation": 4,
+        "event_type": "no_work",
+        "quantity": null,
+        "unit": null,
+        "activity": "SUP-GF-04",
+        "mapping_state": "suggested",
+        "error": null,
+        "elapsed_seconds": 2.672
+      },
+      {
+        "observation": 5,
+        "event_type": "no_work",
+        "quantity": null,
+        "unit": null,
+        "activity": "SUP-GF-05",
+        "mapping_state": "suggested",
+        "error": null,
+        "elapsed_seconds": 42.015
+      },
+      {
+        "observation": 6,
+        "event_type": "inspection",
+        "quantity": null,
+        "unit": null,
+        "activity": "SUP-GF-01",
+        "mapping_state": "suggested",
+        "error": null,
+        "elapsed_seconds": 2.715
+      }
+    ],
+    "deepseek::qwen": [
+      {
+        "observation": 1,
+        "event_type": "actual_progress",
+        "quantity": "300",
+        "unit": "kg",
+        "activity": "SUP-GF-01",
+        "mapping_state": "suggested",
+        "error": null,
+        "elapsed_seconds": 0.839
+      },
+      {
+        "observation": 2,
+        "event_type": "inspection",
+        "quantity": null,
+        "unit": null,
+        "activity": "SUP-GF-01",
+        "mapping_state": "suggested",
+        "error": null,
+        "elapsed_seconds": 21.942
+      },
+      {
+        "observation": 3,
+        "event_type": "actual_progress",
+        "quantity": "60",
+        "unit": "m2",
+        "activity": "SUP-GF-03",
+        "mapping_state": "suggested",
+        "error": null,
+        "elapsed_seconds": 21.896
+      },
+      {
+        "observation": 4,
+        "event_type": "inspection",
+        "quantity": null,
+        "unit": null,
+        "activity": "SUP-GF-03",
+        "mapping_state": "suggested",
+        "error": null,
+        "elapsed_seconds": 22.201
+      },
+      {
+        "observation": 5,
+        "event_type": "no_work",
+        "quantity": null,
+        "unit": null,
+        "activity": "SUP-GF-02",
+        "mapping_state": "suggested",
+        "error": null,
+        "elapsed_seconds": 21.809
+      },
+      {
+        "observation": 6,
+        "event_type": "no_work",
+        "quantity": null,
+        "unit": null,
+        "activity": "SUP-GF-04",
+        "mapping_state": "suggested",
+        "error": null,
+        "elapsed_seconds": 22.001
+      },
+      {
+        "observation": 7,
+        "event_type": "material_delivery",
+        "quantity": null,
+        "unit": null,
+        "activity": "SUP-GF-04",
+        "mapping_state": "suggested",
+        "error": null,
+        "elapsed_seconds": 22.225
+      },
+      {
+        "observation": 8,
+        "event_type": "no_work",
+        "quantity": null,
+        "unit": null,
+        "activity": "SUP-GF-05",
+        "mapping_state": "suggested",
+        "error": null,
+        "elapsed_seconds": 22.125
+      },
+      {
+        "observation": 9,
+        "event_type": "inspection",
+        "quantity": null,
+        "unit": null,
+        "activity": "SUP-GF-01",
+        "mapping_state": "suggested",
+        "error": null,
+        "elapsed_seconds": 21.828
+      },
+      {
+        "observation": 10,
+        "event_type": "planned_work",
+        "quantity": null,
+        "unit": null,
+        "activity": "SUP-GF-01",
+        "mapping_state": "suggested",
+        "error": null,
+        "elapsed_seconds": 22.038
+      }
+    ],
+    "deepseek::gpt120": [
+      {
+        "observation": 1,
+        "event_type": "actual_progress",
+        "quantity": "300",
+        "unit": "kg",
+        "activity": "SUP-GF-01",
+        "mapping_state": "suggested",
+        "error": null,
+        "elapsed_seconds": 22.34
+      },
+      {
+        "observation": 2,
+        "event_type": "inspection",
+        "quantity": null,
+        "unit": null,
+        "activity": "SUP-GF-01",
+        "mapping_state": "suggested",
+        "error": null,
+        "elapsed_seconds": 22.384
+      },
+      {
+        "observation": 3,
+        "event_type": "actual_progress",
+        "quantity": "60",
+        "unit": "m2",
+        "activity": "SUP-GF-03",
+        "mapping_state": "suggested",
+        "error": null,
+        "elapsed_seconds": 21.9
+      },
+      {
+        "observation": 4,
+        "event_type": "inspection",
+        "quantity": null,
+        "unit": null,
+        "activity": "SUP-GF-03",
+        "mapping_state": "suggested",
+        "error": null,
+        "elapsed_seconds": 22.263
+      },
+      {
+        "observation": 5,
+        "event_type": "no_work",
+        "quantity": null,
+        "unit": null,
+        "activity": "SUP-GF-02",
+        "mapping_state": "suggested",
+        "error": null,
+        "elapsed_seconds": 21.698
+      },
+      {
+        "observation": 6,
+        "event_type": "no_work",
+        "quantity": null,
+        "unit": null,
+        "activity": "SUP-GF-04",
+        "mapping_state": "suggested",
+        "error": null,
+        "elapsed_seconds": 22.128
+      },
+      {
+        "observation": 7,
+        "event_type": "material_delivery",
+        "quantity": null,
+        "unit": null,
+        "activity": "SUP-GF-04",
+        "mapping_state": "suggested",
+        "error": null,
+        "elapsed_seconds": 22.286
+      },
+      {
+        "observation": 8,
+        "event_type": "no_work",
+        "quantity": null,
+        "unit": null,
+        "activity": "SUP-GF-05",
+        "mapping_state": "suggested",
+        "error": null,
+        "elapsed_seconds": 22.235
+      },
+      {
+        "observation": 9,
+        "event_type": "inspection",
+        "quantity": null,
+        "unit": null,
+        "activity": "SUP-GF-01",
+        "mapping_state": "suggested",
+        "error": null,
+        "elapsed_seconds": 21.871
+      },
+      {
+        "observation": 10,
+        "event_type": "planned_work",
+        "quantity": null,
+        "unit": null,
+        "activity": null,
+        "mapping_state": "unmatched",
+        "error": null,
+        "elapsed_seconds": 22.213
+      }
+    ],
+    "deepseek::gpt20": [
+      {
+        "observation": 1,
+        "event_type": "actual_progress",
+        "quantity": "300",
+        "unit": "kg",
+        "activity": "SUP-GF-01",
+        "mapping_state": "suggested",
+        "error": null,
+        "elapsed_seconds": 21.942
+      },
+      {
+        "observation": 2,
+        "event_type": "inspection",
+        "quantity": null,
+        "unit": null,
+        "activity": "SUP-GF-01",
+        "mapping_state": "suggested",
+        "error": null,
+        "elapsed_seconds": 22.703
+      },
+      {
+        "observation": 3,
+        "event_type": "actual_progress",
+        "quantity": "60",
+        "unit": "m2",
+        "activity": "SUP-GF-03",
+        "mapping_state": "suggested",
+        "error": null,
+        "elapsed_seconds": 21.277
+      },
+      {
+        "observation": 4,
+        "event_type": "inspection",
+        "quantity": null,
+        "unit": null,
+        "activity": "SUP-GF-03",
+        "mapping_state": "suggested",
+        "error": null,
+        "elapsed_seconds": 22.369
+      },
+      {
+        "observation": 5,
+        "event_type": "no_work",
+        "quantity": null,
+        "unit": null,
+        "activity": "SUP-GF-02",
+        "mapping_state": "suggested",
+        "error": null,
+        "elapsed_seconds": 21.46
+      },
+      {
+        "observation": 6,
+        "event_type": "no_work",
+        "quantity": null,
+        "unit": null,
+        "activity": "SUP-GF-04",
+        "mapping_state": "suggested",
+        "error": null,
+        "elapsed_seconds": 22.401
+      },
+      {
+        "observation": 7,
+        "event_type": "material_delivery",
+        "quantity": null,
+        "unit": null,
+        "activity": null,
+        "mapping_state": "unmatched",
+        "error": null,
+        "elapsed_seconds": 23.068
+      },
+      {
+        "observation": 8,
+        "event_type": "no_work",
+        "quantity": null,
+        "unit": null,
+        "activity": "SUP-GF-05",
+        "mapping_state": "suggested",
+        "error": null,
+        "elapsed_seconds": 21.552
+      },
+      {
+        "observation": 9,
+        "event_type": "inspection",
+        "quantity": null,
+        "unit": null,
+        "activity": "SUP-GF-01",
+        "mapping_state": "suggested",
+        "error": null,
+        "elapsed_seconds": 22.971
+      },
+      {
+        "observation": 10,
+        "event_type": "planned_work",
+        "quantity": null,
+        "unit": null,
+        "activity": null,
+        "mapping_state": "unmatched",
+        "error": null,
+        "elapsed_seconds": 21.096
+      }
+    ],
+    "deepseek::deepseek": [
+      {
+        "observation": 1,
+        "event_type": "actual_progress",
+        "quantity": "300",
+        "unit": "kg",
+        "activity": "SUP-GF-01",
+        "mapping_state": "suggested",
+        "error": null,
+        "elapsed_seconds": 2.453
+      },
+      {
+        "observation": 2,
+        "event_type": "inspection",
+        "quantity": null,
+        "unit": null,
+        "activity": "SUP-GF-01",
+        "mapping_state": "suggested",
+        "error": null,
+        "elapsed_seconds": 57.961
+      },
+      {
+        "observation": 3,
+        "event_type": "actual_progress",
+        "quantity": "60",
+        "unit": "m2",
+        "activity": "SUP-GF-03",
+        "mapping_state": "suggested",
+        "error": null,
+        "elapsed_seconds": 32.55
+      },
+      {
+        "observation": 4,
+        "event_type": "inspection",
+        "quantity": null,
+        "unit": null,
+        "activity": "SUP-GF-03",
+        "mapping_state": "suggested",
+        "error": null,
+        "elapsed_seconds": 2.228
+      },
+      {
+        "observation": 5,
+        "event_type": "no_work",
+        "quantity": null,
+        "unit": null,
+        "activity": "SUP-GF-02",
+        "mapping_state": "suggested",
+        "error": null,
+        "elapsed_seconds": 10.602
+      },
+      {
+        "observation": 6,
+        "event_type": "no_work",
+        "quantity": null,
+        "unit": null,
+        "activity": "SUP-GF-04",
+        "mapping_state": "suggested",
+        "error": null,
+        "elapsed_seconds": 47.803
+      },
+      {
+        "observation": 7,
+        "event_type": "material_delivery",
+        "quantity": null,
+        "unit": null,
+        "activity": "SUP-GF-04",
+        "mapping_state": "suggested",
+        "error": null,
+        "elapsed_seconds": 2.892
+      },
+      {
+        "observation": 8,
+        "event_type": "no_work",
+        "quantity": null,
+        "unit": null,
+        "activity": "SUP-GF-05",
+        "mapping_state": "suggested",
+        "error": null,
+        "elapsed_seconds": 9.948
+      },
+      {
+        "observation": 9,
+        "event_type": "inspection",
+        "quantity": null,
+        "unit": null,
+        "activity": "SUP-GF-01",
+        "mapping_state": "suggested",
+        "error": null,
+        "elapsed_seconds": 9.942
+      },
+      {
+        "observation": 10,
+        "event_type": "planned_work",
+        "quantity": null,
+        "unit": null,
+        "activity": null,
+        "mapping_state": "unmatched",
+        "error": null,
+        "elapsed_seconds": 30.745
+      }
+    ]
+  },
+  "calls": [
+    {
+      "provider": "groq",
+      "model": "qwen/qwen3.8-27b",
+      "role": "orchestrator",
+      "label": "intake",
+      "started_at": "2026-10-26T11:28:52.675325+00:00",
+      "attempts": [
+        {
+          "http_status": 200,
+          "finish_reason": "stop",
+          "usage": {
+            "prompt_tokens": 38,
+            "completion_tokens": 9,
+            "total_tokens": 47
+          }
+        }
+      ],
+      "ok": true,
+      "elapsed_seconds": 0.16
+    },
+    {
+      "provider": "groq",
+      "model": "openai/gpt-oss-120b",
+      "role": "orchestrator",
+      "label": "intake",
+      "started_at": "2026-10-26T11:28:52.836498+00:00",
+      "attempts": [
+        {
+          "http_status": 200,
+          "finish_reason": "stop",
+          "usage": {
+            "prompt_tokens": 153,
+            "completion_tokens": 57,
+            "total_tokens": 210
+          }
+        }
+      ],
+      "ok": true,
+      "elapsed_seconds": 2.883
+    },
+    {
+      "provider": "groq",
+      "model": "openai/gpt-oss-20b",
+      "role": "orchestrator",
+      "label": "intake",
+      "started_at": "2026-10-26T11:28:55.722050+00:00",
+      "attempts": [
+        {
+          "http_status": 200,
+          "finish_reason": "stop",
+          "usage": {
+            "prompt_tokens": 153,
+            "completion_tokens": 49,
+            "total_tokens": 202
+          }
+        }
+      ],
+      "ok": true,
+      "elapsed_seconds": 2.531
+    },
+    {
+      "provider": "gonka",
+      "model": "deepseek-ai/DeepSeek-V4-Flash-0731",
+      "role": "orchestrator",
+      "label": "intake",
+      "started_at": "2026-10-26T11:28:58.256941+00:00",
+      "attempts": [
+        {
+          "http_status": 200,
+          "finish_reason": "stop",
+          "usage": {
+            "prompt_tokens": 92,
+            "completion_tokens": 84,
+            "total_tokens": 176
+          }
+        }
+      ],
+      "ok": false,
+      "error": "OllamaResponseError: Gonka returned an invalid JSON response",
+      "elapsed_seconds": 2.094
+    },
+    {
+      "provider": "groq",
+      "model": "qwen/qwen3.8-27b",
+      "role": "orchestrator",
+      "label": "analysis",
+      "started_at": "2026-10-26T11:29:00.353591+00:00",
+      "attempts": [
+        {
+          "http_status": 200,
+          "finish_reason": "stop",
+          "usage": {
+            "prompt_tokens": 37,
+            "completion_tokens": 8,
+            "total_tokens": 45
+          }
+        }
+      ],
+      "ok": true,
+      "elapsed_seconds": 0.323
+    },
+    {
+      "provider": "groq",
+      "model": "openai/gpt-oss-120b",
+      "role": "orchestrator",
+      "label": "analysis",
+      "started_at": "2026-10-26T11:29:00.678544+00:00",
+      "attempts": [
+        {
+          "http_status": 200,
+          "finish_reason": "stop",
+          "usage": {
+            "prompt_tokens": 152,
+            "completion_tokens": 59,
+            "total_tokens": 211
+          }
+        }
+      ],
+      "ok": true,
+      "elapsed_seconds": 2.569
+    },
+    {
+      "provider": "groq",
+      "model": "openai/gpt-oss-20b",
+      "role": "orchestrator",
+      "label": "analysis",
+      "started_at": "2026-10-26T11:29:03.252873+00:00",
+      "attempts": [
+        {
+          "http_status": 200,
+          "finish_reason": "stop",
+          "usage": {
+            "prompt_tokens": 152,
+            "completion_tokens": 27,
+            "total_tokens": 179
+          }
+        }
+      ],
+      "ok": true,
+      "elapsed_seconds": 2.589
+    },
+    {
+      "provider": "gonka",
+      "model": "deepseek-ai/DeepSeek-V4-Flash-0731",
+      "role": "orchestrator",
+      "label": "analysis",
+      "started_at": "2026-10-26T11:29:05.846468+00:00",
+      "attempts": [
+        {
+          "http_status": 200,
+          "finish_reason": "length",
+          "usage": {
+            "prompt_tokens": 91,
+            "completion_tokens": 128,
+            "total_tokens": 219
+          }
+        }
+      ],
+      "ok": false,
+      "error": "OllamaResponseError: Gonka response was incomplete",
+      "elapsed_seconds": 6.965
+    },
+    {
+      "provider": "groq",
+      "model": "qwen/qwen3.8-27b",
+      "role": "orchestrator",
+      "label": "review",
+      "started_at": "2026-10-26T11:29:12.815631+00:00",
+      "attempts": [
+        {
+          "http_status": 200,
+          "finish_reason": "stop",
+          "usage": {
+            "prompt_tokens": 37,
+            "completion_tokens": 8,
+            "total_tokens": 45
+          }
+        }
+      ],
+      "ok": true,
+      "elapsed_seconds": 0.38
+    },
+    {
+      "provider": "groq",
+      "model": "openai/gpt-oss-120b",
+      "role": "orchestrator",
+      "label": "review",
+      "started_at": "2026-10-26T11:29:13.200345+00:00",
+      "attempts": [
+        {
+          "http_status": 200,
+          "finish_reason": "stop",
+          "usage": {
+            "prompt_tokens": 152,
+            "completion_tokens": 54,
+            "total_tokens": 206
+          }
+        }
+      ],
+      "ok": true,
+      "elapsed_seconds": 2.678
+    },
+    {
+      "provider": "groq",
+      "model": "openai/gpt-oss-20b",
+      "role": "orchestrator",
+      "label": "review",
+      "started_at": "2026-10-26T11:29:15.881704+00:00",
+      "attempts": [
+        {
+          "http_status": 200,
+          "finish_reason": "stop",
+          "usage": {
+            "prompt_tokens": 152,
+            "completion_tokens": 48,
+            "total_tokens": 200
+          }
+        }
+      ],
+      "ok": true,
+      "elapsed_seconds": 2.472
+    },
+    {
+      "provider": "gonka",
+      "model": "deepseek-ai/DeepSeek-V4-Flash-0731",
+      "role": "orchestrator",
+      "label": "review",
+      "started_at": "2026-10-26T11:29:18.357239+00:00",
+      "attempts": [
+        {
+          "http_status": 200,
+          "finish_reason": "stop",
+          "usage": {
+            "prompt_tokens": 91,
+            "completion_tokens": 77,
+            "total_tokens": 168
+          }
+        }
+      ],
+      "ok": false,
+      "error": "OllamaResponseError: Gonka returned an invalid JSON response",
+      "elapsed_seconds": 2.964
+    },
+    {
+      "provider": "groq",
+      "model": "qwen/qwen3.8-27b",
+      "role": "extraction",
+      "label": "full site update",
+      "started_at": "2026-10-26T11:29:21.325751+00:00",
+      "attempts": [
+        {
+          "http_status": 200,
+          "finish_reason": "stop",
+          "usage": {
+            "prompt_tokens": 2384,
+            "completion_tokens": 1602,
+            "total_tokens": 3986
+          }
+        }
+      ],
+      "ok": true,
+      "elapsed_seconds": 3.953
+    },
+    {
+      "provider": "groq",
+      "model": "openai/gpt-oss-120b",
+      "role": "extraction",
+      "label": "full site update",
+      "started_at": "2026-10-26T11:29:25.283756+00:00",
+      "attempts": [
+        {
+          "http_status": 200,
+          "finish_reason": "stop",
+          "usage": {
+            "prompt_tokens": 3422,
+            "completion_tokens": 2998,
+            "total_tokens": 6420
+          }
+        }
+      ],
+      "ok": true,
+      "elapsed_seconds": 78.224
+    },
+    {
+      "provider": "groq",
+      "model": "openai/gpt-oss-20b",
+      "role": "extraction",
+      "label": "full site update",
+      "started_at": "2026-10-26T11:30:43.513684+00:00",
+      "attempts": [
+        {
+          "http_status": 200,
+          "finish_reason": "stop",
+          "usage": {
+            "prompt_tokens": 3422,
+            "completion_tokens": 1505,
+            "total_tokens": 4927
+          }
+        }
+      ],
+      "ok": true,
+      "elapsed_seconds": 70.905
+    },
+    {
+      "provider": "gonka",
+      "model": "deepseek-ai/DeepSeek-V4-Flash-0731",
+      "role": "extraction",
+      "label": "full site update",
+      "started_at": "2026-10-26T11:31:54.424086+00:00",
+      "attempts": [
+        {
+          "http_status": 200,
+          "finish_reason": "stop",
+          "usage": {
+            "prompt_tokens": 4463,
+            "completion_tokens": 3133,
+            "total_tokens": 7596
+          }
+        }
+      ],
+      "ok": false,
+      "error": "OllamaResponseError: Gonka returned an invalid JSON response",
+      "elapsed_seconds": 39.525
+    },
+    {
+      "provider": "groq",
+      "model": "qwen/qwen3.8-27b",
+      "role": "selection",
+      "label": "qwen observation 1",
+      "started_at": "2026-10-26T11:32:33.956710+00:00",
+      "attempts": [],
+      "elapsed_seconds": 10.043,
+      "ok": false,
+      "error": "Interrupted before transport"
+    },
+    {
+      "provider": "gonka",
+      "model": "deepseek-ai/DeepSeek-V4-Flash-0731",
+      "role": "extraction",
+      "label": "full site update",
+      "started_at": "2026-10-26T11:33:28.475193+00:00",
+      "attempts": [
+        {
+          "http_status": 200,
+          "finish_reason": "stop",
+          "content_shape": "fenced",
+          "content_length": 12114,
+          "usage": {
+            "prompt_tokens": 4463,
+            "completion_tokens": 2913,
+            "total_tokens": 7376
+          }
+        }
+      ],
+      "ok": true,
+      "elapsed_seconds": 49.361
+    },
+    {
+      "provider": "groq",
+      "model": "qwen/qwen3.8-27b",
+      "role": "selection",
+      "label": "qwen observation 1",
+      "started_at": "2026-10-26T11:34:17.844985+00:00",
+      "attempts": [
+        {
+          "http_status": 200,
+          "finish_reason": "stop",
+          "content_shape": "object",
+          "content_length": 397,
+          "usage": {
+            "prompt_tokens": 1409,
+            "completion_tokens": 100,
+            "total_tokens": 1509
+          }
+        }
+      ],
+      "ok": true,
+      "elapsed_seconds": 0.504
+    },
+    {
+      "provider": "groq",
+      "model": "qwen/qwen3.8-27b",
+      "role": "selection",
+      "label": "qwen observation 2",
+      "started_at": "2026-10-26T11:34:18.356894+00:00",
+      "attempts": [
+        {
+          "http_status": 200,
+          "finish_reason": "stop",
+          "content_shape": "object",
+          "content_length": 325,
+          "usage": {
+            "prompt_tokens": 1411,
+            "completion_tokens": 88,
+            "total_tokens": 1499
+          }
+        }
+      ],
+      "ok": true,
+      "elapsed_seconds": 22.518
+    },
+    {
+      "provider": "groq",
+      "model": "qwen/qwen3.8-27b",
+      "role": "selection",
+      "label": "qwen observation 3",
+      "started_at": "2026-10-26T11:34:40.898163+00:00",
+      "attempts": [
+        {
+          "http_status": 200,
+          "finish_reason": "stop",
+          "content_shape": "object",
+          "content_length": 405,
+          "usage": {
+            "prompt_tokens": 1393,
+            "completion_tokens": 94,
+            "total_tokens": 1487
+          }
+        }
+      ],
+      "ok": true,
+      "elapsed_seconds": 22.04
+    },
+    {
+      "provider": "groq",
+      "model": "qwen/qwen3.8-27b",
+      "role": "selection",
+      "label": "qwen observation 4",
+      "started_at": "2026-10-26T11:35:02.943070+00:00",
+      "attempts": [
+        {
+          "http_status": 200,
+          "finish_reason": "stop",
+          "content_shape": "object",
+          "content_length": 472,
+          "usage": {
+            "prompt_tokens": 1390,
+            "completion_tokens": 111,
+            "total_tokens": 1501
+          }
+        }
+      ],
+      "ok": true,
+      "elapsed_seconds": 22.301
+    },
+    {
+      "provider": "groq",
+      "model": "qwen/qwen3.8-27b",
+      "role": "selection",
+      "label": "qwen observation 5",
+      "started_at": "2026-10-26T11:35:25.259056+00:00",
+      "attempts": [
+        {
+          "http_status": 200,
+          "finish_reason": "stop",
+          "content_shape": "object",
+          "content_length": 338,
+          "usage": {
+            "prompt_tokens": 1379,
+            "completion_tokens": 88,
+            "total_tokens": 1467
+          }
+        }
+      ],
+      "ok": true,
+      "elapsed_seconds": 22.002
+    },
+    {
+      "provider": "groq",
+      "model": "qwen/qwen3.8-27b",
+      "role": "selection",
+      "label": "qwen observation 6",
+      "started_at": "2026-10-26T11:35:47.275350+00:00",
+      "attempts": [
+        {
+          "http_status": 200,
+          "finish_reason": "stop",
+          "content_shape": "object",
+          "content_length": 366,
+          "usage": {
+            "prompt_tokens": 1366,
+            "completion_tokens": 91,
+            "total_tokens": 1457
+          }
+        }
+      ],
+      "ok": true,
+      "elapsed_seconds": 22.152
+    },
+    {
+      "provider": "groq",
+      "model": "openai/gpt-oss-120b",
+      "role": "selection",
+      "label": "qwen observation 1",
+      "started_at": "2026-10-26T11:36:09.434802+00:00",
+      "attempts": [
+        {
+          "http_status": 200,
+          "finish_reason": "stop",
+          "content_shape": "object",
+          "content_length": 300,
+          "usage": {
+            "prompt_tokens": 1545,
+            "completion_tokens": 151,
+            "total_tokens": 1696
+          }
+        }
+      ],
+      "ok": true,
+      "elapsed_seconds": 22.456
+    },
+    {
+      "provider": "groq",
+      "model": "openai/gpt-oss-120b",
+      "role": "selection",
+      "label": "qwen observation 2",
+      "started_at": "2026-10-26T11:36:31.899985+00:00",
+      "attempts": [
+        {
+          "http_status": 200,
+          "finish_reason": "stop",
+          "content_shape": "object",
+          "content_length": 341,
+          "usage": {
+            "prompt_tokens": 1548,
+            "completion_tokens": 166,
+            "total_tokens": 1714
+          }
+        }
+      ],
+      "ok": true,
+      "elapsed_seconds": 22.425
+    },
+    {
+      "provider": "groq",
+      "model": "openai/gpt-oss-120b",
+      "role": "selection",
+      "label": "qwen observation 3",
+      "started_at": "2026-10-26T11:36:54.334998+00:00",
+      "attempts": [
+        {
+          "http_status": 200,
+          "finish_reason": "stop",
+          "content_shape": "object",
+          "content_length": 310,
+          "usage": {
+            "prompt_tokens": 1535,
+            "completion_tokens": 147,
+            "total_tokens": 1682
+          }
+        }
+      ],
+      "ok": true,
+      "elapsed_seconds": 22.156
+    },
+    {
+      "provider": "groq",
+      "model": "openai/gpt-oss-120b",
+      "role": "selection",
+      "label": "qwen observation 4",
+      "started_at": "2026-10-26T11:37:16.496229+00:00",
+      "attempts": [
+        {
+          "http_status": 200,
+          "finish_reason": "stop",
+          "content_shape": "object",
+          "content_length": 321,
+          "usage": {
+            "prompt_tokens": 1528,
+            "completion_tokens": 150,
+            "total_tokens": 1678
+          }
+        }
+      ],
+      "ok": true,
+      "elapsed_seconds": 22.451
+    },
+    {
+      "provider": "groq",
+      "model": "openai/gpt-oss-120b",
+      "role": "selection",
+      "label": "qwen observation 5",
+      "started_at": "2026-10-26T11:37:38.955952+00:00",
+      "attempts": [
+        {
+          "http_status": 200,
+          "finish_reason": "stop",
+          "content_shape": "object",
+          "content_length": 374,
+          "usage": {
+            "prompt_tokens": 1521,
+            "completion_tokens": 175,
+            "total_tokens": 1696
+          }
+        }
+      ],
+      "ok": true,
+      "elapsed_seconds": 22.185
+    },
+    {
+      "provider": "groq",
+      "model": "openai/gpt-oss-120b",
+      "role": "selection",
+      "label": "qwen observation 6",
+      "started_at": "2026-10-26T11:38:01.147818+00:00",
+      "attempts": [
+        {
+          "http_status": 200,
+          "finish_reason": "stop",
+          "content_shape": "object",
+          "content_length": 319,
+          "usage": {
+            "prompt_tokens": 1509,
+            "completion_tokens": 171,
+            "total_tokens": 1680
+          }
+        }
+      ],
+      "ok": true,
+      "elapsed_seconds": 22.154
+    },
+    {
+      "provider": "groq",
+      "model": "openai/gpt-oss-20b",
+      "role": "selection",
+      "label": "qwen observation 1",
+      "started_at": "2026-10-26T11:38:23.313951+00:00",
+      "attempts": [
+        {
+          "http_status": 200,
+          "finish_reason": "stop",
+          "content_shape": "object",
+          "content_length": 293,
+          "usage": {
+            "prompt_tokens": 1545,
+            "completion_tokens": 127,
+            "total_tokens": 1672
+          }
+        }
+      ],
+      "ok": true,
+      "elapsed_seconds": 21.931
+    },
+    {
+      "provider": "groq",
+      "model": "openai/gpt-oss-20b",
+      "role": "selection",
+      "label": "qwen observation 2",
+      "started_at": "2026-10-26T11:38:45.254055+00:00",
+      "attempts": [
+        {
+          "http_status": 200,
+          "finish_reason": "stop",
+          "content_shape": "object",
+          "content_length": 321,
+          "usage": {
+            "prompt_tokens": 1548,
+            "completion_tokens": 144,
+            "total_tokens": 1692
+          }
+        }
+      ],
+      "ok": true,
+      "elapsed_seconds": 22.241
+    },
+    {
+      "provider": "groq",
+      "model": "openai/gpt-oss-20b",
+      "role": "selection",
+      "label": "qwen observation 3",
+      "started_at": "2026-10-26T11:39:07.505650+00:00",
+      "attempts": [
+        {
+          "http_status": 200,
+          "finish_reason": "stop",
+          "content_shape": "object",
+          "content_length": 320,
+          "usage": {
+            "prompt_tokens": 1535,
+            "completion_tokens": 131,
+            "total_tokens": 1666
+          }
+        }
+      ],
+      "ok": true,
+      "elapsed_seconds": 22.363
+    },
+    {
+      "provider": "groq",
+      "model": "openai/gpt-oss-20b",
+      "role": "selection",
+      "label": "qwen observation 4",
+      "started_at": "2026-10-26T11:39:29.878482+00:00",
+      "attempts": [
+        {
+          "http_status": 200,
+          "finish_reason": "stop",
+          "content_shape": "object",
+          "content_length": 341,
+          "usage": {
+            "prompt_tokens": 1528,
+            "completion_tokens": 140,
+            "total_tokens": 1668
+          }
+        }
+      ],
+      "ok": true,
+      "elapsed_seconds": 22.435
+    },
+    {
+      "provider": "groq",
+      "model": "openai/gpt-oss-20b",
+      "role": "selection",
+      "label": "qwen observation 5",
+      "started_at": "2026-10-26T11:39:52.322441+00:00",
+      "attempts": [
+        {
+          "http_status": 200,
+          "finish_reason": "stop",
+          "content_shape": "object",
+          "content_length": 280,
+          "usage": {
+            "prompt_tokens": 1521,
+            "completion_tokens": 119,
+            "total_tokens": 1640
+          }
+        }
+      ],
+      "ok": true,
+      "elapsed_seconds": 22.309
+    },
+    {
+      "provider": "groq",
+      "model": "openai/gpt-oss-20b",
+      "role": "selection",
+      "label": "qwen observation 6",
+      "started_at": "2026-10-26T11:40:14.641615+00:00",
+      "attempts": [
+        {
+          "http_status": 200,
+          "finish_reason": "stop",
+          "content_shape": "object",
+          "content_length": 392,
+          "usage": {
+            "prompt_tokens": 1509,
+            "completion_tokens": 202,
+            "total_tokens": 1711
+          }
+        }
+      ],
+      "ok": true,
+      "elapsed_seconds": 22.278
+    },
+    {
+      "provider": "gonka",
+      "model": "deepseek-ai/DeepSeek-V4-Flash-0731",
+      "role": "selection",
+      "label": "qwen observation 1",
+      "started_at": "2026-10-26T11:40:36.931732+00:00",
+      "attempts": [
+        {
+          "http_status": 200,
+          "finish_reason": "stop",
+          "content_shape": "object",
+          "content_length": 397,
+          "usage": {
+            "prompt_tokens": 1577,
+            "completion_tokens": 106,
+            "total_tokens": 1683
+          }
+        }
+      ],
+      "ok": true,
+      "elapsed_seconds": 2.839
+    },
+    {
+      "provider": "gonka",
+      "model": "deepseek-ai/DeepSeek-V4-Flash-0731",
+      "role": "selection",
+      "label": "qwen observation 2",
+      "started_at": "2026-10-26T11:40:39.782309+00:00",
+      "attempts": [
+        {
+          "http_status": 200,
+          "finish_reason": "stop",
+          "content_shape": "object",
+          "content_length": 335,
+          "usage": {
+            "prompt_tokens": 1581,
+            "completion_tokens": 101,
+            "total_tokens": 1682
+          }
+        }
+      ],
+      "ok": true,
+      "elapsed_seconds": 43.937
+    },
+    {
+      "provider": "gonka",
+      "model": "deepseek-ai/DeepSeek-V4-Flash-0731",
+      "role": "selection",
+      "label": "qwen observation 3",
+      "started_at": "2026-10-26T11:41:23.729575+00:00",
+      "attempts": [
+        {
+          "http_status": 200,
+          "finish_reason": "stop",
+          "content_shape": "object",
+          "content_length": 387,
+          "usage": {
+            "prompt_tokens": 1568,
+            "completion_tokens": 111,
+            "total_tokens": 1679
+          }
+        }
+      ],
+      "ok": true,
+      "elapsed_seconds": 2.336
+    },
+    {
+      "provider": "gonka",
+      "model": "deepseek-ai/DeepSeek-V4-Flash-0731",
+      "role": "selection",
+      "label": "qwen observation 4",
+      "started_at": "2026-10-26T11:41:26.071296+00:00",
+      "attempts": [
+        {
+          "http_status": 200,
+          "finish_reason": "stop",
+          "content_shape": "object",
+          "content_length": 366,
+          "usage": {
+            "prompt_tokens": 1558,
+            "completion_tokens": 99,
+            "total_tokens": 1657
+          }
+        }
+      ],
+      "ok": true,
+      "elapsed_seconds": 37.125
+    },
+    {
+      "provider": "gonka",
+      "model": "deepseek-ai/DeepSeek-V4-Flash-0731",
+      "role": "selection",
+      "label": "qwen observation 5",
+      "started_at": "2026-10-26T11:42:03.207317+00:00",
+      "attempts": [
+        {
+          "http_status": 200,
+          "finish_reason": "stop",
+          "content_shape": "object",
+          "content_length": 369,
+          "usage": {
+            "prompt_tokens": 1553,
+            "completion_tokens": 102,
+            "total_tokens": 1655
+          }
+        }
+      ],
+      "ok": true,
+      "elapsed_seconds": 33.007
+    },
+    {
+      "provider": "gonka",
+      "model": "deepseek-ai/DeepSeek-V4-Flash-0731",
+      "role": "selection",
+      "label": "qwen observation 6",
+      "started_at": "2026-10-26T11:42:36.225076+00:00",
+      "attempts": [
+        {
+          "http_status": 200,
+          "finish_reason": "stop",
+          "content_shape": "object",
+          "content_length": 486,
+          "usage": {
+            "prompt_tokens": 1541,
+            "completion_tokens": 123,
+            "total_tokens": 1664
+          }
+        }
+      ],
+      "ok": true,
+      "elapsed_seconds": 46.6
+    },
+    {
+      "provider": "groq",
+      "model": "qwen/qwen3.8-27b",
+      "role": "selection",
+      "label": "gpt120 observation 1",
+      "started_at": "2026-10-26T11:43:22.835895+00:00",
+      "attempts": [
+        {
+          "http_status": 200,
+          "finish_reason": "stop",
+          "content_shape": "object",
+          "content_length": 406,
+          "usage": {
+            "prompt_tokens": 1388,
+            "completion_tokens": 100,
+            "total_tokens": 1488
+          }
+        }
+      ],
+      "ok": true,
+      "elapsed_seconds": 0.615
+    },
+    {
+      "provider": "groq",
+      "model": "qwen/qwen3.8-27b",
+      "role": "selection",
+      "label": "gpt120 observation 2",
+      "started_at": "2026-10-26T11:43:23.457557+00:00",
+      "attempts": [
+        {
+          "http_status": 200,
+          "finish_reason": "stop",
+          "content_shape": "object",
+          "content_length": 454,
+          "usage": {
+            "prompt_tokens": 1403,
+            "completion_tokens": 119,
+            "total_tokens": 1522
+          }
+        }
+      ],
+      "ok": true,
+      "elapsed_seconds": 22.153
+    },
+    {
+      "provider": "groq",
+      "model": "qwen/qwen3.8-27b",
+      "role": "selection",
+      "label": "gpt120 observation 3",
+      "started_at": "2026-10-26T11:43:45.619990+00:00",
+      "attempts": [
+        {
+          "http_status": 200,
+          "finish_reason": "stop",
+          "content_shape": "object",
+          "content_length": 426,
+          "usage": {
+            "prompt_tokens": 1361,
+            "completion_tokens": 104,
+            "total_tokens": 1465
+          }
+        }
+      ],
+      "ok": true,
+      "elapsed_seconds": 21.907
+    },
+    {
+      "provider": "groq",
+      "model": "qwen/qwen3.8-27b",
+      "role": "selection",
+      "label": "gpt120 observation 4",
+      "started_at": "2026-10-26T11:44:07.540249+00:00",
+      "attempts": [
+        {
+          "http_status": 200,
+          "finish_reason": "stop",
+          "content_shape": "object",
+          "content_length": 427,
+          "usage": {
+            "prompt_tokens": 1462,
+            "completion_tokens": 100,
+            "total_tokens": 1562
+          }
+        }
+      ],
+      "ok": true,
+      "elapsed_seconds": 21.876
+    },
+    {
+      "provider": "groq",
+      "model": "qwen/qwen3.8-27b",
+      "role": "selection",
+      "label": "gpt120 observation 5",
+      "started_at": "2026-10-26T11:44:29.424053+00:00",
+      "attempts": [
+        {
+          "http_status": 200,
+          "finish_reason": "stop",
+          "content_shape": "object",
+          "content_length": 500,
+          "usage": {
+            "prompt_tokens": 1387,
+            "completion_tokens": 115,
+            "total_tokens": 1502
+          }
+        }
+      ],
+      "ok": true,
+      "elapsed_seconds": 23.055
+    },
+    {
+      "provider": "groq",
+      "model": "qwen/qwen3.8-27b",
+      "role": "selection",
+      "label": "gpt120 observation 6",
+      "started_at": "2026-10-26T11:44:52.489103+00:00",
+      "attempts": [
+        {
+          "http_status": 200,
+          "finish_reason": "stop",
+          "content_shape": "object",
+          "content_length": 536,
+          "usage": {
+            "prompt_tokens": 1343,
+            "completion_tokens": 135,
+            "total_tokens": 1478
+          }
+        }
+      ],
+      "ok": true,
+      "elapsed_seconds": 22.172
+    },
+    {
+      "provider": "groq",
+      "model": "qwen/qwen3.8-27b",
+      "role": "selection",
+      "label": "gpt120 observation 7",
+      "started_at": "2026-10-26T11:45:14.670407+00:00",
+      "attempts": [
+        {
+          "http_status": 200,
+          "finish_reason": "stop",
+          "content_shape": "object",
+          "content_length": 347,
+          "usage": {
+            "prompt_tokens": 1441,
+            "completion_tokens": 84,
+            "total_tokens": 1525
+          }
+        }
+      ],
+      "ok": true,
+      "elapsed_seconds": 21.214
+    },
+    {
+      "provider": "groq",
+      "model": "qwen/qwen3.8-27b",
+      "role": "selection",
+      "label": "gpt120 observation 8",
+      "started_at": "2026-10-26T11:45:35.897748+00:00",
+      "attempts": [
+        {
+          "http_status": 200,
+          "finish_reason": "stop",
+          "content_shape": "object",
+          "content_length": 405,
+          "usage": {
+            "prompt_tokens": 1362,
+            "completion_tokens": 89,
+            "total_tokens": 1451
+          }
+        }
+      ],
+      "ok": true,
+      "elapsed_seconds": 23.792
+    },
+    {
+      "provider": "groq",
+      "model": "openai/gpt-oss-120b",
+      "role": "selection",
+      "label": "gpt120 observation 1",
+      "started_at": "2026-10-26T11:45:59.702578+00:00",
+      "attempts": [
+        {
+          "http_status": 200,
+          "finish_reason": "stop",
+          "content_shape": "object",
+          "content_length": 315,
+          "usage": {
+            "prompt_tokens": 1522,
+            "completion_tokens": 162,
+            "total_tokens": 1684
+          }
+        }
+      ],
+      "ok": true,
+      "elapsed_seconds": 21.382
+    },
+    {
+      "provider": "groq",
+      "model": "openai/gpt-oss-120b",
+      "role": "selection",
+      "label": "gpt120 observation 2",
+      "started_at": "2026-10-26T11:46:21.094310+00:00",
+      "attempts": [
+        {
+          "http_status": 200,
+          "finish_reason": "stop",
+          "content_shape": "object",
+          "content_length": 332,
+          "usage": {
+            "prompt_tokens": 1536,
+            "completion_tokens": 172,
+            "total_tokens": 1708
+          }
+        }
+      ],
+      "ok": true,
+      "elapsed_seconds": 23.06
+    },
+    {
+      "provider": "groq",
+      "model": "openai/gpt-oss-120b",
+      "role": "selection",
+      "label": "gpt120 observation 3",
+      "started_at": "2026-10-26T11:46:44.163888+00:00",
+      "attempts": [
+        {
+          "http_status": 200,
+          "finish_reason": "stop",
+          "content_shape": "object",
+          "content_length": 334,
+          "usage": {
+            "prompt_tokens": 1501,
+            "completion_tokens": 161,
+            "total_tokens": 1662
+          }
+        }
+      ],
+      "ok": true,
+      "elapsed_seconds": 21.486
+    },
+    {
+      "provider": "groq",
+      "model": "openai/gpt-oss-120b",
+      "role": "selection",
+      "label": "gpt120 observation 4",
+      "started_at": "2026-10-26T11:47:05.662202+00:00",
+      "attempts": [
+        {
+          "http_status": 200,
+          "finish_reason": "stop",
+          "content_shape": "object",
+          "content_length": 360,
+          "usage": {
+            "prompt_tokens": 1602,
+            "completion_tokens": 175,
+            "total_tokens": 1777
+          }
+        }
+      ],
+      "ok": true,
+      "elapsed_seconds": 21.744
+    },
+    {
+      "provider": "groq",
+      "model": "openai/gpt-oss-120b",
+      "role": "selection",
+      "label": "gpt120 observation 5",
+      "started_at": "2026-10-26T11:47:27.418942+00:00",
+      "attempts": [
+        {
+          "http_status": 200,
+          "finish_reason": "stop",
+          "content_shape": "object",
+          "content_length": 318,
+          "usage": {
+            "prompt_tokens": 1523,
+            "completion_tokens": 176,
+            "total_tokens": 1699
+          }
+        }
+      ],
+      "ok": true,
+      "elapsed_seconds": 22.998
+    },
+    {
+      "provider": "groq",
+      "model": "openai/gpt-oss-120b",
+      "role": "selection",
+      "label": "gpt120 observation 6",
+      "started_at": "2026-10-26T11:47:50.425900+00:00",
+      "attempts": [
+        {
+          "http_status": 200,
+          "finish_reason": "stop",
+          "content_shape": "object",
+          "content_length": 307,
+          "usage": {
+            "prompt_tokens": 1485,
+            "completion_tokens": 154,
+            "total_tokens": 1639
+          }
+        }
+      ],
+      "ok": true,
+      "elapsed_seconds": 22.181
+    },
+    {
+      "provider": "groq",
+      "model": "openai/gpt-oss-120b",
+      "role": "selection",
+      "label": "gpt120 observation 7",
+      "started_at": "2026-10-26T11:48:12.617181+00:00",
+      "attempts": [
+        {
+          "http_status": 200,
+          "finish_reason": "stop",
+          "content_shape": "object",
+          "content_length": 304,
+          "usage": {
+            "prompt_tokens": 1583,
+            "completion_tokens": 144,
+            "total_tokens": 1727
+          }
+        }
+      ],
+      "ok": true,
+      "elapsed_seconds": 21.479
+    },
+    {
+      "provider": "groq",
+      "model": "openai/gpt-oss-120b",
+      "role": "selection",
+      "label": "gpt120 observation 8",
+      "started_at": "2026-10-26T11:48:34.109731+00:00",
+      "attempts": [
+        {
+          "http_status": 200,
+          "finish_reason": "stop",
+          "content_shape": "object",
+          "content_length": 297,
+          "usage": {
+            "prompt_tokens": 1506,
+            "completion_tokens": 128,
+            "total_tokens": 1634
+          }
+        }
+      ],
+      "ok": true,
+      "elapsed_seconds": 22.919
+    },
+    {
+      "provider": "groq",
+      "model": "openai/gpt-oss-20b",
+      "role": "selection",
+      "label": "gpt120 observation 1",
+      "started_at": "2026-10-26T11:48:57.038702+00:00",
+      "attempts": [
+        {
+          "http_status": 200,
+          "finish_reason": "stop",
+          "content_shape": "object",
+          "content_length": 259,
+          "usage": {
+            "prompt_tokens": 1522,
+            "completion_tokens": 127,
+            "total_tokens": 1649
+          }
+        }
+      ],
+      "ok": true,
+      "elapsed_seconds": 21.985
+    },
+    {
+      "provider": "groq",
+      "model": "openai/gpt-oss-20b",
+      "role": "selection",
+      "label": "gpt120 observation 2",
+      "started_at": "2026-10-26T11:49:19.036899+00:00",
+      "attempts": [
+        {
+          "http_status": 200,
+          "finish_reason": "stop",
+          "content_shape": "object",
+          "content_length": 246,
+          "usage": {
+            "prompt_tokens": 1536,
+            "completion_tokens": 94,
+            "total_tokens": 1630
+          }
+        }
+      ],
+      "ok": true,
+      "elapsed_seconds": 22.107
+    },
+    {
+      "provider": "groq",
+      "model": "openai/gpt-oss-20b",
+      "role": "selection",
+      "label": "gpt120 observation 3",
+      "started_at": "2026-10-26T11:49:41.159404+00:00",
+      "attempts": [
+        {
+          "http_status": 200,
+          "finish_reason": "stop",
+          "content_shape": "object",
+          "content_length": 306,
+          "usage": {
+            "prompt_tokens": 1501,
+            "completion_tokens": 169,
+            "total_tokens": 1670
+          }
+        }
+      ],
+      "ok": true,
+      "elapsed_seconds": 22.226
+    },
+    {
+      "provider": "groq",
+      "model": "openai/gpt-oss-20b",
+      "role": "selection",
+      "label": "gpt120 observation 4",
+      "started_at": "2026-10-26T11:50:03.400596+00:00",
+      "attempts": [
+        {
+          "http_status": 200,
+          "finish_reason": "stop",
+          "content_shape": "object",
+          "content_length": 358,
+          "usage": {
+            "prompt_tokens": 1602,
+            "completion_tokens": 133,
+            "total_tokens": 1735
+          }
+        }
+      ],
+      "ok": true,
+      "elapsed_seconds": 22.004
+    },
+    {
+      "provider": "groq",
+      "model": "openai/gpt-oss-20b",
+      "role": "selection",
+      "label": "gpt120 observation 5",
+      "started_at": "2026-10-26T11:50:25.416859+00:00",
+      "attempts": [
+        {
+          "http_status": 200,
+          "finish_reason": "stop",
+          "content_shape": "object",
+          "content_length": 294,
+          "usage": {
+            "prompt_tokens": 1523,
+            "completion_tokens": 127,
+            "total_tokens": 1650
+          }
+        }
+      ],
+      "ok": true,
+      "elapsed_seconds": 22.931
+    },
+    {
+      "provider": "groq",
+      "model": "openai/gpt-oss-20b",
+      "role": "selection",
+      "label": "gpt120 observation 6",
+      "started_at": "2026-10-26T11:50:48.358934+00:00",
+      "attempts": [
+        {
+          "http_status": 200,
+          "finish_reason": "stop",
+          "content_shape": "object",
+          "content_length": 297,
+          "usage": {
+            "prompt_tokens": 1485,
+            "completion_tokens": 153,
+            "total_tokens": 1638
+          }
+        }
+      ],
+      "ok": true,
+      "elapsed_seconds": 22.749
+    },
+    {
+      "provider": "groq",
+      "model": "openai/gpt-oss-20b",
+      "role": "selection",
+      "label": "gpt120 observation 7",
+      "started_at": "2026-10-26T11:51:11.117115+00:00",
+      "attempts": [
+        {
+          "http_status": 200,
+          "finish_reason": "stop",
+          "content_shape": "object",
+          "content_length": 285,
+          "usage": {
+            "prompt_tokens": 1583,
+            "completion_tokens": 137,
+            "total_tokens": 1720
+          }
+        }
+      ],
+      "ok": true,
+      "elapsed_seconds": 20.75
+    },
+    {
+      "provider": "groq",
+      "model": "openai/gpt-oss-20b",
+      "role": "selection",
+      "label": "gpt120 observation 8",
+      "started_at": "2026-10-26T11:51:31.874241+00:00",
+      "attempts": [
+        {
+          "http_status": 200,
+          "finish_reason": "stop",
+          "content_shape": "object",
+          "content_length": 284,
+          "usage": {
+            "prompt_tokens": 1506,
+            "completion_tokens": 105,
+            "total_tokens": 1611
+          }
+        }
+      ],
+      "ok": true,
+      "elapsed_seconds": 23.184
+    },
+    {
+      "provider": "gonka",
+      "model": "deepseek-ai/DeepSeek-V4-Flash-0731",
+      "role": "selection",
+      "label": "gpt120 observation 1",
+      "started_at": "2026-10-26T11:51:55.067873+00:00",
+      "attempts": [
+        {
+          "http_status": 200,
+          "finish_reason": "stop",
+          "content_shape": "object",
+          "content_length": 352,
+          "usage": {
+            "prompt_tokens": 1552,
+            "completion_tokens": 96,
+            "total_tokens": 1648
+          }
+        }
+      ],
+      "ok": true,
+      "elapsed_seconds": 3.185
+    },
+    {
+      "provider": "gonka",
+      "model": "deepseek-ai/DeepSeek-V4-Flash-0731",
+      "role": "selection",
+      "label": "gpt120 observation 2",
+      "started_at": "2026-10-26T11:51:58.261503+00:00",
+      "attempts": [
+        {
+          "http_status": 200,
+          "finish_reason": "stop",
+          "content_shape": "object",
+          "content_length": 387,
+          "usage": {
+            "prompt_tokens": 1567,
+            "completion_tokens": 112,
+            "total_tokens": 1679
+          }
+        }
+      ],
+      "ok": true,
+      "elapsed_seconds": 10.288
+    },
+    {
+      "provider": "gonka",
+      "model": "deepseek-ai/DeepSeek-V4-Flash-0731",
+      "role": "selection",
+      "label": "gpt120 observation 3",
+      "started_at": "2026-10-26T11:52:08.564991+00:00",
+      "attempts": [
+        {
+          "http_status": 200,
+          "finish_reason": "stop",
+          "content_shape": "object",
+          "content_length": 374,
+          "usage": {
+            "prompt_tokens": 1532,
+            "completion_tokens": 109,
+            "total_tokens": 1641
+          }
+        }
+      ],
+      "ok": true,
+      "elapsed_seconds": 11.362
+    },
+    {
+      "provider": "gonka",
+      "model": "deepseek-ai/DeepSeek-V4-Flash-0731",
+      "role": "selection",
+      "label": "gpt120 observation 4",
+      "started_at": "2026-10-26T11:52:19.938389+00:00",
+      "attempts": [
+        {
+          "http_status": 200,
+          "finish_reason": "stop",
+          "content_shape": "object",
+          "content_length": 423,
+          "usage": {
+            "prompt_tokens": 1633,
+            "completion_tokens": 112,
+            "total_tokens": 1745
+          }
+        }
+      ],
+      "ok": true,
+      "elapsed_seconds": 39.082
+    },
+    {
+      "provider": "gonka",
+      "model": "deepseek-ai/DeepSeek-V4-Flash-0731",
+      "role": "selection",
+      "label": "gpt120 observation 5",
+      "started_at": "2026-10-26T11:52:59.033877+00:00",
+      "attempts": [
+        {
+          "http_status": 200,
+          "finish_reason": "stop",
+          "content_shape": "object",
+          "content_length": 463,
+          "usage": {
+            "prompt_tokens": 1550,
+            "completion_tokens": 117,
+            "total_tokens": 1667
+          }
+        }
+      ],
+      "ok": true,
+      "elapsed_seconds": 36.686
+    },
+    {
+      "provider": "gonka",
+      "model": "deepseek-ai/DeepSeek-V4-Flash-0731",
+      "role": "selection",
+      "label": "gpt120 observation 6",
+      "started_at": "2026-10-26T11:53:35.730753+00:00",
+      "attempts": [
+        {
+          "http_status": 200,
+          "finish_reason": "stop",
+          "content_shape": "object",
+          "content_length": 356,
+          "usage": {
+            "prompt_tokens": 1514,
+            "completion_tokens": 100,
+            "total_tokens": 1614
+          }
+        }
+      ],
+      "ok": true,
+      "elapsed_seconds": 39.582
+    },
+    {
+      "provider": "gonka",
+      "model": "deepseek-ai/DeepSeek-V4-Flash-0731",
+      "role": "selection",
+      "label": "gpt120 observation 7",
+      "started_at": "2026-10-26T11:54:15.324493+00:00",
+      "attempts": [
+        {
+          "http_status": 200,
+          "finish_reason": "stop",
+          "content_shape": "object",
+          "content_length": 405,
+          "usage": {
+            "prompt_tokens": 1612,
+            "completion_tokens": 105,
+            "total_tokens": 1717
+          }
+        }
+      ],
+      "ok": true,
+      "elapsed_seconds": 43.474
+    },
+    {
+      "provider": "gonka",
+      "model": "deepseek-ai/DeepSeek-V4-Flash-0731",
+      "role": "selection",
+      "label": "gpt120 observation 8",
+      "started_at": "2026-10-26T11:54:58.808354+00:00",
+      "attempts": [
+        {
+          "http_status": 200,
+          "finish_reason": "stop",
+          "content_shape": "object",
+          "content_length": 422,
+          "usage": {
+            "prompt_tokens": 1534,
+            "completion_tokens": 108,
+            "total_tokens": 1642
+          }
+        }
+      ],
+      "ok": true,
+      "elapsed_seconds": 2.174
+    },
+    {
+      "provider": "groq",
+      "model": "qwen/qwen3.8-27b",
+      "role": "selection",
+      "label": "gpt20 observation 1",
+      "started_at": "2026-10-26T11:55:00.998759+00:00",
+      "attempts": [
+        {
+          "http_status": 200,
+          "finish_reason": "stop",
+          "content_shape": "object",
+          "content_length": 349,
+          "usage": {
+            "prompt_tokens": 1329,
+            "completion_tokens": 89,
+            "total_tokens": 1418
+          }
+        }
+      ],
+      "ok": true,
+      "elapsed_seconds": 0.426
+    },
+    {
+      "provider": "groq",
+      "model": "qwen/qwen3.8-27b",
+      "role": "selection",
+      "label": "gpt20 observation 2",
+      "started_at": "2026-10-26T11:55:01.438838+00:00",
+      "attempts": [
+        {
+          "http_status": 200,
+          "finish_reason": "stop",
+          "content_shape": "object",
+          "content_length": 330,
+          "usage": {
+            "prompt_tokens": 1328,
+            "completion_tokens": 88,
+            "total_tokens": 1416
+          }
+        }
+      ],
+      "ok": true,
+      "elapsed_seconds": 21.376
+    },
+    {
+      "provider": "groq",
+      "model": "qwen/qwen3.8-27b",
+      "role": "selection",
+      "label": "gpt20 observation 3",
+      "started_at": "2026-10-26T11:55:22.831972+00:00",
+      "attempts": [
+        {
+          "http_status": 200,
+          "finish_reason": "stop",
+          "content_shape": "object",
+          "content_length": 425,
+          "usage": {
+            "prompt_tokens": 1300,
+            "completion_tokens": 101,
+            "total_tokens": 1401
+          }
+        }
+      ],
+      "ok": true,
+      "elapsed_seconds": 21.341
+    },
+    {
+      "provider": "groq",
+      "model": "qwen/qwen3.8-27b",
+      "role": "selection",
+      "label": "gpt20 observation 4",
+      "started_at": "2026-10-26T11:55:44.186681+00:00",
+      "attempts": [
+        {
+          "http_status": 200,
+          "finish_reason": "stop",
+          "content_shape": "object",
+          "content_length": 435,
+          "usage": {
+            "prompt_tokens": 1315,
+            "completion_tokens": 101,
+            "total_tokens": 1416
+          }
+        }
+      ],
+      "ok": true,
+      "elapsed_seconds": 21.121
+    },
+    {
+      "provider": "groq",
+      "model": "qwen/qwen3.8-27b",
+      "role": "selection",
+      "label": "gpt20 observation 5",
+      "started_at": "2026-10-26T11:56:05.318431+00:00",
+      "attempts": [
+        {
+          "http_status": 200,
+          "finish_reason": "stop",
+          "content_shape": "object",
+          "content_length": 447,
+          "usage": {
+            "prompt_tokens": 1291,
+            "completion_tokens": 112,
+            "total_tokens": 1403
+          }
+        }
+      ],
+      "ok": true,
+      "elapsed_seconds": 21.733
+    },
+    {
+      "provider": "groq",
+      "model": "qwen/qwen3.8-27b",
+      "role": "selection",
+      "label": "gpt20 observation 6",
+      "started_at": "2026-10-26T11:56:27.062036+00:00",
+      "attempts": [
+        {
+          "http_status": 200,
+          "finish_reason": "stop",
+          "content_shape": "object",
+          "content_length": 482,
+          "usage": {
+            "prompt_tokens": 1280,
+            "completion_tokens": 105,
+            "total_tokens": 1385
+          }
+        }
+      ],
+      "ok": true,
+      "elapsed_seconds": 20.871
+    },
+    {
+      "provider": "groq",
+      "model": "openai/gpt-oss-120b",
+      "role": "selection",
+      "label": "gpt20 observation 1",
+      "started_at": "2026-10-26T11:56:47.944813+00:00",
+      "attempts": [
+        {
+          "http_status": 200,
+          "finish_reason": "stop",
+          "content_shape": "object",
+          "content_length": 329,
+          "usage": {
+            "prompt_tokens": 1465,
+            "completion_tokens": 179,
+            "total_tokens": 1644
+          }
+        }
+      ],
+      "ok": true,
+      "elapsed_seconds": 22.067
+    },
+    {
+      "provider": "groq",
+      "model": "openai/gpt-oss-120b",
+      "role": "selection",
+      "label": "gpt20 observation 2",
+      "started_at": "2026-10-26T11:57:10.023884+00:00",
+      "attempts": [
+        {
+          "http_status": 200,
+          "finish_reason": "stop",
+          "content_shape": "object",
+          "content_length": 336,
+          "usage": {
+            "prompt_tokens": 1464,
+            "completion_tokens": 191,
+            "total_tokens": 1655
+          }
+        }
+      ],
+      "ok": true,
+      "elapsed_seconds": 21.45
+    },
+    {
+      "provider": "groq",
+      "model": "openai/gpt-oss-120b",
+      "role": "selection",
+      "label": "gpt20 observation 3",
+      "started_at": "2026-10-26T11:57:31.483230+00:00",
+      "attempts": [
+        {
+          "http_status": 200,
+          "finish_reason": "stop",
+          "content_shape": "object",
+          "content_length": 297,
+          "usage": {
+            "prompt_tokens": 1442,
+            "completion_tokens": 147,
+            "total_tokens": 1589
+          }
+        }
+      ],
+      "ok": true,
+      "elapsed_seconds": 20.294
+    },
+    {
+      "provider": "groq",
+      "model": "openai/gpt-oss-120b",
+      "role": "selection",
+      "label": "gpt20 observation 4",
+      "started_at": "2026-10-26T11:57:51.793203+00:00",
+      "attempts": [
+        {
+          "http_status": 200,
+          "finish_reason": "stop",
+          "content_shape": "object",
+          "content_length": 315,
+          "usage": {
+            "prompt_tokens": 1455,
+            "completion_tokens": 150,
+            "total_tokens": 1605
+          }
+        }
+      ],
+      "ok": true,
+      "elapsed_seconds": 21.278
+    },
+    {
+      "provider": "groq",
+      "model": "openai/gpt-oss-120b",
+      "role": "selection",
+      "label": "gpt20 observation 5",
+      "started_at": "2026-10-26T11:58:13.083589+00:00",
+      "attempts": [],
+      "ok": false,
+      "error": "Interrupted",
+      "elapsed_seconds": 6.021
+    },
+    {
+      "provider": "groq",
+      "model": "openai/gpt-oss-120b",
+      "role": "selection",
+      "label": "gpt20 observation 5",
+      "started_at": "2026-10-26T12:00:04.426143+00:00",
+      "attempts": [],
+      "ok": false,
+      "error": "OllamaTransportError: Groq request timed out or failed",
+      "elapsed_seconds": 0.013
+    },
+    {
+      "provider": "groq",
+      "model": "openai/gpt-oss-120b",
+      "role": "selection",
+      "label": "gpt20 observation 6",
+      "started_at": "2026-10-26T12:00:04.441541+00:00",
+      "attempts": [],
+      "ok": false,
+      "error": "OllamaTransportError: Groq request timed out or failed",
+      "elapsed_seconds": 2.093
+    },
+    {
+      "provider": "groq",
+      "model": "openai/gpt-oss-20b",
+      "role": "selection",
+      "label": "gpt20 observation 1",
+      "started_at": "2026-10-26T12:00:06.547750+00:00",
+      "attempts": [],
+      "ok": false,
+      "error": "Interrupted",
+      "elapsed_seconds": 1.697
+    },
+    {
+      "provider": "gonka",
+      "model": "deepseek-ai/DeepSeek-V4-Flash-0731",
+      "role": "orchestrator",
+      "label": "intake",
+      "started_at": "2026-10-26T12:00:31.872350+00:00",
+      "attempts": [
+        {
+          "http_status": 200,
+          "finish_reason": "stop",
+          "content_shape": "object",
+          "content_length": 395,
+          "usage": {
+            "prompt_tokens": 92,
+            "completion_tokens": 110,
+            "total_tokens": 202
+          }
+        }
+      ],
+      "ok": false,
+      "error": "OllamaResponseError: Gonka returned an invalid JSON response",
+      "elapsed_seconds": 2.586,
+      "trial": "fenced_json_v1"
+    },
+    {
+      "provider": "gonka",
+      "model": "deepseek-ai/DeepSeek-V4-Flash-0731",
+      "role": "orchestrator",
+      "label": "analysis",
+      "started_at": "2026-10-26T12:00:34.472602+00:00",
+      "attempts": [
+        {
+          "http_status": 200,
+          "finish_reason": "length",
+          "content_shape": "object",
+          "content_length": 548,
+          "usage": {
+            "prompt_tokens": 91,
+            "completion_tokens": 128,
+            "total_tokens": 219
+          }
+        }
+      ],
+      "ok": false,
+      "error": "OllamaResponseError: Gonka response was incomplete",
+      "elapsed_seconds": 8.605,
+      "trial": "fenced_json_v1"
+    },
+    {
+      "provider": "gonka",
+      "model": "deepseek-ai/DeepSeek-V4-Flash-0731",
+      "role": "orchestrator",
+      "label": "review",
+      "started_at": "2026-10-26T12:00:43.088832+00:00",
+      "attempts": [
+        {
+          "http_status": 200,
+          "finish_reason": "stop",
+          "content_shape": "object",
+          "content_length": 327,
+          "usage": {
+            "prompt_tokens": 91,
+            "completion_tokens": 81,
+            "total_tokens": 172
+          }
+        }
+      ],
+      "ok": false,
+      "error": "OllamaResponseError: Gonka returned an invalid JSON response",
+      "elapsed_seconds": 12.126,
+      "trial": "fenced_json_v1"
+    },
+    {
+      "provider": "groq",
+      "model": "openai/gpt-oss-120b",
+      "role": "selection",
+      "label": "gpt20 observation 5",
+      "started_at": "2026-10-26T12:00:55.231030+00:00",
+      "attempts": [
+        {
+          "http_status": 200,
+          "finish_reason": "stop",
+          "content_shape": "object",
+          "content_length": 334,
+          "usage": {
+            "prompt_tokens": 1433,
+            "completion_tokens": 160,
+            "total_tokens": 1593
+          }
+        }
+      ],
+      "ok": true,
+      "elapsed_seconds": 0.701
+    },
+    {
+      "provider": "groq",
+      "model": "openai/gpt-oss-120b",
+      "role": "selection",
+      "label": "gpt20 observation 6",
+      "started_at": "2026-10-26T12:00:55.941766+00:00",
+      "attempts": [
+        {
+          "http_status": 200,
+          "finish_reason": "stop",
+          "content_shape": "object",
+          "content_length": 322,
+          "usage": {
+            "prompt_tokens": 1420,
+            "completion_tokens": 133,
+            "total_tokens": 1553
+          }
+        }
+      ],
+      "ok": true,
+      "elapsed_seconds": 21.157
+    },
+    {
+      "provider": "groq",
+      "model": "openai/gpt-oss-20b",
+      "role": "selection",
+      "label": "gpt20 observation 1",
+      "started_at": "2026-10-26T12:01:17.113711+00:00",
+      "attempts": [
+        {
+          "http_status": 200,
+          "finish_reason": "stop",
+          "content_shape": "object",
+          "content_length": 367,
+          "usage": {
+            "prompt_tokens": 1465,
+            "completion_tokens": 163,
+            "total_tokens": 1628
+          }
+        }
+      ],
+      "ok": true,
+      "elapsed_seconds": 22.286
+    },
+    {
+      "provider": "groq",
+      "model": "openai/gpt-oss-20b",
+      "role": "selection",
+      "label": "gpt20 observation 2",
+      "started_at": "2026-10-26T12:01:39.415873+00:00",
+      "attempts": [
+        {
+          "http_status": 200,
+          "finish_reason": "stop",
+          "content_shape": "object",
+          "content_length": 309,
+          "usage": {
+            "prompt_tokens": 1464,
+            "completion_tokens": 143,
+            "total_tokens": 1607
+          }
+        }
+      ],
+      "ok": true,
+      "elapsed_seconds": 20.464
+    },
+    {
+      "provider": "groq",
+      "model": "openai/gpt-oss-20b",
+      "role": "selection",
+      "label": "gpt20 observation 3",
+      "started_at": "2026-10-26T12:01:59.891837+00:00",
+      "attempts": [
+        {
+          "http_status": 200,
+          "finish_reason": "stop",
+          "content_shape": "object",
+          "content_length": 386,
+          "usage": {
+            "prompt_tokens": 1442,
+            "completion_tokens": 181,
+            "total_tokens": 1623
+          }
+        }
+      ],
+      "ok": true,
+      "elapsed_seconds": 22.82
+    },
+    {
+      "provider": "groq",
+      "model": "openai/gpt-oss-20b",
+      "role": "selection",
+      "label": "gpt20 observation 4",
+      "started_at": "2026-10-26T12:02:22.726814+00:00",
+      "attempts": [
+        {
+          "http_status": 200,
+          "finish_reason": "stop",
+          "content_shape": "object",
+          "content_length": 301,
+          "usage": {
+            "prompt_tokens": 1455,
+            "completion_tokens": 145,
+            "total_tokens": 1600
+          }
+        }
+      ],
+      "ok": true,
+      "elapsed_seconds": 19.555
+    },
+    {
+      "provider": "groq",
+      "model": "openai/gpt-oss-20b",
+      "role": "selection",
+      "label": "gpt20 observation 5",
+      "started_at": "2026-10-26T12:02:42.294398+00:00",
+      "attempts": [
+        {
+          "http_status": 200,
+          "finish_reason": "stop",
+          "content_shape": "object",
+          "content_length": 354,
+          "usage": {
+            "prompt_tokens": 1433,
+            "completion_tokens": 129,
+            "total_tokens": 1562
+          }
+        }
+      ],
+      "ok": true,
+      "elapsed_seconds": 22.566
+    },
+    {
+      "provider": "groq",
+      "model": "openai/gpt-oss-20b",
+      "role": "selection",
+      "label": "gpt20 observation 6",
+      "started_at": "2026-10-26T12:03:04.876982+00:00",
+      "attempts": [
+        {
+          "http_status": 200,
+          "finish_reason": "stop",
+          "content_shape": "object",
+          "content_length": 319,
+          "usage": {
+            "prompt_tokens": 1420,
+            "completion_tokens": 142,
+            "total_tokens": 1562
+          }
+        }
+      ],
+      "ok": true,
+      "elapsed_seconds": 20.674
+    },
+    {
+      "provider": "gonka",
+      "model": "deepseek-ai/DeepSeek-V4-Flash-0731",
+      "role": "selection",
+      "label": "gpt20 observation 1",
+      "started_at": "2026-10-26T12:03:25.567542+00:00",
+      "attempts": [
+        {
+          "http_status": 200,
+          "finish_reason": "stop",
+          "content_shape": "object",
+          "content_length": 447,
+          "usage": {
+            "prompt_tokens": 1493,
+            "completion_tokens": 124,
+            "total_tokens": 1617
+          }
+        }
+      ],
+      "ok": true,
+      "elapsed_seconds": 27.498
+    },
+    {
+      "provider": "gonka",
+      "model": "deepseek-ai/DeepSeek-V4-Flash-0731",
+      "role": "selection",
+      "label": "gpt20 observation 2",
+      "started_at": "2026-10-26T12:03:53.081461+00:00",
+      "attempts": [
+        {
+          "http_status": 200,
+          "finish_reason": "stop",
+          "content_shape": "object",
+          "content_length": 362,
+          "usage": {
+            "prompt_tokens": 1493,
+            "completion_tokens": 110,
+            "total_tokens": 1603
+          }
+        }
+      ],
+      "ok": true,
+      "elapsed_seconds": 2.435
+    },
+    {
+      "provider": "gonka",
+      "model": "deepseek-ai/DeepSeek-V4-Flash-0731",
+      "role": "selection",
+      "label": "gpt20 observation 3",
+      "started_at": "2026-10-26T12:03:55.532305+00:00",
+      "attempts": [
+        {
+          "http_status": 200,
+          "finish_reason": "stop",
+          "content_shape": "object",
+          "content_length": 417,
+          "usage": {
+            "prompt_tokens": 1471,
+            "completion_tokens": 113,
+            "total_tokens": 1584
+          }
+        }
+      ],
+      "ok": true,
+      "elapsed_seconds": 47.723
+    },
+    {
+      "provider": "gonka",
+      "model": "deepseek-ai/DeepSeek-V4-Flash-0731",
+      "role": "selection",
+      "label": "gpt20 observation 4",
+      "started_at": "2026-10-26T12:04:43.266876+00:00",
+      "attempts": [
+        {
+          "http_status": 200,
+          "finish_reason": "stop",
+          "content_shape": "object",
+          "content_length": 477,
+          "usage": {
+            "prompt_tokens": 1483,
+            "completion_tokens": 127,
+            "total_tokens": 1610
+          }
+        }
+      ],
+      "ok": true,
+      "elapsed_seconds": 2.672
+    },
+    {
+      "provider": "gonka",
+      "model": "deepseek-ai/DeepSeek-V4-Flash-0731",
+      "role": "selection",
+      "label": "gpt20 observation 5",
+      "started_at": "2026-10-26T12:04:45.951792+00:00",
+      "attempts": [
+        {
+          "http_status": 200,
+          "finish_reason": "stop",
+          "content_shape": "object",
+          "content_length": 407,
+          "usage": {
+            "prompt_tokens": 1461,
+            "completion_tokens": 117,
+            "total_tokens": 1578
+          }
+        }
+      ],
+      "ok": true,
+      "elapsed_seconds": 42.015
+    },
+    {
+      "provider": "gonka",
+      "model": "deepseek-ai/DeepSeek-V4-Flash-0731",
+      "role": "selection",
+      "label": "gpt20 observation 6",
+      "started_at": "2026-10-26T12:05:27.984787+00:00",
+      "attempts": [
+        {
+          "http_status": 200,
+          "finish_reason": "stop",
+          "content_shape": "object",
+          "content_length": 512,
+          "usage": {
+            "prompt_tokens": 1449,
+            "completion_tokens": 125,
+            "total_tokens": 1574
+          }
+        }
+      ],
+      "ok": true,
+      "elapsed_seconds": 2.715
+    },
+    {
+      "provider": "groq",
+      "model": "qwen/qwen3.8-27b",
+      "role": "selection",
+      "label": "deepseek observation 1",
+      "started_at": "2026-10-26T12:05:30.716498+00:00",
+      "attempts": [
+        {
+          "http_status": 200,
+          "finish_reason": "stop",
+          "content_shape": "object",
+          "content_length": 408,
+          "usage": {
+            "prompt_tokens": 1406,
+            "completion_tokens": 100,
+            "total_tokens": 1506
+          }
+        }
+      ],
+      "ok": true,
+      "elapsed_seconds": 0.839
+    },
+    {
+      "provider": "groq",
+      "model": "qwen/qwen3.8-27b",
+      "role": "selection",
+      "label": "deepseek observation 2",
+      "started_at": "2026-10-26T12:05:31.571026+00:00",
+      "attempts": [
+        {
+          "http_status": 200,
+          "finish_reason": "stop",
+          "content_shape": "object",
+          "content_length": 437,
+          "usage": {
+            "prompt_tokens": 1343,
+            "completion_tokens": 97,
+            "total_tokens": 1440
+          }
+        }
+      ],
+      "ok": true,
+      "elapsed_seconds": 21.942
+    },
+    {
+      "provider": "groq",
+      "model": "qwen/qwen3.8-27b",
+      "role": "selection",
+      "label": "deepseek observation 3",
+      "started_at": "2026-10-26T12:05:53.528535+00:00",
+      "attempts": [
+        {
+          "http_status": 200,
+          "finish_reason": "stop",
+          "content_shape": "object",
+          "content_length": 330,
+          "usage": {
+            "prompt_tokens": 1408,
+            "completion_tokens": 88,
+            "total_tokens": 1496
+          }
+        }
+      ],
+      "ok": true,
+      "elapsed_seconds": 21.896
+    },
+    {
+      "provider": "groq",
+      "model": "qwen/qwen3.8-27b",
+      "role": "selection",
+      "label": "deepseek observation 4",
+      "started_at": "2026-10-26T12:06:15.438762+00:00",
+      "attempts": [
+        {
+          "http_status": 200,
+          "finish_reason": "stop",
+          "content_shape": "object",
+          "content_length": 411,
+          "usage": {
+            "prompt_tokens": 1342,
+            "completion_tokens": 108,
+            "total_tokens": 1450
+          }
+        }
+      ],
+      "ok": true,
+      "elapsed_seconds": 22.201
+    },
+    {
+      "provider": "groq",
+      "model": "qwen/qwen3.8-27b",
+      "role": "selection",
+      "label": "deepseek observation 5",
+      "started_at": "2026-10-26T12:06:37.654492+00:00",
+      "attempts": [
+        {
+          "http_status": 200,
+          "finish_reason": "stop",
+          "content_shape": "object",
+          "content_length": 424,
+          "usage": {
+            "prompt_tokens": 1372,
+            "completion_tokens": 98,
+            "total_tokens": 1470
+          }
+        }
+      ],
+      "ok": true,
+      "elapsed_seconds": 21.809
+    },
+    {
+      "provider": "groq",
+      "model": "qwen/qwen3.8-27b",
+      "role": "selection",
+      "label": "deepseek observation 6",
+      "started_at": "2026-10-26T12:06:59.481394+00:00",
+      "attempts": [
+        {
+          "http_status": 200,
+          "finish_reason": "stop",
+          "content_shape": "object",
+          "content_length": 439,
+          "usage": {
+            "prompt_tokens": 1382,
+            "completion_tokens": 102,
+            "total_tokens": 1484
+          }
+        }
+      ],
+      "ok": true,
+      "elapsed_seconds": 22.001
+    },
+    {
+      "provider": "groq",
+      "model": "qwen/qwen3.8-27b",
+      "role": "selection",
+      "label": "deepseek observation 7",
+      "started_at": "2026-10-26T12:07:21.490291+00:00",
+      "attempts": [
+        {
+          "http_status": 200,
+          "finish_reason": "stop",
+          "content_shape": "object",
+          "content_length": 393,
+          "usage": {
+            "prompt_tokens": 1376,
+            "completion_tokens": 97,
+            "total_tokens": 1473
+          }
+        }
+      ],
+      "ok": true,
+      "elapsed_seconds": 22.225
+    },
+    {
+      "provider": "groq",
+      "model": "qwen/qwen3.8-27b",
+      "role": "selection",
+      "label": "deepseek observation 8",
+      "started_at": "2026-10-26T12:07:43.720332+00:00",
+      "attempts": [
+        {
+          "http_status": 200,
+          "finish_reason": "stop",
+          "content_shape": "object",
+          "content_length": 442,
+          "usage": {
+            "prompt_tokens": 1369,
+            "completion_tokens": 111,
+            "total_tokens": 1480
+          }
+        }
+      ],
+      "ok": true,
+      "elapsed_seconds": 22.125
+    },
+    {
+      "provider": "groq",
+      "model": "qwen/qwen3.8-27b",
+      "role": "selection",
+      "label": "deepseek observation 9",
+      "started_at": "2026-10-26T12:08:05.862784+00:00",
+      "attempts": [
+        {
+          "http_status": 200,
+          "finish_reason": "stop",
+          "content_shape": "object",
+          "content_length": 451,
+          "usage": {
+            "prompt_tokens": 1352,
+            "completion_tokens": 100,
+            "total_tokens": 1452
+          }
+        }
+      ],
+      "ok": true,
+      "elapsed_seconds": 21.828
+    },
+    {
+      "provider": "groq",
+      "model": "qwen/qwen3.8-27b",
+      "role": "selection",
+      "label": "deepseek observation 10",
+      "started_at": "2026-10-26T12:08:27.703501+00:00",
+      "attempts": [
+        {
+          "http_status": 200,
+          "finish_reason": "stop",
+          "content_shape": "object",
+          "content_length": 478,
+          "usage": {
+            "prompt_tokens": 1333,
+            "completion_tokens": 104,
+            "total_tokens": 1437
+          }
+        }
+      ],
+      "ok": true,
+      "elapsed_seconds": 22.038
+    },
+    {
+      "provider": "groq",
+      "model": "openai/gpt-oss-120b",
+      "role": "selection",
+      "label": "deepseek observation 1",
+      "started_at": "2026-10-26T12:08:49.754952+00:00",
+      "attempts": [
+        {
+          "http_status": 200,
+          "finish_reason": "stop",
+          "content_shape": "object",
+          "content_length": 304,
+          "usage": {
+            "prompt_tokens": 1543,
+            "completion_tokens": 178,
+            "total_tokens": 1721
+          }
+        }
+      ],
+      "ok": true,
+      "elapsed_seconds": 22.34
+    },
+    {
+      "provider": "groq",
+      "model": "openai/gpt-oss-120b",
+      "role": "selection",
+      "label": "deepseek observation 2",
+      "started_at": "2026-10-26T12:09:12.105970+00:00",
+      "attempts": [
+        {
+          "http_status": 200,
+          "finish_reason": "stop",
+          "content_shape": "object",
+          "content_length": 310,
+          "usage": {
+            "prompt_tokens": 1484,
+            "completion_tokens": 178,
+            "total_tokens": 1662
+          }
+        }
+      ],
+      "ok": true,
+      "elapsed_seconds": 22.384
+    },
+    {
+      "provider": "groq",
+      "model": "openai/gpt-oss-120b",
+      "role": "selection",
+      "label": "deepseek observation 3",
+      "started_at": "2026-10-26T12:09:34.504240+00:00",
+      "attempts": [
+        {
+          "http_status": 200,
+          "finish_reason": "stop",
+          "content_shape": "object",
+          "content_length": 342,
+          "usage": {
+            "prompt_tokens": 1546,
+            "completion_tokens": 165,
+            "total_tokens": 1711
+          }
+        }
+      ],
+      "ok": true,
+      "elapsed_seconds": 21.9
+    },
+    {
+      "provider": "groq",
+      "model": "openai/gpt-oss-120b",
+      "role": "selection",
+      "label": "deepseek observation 4",
+      "started_at": "2026-10-26T12:09:56.417028+00:00",
+      "attempts": [
+        {
+          "http_status": 200,
+          "finish_reason": "stop",
+          "content_shape": "object",
+          "content_length": 349,
+          "usage": {
+            "prompt_tokens": 1483,
+            "completion_tokens": 199,
+            "total_tokens": 1682
+          }
+        }
+      ],
+      "ok": true,
+      "elapsed_seconds": 22.263
+    },
+    {
+      "provider": "groq",
+      "model": "openai/gpt-oss-120b",
+      "role": "selection",
+      "label": "deepseek observation 5",
+      "started_at": "2026-10-26T12:10:18.696295+00:00",
+      "attempts": [
+        {
+          "http_status": 200,
+          "finish_reason": "stop",
+          "content_shape": "object",
+          "content_length": 307,
+          "usage": {
+            "prompt_tokens": 1516,
+            "completion_tokens": 141,
+            "total_tokens": 1657
+          }
+        }
+      ],
+      "ok": true,
+      "elapsed_seconds": 21.698
+    },
+    {
+      "provider": "groq",
+      "model": "openai/gpt-oss-120b",
+      "role": "selection",
+      "label": "deepseek observation 6",
+      "started_at": "2026-10-26T12:10:40.411911+00:00",
+      "attempts": [
+        {
+          "http_status": 200,
+          "finish_reason": "stop",
+          "content_shape": "object",
+          "content_length": 305,
+          "usage": {
+            "prompt_tokens": 1522,
+            "completion_tokens": 145,
+            "total_tokens": 1667
+          }
+        }
+      ],
+      "ok": true,
+      "elapsed_seconds": 22.128
+    },
+    {
+      "provider": "groq",
+      "model": "openai/gpt-oss-120b",
+      "role": "selection",
+      "label": "deepseek observation 7",
+      "started_at": "2026-10-26T12:11:02.556513+00:00",
+      "attempts": [
+        {
+          "http_status": 200,
+          "finish_reason": "stop",
+          "content_shape": "object",
+          "content_length": 345,
+          "usage": {
+            "prompt_tokens": 1516,
+            "completion_tokens": 175,
+            "total_tokens": 1691
+          }
+        }
+      ],
+      "ok": true,
+      "elapsed_seconds": 22.286
+    },
+    {
+      "provider": "groq",
+      "model": "openai/gpt-oss-120b",
+      "role": "selection",
+      "label": "deepseek observation 8",
+      "started_at": "2026-10-26T12:11:24.856490+00:00",
+      "attempts": [
+        {
+          "http_status": 200,
+          "finish_reason": "stop",
+          "content_shape": "object",
+          "content_length": 318,
+          "usage": {
+            "prompt_tokens": 1512,
+            "completion_tokens": 156,
+            "total_tokens": 1668
+          }
+        }
+      ],
+      "ok": true,
+      "elapsed_seconds": 22.235
+    },
+    {
+      "provider": "groq",
+      "model": "openai/gpt-oss-120b",
+      "role": "selection",
+      "label": "deepseek observation 9",
+      "started_at": "2026-10-26T12:11:47.106499+00:00",
+      "attempts": [
+        {
+          "http_status": 200,
+          "finish_reason": "stop",
+          "content_shape": "object",
+          "content_length": 315,
+          "usage": {
+            "prompt_tokens": 1494,
+            "completion_tokens": 161,
+            "total_tokens": 1655
+          }
+        }
+      ],
+      "ok": true,
+      "elapsed_seconds": 21.871
+    },
+    {
+      "provider": "groq",
+      "model": "openai/gpt-oss-120b",
+      "role": "selection",
+      "label": "deepseek observation 10",
+      "started_at": "2026-10-26T12:12:08.993266+00:00",
+      "attempts": [
+        {
+          "http_status": 200,
+          "finish_reason": "stop",
+          "content_shape": "object",
+          "content_length": 336,
+          "usage": {
+            "prompt_tokens": 1476,
+            "completion_tokens": 172,
+            "total_tokens": 1648
+          }
+        }
+      ],
+      "ok": true,
+      "elapsed_seconds": 22.213
+    },
+    {
+      "provider": "groq",
+      "model": "openai/gpt-oss-20b",
+      "role": "selection",
+      "label": "deepseek observation 1",
+      "started_at": "2026-10-26T12:12:31.225151+00:00",
+      "attempts": [
+        {
+          "http_status": 200,
+          "finish_reason": "stop",
+          "content_shape": "object",
+          "content_length": 281,
+          "usage": {
+            "prompt_tokens": 1543,
+            "completion_tokens": 143,
+            "total_tokens": 1686
+          }
+        }
+      ],
+      "ok": true,
+      "elapsed_seconds": 21.942
+    },
+    {
+      "provider": "groq",
+      "model": "openai/gpt-oss-20b",
+      "role": "selection",
+      "label": "deepseek observation 2",
+      "started_at": "2026-10-26T12:12:53.185295+00:00",
+      "attempts": [
+        {
+          "http_status": 200,
+          "finish_reason": "stop",
+          "content_shape": "object",
+          "content_length": 371,
+          "usage": {
+            "prompt_tokens": 1484,
+            "completion_tokens": 143,
+            "total_tokens": 1627
+          }
+        }
+      ],
+      "ok": true,
+      "elapsed_seconds": 22.703
+    },
+    {
+      "provider": "groq",
+      "model": "openai/gpt-oss-20b",
+      "role": "selection",
+      "label": "deepseek observation 3",
+      "started_at": "2026-10-26T12:13:15.907046+00:00",
+      "attempts": [
+        {
+          "http_status": 200,
+          "finish_reason": "stop",
+          "content_shape": "object",
+          "content_length": 317,
+          "usage": {
+            "prompt_tokens": 1546,
+            "completion_tokens": 135,
+            "total_tokens": 1681
+          }
+        }
+      ],
+      "ok": true,
+      "elapsed_seconds": 21.277
+    },
+    {
+      "provider": "groq",
+      "model": "openai/gpt-oss-20b",
+      "role": "selection",
+      "label": "deepseek observation 4",
+      "started_at": "2026-10-26T12:13:37.202740+00:00",
+      "attempts": [
+        {
+          "http_status": 200,
+          "finish_reason": "stop",
+          "content_shape": "object",
+          "content_length": 267,
+          "usage": {
+            "prompt_tokens": 1483,
+            "completion_tokens": 158,
+            "total_tokens": 1641
+          }
+        }
+      ],
+      "ok": true,
+      "elapsed_seconds": 22.369
+    },
+    {
+      "provider": "groq",
+      "model": "openai/gpt-oss-20b",
+      "role": "selection",
+      "label": "deepseek observation 5",
+      "started_at": "2026-10-26T12:13:59.588632+00:00",
+      "attempts": [
+        {
+          "http_status": 200,
+          "finish_reason": "stop",
+          "content_shape": "object",
+          "content_length": 313,
+          "usage": {
+            "prompt_tokens": 1516,
+            "completion_tokens": 128,
+            "total_tokens": 1644
+          }
+        }
+      ],
+      "ok": true,
+      "elapsed_seconds": 21.46
+    },
+    {
+      "provider": "groq",
+      "model": "openai/gpt-oss-20b",
+      "role": "selection",
+      "label": "deepseek observation 6",
+      "started_at": "2026-10-26T12:14:21.065836+00:00",
+      "attempts": [
+        {
+          "http_status": 200,
+          "finish_reason": "stop",
+          "content_shape": "object",
+          "content_length": 347,
+          "usage": {
+            "prompt_tokens": 1522,
+            "completion_tokens": 125,
+            "total_tokens": 1647
+          }
+        }
+      ],
+      "ok": true,
+      "elapsed_seconds": 22.401
+    },
+    {
+      "provider": "groq",
+      "model": "openai/gpt-oss-20b",
+      "role": "selection",
+      "label": "deepseek observation 7",
+      "started_at": "2026-10-26T12:14:43.481058+00:00",
+      "attempts": [
+        {
+          "http_status": 200,
+          "finish_reason": "stop",
+          "content_shape": "object",
+          "content_length": 364,
+          "usage": {
+            "prompt_tokens": 1516,
+            "completion_tokens": 152,
+            "total_tokens": 1668
+          }
+        }
+      ],
+      "ok": true,
+      "elapsed_seconds": 23.068
+    },
+    {
+      "provider": "groq",
+      "model": "openai/gpt-oss-20b",
+      "role": "selection",
+      "label": "deepseek observation 8",
+      "started_at": "2026-10-26T12:15:06.565567+00:00",
+      "attempts": [
+        {
+          "http_status": 200,
+          "finish_reason": "stop",
+          "content_shape": "object",
+          "content_length": 305,
+          "usage": {
+            "prompt_tokens": 1512,
+            "completion_tokens": 149,
+            "total_tokens": 1661
+          }
+        }
+      ],
+      "ok": true,
+      "elapsed_seconds": 21.552
+    },
+    {
+      "provider": "groq",
+      "model": "openai/gpt-oss-20b",
+      "role": "selection",
+      "label": "deepseek observation 9",
+      "started_at": "2026-10-26T12:15:28.136583+00:00",
+      "attempts": [
+        {
+          "http_status": 200,
+          "finish_reason": "stop",
+          "content_shape": "object",
+          "content_length": 374,
+          "usage": {
+            "prompt_tokens": 1494,
+            "completion_tokens": 172,
+            "total_tokens": 1666
+          }
+        }
+      ],
+      "ok": true,
+      "elapsed_seconds": 22.971
+    },
+    {
+      "provider": "groq",
+      "model": "openai/gpt-oss-20b",
+      "role": "selection",
+      "label": "deepseek observation 10",
+      "started_at": "2026-10-26T12:15:51.123143+00:00",
+      "attempts": [
+        {
+          "http_status": 200,
+          "finish_reason": "stop",
+          "content_shape": "object",
+          "content_length": 297,
+          "usage": {
+            "prompt_tokens": 1476,
+            "completion_tokens": 110,
+            "total_tokens": 1586
+          }
+        }
+      ],
+      "ok": true,
+      "elapsed_seconds": 21.096
+    },
+    {
+      "provider": "gonka",
+      "model": "deepseek-ai/DeepSeek-V4-Flash-0731",
+      "role": "selection",
+      "label": "deepseek observation 1",
+      "started_at": "2026-10-26T12:16:12.231992+00:00",
+      "attempts": [
+        {
+          "http_status": 200,
+          "finish_reason": "stop",
+          "content_shape": "object",
+          "content_length": 412,
+          "usage": {
+            "prompt_tokens": 1573,
+            "completion_tokens": 113,
+            "total_tokens": 1686
+          }
+        }
+      ],
+      "ok": true,
+      "elapsed_seconds": 2.453
+    },
+    {
+      "provider": "gonka",
+      "model": "deepseek-ai/DeepSeek-V4-Flash-0731",
+      "role": "selection",
+      "label": "deepseek observation 2",
+      "started_at": "2026-10-26T12:16:14.701392+00:00",
+      "attempts": [
+        {
+          "http_status": 200,
+          "finish_reason": "stop",
+          "content_shape": "object",
+          "content_length": 426,
+          "usage": {
+            "prompt_tokens": 1512,
+            "completion_tokens": 108,
+            "total_tokens": 1620
+          }
+        }
+      ],
+      "ok": true,
+      "elapsed_seconds": 57.961
+    },
+    {
+      "provider": "gonka",
+      "model": "deepseek-ai/DeepSeek-V4-Flash-0731",
+      "role": "selection",
+      "label": "deepseek observation 3",
+      "started_at": "2026-10-26T12:17:12.682174+00:00",
+      "attempts": [
+        {
+          "http_status": 200,
+          "finish_reason": "stop",
+          "content_shape": "object",
+          "content_length": 360,
+          "usage": {
+            "prompt_tokens": 1576,
+            "completion_tokens": 108,
+            "total_tokens": 1684
+          }
+        }
+      ],
+      "ok": true,
+      "elapsed_seconds": 32.55
+    },
+    {
+      "provider": "gonka",
+      "model": "deepseek-ai/DeepSeek-V4-Flash-0731",
+      "role": "selection",
+      "label": "deepseek observation 4",
+      "started_at": "2026-10-26T12:17:45.245517+00:00",
+      "attempts": [
+        {
+          "http_status": 200,
+          "finish_reason": "stop",
+          "content_shape": "object",
+          "content_length": 416,
+          "usage": {
+            "prompt_tokens": 1511,
+            "completion_tokens": 113,
+            "total_tokens": 1624
+          }
+        }
+      ],
+      "ok": true,
+      "elapsed_seconds": 2.228
+    },
+    {
+      "provider": "gonka",
+      "model": "deepseek-ai/DeepSeek-V4-Flash-0731",
+      "role": "selection",
+      "label": "deepseek observation 5",
+      "started_at": "2026-10-26T12:17:47.492209+00:00",
+      "attempts": [
+        {
+          "http_status": 200,
+          "finish_reason": "stop",
+          "content_shape": "object",
+          "content_length": 375,
+          "usage": {
+            "prompt_tokens": 1545,
+            "completion_tokens": 104,
+            "total_tokens": 1649
+          }
+        }
+      ],
+      "ok": true,
+      "elapsed_seconds": 10.602
+    },
+    {
+      "provider": "gonka",
+      "model": "deepseek-ai/DeepSeek-V4-Flash-0731",
+      "role": "selection",
+      "label": "deepseek observation 6",
+      "started_at": "2026-10-26T12:17:58.107414+00:00",
+      "attempts": [
+        {
+          "http_status": 200,
+          "finish_reason": "stop",
+          "content_shape": "object",
+          "content_length": 521,
+          "usage": {
+            "prompt_tokens": 1550,
+            "completion_tokens": 132,
+            "total_tokens": 1682
+          }
+        }
+      ],
+      "ok": true,
+      "elapsed_seconds": 47.803
+    },
+    {
+      "provider": "gonka",
+      "model": "deepseek-ai/DeepSeek-V4-Flash-0731",
+      "role": "selection",
+      "label": "deepseek observation 7",
+      "started_at": "2026-10-26T12:18:45.923402+00:00",
+      "attempts": [
+        {
+          "http_status": 200,
+          "finish_reason": "stop",
+          "content_shape": "object",
+          "content_length": 560,
+          "usage": {
+            "prompt_tokens": 1546,
+            "completion_tokens": 137,
+            "total_tokens": 1683
+          }
+        }
+      ],
+      "ok": true,
+      "elapsed_seconds": 2.892
+    },
+    {
+      "provider": "gonka",
+      "model": "deepseek-ai/DeepSeek-V4-Flash-0731",
+      "role": "selection",
+      "label": "deepseek observation 8",
+      "started_at": "2026-10-26T12:18:48.829232+00:00",
+      "attempts": [
+        {
+          "http_status": 200,
+          "finish_reason": "stop",
+          "content_shape": "object",
+          "content_length": 435,
+          "usage": {
+            "prompt_tokens": 1541,
+            "completion_tokens": 113,
+            "total_tokens": 1654
+          }
+        }
+      ],
+      "ok": true,
+      "elapsed_seconds": 9.948
+    },
+    {
+      "provider": "gonka",
+      "model": "deepseek-ai/DeepSeek-V4-Flash-0731",
+      "role": "selection",
+      "label": "deepseek observation 9",
+      "started_at": "2026-10-26T12:18:58.794791+00:00",
+      "attempts": [
+        {
+          "http_status": 200,
+          "finish_reason": "stop",
+          "content_shape": "object",
+          "content_length": 511,
+          "usage": {
+            "prompt_tokens": 1523,
+            "completion_tokens": 126,
+            "total_tokens": 1649
+          }
+        }
+      ],
+      "ok": true,
+      "elapsed_seconds": 9.942
+    },
+    {
+      "provider": "gonka",
+      "model": "deepseek-ai/DeepSeek-V4-Flash-0731",
+      "role": "selection",
+      "label": "deepseek observation 10",
+      "started_at": "2026-10-26T12:19:08.754993+00:00",
+      "attempts": [
+        {
+          "http_status": 200,
+          "finish_reason": "stop",
+          "content_shape": "object",
+          "content_length": 344,
+          "usage": {
+            "prompt_tokens": 1504,
+            "completion_tokens": 86,
+            "total_tokens": 1590
+          }
+        }
+      ],
+      "ok": true,
+      "elapsed_seconds": 30.745
+    }
+  ],
+  "selection_transport_failures": {
+    "gpt20::gpt120": [
+      {
+        "observation": 5,
+        "event_type": "no_work",
+        "quantity": null,
+        "unit": null,
+        "activity": null,
+        "mapping_state": null,
+        "error": "OllamaTransportError: Groq request timed out or failed",
+        "elapsed_seconds": 0.013
+      },
+      {
+        "observation": 6,
+        "event_type": "inspection",
+        "quantity": null,
+        "unit": null,
+        "activity": null,
+        "mapping_state": null,
+        "error": "OllamaTransportError: Groq request timed out or failed",
+        "elapsed_seconds": 2.093
+      }
+    ]
+  },
+  "planner_retest_fenced_json_v1": {
+    "deepseek": {
+      "intake": {
+        "error": "OllamaResponseError: Gonka returned an invalid JSON response",
+        "elapsed_seconds": 2.586
+      },
+      "analysis": {
+        "error": "OllamaResponseError: Gonka response was incomplete",
+        "elapsed_seconds": 8.605
+      },
+      "review": {
+        "error": "OllamaResponseError: Gonka returned an invalid JSON response",
+        "elapsed_seconds": 12.126
+      }
+    }
+  }
+}

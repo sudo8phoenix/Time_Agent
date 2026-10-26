@@ -1,0 +1,16 @@
+{
+  "scope": "Hashes at report generation, not call-time attestations of earlier trials",
+  "sha256": {
+    "artifacts/gonka-model-comparison/input.txt": "1231f585097a1947489213d6855a20fb8522c56a7c2be16a4e9c012d3bd8d5e3",
+    "artifacts/gonka-model-comparison/four-model-matrix.json": "e4c4b2a26fd91140b84c95e8d4e04defbfa1487fa002adb25d2875c6ef874cfe",
+    "artifacts/gonka-model-comparison/four_model_matrix.py": "76ed536ae06431a52bb942d790baf2c2297e9352281e1f194d285f847d00f15d",
+    "artifacts/gonka-model-comparison/summarize_matrix.py": "cc8fe8f832550b3705f6f4715ada6c534cdc11b3dc87b54a2ced480873a57264",
+    "data/review/gt10-five-entry/schedule.csv": "a2c19a68a7e24acfa8cac093575e1969d61bc0af86e5b0b82347f6768bf8b462",
+    "backend/app/agent/hierarchy.py": "5d9064a2c219a9aba138c79c383dbf85a38e234882c9c5a7ca154a98bce8dd5f",
+    "backend/app/agent/schedule_decision.py": "7f29da96d0f6ce3359c3f066597b48ab8838d54ea4868da4353b2dd44ace920a",
+    "backend/app/llm/gonka.py": "fa136b8254facda826e4cb8c1cc8034c5a4fd6e3c4bbb47ca6313f4839086689",
+    "backend/app/llm/groq.py": "f0983370b650b2ccbc553141b78188987e2785776418825f19ffce0abdf082d0",
+    "backend/app/llm/openrouter.py": "fe2102c235441982ce00ea98ca48492a8bad5984395238401315b611289d9c91",
+    "backend/app/llm/extract.py": "17ad8e69f39247137cb87d43aee1cf04f30f893a4be416982fcc8aae95da288a"
+  }
+}

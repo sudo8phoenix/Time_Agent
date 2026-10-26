@@ -34,7 +34,7 @@ def _error_update(error: AgentToolError, *, node: str) -> dict[str, Any]:
     terminal = "stale" if error.code == "SCHEDULE_VERSION_STALE" else None
     return {
         "validation_errors": [_record(
-            error.code, error.safe_message, stage=error.stage or node,
+            error.failure_category or error.code, error.safe_message, stage=error.stage or node,
             retryable=retry_stage is not None,
         )],
         "next_action": "repair_extraction" if retry_stage == "extraction" else (
@@ -256,7 +256,7 @@ def _nodes(tools: Any, policy: Any) -> dict[str, Callable[[AgentState], dict[str
                     proposals[key] = proposal.model_dump(mode="python")
                 except AgentToolError as error:
                     errors.append(_record(
-                        error.code, error.safe_message, stage=error.stage or "selection",
+                        error.failure_category or error.code, error.safe_message, stage=error.stage or "selection",
                         retryable=error.retryable,
                     ))
                     if not error.retryable:
