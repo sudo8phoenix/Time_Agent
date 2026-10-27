@@ -1,5 +1,4 @@
-from uuid import UUID
-from fastapi import APIRouter, Depends, File, HTTPException, UploadFile
+from fastapi import APIRouter, Depends, HTTPException, Request
 from pydantic import BaseModel
 from sqlalchemy.orm import Session as DBSession
 from sqlalchemy import select
@@ -7,14 +6,13 @@ from ...db.models import Activity, ActivityState, Project, Proposal, ScheduleVer
 from ...db.session import get_session
 from ...ingest.schedules import stage_schedule
 from ..dependencies import project_access, require_reviewer
+from ..schedule_upload import SCHEDULE_UPLOAD_OPENAPI, read_schedule_upload
 
 router = APIRouter(prefix="/projects/{project_id}/schedules", tags=["schedules"])
 
-@router.post("")
-async def import_schedule(project: Project = Depends(project_access), upload: UploadFile = File(...), db: DBSession = Depends(get_session), _reviewer=Depends(require_reviewer)):
-    raw = await upload.read(10 * 1024 * 1024 + 1)
-    if len(raw) > 10 * 1024 * 1024:
-        raise HTTPException(413, detail={"code": "SCHEDULE_TOO_LARGE"})
+@router.post("", openapi_extra=SCHEDULE_UPLOAD_OPENAPI)
+async def import_schedule(request: Request, project: Project = Depends(project_access), db: DBSession = Depends(get_session), _reviewer=Depends(require_reviewer)):
+    raw, _filename, _mime = await read_schedule_upload(request)
     db.execute(select(Project).where(Project.id == project.id).with_for_update())
     version, digest, errors, existing = stage_schedule(db, project, raw)
     if errors: raise HTTPException(422, detail={"code": "SCHEDULE_INVALID", "errors": errors})

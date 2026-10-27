@@ -19,6 +19,8 @@ def run_once(db: Session, pipeline: Pipeline, *, should_stop: Callable[[], bool]
              admission_check: Callable | None = None) -> bool:
     claimed = claim_job(db, admission_check=admission_check)
     if not claimed:
+        # Admission deferrals and exhausted-lease cleanup must survive this poll.
+        db.commit()
         return False
     job, token = claimed
     db.commit()  # make the lease visible before potentially slow model calls

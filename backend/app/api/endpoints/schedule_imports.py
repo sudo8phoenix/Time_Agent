@@ -5,7 +5,7 @@ from __future__ import annotations
 from pathlib import Path
 from uuid import UUID
 
-from fastapi import APIRouter, Depends, File, HTTPException, Response, UploadFile
+from fastapi import APIRouter, Depends, HTTPException, Request, Response
 from pydantic import BaseModel, ConfigDict, Field
 from sqlalchemy.orm import Session as DBSession
 from sqlalchemy import select
@@ -19,6 +19,7 @@ from ...ingest.native_schedule.storage import create_import, stage_import
 from ...schemas.native_schedule import ReviewedScheduleMapping, SchedulePreview
 from ...settings import get_settings
 from ..dependencies import current_user, project_access, require_reviewer
+from ..schedule_upload import SCHEDULE_UPLOAD_OPENAPI, read_schedule_upload
 
 router = APIRouter(
     prefix="/projects/{project_id}/schedule-imports", tags=["native-schedule-imports"]
@@ -84,21 +85,22 @@ def _payload(record: ScheduleImport, db: DBSession) -> dict[str, object]:
     }
 
 
-@router.post("", status_code=201)
+@router.post("", status_code=201, openapi_extra=SCHEDULE_UPLOAD_OPENAPI)
 async def create_schedule_import(
+    request: Request,
     project: Project = Depends(project_access),
-    upload: UploadFile = File(...),
     reviewer: User = Depends(require_reviewer),
     db: DBSession = Depends(get_session),
 ):
     try:
+        raw, filename, mime_type = await read_schedule_upload(request)
         db.execute(select(Project).where(Project.id == project.id).with_for_update())
         record = create_import(
             db,
             project,
-            await upload.read(10 * 1024 * 1024 + 1),
-            filename=upload.filename or "schedule",
-            mime_type=upload.content_type or "application/octet-stream",
+            raw,
+            filename=filename,
+            mime_type=mime_type,
             creator_id=reviewer.id,
         )
         return _payload(record, db)

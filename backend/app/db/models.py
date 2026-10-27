@@ -210,7 +210,8 @@ class Job(Base):
     __tablename__ = "jobs"
     __table_args__ = (Index("uq_jobs_project_report_base", "project_id", "report_id", unique=True,
                             postgresql_where=text("parent_job_id IS NULL")),
-                      UniqueConstraint("reanalysis_key", name="uq_jobs_reanalysis_key"))
+                      UniqueConstraint("reanalysis_key", name="uq_jobs_reanalysis_key"),
+                      Index("ix_jobs_admission", "state", "admission_retry_at", "created_at"))
     id: Mapped[UUID] = mapped_column(primary_key=True, default=uuid4)
     project_id: Mapped[UUID] = mapped_column(
         ForeignKey("projects.id", ondelete="CASCADE"), index=True
@@ -230,6 +231,7 @@ class Job(Base):
     lease_token: Mapped[str | None] = mapped_column(String(64), index=True)
     lease_expires_at: Mapped[datetime | None] = mapped_column(DateTime(timezone=True), index=True)
     heartbeat_at: Mapped[datetime | None] = mapped_column(DateTime(timezone=True))
+    admission_retry_at: Mapped[datetime | None] = mapped_column(DateTime(timezone=True))
     error_code: Mapped[str | None] = mapped_column(String(100))
     error_message: Mapped[str | None] = mapped_column(Text)
     model_version: Mapped[str | None] = mapped_column(String(200))

@@ -227,6 +227,16 @@ def _model_callable(model_name: str | None = None, provider: str | None = None, 
                           role=role).chat
 
 
+def _guard_model_calls(model_call, ensure_active):
+    """Fence every inference, including batches hidden inside a single node."""
+    def call(*args, **kwargs):
+        ensure_active()
+        result = model_call(*args, **kwargs)
+        ensure_active()
+        return result
+    return call
+
+
 def _json(value: Any) -> Any:
     if hasattr(value, "model_dump"):
         return value.model_dump(mode="json")
@@ -588,6 +598,11 @@ def process_job_with_graph(
         model_dispatch = _model_callable(assignment["model"], assignment["provider"],
             timeout=run.config_metadata["timeout"],
             account_scopes_enabled=run.config_metadata["groq_account_scopes_enabled"])
+    if not hierarchical:
+        model_dispatch = _guard_model_calls(model_dispatch, lambda: _ensure_active(
+            session_factory, job.id, token, job_for_heartbeat=job,
+            heartbeat_callback=heartbeat_callback, should_stop=should_stop, clock=clock,
+        ))
     if hierarchical:
         from .hierarchy import HierarchyExecution
         from ..llm.provider import create_adapter

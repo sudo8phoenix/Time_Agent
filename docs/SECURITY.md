@@ -119,6 +119,22 @@ quality evaluation and human review remain required.
 
 ## Deployment controls and verification
 
+Apply migration `0020_job_admission_retry` before deploying the updated API or
+worker. Report admission scans at most 20 eligible jobs per poll. A cooled job
+receives a persisted five-second retry time without spending an attempt; jobs
+not yet checked are considered first so a larger cooled backlog cannot pin the
+queue head. Idle worker polls commit these deferrals as well as exhausted-lease
+cleanup. Successful claims and explicit retries clear the admission deferral.
+
+Both schedule upload routes authenticate before parsing multipart input, then
+enforce a 10 MiB file cap before spooling each part and an aggregate transfer cap
+with 64 KiB allowance for multipart headers. Only one `upload` file and no extra
+fields are accepted. Temporary files close on rejection, disconnect or cancelled
+receipt. The baseline report graph also checks current ownership before and after
+each model call, including calls inside one extraction/retrieval node. It cannot
+interrupt an inference already in flight, but revoked work cannot initiate the
+next call once cancellation is visible to its ownership check.
+
 Production startup rejects the development/example secret and secrets shorter than
 32 characters. Generate a random secret, use restricted database credentials,
 protect uploads and backups, and keep provider keys server-side.

@@ -9,6 +9,8 @@ from ..db.models import Job, Project, Report
 
 LEASE_SECONDS = 120
 MAX_ATTEMPTS = 3
+CLAIM_SCAN_LIMIT = 20
+ADMISSION_RETRY_SECONDS = 5
 TERMINAL = {"ready_for_review", "needs_transcription", "failed", "stale", "cancelled"}
 
 def _now() -> datetime:
@@ -74,18 +76,29 @@ def claim_job(db: Session, *, now: datetime | None = None,
         Job.attempts >= MAX_ATTEMPTS).values(state="failed", error_code="JOB_ATTEMPT_LIMIT",
         error_message="Worker lease expired after the final attempt",
         lease_token=None, lease_expires_at=None))
-    job = db.scalar(select(Job).where(
+    jobs = db.scalars(select(Job).where(
         or_(Job.state == "queued", (Job.state == "running") & (Job.lease_expires_at < now)),
-        Job.attempts < MAX_ATTEMPTS).order_by(Job.created_at).with_for_update(skip_locked=True))
-    if not job:
-        return None
-    if admission_check is not None and not admission_check(db, job):
-        return None
-    token = uuid4().hex
-    job.state = "running"; job.attempts += 1; job.lease_token = token
-    job.lease_expires_at = now + timedelta(seconds=LEASE_SECONDS); job.heartbeat_at = now
+        Job.attempts < MAX_ATTEMPTS,
+        or_(Job.admission_retry_at.is_(None), Job.admission_retry_at <= now),
+    ).order_by(Job.admission_retry_at.asc().nullsfirst(), Job.created_at, Job.id)
+      .limit(CLAIM_SCAN_LIMIT).with_for_update(skip_locked=True)).all()
+    for job in jobs:
+        if admission_check is not None and not admission_check(db, job):
+            # Persist a short deferral so a backlog larger than one scan cannot
+            # monopolize every poll. Never spend an attempt or alter its lease.
+            job.admission_retry_at = now + timedelta(seconds=ADMISSION_RETRY_SECONDS)
+            continue
+        token = uuid4().hex
+        job.state = "running"
+        job.attempts += 1
+        job.lease_token = token
+        job.lease_expires_at = now + timedelta(seconds=LEASE_SECONDS)
+        job.heartbeat_at = now
+        job.admission_retry_at = None
+        db.flush()
+        return job, token
     db.flush()
-    return job, token
+    return None
 
 def heartbeat(db: Session, job_id: UUID, token: str, *, now: datetime | None = None) -> bool:
     now = now or _now()
@@ -136,6 +149,7 @@ def retry_job(db: Session, job: Job) -> Job:
     if job.state not in {"failed", "stale"}: raise ValueError("JOB_NOT_RETRYABLE")
     if job.attempts >= MAX_ATTEMPTS: raise ValueError("JOB_ATTEMPT_LIMIT")
     job.state="queued"; job.error_code=None; job.error_message=None; job.lease_token=None; job.lease_expires_at=None
+    job.admission_retry_at = None
     db.flush(); return job
 
 
@@ -158,6 +172,7 @@ def cancel_job(db: Session, job: Job, *, now: datetime | None = None) -> Job:
         job.state, job.error_code = "cancelled", "JOB_CANCELLED"
         job.error_message = "The job was cancelled."
         job.lease_token = job.lease_expires_at = None
+        job.admission_retry_at = None
     run = db.scalar(select(AgentRun).where(AgentRun.job_id == job.id).with_for_update()
                     .execution_options(populate_existing=True))
     if run is not None:
