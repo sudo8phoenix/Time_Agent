@@ -1,51 +1,258 @@
+import { AuditWorkspace } from "./components/AuditWorkspace";
+import { Tabs } from "@base-ui/react/tabs";
 import { AgentRunStatus } from "./components/AgentRunStatus";
 import { ReportReanalysis } from "./components/ReportReanalysis";
 import { ExecutionHistory } from "./components/ExecutionHistory";
 import { ReportMapping } from "./components/ReportMapping";
 import { ReportTranscription } from "./components/ReportTranscription";
-import { ProposalAudit, type ProposalProvenance, type ProposalHistory } from "./components/ProposalAudit";
+import {
+  ProposalAudit,
+  type ProposalProvenance,
+  type ProposalHistory,
+} from "./components/ProposalAudit";
 import { PlannerResolution } from "./components/PlannerResolution";
 import { FormEvent, Fragment, useEffect, useRef, useState } from "react";
 import { createRoot } from "react-dom/client";
 import "./styles.css";
-import "./workspace-theme.css";
-import { TimeChat } from "./components/TimeChat";
+import { WorkspaceNav, WorkspaceBar } from "./components/WorkspaceNav";
+import { ScheduleWorkspace } from "./components/ScheduleWorkspace";
+import "./redesign.css";
 
-type Project = { id: string; name: string; timezone: string; active_schedule_version_id: string | null };
-type Job = { agentRunAvailable?: boolean; reportId?: string; parentJobId?: string; reanalysisReason?: string; id: string; projectId: string; state: string; stage: string; progress: number; reportName: string; proposalIds: string[]; proposalCount?: number; attempts?: number; error?: string; createdAt?: string; pendingCount?: number };
-type Proposal = {
-  provenance?: ProposalProvenance; decision_history?: ProposalHistory;
-  id: string; revision: number; current_activity_revision: number; current_lifecycle_state?: { actual_start: string | null; actual_start_time: string | null; actual_start_precision: string | null; actual_finish: string | null; actual_finish_time: string | null; actual_finish_precision: string | null; status: string | null }; review_state: string; mapping_state: string; match_strength: string; selection_explanation?: string | null;
-  observation: { event_type?: string; summary: string; quantity: string | null; unit: string | null; work_type: string; area: string; tags: string[] };
-  evidence: { quote: string; locator: string; fragment_id: string }[];
-  candidates: { id: string; name: string; area: string; work_type: string; tags: string[]; rank: number }[];
-  chosen_activity_id: string | null; chosen_activity_measurement_basis?: string | null; warnings: string[]; proposed_effects: Record<string, unknown>; missing_information: string[];
+type Project = {
+  id: string;
+  name: string;
+  timezone: string;
+  active_schedule_version_id: string | null;
 };
-type ProgressItem = { delivery?: { status: string; revision: number; attempts: number; last_error: string | null; delivered_at: string | null }; state_revision?: number; lifecycle_status?: string | null; actual_start?: string | null; actual_finish?: string | null; actual_start_time?: string | null; actual_finish_time?: string | null; actual_start_precision?: string | null; actual_finish_precision?: string | null; activity_id: string; external_id: string; name: string; wbs: string; planned_quantity: string | null; completed_quantity: string; unit: string | null; physical_percent: string | null; approved_event_count: number; history: { event_id: string; status?: string; active?: boolean; work_date: string | null; quantity: string | null; unit: string | null; source_locator: string | null; event_type?: string; scope?: string | null; subactivity_key?: string | null; scheduled_parent_id?: string | null; endpoint?: { local_date: string; local_time?: string | null; precision: string; timezone?: string | null; basis?: string; raw_expression?: string; normalized_instant?: string | null } | null; evidence?: { fields: string[]; fragment_id: string; quote: string }[] }[] };
-type ProgressView = { project_id: string; project_name: string; schedule_version: number; counts: { activities: number; approved_events: number; pending_review: number }; items: ProgressItem[]; notice: string };
-type NativeImport = { reviewed_mapping?: { baseline_date: string; reason: string; task_overrides: Record<string, Record<string, unknown>> }; id: string; revision: number; state: string; source_format: string; selected_source_project_id: string | null; preview: { projects: { source_project_id: string; name: string }[]; tasks: { source_task_id: string; external_id: string; name: string; is_summary: boolean; is_milestone?: boolean; source_wbs_id: string | null; source_fields: Record<string, unknown> }[]; wbs: { source_wbs_id: string; name: string; path: string[] }[]; relationships: { predecessor_source_task_id: string; successor_source_task_id: string; relation_type: string }[]; issues: { severity: string; message: string }[] }; staged_schedule_version_id: string | null; schedule_version_id?: string; version?: number };
+type Job = {
+  agentRunAvailable?: boolean;
+  reportId?: string;
+  parentJobId?: string;
+  reanalysisReason?: string;
+  id: string;
+  projectId: string;
+  state: string;
+  stage: string;
+  progress: number;
+  reportName: string;
+  proposalIds: string[];
+  proposalCount?: number;
+  attempts?: number;
+  error?: string;
+  createdAt?: string;
+  pendingCount?: number;
+};
+type Proposal = {
+  provenance?: ProposalProvenance;
+  decision_history?: ProposalHistory;
+  id: string;
+  revision: number;
+  current_activity_revision: number;
+  current_lifecycle_state?: {
+    actual_start: string | null;
+    actual_start_time: string | null;
+    actual_start_precision: string | null;
+    actual_finish: string | null;
+    actual_finish_time: string | null;
+    actual_finish_precision: string | null;
+    status: string | null;
+  };
+  review_state: string;
+  mapping_state: string;
+  match_strength: string;
+  selection_explanation?: string | null;
+  observation: {
+    event_type?: string;
+    summary: string;
+    quantity: string | null;
+    unit: string | null;
+    work_type: string;
+    area: string;
+    tags: string[];
+  };
+  evidence: { quote: string; locator: string; fragment_id: string }[];
+  candidates: {
+    id: string;
+    name: string;
+    area: string;
+    work_type: string;
+    tags: string[];
+    rank: number;
+  }[];
+  chosen_activity_id: string | null;
+  chosen_activity_measurement_basis?: string | null;
+  warnings: string[];
+  proposed_effects: Record<string, unknown>;
+  missing_information: string[];
+};
+type ProgressItem = {
+  delivery?: {
+    status: string;
+    revision: number;
+    attempts: number;
+    last_error: string | null;
+    delivered_at: string | null;
+  };
+  state_revision?: number;
+  lifecycle_status?: string | null;
+  actual_start?: string | null;
+  actual_finish?: string | null;
+  actual_start_time?: string | null;
+  actual_finish_time?: string | null;
+  actual_start_precision?: string | null;
+  actual_finish_precision?: string | null;
+  activity_id: string;
+  external_id: string;
+  name: string;
+  wbs: string;
+  planned_quantity: string | null;
+  completed_quantity: string;
+  unit: string | null;
+  physical_percent: string | null;
+  approved_event_count: number;
+  history: {
+    event_id: string;
+    status?: string;
+    active?: boolean;
+    work_date: string | null;
+    quantity: string | null;
+    unit: string | null;
+    source_locator: string | null;
+    event_type?: string;
+    scope?: string | null;
+    subactivity_key?: string | null;
+    scheduled_parent_id?: string | null;
+    endpoint?: {
+      local_date: string;
+      local_time?: string | null;
+      precision: string;
+      timezone?: string | null;
+      basis?: string;
+      raw_expression?: string;
+      normalized_instant?: string | null;
+    } | null;
+    evidence?: { fields: string[]; fragment_id: string; quote: string }[];
+  }[];
+};
+type ProgressView = {
+  project_id: string;
+  project_name: string;
+  schedule_version: number;
+  counts: {
+    activities: number;
+    approved_events: number;
+    pending_review: number;
+  };
+  items: ProgressItem[];
+  notice: string;
+};
+type NativeImport = {
+  reviewed_mapping?: {
+    baseline_date: string;
+    reason: string;
+    task_overrides: Record<string, Record<string, unknown>>;
+  };
+  id: string;
+  revision: number;
+  state: string;
+  source_format: string;
+  selected_source_project_id: string | null;
+  preview: {
+    projects: { source_project_id: string; name: string }[];
+    tasks: {
+      source_task_id: string;
+      external_id: string;
+      name: string;
+      is_summary: boolean;
+      is_milestone?: boolean;
+      source_wbs_id: string | null;
+      source_fields: Record<string, unknown>;
+    }[];
+    wbs: { source_wbs_id: string; name: string; path: string[] }[];
+    relationships: {
+      predecessor_source_task_id: string;
+      successor_source_task_id: string;
+      relation_type: string;
+    }[];
+    issues: { severity: string; message: string }[];
+  };
+  staged_schedule_version_id: string | null;
+  schedule_version_id?: string;
+  version?: number;
+};
 type TaskOverrideInput = Record<string, string>;
-const disciplines = ["unknown", "civil", "structural", "piping", "mechanical", "electrical", "instrumentation", "other"];
-const workTypes = ["unknown", "excavation", "backfill", "rebar_installation", "formwork", "concrete_pour", "curing", "structural_erection", "pipe_spool_erection", "welding", "weld_inspection", "hydrotest", "cable_laying", "cable_termination", "equipment_installation", "other"];
+const disciplines = [
+  "unknown",
+  "civil",
+  "structural",
+  "piping",
+  "mechanical",
+  "electrical",
+  "instrumentation",
+  "other",
+];
+const workTypes = [
+  "unknown",
+  "excavation",
+  "backfill",
+  "rebar_installation",
+  "formwork",
+  "concrete_pour",
+  "curing",
+  "structural_erection",
+  "pipe_spool_erection",
+  "welding",
+  "weld_inspection",
+  "hydrotest",
+  "cable_laying",
+  "cable_termination",
+  "equipment_installation",
+  "other",
+];
 const units = ["m", "m2", "m3", "kg", "t", "spool", "joint", "point", "each"];
+
+// Apply the saved appearance before either the sign-in page or workspace renders.
+try {
+  document.documentElement.dataset.theme =
+    localStorage.getItem("time-agent-theme") === "dark" ? "dark" : "light";
+} catch {
+  /* Storage can be disabled without blocking sign-in. */
+}
 
 // Fixtures are deliberately opt-in: a development build still uses the real API
 // unless the developer explicitly sets VITE_FIXTURE_MODE=true.
-const fixtureMode = import.meta.env.DEV && import.meta.env.VITE_FIXTURE_MODE === "true";
-type Account = { id: string; username: string; role: string; csrf_token: string };
+const fixtureMode =
+  import.meta.env.DEV && import.meta.env.VITE_FIXTURE_MODE === "true";
+type Account = {
+  id: string;
+  username: string;
+  role: string;
+  csrf_token: string;
+};
 let csrfToken: string | null = null;
 let draftOwner = "";
 function readStored<T>(key: string, fallback: T): T {
-  try { return JSON.parse(sessionStorage.getItem(key) || "null") ?? fallback; } catch { return fallback; }
+  try {
+    return JSON.parse(sessionStorage.getItem(key) || "null") ?? fallback;
+  } catch {
+    return fallback;
+  }
 }
 function useDraft<T>(key: string, fallback: T) {
   const storageKey = `spa-draft:${draftOwner}:${key}`;
   const [value, update] = useState<T>(() => readStored(storageKey, fallback));
   const current = useRef(value);
   const setValue = (next: T | ((previous: T) => T)) => {
-    const resolved = typeof next === "function" ? (next as (previous: T) => T)(current.current) : next;
+    const resolved =
+      typeof next === "function"
+        ? (next as (previous: T) => T)(current.current)
+        : next;
     current.current = resolved;
-    try { sessionStorage.setItem(storageKey, JSON.stringify(resolved)); } catch { /* Storage may be disabled. */ }
+    try {
+      sessionStorage.setItem(storageKey, JSON.stringify(resolved));
+    } catch {
+      /* Storage may be disabled. */
+    }
     update(resolved);
   };
   return [value, setValue] as const;
@@ -55,416 +262,3921 @@ function useBusy() {
   const [busy, update] = useState(false);
   const id = useRef(Symbol("operation"));
   const setBusy = (value: boolean) => {
-    if (value) pendingOperations.add(id.current); else pendingOperations.delete(id.current);
-    update(value); window.dispatchEvent(new Event("spa-busy"));
+    if (value) pendingOperations.add(id.current);
+    else pendingOperations.delete(id.current);
+    update(value);
+    window.dispatchEvent(new Event("spa-busy"));
   };
-  useEffect(() => { const key = id.current; return () => { pendingOperations.delete(key); window.dispatchEvent(new Event("spa-busy")); }; }, []);
+  useEffect(() => {
+    const key = id.current;
+    return () => {
+      pendingOperations.delete(key);
+      window.dispatchEvent(new Event("spa-busy"));
+    };
+  }, []);
   return [busy, setBusy] as const;
 }
-function canLeave() { if (pendingOperations.size) return false; return !document.querySelector('[data-dirty="true"]') || window.confirm("Leave this page? Text drafts are saved in this tab, but selected files must be chosen again."); }
-function notifyAuth() { try { localStorage.setItem("spa-auth-change", `${Date.now()}:${crypto.randomUUID()}`); } catch { /* Cookie auth works without local storage. */ } }
-class ApiError extends Error { constructor(message: string, public status: number, public code?: string) { super(message); } }
+function canLeave() {
+  if (pendingOperations.size) return false;
+  return (
+    !document.querySelector('[data-dirty="true"]') ||
+    window.confirm(
+      "Leave this page? Text drafts are saved in this tab, but selected files must be chosen again.",
+    )
+  );
+}
+function notifyAuth() {
+  try {
+    localStorage.setItem(
+      "spa-auth-change",
+      `${Date.now()}:${crypto.randomUUID()}`,
+    );
+  } catch {
+    /* Cookie auth works without local storage. */
+  }
+}
+class ApiError extends Error {
+  constructor(
+    message: string,
+    public status: number,
+    public code?: string,
+  ) {
+    super(message);
+  }
+}
 const errorMessages: Record<string, string> = {
-  MODEL_REQUEST_FAILED: "The model request failed or was rejected by the provider. Check the analysis details before retrying.",
-  MODEL_SCHEMA_MISMATCH: "The model output did not match the required schema. Analysis stopped after its bounded validation attempts.",
-  MODEL_JSON_INVALID: "The model returned invalid JSON. No progress was applied.",
-  MODEL_OUTPUT_TRUNCATED: "The model response reached its output limit. No progress was applied.",
-  MODEL_QUOTA_EXHAUSTED: "The model provider quota is exhausted. Wait for the provider reset before starting a new analysis.",
-  MODEL_RATE_LIMITED: "The model provider is rate limited. Wait for its cooldown before starting a new analysis.",
-  MODEL_RESPONSE_INVALID: "The model returned an invalid response. Retry the report or check the model service.",
-  EXTRACTION_ITEMS_REJECTED: "The model returned observations, but none passed source evidence or date validation. Check the report date and retry or reanalyse the report.",
+  MODEL_REQUEST_FAILED:
+    "The model request failed or was rejected by the provider. Check the analysis details before retrying.",
+  MODEL_SCHEMA_MISMATCH:
+    "The model output did not match the required schema. Analysis stopped after its bounded validation attempts.",
+  MODEL_JSON_INVALID:
+    "The model returned invalid JSON. No progress was applied.",
+  MODEL_OUTPUT_TRUNCATED:
+    "The model response reached its output limit. No progress was applied.",
+  MODEL_QUOTA_EXHAUSTED:
+    "The model provider quota is exhausted. Wait for the provider reset before starting a new analysis.",
+  MODEL_RATE_LIMITED:
+    "The model provider is rate limited. Wait for its cooldown before starting a new analysis.",
+  MODEL_RESPONSE_INVALID:
+    "The model returned an invalid response. Retry the report or check the model service.",
+  EXTRACTION_ITEMS_REJECTED:
+    "The model returned observations, but none passed source evidence or date validation. Check the report date and retry or reanalyse the report.",
   NO_ACTIVE_SCHEDULE: "Import and activate a schedule before viewing progress.",
-  PROJECT_HAS_NO_ACTIVE_SCHEDULE: "Import and activate a schedule before submitting a report.",
-  SCHEDULE_VERSION_CONFLICT: "The active schedule changed. Refresh the schedule context and try again.",
-  SCHEDULE_REBASE_REQUIRED: "This schedule has approved progress. A reviewed rebase is required before replacing it.",
-  SCHEDULE_IMPORT_CONFLICT: "This import changed in another session. The latest version has been loaded; review it before continuing.",
-  STALE_PROPOSAL: "This proposal changed. Reload it and review the latest revision.",
-  STALE_ACTIVITY: "This activity received another update. Reload the proposal before approving.",
-  SCHEDULE_INVALID: "The schedule contains invalid fields. Correct the following rows and upload it again.",
-  SCHEDULE_PARSE_FAILED: "This schedule could not be parsed. Check the file format and try again.",
+  PROJECT_HAS_NO_ACTIVE_SCHEDULE:
+    "Import and activate a schedule before submitting a report.",
+  SCHEDULE_VERSION_CONFLICT:
+    "The active schedule changed. Refresh the schedule context and try again.",
+  SCHEDULE_REBASE_REQUIRED:
+    "This schedule has approved progress. A reviewed rebase is required before replacing it.",
+  SCHEDULE_IMPORT_CONFLICT:
+    "This import changed in another session. The latest version has been loaded; review it before continuing.",
+  STALE_PROPOSAL:
+    "This proposal changed. Reload it and review the latest revision.",
+  STALE_ACTIVITY:
+    "This activity received another update. Reload the proposal before approving.",
+  SCHEDULE_INVALID:
+    "The schedule contains invalid fields. Correct the following rows and upload it again.",
+  SCHEDULE_PARSE_FAILED:
+    "This schedule could not be parsed. Check the file format and try again.",
   SCHEDULE_TOO_LARGE: "Choose a schedule file no larger than 10 MB.",
-  SCHEDULE_PARSER_UNAVAILABLE: "The schedule parser is unavailable. Contact your administrator or use canonical CSV.",
-  SCHEDULE_PARSE_TIMEOUT: "Schedule parsing timed out. Try a smaller file or canonical CSV.",
+  SCHEDULE_PARSER_UNAVAILABLE:
+    "The schedule parser is unavailable. Contact your administrator or use canonical CSV.",
+  SCHEDULE_PARSE_TIMEOUT:
+    "Schedule parsing timed out. Try a smaller file or canonical CSV.",
 };
 function describeDetail(value: unknown): string {
-  if (typeof value === "string") return errorMessages[value] || value.replaceAll("_", " ");
-  if (Array.isArray(value)) return value.map(describeDetail).filter(Boolean).join("; ");
+  if (typeof value === "string")
+    return errorMessages[value] || value.replaceAll("_", " ");
+  if (Array.isArray(value))
+    return value.map(describeDetail).filter(Boolean).join("; ");
   if (value && typeof value === "object") {
     const detail = value as Record<string, unknown>;
-    const field = Array.isArray(detail.loc) ? detail.loc.slice(1).join(" ") : detail.field || detail.row;
-    return [field, detail.message || detail.msg || (typeof detail.code === "string" ? errorMessages[detail.code] || detail.code.replaceAll("_", " ") : ""), describeDetail(detail.errors), describeDetail(detail.conflicts)].filter(Boolean).join(": ");
+    const field = Array.isArray(detail.loc)
+      ? detail.loc.slice(1).join(" ")
+      : detail.field || detail.row;
+    return [
+      field,
+      detail.message ||
+        detail.msg ||
+        (typeof detail.code === "string"
+          ? errorMessages[detail.code] || detail.code.replaceAll("_", " ")
+          : ""),
+      describeDetail(detail.errors),
+      describeDetail(detail.conflicts),
+    ]
+      .filter(Boolean)
+      .join(": ");
   }
   return "";
 }
-async function api<T>(path: string, init: RequestInit = {}, retry = true): Promise<T> {
+async function api<T>(
+  path: string,
+  init: RequestInit = {},
+  retry = true,
+): Promise<T> {
   const headers = new Headers(init.headers);
-  if (!["GET", "HEAD", "OPTIONS"].includes((init.method || "GET").toUpperCase()) && csrfToken) headers.set("X-CSRF-Token", csrfToken);
-  const response = await fetch("/api/v1" + path, { credentials: "include", ...init, headers });
+  if (
+    !["GET", "HEAD", "OPTIONS"].includes(
+      (init.method || "GET").toUpperCase(),
+    ) &&
+    csrfToken
+  )
+    headers.set("X-CSRF-Token", csrfToken);
+  const response = await fetch("/api/v1" + path, {
+    credentials: "include",
+    ...init,
+    headers,
+  });
   if (!response.ok) {
     const body = await response.json().catch(() => null);
     const detail = body?.detail;
-    if (response.status === 401 && !["/auth/login", "/auth/register"].includes(path)) window.dispatchEvent(new Event("spa-session-expired"));
-    if (response.status === 403 && detail === "CSRF validation failed" && retry) {
+    if (
+      response.status === 401 &&
+      !["/auth/login", "/auth/register"].includes(path)
+    )
+      window.dispatchEvent(new Event("spa-session-expired"));
+    if (
+      response.status === 403 &&
+      detail === "CSRF validation failed" &&
+      retry
+    ) {
       const account = await api<Account>("/auth/me", {}, false);
-      if (draftOwner && account.id !== draftOwner) { window.dispatchEvent(new Event("spa-session-expired")); throw new Error("The account changed in another tab. Sign in again before continuing."); }
+      if (draftOwner && account.id !== draftOwner) {
+        window.dispatchEvent(new Event("spa-session-expired"));
+        throw new Error(
+          "The account changed in another tab. Sign in again before continuing.",
+        );
+      }
       csrfToken = account.csrf_token;
       return api<T>(path, init, false);
     }
     const message = describeDetail(detail);
-    throw new ApiError(message || "The request could not be completed. Please try again.", response.status, detail?.code);
-
+    throw new ApiError(
+      message || "The request could not be completed. Please try again.",
+      response.status,
+      detail?.code,
+    );
   }
   return response.status === 204 ? (undefined as T) : response.json();
 }
 function toJob(value: Record<string, unknown>, name = "Field report"): Job {
   const state = String(value.state || "queued");
-  return { agentRunAvailable: typeof value.agent_run_available === "boolean" ? value.agent_run_available : undefined, reportId: typeof value.report_id === "string" ? value.report_id : undefined, parentJobId: typeof value.parent_job_id === "string" ? value.parent_job_id : undefined, reanalysisReason: typeof value.reanalysis_reason === "string" ? value.reanalysis_reason : undefined, id: String(value.job_id || value.id), projectId: String(value.project_id || ""), state, stage: String(value.stage || "parse"), progress: state === "ready_for_review" ? 100 : 0, reportName: typeof value.report_name === "string" ? value.report_name : name, createdAt: typeof value.created_at === "string" ? value.created_at : undefined, pendingCount: Number(value.pending_count || 0), proposalCount: Number(value.proposal_count || 0), attempts: Number(value.attempts || 0), proposalIds: Array.isArray(value.proposal_ids) ? value.proposal_ids.map(String) : [], error: typeof value.error_code === "string" ? describeDetail(value.error_code) : undefined };
+  return {
+    agentRunAvailable:
+      typeof value.agent_run_available === "boolean"
+        ? value.agent_run_available
+        : undefined,
+    reportId: typeof value.report_id === "string" ? value.report_id : undefined,
+    parentJobId:
+      typeof value.parent_job_id === "string" ? value.parent_job_id : undefined,
+    reanalysisReason:
+      typeof value.reanalysis_reason === "string"
+        ? value.reanalysis_reason
+        : undefined,
+    id: String(value.job_id || value.id),
+    projectId: String(value.project_id || ""),
+    state,
+    stage: String(value.stage || "parse"),
+    progress: state === "ready_for_review" ? 100 : 0,
+    reportName:
+      typeof value.report_name === "string" ? value.report_name : name,
+    createdAt:
+      typeof value.created_at === "string" ? value.created_at : undefined,
+    pendingCount: Number(value.pending_count || 0),
+    proposalCount: Number(value.proposal_count || 0),
+    attempts: Number(value.attempts || 0),
+    proposalIds: Array.isArray(value.proposal_ids)
+      ? value.proposal_ids.map(String)
+      : [],
+    error:
+      typeof value.error_code === "string"
+        ? describeDetail(value.error_code)
+        : undefined,
+  };
 }
-const fixtureProposal: Proposal = { id: "fixture-proposal-001", revision: 1, current_activity_revision: 0, review_state: "pending", mapping_state: "suggested", match_strength: "review", observation: { summary: "Three spools erected on the stated line.", quantity: "3", unit: "spool", work_type: "pipe_spool_erection", area: "AREA-A", tags: ["24-XX"] }, evidence: [{ quote: "On 2026-09-21, erected 3 spools today on line 24-XX in Area A.", locator: "Paragraph 2", fragment_id: "fixture-fragment-01" }], candidates: [{ id: "activity-024", name: "Erect spools on line 24-XX", area: "AREA-A", work_type: "pipe_spool_erection", tags: ["24-XX"], rank: 1 }], chosen_activity_id: "activity-024", warnings: [], proposed_effects: { quantity: 3, unit: "spool", quantity_semantics: "delta", effective_date: "2026-09-21" }, missing_information: [] };
-const fixtureProgress: ProgressView = { project_id: "fixture-project", project_name: "DEMO-UTILITY-01", schedule_version: 1, counts: { activities: 12, approved_events: 1, pending_review: 1 }, notice: "Per-activity values only. No overall project percentage is calculated.", items: [{ activity_id: "activity-024", external_id: "PIP-A-ERECT-024", name: "Erect spools on line 24-XX", wbs: "DEMO / AREA-A / PIPING", planned_quantity: "12", completed_quantity: "3", unit: "spool", physical_percent: "25", approved_event_count: 1, history: [{ event_id: "fixture-event-001", work_date: "2026-09-21", quantity: "3", unit: "spool", source_locator: "Paragraph 2" }] }] };
-const fixtureImport: NativeImport = { id: "fixture-import-001", revision: 1, state: "needs_mapping", source_format: "p6_xer", selected_source_project_id: "4507", staged_schedule_version_id: null, preview: { projects: [{ source_project_id: "4507", name: "PROJECT" }], tasks: [{ source_task_id: "101717", external_id: "3", name: "Task #1", is_summary: false, source_wbs_id: "26011", source_fields: { wbs: "PROJECT.1" } }, { source_task_id: "26011", external_id: "2", name: "Project #1", is_summary: true, source_wbs_id: "26010", source_fields: { wbs: "PROJECT.1" } }], wbs: [{ source_wbs_id: "26011", name: "Project #1", path: ["PROJECT", "1"] }], relationships: [{ predecessor_source_task_id: "101720", successor_source_task_id: "101721", relation_type: "FS" }], issues: [] } };
+const fixtureProposal: Proposal = {
+  id: "fixture-proposal-001",
+  revision: 1,
+  current_activity_revision: 0,
+  review_state: "pending",
+  mapping_state: "suggested",
+  match_strength: "review",
+  observation: {
+    summary: "Three spools erected on the stated line.",
+    quantity: "3",
+    unit: "spool",
+    work_type: "pipe_spool_erection",
+    area: "AREA-A",
+    tags: ["24-XX"],
+  },
+  evidence: [
+    {
+      quote: "On 2026-09-21, erected 3 spools today on line 24-XX in Area A.",
+      locator: "Paragraph 2",
+      fragment_id: "fixture-fragment-01",
+    },
+  ],
+  candidates: [
+    {
+      id: "activity-024",
+      name: "Erect spools on line 24-XX",
+      area: "AREA-A",
+      work_type: "pipe_spool_erection",
+      tags: ["24-XX"],
+      rank: 1,
+    },
+  ],
+  chosen_activity_id: "activity-024",
+  warnings: [],
+  proposed_effects: {
+    quantity: 3,
+    unit: "spool",
+    quantity_semantics: "delta",
+    effective_date: "2026-09-21",
+  },
+  missing_information: [],
+};
+const fixtureProgress: ProgressView = {
+  project_id: "fixture-project",
+  project_name: "DEMO-UTILITY-01",
+  schedule_version: 1,
+  counts: { activities: 12, approved_events: 1, pending_review: 1 },
+  notice:
+    "Per-activity values only. No overall project percentage is calculated.",
+  items: [
+    {
+      activity_id: "activity-024",
+      external_id: "PIP-A-ERECT-024",
+      name: "Erect spools on line 24-XX",
+      wbs: "DEMO / AREA-A / PIPING",
+      planned_quantity: "12",
+      completed_quantity: "3",
+      unit: "spool",
+      physical_percent: "25",
+      approved_event_count: 1,
+      history: [
+        {
+          event_id: "fixture-event-001",
+          work_date: "2026-09-21",
+          quantity: "3",
+          unit: "spool",
+          source_locator: "Paragraph 2",
+        },
+      ],
+    },
+  ],
+};
+const fixtureImport: NativeImport = {
+  id: "fixture-import-001",
+  revision: 1,
+  state: "needs_mapping",
+  source_format: "p6_xer",
+  selected_source_project_id: "4507",
+  staged_schedule_version_id: null,
+  preview: {
+    projects: [{ source_project_id: "4507", name: "PROJECT" }],
+    tasks: [
+      {
+        source_task_id: "101717",
+        external_id: "3",
+        name: "Task #1",
+        is_summary: false,
+        source_wbs_id: "26011",
+        source_fields: { wbs: "PROJECT.1" },
+      },
+      {
+        source_task_id: "26011",
+        external_id: "2",
+        name: "Project #1",
+        is_summary: true,
+        source_wbs_id: "26010",
+        source_fields: { wbs: "PROJECT.1" },
+      },
+    ],
+    wbs: [
+      { source_wbs_id: "26011", name: "Project #1", path: ["PROJECT", "1"] },
+    ],
+    relationships: [
+      {
+        predecessor_source_task_id: "101720",
+        successor_source_task_id: "101721",
+        relation_type: "FS",
+      },
+    ],
+    issues: [],
+  },
+};
 
 function App() {
-  const [account, setAccount] = useState<Account | null>(null), [checking, setChecking] = useState(!fixtureMode), [authMessage, setAuthMessage] = useState(""), [logoutBusy, setLogoutBusy] = useState(false);
-  const [signedIn, setSignedIn] = useState(false), [projects, setProjects] = useState<Project[]>([]), [project, setProject] = useState<Project | null>(null);
-  const [job, setJob] = useState<Job | null>(null), [view, setView] = useState<"intake" | "job" | "review" | "progress" | "scheduleImport" | "history" | "queue" | "timeChat">("intake"), [reviewIndex, setReviewIndex] = useState(0), [error, setError] = useState("");
+  const [account, setAccount] = useState<Account | null>(null),
+    [checking, setChecking] = useState(!fixtureMode),
+    [authMessage, setAuthMessage] = useState(""),
+    [logoutBusy, setLogoutBusy] = useState(false);
+  const [signedIn, setSignedIn] = useState(false),
+    [projects, setProjects] = useState<Project[]>([]),
+    [project, setProject] = useState<Project | null>(null);
+  const [job, setJob] = useState<Job | null>(null),
+    [view, setView] = useState<
+      | "intake"
+      | "job"
+      | "review"
+      | "progress"
+      | "scheduleImport"
+      | "history"
+      | "queue"
+      | "overview"
+      | "schedule"
+    >("intake"),
+    [reviewIndex, setReviewIndex] = useState(0),
+    [error, setError] = useState("");
   const [reviewedIds, setReviewedIds] = useState<string[]>([]);
   const [recentJobs, setRecentJobs] = useState<Job[]>([]);
   const [connectionError, setConnectionError] = useState("");
   const [sessionCheckError, setSessionCheckError] = useState("");
   const [operationBusy, setOperationBusy] = useState(false);
-  const projectRef = useRef<string | null>(null); projectRef.current = fixtureMode ? "fixture-project" : project?.id || null;
+  const projectRef = useRef<string | null>(null);
+  projectRef.current = fixtureMode ? "fixture-project" : project?.id || null;
   const authRevision = useRef(0);
   const userRef = useRef<string | null>(null);
   const acceptAccount = (next: Account) => {
-    if (userRef.current && userRef.current !== next.id) { setProjects([]); setProject(null); setJob(null); setView("intake"); }
-    userRef.current = next.id; draftOwner = next.id; csrfToken = next.csrf_token;
+    if (userRef.current && userRef.current !== next.id) {
+      setProjects([]);
+      setProject(null);
+      setJob(null);
+      setView("intake");
+    }
+    userRef.current = next.id;
+    draftOwner = next.id;
+    csrfToken = next.csrf_token;
     if (next.role !== "reviewer") setView("progress");
-    setAccount(next); setSignedIn(true); setAuthMessage(""); setSessionCheckError("");
+    setAccount(next);
+    setSignedIn(true);
+    setAuthMessage("");
+    setSessionCheckError("");
   };
   useEffect(() => {
-    const expired = () => { authRevision.current++; csrfToken = null; setSignedIn(false); setAuthMessage("Your session ended. Sign in again to continue. Text drafts are saved in this tab."); };
-    const restore = () => { if (fixtureMode) return; const revision = authRevision.current; api<Account>("/auth/me").then(next => { if (revision === authRevision.current) acceptAccount(next); }).catch(reason => { if (reason instanceof ApiError && reason.status === 401) { setSignedIn(false); if (!userRef.current) setAuthMessage(""); } else { setSessionCheckError("Could not check your session. Check your connection and try again."); if (!userRef.current) setAuthMessage("Could not check your session. Check your connection, then sign in."); } }).finally(() => setChecking(false)); };
-    const focus = () => { if (userRef.current) restore(); };
+    const expired = () => {
+      authRevision.current++;
+      csrfToken = null;
+      setSignedIn(false);
+      setAuthMessage(
+        "Your session ended. Sign in again to continue. Text drafts are saved in this tab.",
+      );
+    };
+    const restore = () => {
+      if (fixtureMode) return;
+      const revision = authRevision.current;
+      api<Account>("/auth/me")
+        .then((next) => {
+          if (revision === authRevision.current) acceptAccount(next);
+        })
+        .catch((reason) => {
+          if (reason instanceof ApiError && reason.status === 401) {
+            setSignedIn(false);
+            if (!userRef.current) setAuthMessage("");
+          } else {
+            setSessionCheckError(
+              "Could not check your session. Check your connection and try again.",
+            );
+            if (!userRef.current)
+              setAuthMessage(
+                "Could not check your session. Check your connection, then sign in.",
+              );
+          }
+        })
+        .finally(() => setChecking(false));
+    };
+    const focus = () => {
+      if (userRef.current) restore();
+    };
     const timer = setInterval(focus, 60000);
-    const changed = (event: StorageEvent) => { if (event.key === "spa-auth-change") restore(); };
-    const unload = (event: BeforeUnloadEvent) => { if (document.querySelector('[data-dirty="true"]')) { event.preventDefault(); event.returnValue = ""; } };
+    const changed = (event: StorageEvent) => {
+      if (event.key === "spa-auth-change") restore();
+    };
+    const unload = (event: BeforeUnloadEvent) => {
+      if (document.querySelector('[data-dirty="true"]')) {
+        event.preventDefault();
+        event.returnValue = "";
+      }
+    };
     const busyChanged = () => setOperationBusy(pendingOperations.size > 0);
-    window.addEventListener("spa-busy", busyChanged); window.addEventListener("focus", focus); window.addEventListener("spa-session-expired", expired); window.addEventListener("storage", changed); window.addEventListener("beforeunload", unload);
+    window.addEventListener("spa-busy", busyChanged);
+    window.addEventListener("focus", focus);
+    window.addEventListener("spa-session-expired", expired);
+    window.addEventListener("storage", changed);
+    window.addEventListener("beforeunload", unload);
     restore();
-    return () => { clearInterval(timer); window.removeEventListener("spa-busy", busyChanged); window.removeEventListener("focus", focus); window.removeEventListener("spa-session-expired", expired); window.removeEventListener("storage", changed); window.removeEventListener("beforeunload", unload); };
+    return () => {
+      clearInterval(timer);
+      window.removeEventListener("spa-busy", busyChanged);
+      window.removeEventListener("focus", focus);
+      window.removeEventListener("spa-session-expired", expired);
+      window.removeEventListener("storage", changed);
+      window.removeEventListener("beforeunload", unload);
+    };
   }, []);
   useEffect(() => {
     if (!signedIn || fixtureMode) return;
     let cancelled = false;
-    api<{ items: Project[] }>("/projects").then(result => {
-      if (cancelled) return;
-      setProjects(result.items);
-      setRecentJobs(readStored<Job[]>(`spa-jobs:${account?.id}`, []));
-      const saved = readStored<{ projectId?: string; job?: Job }>(`spa-workspace:${account?.id}`, {});
-      const next = result.items.find(item => item.id === saved.projectId) || result.items[0] || null;
-      setProject(next);
-      if (account?.role === "reviewer" && saved.job && saved.job.projectId === next?.id) { setJob(saved.job); setView("job"); api<Record<string, unknown>>("/jobs/" + saved.job.id).then(value => { if (!cancelled) setJob(toJob(value, saved.job?.reportName)); }).catch(reason => { if (!cancelled) setConnectionError("Could not restore job status. " + reason.message); }); }
-      if (!result.items.length) setError("Create a project in Import schedule to get started.");
-    }).catch(reason => { if (!cancelled) setError(reason.message); });
-    return () => { cancelled = true; };
+    api<{ items: Project[] }>("/projects")
+      .then((result) => {
+        if (cancelled) return;
+        setProjects(result.items);
+        setRecentJobs(readStored<Job[]>(`spa-jobs:${account?.id}`, []));
+        const saved = readStored<{ projectId?: string; job?: Job }>(
+          `spa-workspace:${account?.id}`,
+          {},
+        );
+        const next =
+          result.items.find((item) => item.id === saved.projectId) ||
+          result.items[0] ||
+          null;
+        setProject(next);
+        if (
+          account?.role === "reviewer" &&
+          saved.job &&
+          saved.job.projectId === next?.id
+        ) {
+          setJob(saved.job);
+          setView("job");
+          api<Record<string, unknown>>("/jobs/" + saved.job.id)
+            .then((value) => {
+              if (!cancelled) setJob(toJob(value, saved.job?.reportName));
+            })
+            .catch((reason) => {
+              if (!cancelled)
+                setConnectionError(
+                  "Could not restore job status. " + reason.message,
+                );
+            });
+        }
+        if (!result.items.length)
+          setError("Create a project in Import schedule to get started.");
+      })
+      .catch((reason) => {
+        if (!cancelled) setError(reason.message);
+      });
+    return () => {
+      cancelled = true;
+    };
   }, [signedIn, account?.id]);
-  useEffect(() => { if (signedIn && account && project) { try { sessionStorage.setItem(`spa-workspace:${account.id}`, JSON.stringify({ projectId: project.id, job })); } catch { /* Optional recovery storage. */ } } }, [signedIn, account, project, job]);
   useEffect(() => {
-    if (!signedIn || !job || fixtureMode || ["ready_for_review", "failed", "stale", "needs_transcription"].includes(job.state) && !connectionError) return;
+    if (signedIn && account && project) {
+      try {
+        sessionStorage.setItem(
+          `spa-workspace:${account.id}`,
+          JSON.stringify({ projectId: project.id, job }),
+        );
+      } catch {
+        /* Optional recovery storage. */
+      }
+    }
+  }, [signedIn, account, project, job]);
+  useEffect(() => {
+    if (
+      !signedIn ||
+      !job ||
+      fixtureMode ||
+      (["ready_for_review", "failed", "stale", "needs_transcription"].includes(
+        job.state,
+      ) &&
+        !connectionError)
+    )
+      return;
     let cancelled = false;
-    const poll = () => api<Record<string, unknown>>("/jobs/" + job.id).then(result => { if (!cancelled) { setJob(toJob(result, job.reportName)); setConnectionError(""); } }).catch(reason => { if (!cancelled) setConnectionError("Status could not be refreshed. Retrying automatically. " + reason.message); });
+    const poll = () =>
+      api<Record<string, unknown>>("/jobs/" + job.id)
+        .then((result) => {
+          if (!cancelled) {
+            setJob(toJob(result, job.reportName));
+            setConnectionError("");
+          }
+        })
+        .catch((reason) => {
+          if (!cancelled)
+            setConnectionError(
+              "Status could not be refreshed. Retrying automatically. " +
+                reason.message,
+            );
+        });
     const timer = setInterval(poll, 2000);
-    return () => { cancelled = true; clearInterval(timer); };
+    return () => {
+      cancelled = true;
+      clearInterval(timer);
+    };
   }, [job, connectionError, signedIn]);
-  useEffect(() => { if (!signedIn) return; const heading = document.querySelector<HTMLElement>(".workspace h1"); if (heading) { heading.tabIndex = -1; heading.focus({ preventScroll: true }); } }, [view, project?.id, signedIn]);
-  if (checking) return <main className="login-page"><p role="status">Checking your session…</p></main>;
-  if (!signedIn) return <Login message={authMessage} onSuccess={acceptAccount} />;
-  const activeProject = fixtureMode ? { id: "fixture-project", name: "DEMO-UTILITY-01", timezone: "Asia/Kolkata", active_schedule_version_id: null } : project;
-  const navigate = (next: typeof view) => { if (next === view || canLeave()) { setError(""); setView(next); } };
+  useEffect(() => {
+    if (!signedIn) return;
+    const heading = document.querySelector<HTMLElement>(".workspace h1");
+    if (heading) {
+      heading.tabIndex = -1;
+      heading.focus({ preventScroll: true });
+    }
+  }, [view, project?.id, signedIn]);
+  if (checking)
+    return (
+      <main className="login-page">
+        <p role="status">Checking your session…</p>
+      </main>
+    );
+  if (!signedIn)
+    return <Login message={authMessage} onSuccess={acceptAccount} />;
+  const activeProject = fixtureMode
+    ? {
+        id: "fixture-project",
+        name: "DEMO-UTILITY-01",
+        timezone: "Asia/Kolkata",
+        active_schedule_version_id: null,
+      }
+    : project;
+  const navigate = (next: typeof view) => {
+    if (next === view || canLeave()) {
+      setError("");
+      setView(next);
+    }
+  };
   const refreshProjects = async () => {
     if (fixtureMode) return;
     const owner = userRef.current;
     const result = await api<{ items: Project[] }>("/projects");
     if (owner !== userRef.current) return;
-    setProjects(result.items); setProject(current => result.items.find(item => item.id === current?.id) || null);
+    setProjects(result.items);
+    setProject(
+      (current) => result.items.find((item) => item.id === current?.id) || null,
+    );
   };
   const signOut = async () => {
     if (pendingOperations.size || logoutBusy) return;
-    if (document.querySelector('[data-dirty="true"]') && !window.confirm("Sign out and discard unsaved drafts? Signing out clears text drafts and selected files from this tab. Submitted jobs remain in Job history.")) return;
+    if (
+      document.querySelector('[data-dirty="true"]') &&
+      !window.confirm(
+        "Sign out and discard unsaved drafts? Signing out clears text drafts and selected files from this tab. Submitted jobs remain in Job history.",
+      )
+    )
+      return;
     authRevision.current++;
-    setLogoutBusy(true); setError("");
-    try { if (!fixtureMode) await api<void>("/auth/logout", { method: "POST" }); csrfToken = null; setSignedIn(false); userRef.current = null; setAccount(null); setRecentJobs([]);
-      try { for (const key of Object.keys(sessionStorage)) { if (key.startsWith(`spa-draft:${account?.id}:`) || key === `spa-workspace:${account?.id}` || key === `spa-jobs:${account?.id}` || key.startsWith(`spa-time-chat:${account?.id}:`)) sessionStorage.removeItem(key); } } catch { /* Storage may be disabled. */ }
-      setProjects([]); setProject(null); setJob(null); setView("intake"); notifyAuth(); }
-    catch (reason) { setError("Sign out could not be confirmed. Please try again. " + (reason instanceof Error ? reason.message : "")); }
-    finally { setLogoutBusy(false); }
+    setLogoutBusy(true);
+    setError("");
+    try {
+      if (!fixtureMode) await api<void>("/auth/logout", { method: "POST" });
+      csrfToken = null;
+      setSignedIn(false);
+      userRef.current = null;
+      setAccount(null);
+      setRecentJobs([]);
+      try {
+        for (const key of Object.keys(sessionStorage)) {
+          if (
+            key.startsWith(`spa-draft:${account?.id}:`) ||
+            key === `spa-workspace:${account?.id}` ||
+            key === `spa-jobs:${account?.id}` ||
+            key.startsWith(`spa-time-chat:${account?.id}:`)
+          )
+            sessionStorage.removeItem(key);
+        }
+      } catch {
+        /* Storage may be disabled. */
+      }
+      setProjects([]);
+      setProject(null);
+      setJob(null);
+      setView("intake");
+      notifyAuth();
+    } catch (reason) {
+      setError(
+        "Sign out could not be confirmed. Please try again. " +
+          (reason instanceof Error ? reason.message : ""),
+      );
+    } finally {
+      setLogoutBusy(false);
+    }
   };
   const refreshQueue = async (openReview: boolean) => {
     if (!job) return;
-    const owner = userRef.current, selectedProject = projectRef.current, selectedJob = job.id;
+    const owner = userRef.current,
+      selectedProject = projectRef.current,
+      selectedJob = job.id;
     const next = fixtureMode
-      ? { ...job, proposalIds: job.proposalIds.filter(id => !reviewedIds.includes(id)) }
-      : toJob(await api<Record<string, unknown>>("/jobs/" + job.id), job.reportName);
-    if (owner !== userRef.current || selectedProject !== projectRef.current || next.projectId !== selectedProject || selectedJob !== job.id) return;
+      ? {
+          ...job,
+          proposalIds: job.proposalIds.filter(
+            (id) => !reviewedIds.includes(id),
+          ),
+        }
+      : toJob(
+          await api<Record<string, unknown>>("/jobs/" + job.id),
+          job.reportName,
+        );
+    if (
+      owner !== userRef.current ||
+      selectedProject !== projectRef.current ||
+      next.projectId !== selectedProject ||
+      selectedJob !== job.id
+    )
+      return;
     setJob(next);
     setReviewIndex(0);
     setView(openReview && next.proposalIds.length ? "review" : "job");
   };
   const rememberJob = (next: Job) => {
     if (userRef.current !== account?.id) return;
-    if (next.projectId !== projectRef.current) { setError("Your report was submitted to its original project. Open that project’s Job history to continue."); return; }
-    const jobs = [next, ...recentJobs.filter(item => item.id !== next.id)].slice(0, 20);
-    setRecentJobs(jobs); try { sessionStorage.setItem(`spa-jobs:${account?.id}`, JSON.stringify(jobs)); } catch { /* Optional history. */ }
-    setJob(next); setReviewedIds([]); setReviewIndex(0); setView("job");
+    if (next.projectId !== projectRef.current) {
+      setError(
+        "Your report was submitted to its original project. Open that project’s Job history to continue.",
+      );
+      return;
+    }
+    const jobs = [
+      next,
+      ...recentJobs.filter((item) => item.id !== next.id),
+    ].slice(0, 20);
+    setRecentJobs(jobs);
+    try {
+      sessionStorage.setItem(`spa-jobs:${account?.id}`, JSON.stringify(jobs));
+    } catch {
+      /* Optional history. */
+    }
+    setJob(next);
+    setReviewedIds([]);
+    setReviewIndex(0);
+    setView("job");
   };
   const openRecentJob = async (previous: Job, fromHistory = false) => {
     if (!fromHistory && !canLeave()) return;
-    const owner = userRef.current, selectedProject = projectRef.current;
-    try { const next = fixtureMode ? previous : toJob(await api<Record<string, unknown>>("/jobs/" + previous.id), previous.reportName); if (owner !== userRef.current || selectedProject !== projectRef.current || next.projectId !== projectRef.current) return; setJob(next); setReviewIndex(0); setView(view === "queue" && next.proposalIds.length ? "review" : "job"); setConnectionError(""); } catch (reason) { setError(reason instanceof Error ? reason.message : "Could not open job."); }
+    const owner = userRef.current,
+      selectedProject = projectRef.current;
+    try {
+      const next = fixtureMode
+        ? previous
+        : toJob(
+            await api<Record<string, unknown>>("/jobs/" + previous.id),
+            previous.reportName,
+          );
+      if (
+        owner !== userRef.current ||
+        selectedProject !== projectRef.current ||
+        next.projectId !== projectRef.current
+      )
+        return;
+      setJob(next);
+      setReviewIndex(0);
+      setView(view === "queue" && next.proposalIds.length ? "review" : "job");
+      setConnectionError("");
+    } catch (reason) {
+      setError(
+        reason instanceof Error ? reason.message : "Could not open job.",
+      );
+    }
   };
-  const openQueue = () => { setError(""); void refreshQueue(true).catch(reason => setError(reason.message)); };
-  return <div className="app-shell"><Header disabled={operationBusy || logoutBusy} onHistory={() => navigate("history")} onTimeChat={() => navigate("timeChat")} onQueue={() => navigate("queue")} account={account} view={view} logoutBusy={logoutBusy} project={activeProject} projects={projects} onProject={next => { if (canLeave()) { setProject(next); setJob(null); setConnectionError(""); setView(account?.role === "reviewer" ? "intake" : "progress"); } }} onIntake={() => navigate("intake")} onProgress={() => navigate("progress")} onImport={() => navigate("scheduleImport")} onSignOut={() => void signOut()} /><main className="workspace">{sessionCheckError && <p className="form-error" role="alert">{sessionCheckError}</p>}{error && <p className="form-error" role="alert">{error}</p>}{view === "timeChat" ? <TimeChat key={(account?.id || "") + ":" + (activeProject?.id || "none")} project={activeProject} request={api} accountId={account?.id || ""} canReview={account?.role === "reviewer"} onReview={id => { api<Record<string, unknown>>("/jobs/" + id).then(value => { setJob(toJob(value, "Conversation")); setView("job"); }).catch(reason => setError(reason.message)); }} /> : view === "history" || view === "queue" ? <JobHistory key={(account?.id || "") + ":" + activeProject?.id + ":" + view} project={activeProject} pendingOnly={view === "queue"} onOpen={item => openRecentJob(item, true)} /> : view === "scheduleImport" ? <ScheduleImport key={(account?.id || "") + ":" + (activeProject?.id || "none")} onActivated={refreshProjects} project={activeProject} onProjectCreated={next => { setProjects([...projects, next]); setProject(next); }} /> : view === "progress" ? <Progress onQueue={() => navigate("queue")} canReview={account?.role === "reviewer"} key={(account?.id || "") + ":" + (activeProject?.id || "none")} project={activeProject} /> : view === "intake" ? <Intake onImport={() => navigate("scheduleImport")} key={(account?.id || "") + ":" + (activeProject?.id || "none")} project={activeProject} onSubmitted={rememberJob} /> : view === "review" && job?.proposalIds[reviewIndex] ? <Review key={(account?.id || "") + ":" + job.proposalIds[reviewIndex]} proposalId={job.proposalIds[reviewIndex]} project={activeProject} position={reviewIndex + 1} total={job.proposalIds.length} onBack={() => refreshQueue(false)} onNext={() => refreshQueue(true)} onRevised={next => setJob(current => current ? { ...current, proposalIds: current.proposalIds.map(id => id === job.proposalIds[reviewIndex] ? next.id : id) } : current)} onDecided={id => setReviewedIds(ids => [...ids, id])} /> : job ? <JobStatus key={job.id} canReview={account?.role === "reviewer"} onTranscribed={value => { rememberJob(toJob(value, "Transcribed field report")); }} connectionError={connectionError} job={job} project={activeProject} onBack={() => setView("intake")} onReview={openQueue} onRetry={async () => { if (fixtureMode) return setJob({ ...job, state: "queued", stage: "parse" }); try { const owner = userRef.current, selectedProject = projectRef.current, selectedJob = job.id; const next = await api<Record<string, unknown>>("/jobs/" + job.id + "/retry", { method: "POST" }); if (owner !== userRef.current || selectedProject !== projectRef.current || selectedJob !== job.id) return; setConnectionError(""); setJob(toJob({ ...job, ...next, agent_run_available: job.agentRunAvailable }, job.reportName)); } catch (reason) { setError(reason instanceof Error ? reason.message : "Retry failed. Please try again."); } }} /> : <Empty onStart={() => setView("intake")} />}{view === "intake" && recentJobs.some(item => item.projectId === activeProject?.id) && <section className="panel recent-jobs"><h2>Recent jobs in this tab</h2><ul>{recentJobs.filter(item => item.projectId === activeProject?.id).map(item => <li key={item.id}><button className="quiet-button" onClick={() => void openRecentJob(item)}>{item.reportName} · Open job</button></li>)}</ul></section>}</main></div>;
+  const openQueue = () => {
+    setError("");
+    void refreshQueue(true).catch((reason) => setError(reason.message));
+  };
+  return (
+    <div className="app-shell">
+      <WorkspaceNav
+        view={view}
+        reviewer={account?.role === "reviewer"}
+        disabled={operationBusy || logoutBusy}
+        onNavigate={navigate}
+        username={account?.username || ""}
+        onSignOut={() => void signOut()}
+      />
+      <div className="workspace-body">
+        <WorkspaceBar
+          project={activeProject}
+          projects={projects}
+          disabled={operationBusy || logoutBusy}
+          onProject={(next) => {
+            if (canLeave()) {
+              setProject(next);
+              setJob(null);
+              setConnectionError("");
+              setView(account?.role === "reviewer" ? "intake" : "progress");
+            }
+          }}
+          fixture={fixtureMode}
+        />
+        <main className="workspace">
+          {sessionCheckError && (
+            <p className="form-error" role="alert">
+              {sessionCheckError}
+            </p>
+          )}
+          {error && (
+            <p className="form-error" role="alert">
+              {error}
+            </p>
+          )}
+          {view === "overview" || view === "schedule" ? (
+            <ScheduleWorkspace
+              key={(activeProject?.id || "none") + view}
+              project={activeProject}
+              overview={view === "overview"}
+              request={api}
+              fixture={fixtureMode ? fixtureProgress : undefined}
+              canReview={account?.role === "reviewer"}
+              onNavigate={navigate}
+            />
+          ) : view === "history" || view === "queue" ? (
+            <JobHistory
+              key={(account?.id || "") + ":" + activeProject?.id + ":" + view}
+              project={activeProject}
+              pendingOnly={view === "queue"}
+              onOpen={(item) => openRecentJob(item, true)}
+            />
+          ) : view === "scheduleImport" ? (
+            <ScheduleImport
+              key={(account?.id || "") + ":" + (activeProject?.id || "none")}
+              onActivated={refreshProjects}
+              project={activeProject}
+              onProjectCreated={(next) => {
+                setProjects([...projects, next]);
+                setProject(next);
+              }}
+            />
+          ) : view === "progress" ? (
+            <Progress
+              onQueue={() => navigate("queue")}
+              canReview={account?.role === "reviewer"}
+              key={(account?.id || "") + ":" + (activeProject?.id || "none")}
+              project={activeProject}
+            />
+          ) : view === "intake" ? (
+            <Intake
+              onImport={() => navigate("scheduleImport")}
+              key={(account?.id || "") + ":" + (activeProject?.id || "none")}
+              project={activeProject}
+              onSubmitted={rememberJob}
+            />
+          ) : view === "review" && job?.proposalIds[reviewIndex] ? (
+            <Review
+              key={(account?.id || "") + ":" + job.proposalIds[reviewIndex]}
+              proposalId={job.proposalIds[reviewIndex]}
+              project={activeProject}
+              position={reviewIndex + 1}
+              total={job.proposalIds.length}
+              onBack={() => refreshQueue(false)}
+              onNext={() => refreshQueue(true)}
+              onRevised={(next) =>
+                setJob((current) =>
+                  current
+                    ? {
+                        ...current,
+                        proposalIds: current.proposalIds.map((id) =>
+                          id === job.proposalIds[reviewIndex] ? next.id : id,
+                        ),
+                      }
+                    : current,
+                )
+              }
+              onDecided={(id) => setReviewedIds((ids) => [...ids, id])}
+            />
+          ) : job ? (
+            <JobStatus
+              key={job.id}
+              canReview={account?.role === "reviewer"}
+              onTranscribed={(value) => {
+                rememberJob(toJob(value, "Transcribed field report"));
+              }}
+              connectionError={connectionError}
+              job={job}
+              project={activeProject}
+              onBack={() => setView("intake")}
+              onReview={openQueue}
+              onRetry={async () => {
+                if (fixtureMode)
+                  return setJob({ ...job, state: "queued", stage: "parse" });
+                try {
+                  const owner = userRef.current,
+                    selectedProject = projectRef.current,
+                    selectedJob = job.id;
+                  const next = await api<Record<string, unknown>>(
+                    "/jobs/" + job.id + "/retry",
+                    { method: "POST" },
+                  );
+                  if (
+                    owner !== userRef.current ||
+                    selectedProject !== projectRef.current ||
+                    selectedJob !== job.id
+                  )
+                    return;
+                  setConnectionError("");
+                  setJob(
+                    toJob(
+                      {
+                        ...job,
+                        ...next,
+                        agent_run_available: job.agentRunAvailable,
+                      },
+                      job.reportName,
+                    ),
+                  );
+                } catch (reason) {
+                  setError(
+                    reason instanceof Error
+                      ? reason.message
+                      : "Retry failed. Please try again.",
+                  );
+                }
+              }}
+            />
+          ) : (
+            <Empty onStart={() => setView("intake")} />
+          )}
+          {view === "intake" &&
+            recentJobs.some((item) => item.projectId === activeProject?.id) && (
+              <section className="panel recent-jobs">
+                <h2>Recent jobs in this tab</h2>
+                <ul>
+                  {recentJobs
+                    .filter((item) => item.projectId === activeProject?.id)
+                    .map((item) => (
+                      <li key={item.id}>
+                        <button
+                          className="quiet-button"
+                          onClick={() => void openRecentJob(item)}
+                        >
+                          {item.reportName} · Open job
+                        </button>
+                      </li>
+                    ))}
+                </ul>
+              </section>
+            )}
+        </main>
+      </div>
+    </div>
+  );
 }
 
-function JobHistory({ project, pendingOnly, onOpen }: { project: Project | null; pendingOnly: boolean; onOpen: (job: Job) => Promise<void> }) {
-  const [items, setItems] = useState<Job[]>([]), [offset, setOffset] = useState(0), [nextOffset, setNextOffset] = useState<number | null>(null), [loading, setLoading] = useState(true), [error, setError] = useState(""), [reload, setReload] = useState(0);
+function JobHistory({
+  project,
+  pendingOnly,
+  onOpen,
+}: {
+  project: Project | null;
+  pendingOnly: boolean;
+  onOpen: (job: Job) => Promise<void>;
+}) {
+  const [historyTab, setHistoryTab] = useState("reports");
+  const [items, setItems] = useState<Job[]>([]),
+    [offset, setOffset] = useState(0),
+    [nextOffset, setNextOffset] = useState<number | null>(null),
+    [loading, setLoading] = useState(true),
+    [error, setError] = useState(""),
+    [reload, setReload] = useState(0);
   const [busy, setBusy] = useBusy();
   useEffect(() => {
-    let active = true; setLoading(true); setError("");
-    if (!project) { setLoading(false); return; }
-    if (fixtureMode) { setItems([{ id: "fixture-job", projectId: project.id, state: "ready_for_review", stage: "persist", progress: 100, reportName: "Daily field report", proposalIds: [fixtureProposal.id], pendingCount: 1 }]); setLoading(false); return; }
-    api<{ items: Record<string, unknown>[]; next_offset: number | null }>(`/jobs?project_id=${encodeURIComponent(project.id)}&pending_only=${pendingOnly}&offset=${offset}`).then(result => { if (active) { setItems(result.items.map(item => toJob(item))); setNextOffset(result.next_offset); } }).catch(value => { if (active) setError(value.message); }).finally(() => { if (active) setLoading(false); });
-    return () => { active = false; };
+    let active = true;
+    setLoading(true);
+    setError("");
+    if (!project) {
+      setLoading(false);
+      return;
+    }
+    if (fixtureMode) {
+      setItems([
+        {
+          id: "fixture-job",
+          projectId: project.id,
+          state: "ready_for_review",
+          stage: "persist",
+          progress: 100,
+          reportName: "Daily field report",
+          proposalIds: [fixtureProposal.id],
+          pendingCount: 1,
+        },
+      ]);
+      setLoading(false);
+      return;
+    }
+    api<{ items: Record<string, unknown>[]; next_offset: number | null }>(
+      `/jobs?project_id=${encodeURIComponent(project.id)}&pending_only=${pendingOnly}&offset=${offset}`,
+    )
+      .then((result) => {
+        if (active) {
+          setItems(result.items.map((item) => toJob(item)));
+          setNextOffset(result.next_offset);
+        }
+      })
+      .catch((value) => {
+        if (active) setError(value.message);
+      })
+      .finally(() => {
+        if (active) setLoading(false);
+      });
+    return () => {
+      active = false;
+    };
   }, [project?.id, pendingOnly, offset, reload]);
-  return <><Context project={project} /><section className="page-intro"><div><p className="eyebrow">{pendingOnly ? "AWAITING YOUR REVIEW" : "REPORT HISTORY"}</p><h1>{pendingOnly ? "Review queue" : "Job history"}</h1><p>{pendingOnly ? "Review evidence and decide which observations can update progress." : "Every submitted report, available across sessions and devices."}</p></div><button className="secondary" disabled={loading || busy} onClick={() => setReload(value => value + 1)}>Refresh</button></section>{error && <p className="form-error" role="alert">{error}</p>}{loading ? <p role="status">Loading reports…</p> : !project ? <p role="status">Select a project to view reports.</p> : !items.length && !error ? <section className="panel empty-state"><h2>{pendingOnly ? "You’re up to date" : "No reports yet"}</h2><p className="muted">{pendingOnly ? "There are no pending proposals in this project." : "Submitted reports will appear here."}</p></section> : <section className="job-list" aria-label="Reports">{items.map(item => <article className="panel job-list-row" key={item.id}><div><p className="eyebrow">{item.createdAt ? new Intl.DateTimeFormat(undefined, { dateStyle: "medium", timeStyle: "short" }).format(new Date(item.createdAt)) : "FIELD REPORT"}</p><h2>{item.reportName}</h2><p className="muted">{item.pendingCount || 0} pending proposals</p></div><span className="status-badge">{item.state.replaceAll("_", " ")}</span><button className="secondary" disabled={busy} onClick={() => { setBusy(true); void onOpen(item).finally(() => setBusy(false)); }}>{pendingOnly ? "Review proposals →" : "Open job →"}</button></article>)}</section>}<div className="pagination"><button className="secondary" disabled={offset === 0 || loading || busy} onClick={() => setOffset(Math.max(0, offset - 25))}>Previous</button><span>Page {Math.floor(offset / 25) + 1}</span><button className="secondary" disabled={nextOffset === null || loading || busy} onClick={() => { if (nextOffset !== null) setOffset(nextOffset); }}>Next</button></div></>;
+  return (
+    <>
+      <Context project={project} />
+      <section className="page-intro">
+        <div>
+          <p className="eyebrow">
+            {pendingOnly ? "AWAITING YOUR REVIEW" : "REPORT HISTORY"}
+          </p>
+          <h1>{pendingOnly ? "Review queue" : "Job history"}</h1>
+          <p>
+            {pendingOnly
+              ? "Review evidence and decide which observations can update progress."
+              : "Every submitted report, available across sessions and devices."}
+          </p>
+        </div>
+        <button
+          className="secondary"
+          disabled={loading || busy}
+          onClick={() => setReload((value) => value + 1)}
+        >
+          Refresh
+        </button>
+      </section>
+      {!pendingOnly && (
+        <Tabs.Root
+          value={historyTab}
+          onValueChange={(value) => {
+            if (canLeave()) setHistoryTab(String(value));
+          }}
+          className="glass-tabs history-tabs"
+        >
+          <Tabs.List activateOnFocus aria-label="History view">
+            <Tabs.Tab value="reports">Reports & processing</Tabs.Tab>
+            <Tabs.Tab value="audit">Accepted updates & audit</Tabs.Tab>
+            <Tabs.Indicator className="glass-tab-indicator" />
+          </Tabs.List>
+        </Tabs.Root>
+      )}
+      {historyTab === "audit" ? (
+        <AuditWorkspace
+          projectId={project?.id || null}
+          request={api}
+          fixture={fixtureMode ? fixtureProgress : undefined}
+        />
+      ) : (
+        <>
+          {error && (
+            <p className="form-error" role="alert">
+              {error}
+            </p>
+          )}
+          {loading ? (
+            <p role="status">Loading reports…</p>
+          ) : !project ? (
+            <p role="status">Select a project to view reports.</p>
+          ) : !items.length && !error ? (
+            <section className="panel empty-state">
+              <h2>{pendingOnly ? "You’re up to date" : "No reports yet"}</h2>
+              <p className="muted">
+                {pendingOnly
+                  ? "There are no pending proposals in this project."
+                  : "Submitted reports will appear here."}
+              </p>
+            </section>
+          ) : (
+            <section className="job-list" aria-label="Reports">
+              {items.map((item) => (
+                <article className="panel job-list-row" key={item.id}>
+                  <div>
+                    <p className="eyebrow">
+                      {item.createdAt
+                        ? new Intl.DateTimeFormat(undefined, {
+                            dateStyle: "medium",
+                            timeStyle: "short",
+                          }).format(new Date(item.createdAt))
+                        : "FIELD REPORT"}
+                    </p>
+                    <h2>{item.reportName}</h2>
+                    <p className="muted">
+                      {item.pendingCount || 0} pending proposals
+                    </p>
+                  </div>
+                  <span className="status-badge">
+                    {item.state.replaceAll("_", " ")}
+                  </span>
+                  <button
+                    className="secondary"
+                    disabled={busy}
+                    onClick={() => {
+                      setBusy(true);
+                      void onOpen(item).finally(() => setBusy(false));
+                    }}
+                  >
+                    {pendingOnly ? "Review proposals →" : "Open job →"}
+                  </button>
+                </article>
+              ))}
+            </section>
+          )}
+          <div className="pagination">
+            <button
+              className="secondary"
+              disabled={offset === 0 || loading || busy}
+              onClick={() => setOffset(Math.max(0, offset - 25))}
+            >
+              Previous
+            </button>
+            <span>Page {Math.floor(offset / 25) + 1}</span>
+            <button
+              className="secondary"
+              disabled={nextOffset === null || loading || busy}
+              onClick={() => {
+                if (nextOffset !== null) setOffset(nextOffset);
+              }}
+            >
+              Next
+            </button>
+          </div>
+        </>
+      )}
+    </>
+  );
 }
 
-function Login({ onSuccess, message }: { onSuccess: (account: Account) => void; message: string }) {
-  const [error, setError] = useState(""), [busy, setBusy] = useBusy(), [visible, setVisible] = useState(false), [registering, setRegistering] = useState(false);
+function Login({
+  onSuccess,
+  message,
+}: {
+  onSuccess: (account: Account) => void;
+  message: string;
+}) {
+  const [error, setError] = useState(""),
+    [busy, setBusy] = useBusy(),
+    [visible, setVisible] = useState(false),
+    [registering, setRegistering] = useState(false);
   const submitting = useRef(false);
   const submit = async (event: FormEvent<HTMLFormElement>) => {
-    event.preventDefault(); if (submitting.current) return;
-    submitting.current = true; setBusy(true); setError("");
+    event.preventDefault();
+    if (submitting.current) return;
+    submitting.current = true;
+    setBusy(true);
+    setError("");
     const form = event.currentTarget;
     try {
-      if (fixtureMode) { onSuccess({ id: "fixture", username: "reviewer", role: "reviewer", csrf_token: "fixture-csrf" }); return; }
-      const password = (form.elements.namedItem("password") as HTMLInputElement).value;
-      if (registering && password !== (form.elements.namedItem("confirm_password") as HTMLInputElement).value) throw new Error("Passwords do not match.");
-      const result = await api<{ csrf_token: string; user: Account }>(registering ? "/auth/register" : "/auth/login", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ username: (form.elements.namedItem("username") as HTMLInputElement).value.trim(), password }) });
-      onSuccess({ ...result.user, csrf_token: result.csrf_token }); notifyAuth();
-    } catch (reason) { setError(reason instanceof Error ? reason.message : "Sign in failed. Please try again."); }
-    finally { submitting.current = false; setBusy(false); }
+      if (fixtureMode) {
+        onSuccess({
+          id: "fixture",
+          username: "reviewer",
+          role: "reviewer",
+          csrf_token: "fixture-csrf",
+        });
+        return;
+      }
+      const password = (form.elements.namedItem("password") as HTMLInputElement)
+        .value;
+      if (
+        registering &&
+        password !==
+          (form.elements.namedItem("confirm_password") as HTMLInputElement)
+            .value
+      )
+        throw new Error("Passwords do not match.");
+      const result = await api<{ csrf_token: string; user: Account }>(
+        registering ? "/auth/register" : "/auth/login",
+        {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({
+            username: (
+              form.elements.namedItem("username") as HTMLInputElement
+            ).value.trim(),
+            password,
+          }),
+        },
+      );
+      onSuccess({ ...result.user, csrf_token: result.csrf_token });
+      notifyAuth();
+    } catch (reason) {
+      setError(
+        reason instanceof Error
+          ? reason.message
+          : "Sign in failed. Please try again.",
+      );
+    } finally {
+      submitting.current = false;
+      setBusy(false);
+    }
   };
-  return <main className="login-page"><section className="login-card"><span className="brand-mark" aria-hidden="true">SP</span><p className="eyebrow">Site Progress Agent</p><h1>Review field progress with evidence.</h1><p className="lede">{registering ? "Create an account to save your projects and reports." : "Sign in to review daily reports, verify source evidence, and track approved progress."}</p>{message && <p role="status" className="session-notice">{message}</p>}{fixtureMode && <div className="fixture-label">Development fixture mode · no report is sent to a model</div>}<form onSubmit={submit} aria-busy={busy}><label>Username<input name="username" autoFocus autoComplete="username" autoCapitalize="none" spellCheck={false} minLength={registering ? 3 : undefined} maxLength={120} required disabled={busy} defaultValue={fixtureMode ? "reviewer" : ""} /></label><label>Password<input name="password" autoComplete={registering ? "new-password" : "current-password"} type={visible ? "text" : "password"} minLength={registering ? 12 : undefined} maxLength={256} required disabled={busy} defaultValue={fixtureMode ? "fixture-only" : ""} /></label>{registering && <label>Confirm password<input name="confirm_password" autoComplete="new-password" type={visible ? "text" : "password"} minLength={12} maxLength={256} required disabled={busy} /></label>}<button type="button" className="text-button" aria-pressed={visible} onClick={() => setVisible(!visible)}>{visible ? "Hide password" : "Show password"}</button>{error && <p className="form-error" role="alert">{error}</p>}<button className="primary full" disabled={busy}>{busy ? "Please wait…" : registering ? "Create account →" : "Sign in →"}</button></form>{!fixtureMode && <button type="button" className="text-button" disabled={busy} onClick={() => { setRegistering(!registering); setError(""); }}>{registering ? "Already have an account? Sign in" : "New here? Create an account"}</button>}<p className="cookie-note">A necessary session cookie keeps you signed in for up to 12 hours. Text drafts are saved in this browser tab. Sign out when using a shared computer.</p></section></main>;
+  return (
+    <main className="login-page">
+      <section className="login-card">
+        <span className="brand-mark" aria-hidden="true">
+          T
+        </span>
+        <p className="eyebrow">Time Agent · Construction intelligence</p>
+        <h1>Review field progress with evidence.</h1>
+        <p className="lede">
+          {registering
+            ? "Create an account to save your projects and reports."
+            : "Sign in to review daily reports, verify source evidence, and track approved progress."}
+        </p>
+        {message && (
+          <p role="status" className="session-notice">
+            {message}
+          </p>
+        )}
+        {fixtureMode && (
+          <div className="fixture-label">
+            Development fixture mode · no report is sent to a model
+          </div>
+        )}
+        <form onSubmit={submit} aria-busy={busy}>
+          <label>
+            Username
+            <input
+              name="username"
+              autoFocus
+              autoComplete="username"
+              autoCapitalize="none"
+              spellCheck={false}
+              minLength={registering ? 3 : undefined}
+              maxLength={120}
+              required
+              disabled={busy}
+              defaultValue={fixtureMode ? "reviewer" : ""}
+            />
+          </label>
+          <label>
+            Password
+            <input
+              name="password"
+              autoComplete={registering ? "new-password" : "current-password"}
+              type={visible ? "text" : "password"}
+              minLength={registering ? 12 : undefined}
+              maxLength={256}
+              required
+              disabled={busy}
+              defaultValue={fixtureMode ? "fixture-only" : ""}
+            />
+          </label>
+          {registering && (
+            <label>
+              Confirm password
+              <input
+                name="confirm_password"
+                autoComplete="new-password"
+                type={visible ? "text" : "password"}
+                minLength={12}
+                maxLength={256}
+                required
+                disabled={busy}
+              />
+            </label>
+          )}
+          <button
+            type="button"
+            className="text-button"
+            aria-pressed={visible}
+            onClick={() => setVisible(!visible)}
+          >
+            {visible ? "Hide password" : "Show password"}
+          </button>
+          {error && (
+            <p className="form-error" role="alert">
+              {error}
+            </p>
+          )}
+          <button className="primary full" disabled={busy}>
+            {busy
+              ? "Please wait…"
+              : registering
+                ? "Create account →"
+                : "Sign in →"}
+          </button>
+        </form>
+        {!fixtureMode && (
+          <button
+            type="button"
+            className="text-button"
+            disabled={busy}
+            onClick={() => {
+              setRegistering(!registering);
+              setError("");
+            }}
+          >
+            {registering
+              ? "Already have an account? Sign in"
+              : "New here? Create an account"}
+          </button>
+        )}
+        <p className="cookie-note">
+          A necessary session cookie keeps you signed in for up to 12 hours.
+          Text drafts are saved in this browser tab. Sign out when using a
+          shared computer.
+        </p>
+      </section>
+    </main>
+  );
 }
-function Header({ disabled, onHistory, onTimeChat, onQueue, account, view, logoutBusy, project, projects, onProject, onIntake, onProgress, onImport, onSignOut }: { disabled: boolean; onHistory: () => void; onTimeChat: () => void; onQueue: () => void; account: Account | null; view: string; logoutBusy: boolean; project: Project | null; projects: Project[]; onProject: (value: Project) => void; onIntake: () => void; onProgress: () => void; onImport: () => void; onSignOut: () => void }) {
-  const reviewer = account?.role === "reviewer";
-  return <header className="topbar"><div className="brand"><span className="brand-mark" aria-hidden="true">SP</span><div><p className="eyebrow">Site Progress Agent</p><strong>Field review workspace</strong></div></div><div className="topbar-actions">{fixtureMode && <span className="mode-pill">DEV FIXTURE</span>}{projects.length > 1 && <select disabled={disabled} aria-label="Active project" value={project?.id || ""} onChange={event => { const selected = projects.find(item => item.id === event.target.value); if (selected) onProject(selected); }}>{projects.map(item => <option value={item.id} key={item.id}>{item.name}</option>)}</select>}<span className="account-name">{account?.username}<small>{reviewer ? "Reviewer" : "Viewer"}</small></span><button className="quiet-button" disabled={disabled} onClick={onSignOut}>{logoutBusy ? "Signing out…" : "Sign out"}</button></div><nav aria-label="Workspace">{reviewer && <><button className="quiet-button" aria-current={["intake", "job", "review"].includes(view) ? "page" : undefined} disabled={disabled} onClick={onIntake}>Report intake</button><button className="quiet-button" aria-current={view === "queue" ? "page" : undefined} disabled={disabled} onClick={onQueue}>Review queue</button><button className="quiet-button" aria-current={view === "history" ? "page" : undefined} disabled={disabled} onClick={onHistory}>Job history</button><button className="quiet-button" aria-current={view === "scheduleImport" ? "page" : undefined} disabled={disabled} onClick={onImport}>Import schedule</button></>}<button className="quiet-button" aria-current={view === "timeChat" ? "page" : undefined} disabled={disabled} onClick={onTimeChat}>Text log</button><button className="quiet-button" aria-current={view === "progress" ? "page" : undefined} disabled={disabled} onClick={onProgress}>Approved progress</button></nav></header>;
+function Context({ project }: { project: Project | null }) {
+  return (
+    <div className="context-bar">
+      <div>
+        <span className="context-label">Project</span>
+        <strong>{project?.name || "No project selected"}</strong>
+      </div>
+      <div>
+        <span className="context-label">Schedule</span>
+        <strong>
+          {project?.active_schedule_version_id
+            ? "Active schedule"
+            : "No active schedule"}
+        </strong>
+      </div>
+      <span className="context-state">
+        {project?.active_schedule_version_id
+          ? "Ready for intake"
+          : "Schedule required"}
+      </span>
+    </div>
+  );
 }
-function Context({ project }: { project: Project | null }) { return <div className="context-bar"><div><span className="context-label">Project</span><strong>{project?.name || "No project selected"}</strong></div><div><span className="context-label">Schedule</span><strong>{project?.active_schedule_version_id ? "Active schedule" : "No active schedule"}</strong></div><span className="context-state">{project?.active_schedule_version_id ? "Ready for intake" : "Schedule required"}</span></div>; }
-function Intake({ project, onImport, onSubmitted }: { project: Project | null; onImport: () => void; onSubmitted: (job: Job) => void }) {
-  const [text, setText] = useDraft("intake:" + project?.id + ":text", ""), [file, setFile] = useState<File | null>(null), [reportDate, setReportDate] = useDraft("intake:" + project?.id + ":date", ""), [error, setError] = useState(""), [busy, setBusy] = useBusy();
+function Intake({
+  project,
+  onImport,
+  onSubmitted,
+}: {
+  project: Project | null;
+  onImport: () => void;
+  onSubmitted: (job: Job) => void;
+}) {
+  const [text, setText] = useDraft("intake:" + project?.id + ":text", ""),
+    [file, setFile] = useState<File | null>(null),
+    [reportDate, setReportDate] = useDraft(
+      "intake:" + project?.id + ":date",
+      "",
+    ),
+    [error, setError] = useState(""),
+    [busy, setBusy] = useBusy();
   const [mappingId, setMappingId] = useState<string | null>(null);
-  const submit = async (event: FormEvent) => { event.preventDefault(); if (busy) return; if (file?.name.toLowerCase().endsWith(".xlsx") && !mappingId) return setError("Preview and confirm the report column mapping first."); if (!project) return setError("Select an accessible project first."); if (!fixtureMode && !project.active_schedule_version_id) return setError(errorMessages.PROJECT_HAS_NO_ACTIVE_SCHEDULE); if (!text.trim() && !file) return setError("Paste a report or choose a supported file."); setBusy(true); setError(""); try { if (fixtureMode) { setText(""); setReportDate(""); onSubmitted({ agentRunAvailable: false, id: "fixture-job", projectId: project.id, state: "ready_for_review", stage: "persist", progress: 100, reportName: file?.name || "Pasted field report", proposalCount: 1, proposalIds: [fixtureProposal.id] }); return; } const body = file ? (() => { const data = new FormData(); data.append("file", file); data.append("report_date", reportDate); if (mappingId) data.append("mapping_id", mappingId); if (reportDate) data.append("report_date_evidence", "Reviewer-entered report date"); return data; })() : JSON.stringify({ text, report_date: reportDate || null, report_date_evidence: reportDate ? "Reviewer-entered report date" : null }); const result = await api<Record<string, unknown>>("/projects/" + project.id + "/reports", { method: "POST", headers: file ? undefined : { "Content-Type": "application/json" }, body }); setText(""); setReportDate(""); onSubmitted(toJob(result, file?.name || "Pasted field report")); } catch (reason) { setError(reason instanceof Error ? reason.message : "The report could not be submitted."); } finally { setBusy(false); } };
-  return <><Context project={project} /><section className="page-intro"><div><p className="eyebrow">New report</p><h1>Bring in a field report</h1><p>Paste a daily note or upload a report. The system preserves the source and creates a job for review.</p></div><div className="limit-note"><strong>Supported</strong><span>TXT, DOCX, text PDF, XLSX</span><span>10 MB · PDF up to 20 pages</span></div></section>{!fixtureMode && !project?.active_schedule_version_id && <div className="prerequisite" role="status"><strong>An active schedule is required</strong><p>Import and activate a schedule before submitting a report.</p><button className="secondary" onClick={onImport}>Go to schedule import</button></div>}<form aria-busy={busy} data-dirty={!!text.trim() || !!file} className="intake-grid" onSubmit={submit}><section className="panel report-panel"><h2>Report source</h2><label>Paste report text<textarea value={text} onChange={event => setText(event.target.value)} rows={9} disabled={busy || !!file} aria-describedby="report-writing-hint" /></label><div id="report-writing-hint" className="helper"><p><strong>Write it like a site note.</strong> Name the work and location, then say what happened. For quantity progress, include the amount and unit; say whether it is today’s additional work or the total completed so far. Put the work date in the note or use Report date.</p><p>Example: “Ground floor slab concreting: 25 m³ completed in total as of 19 October 2026.”</p><p>Activity codes are optional. Percentage-only updates can be reviewed, but quantity-based activities need a measured quantity before approval. Missing details may need clarification.</p></div><div className="or-rule"><span>or upload a file</span></div><label className="file-drop"><strong>{file ? file.name : "Choose a report file"}</strong><span>TXT, DOCX, PDF or XLSX · max 10 MB</span><input disabled={busy} type="file" accept=".txt,.docx,.pdf,.xlsx" onChange={event => { const selected = event.target.files?.[0] || null; if (selected && selected.size > 10 * 1024 * 1024) { setError("Choose a file smaller than 10 MB."); event.target.value = ""; return; } setError(""); setMappingId(null); setFile(selected); }} /></label>{file && <button type="button" disabled={busy} className="text-button" onClick={event => { setFile(null); setMappingId(null); const input = event.currentTarget.parentElement?.querySelector<HTMLInputElement>('input[type="file"]'); if (input) input.value = ""; }}>Remove file and use text</button>}{file?.name.toLowerCase().endsWith(".xlsx") && project && <ReportMapping key={file.name + file.lastModified} file={file} projectId={project.id} api={api} onConfirmed={setMappingId} />}</section><aside className="panel settings-panel"><h2>Report context</h2><label>Report date<input disabled={busy} type="date" value={reportDate} onChange={event => setReportDate(event.target.value)} /></label><p className="helper">Upload time is never used as a work date.</p>{error && <p className="form-error" role="alert">{error}</p>}<button className="primary full" disabled={busy || !project || (!fixtureMode && !project.active_schedule_version_id)}>{busy ? "Submitting…" : "Create review job"} →</button><p className="muted small">No progress is applied before a reviewer approves a proposal.</p></aside></form></>;
+  const submit = async (event: FormEvent) => {
+    event.preventDefault();
+    if (busy) return;
+    if (file?.name.toLowerCase().endsWith(".xlsx") && !mappingId)
+      return setError("Preview and confirm the report column mapping first.");
+    if (!project) return setError("Select an accessible project first.");
+    if (!fixtureMode && !project.active_schedule_version_id)
+      return setError(errorMessages.PROJECT_HAS_NO_ACTIVE_SCHEDULE);
+    if (!text.trim() && !file)
+      return setError("Paste a report or choose a supported file.");
+    setBusy(true);
+    setError("");
+    try {
+      if (fixtureMode) {
+        setText("");
+        setReportDate("");
+        onSubmitted({
+          agentRunAvailable: false,
+          id: "fixture-job",
+          projectId: project.id,
+          state: "ready_for_review",
+          stage: "persist",
+          progress: 100,
+          reportName: file?.name || "Pasted field report",
+          proposalCount: 1,
+          proposalIds: [fixtureProposal.id],
+        });
+        return;
+      }
+      const body = file
+        ? (() => {
+            const data = new FormData();
+            data.append("file", file);
+            data.append("report_date", reportDate);
+            if (mappingId) data.append("mapping_id", mappingId);
+            if (reportDate)
+              data.append(
+                "report_date_evidence",
+                "Reviewer-entered report date",
+              );
+            return data;
+          })()
+        : JSON.stringify({
+            text,
+            report_date: reportDate || null,
+            report_date_evidence: reportDate
+              ? "Reviewer-entered report date"
+              : null,
+          });
+      const result = await api<Record<string, unknown>>(
+        "/projects/" + project.id + "/reports",
+        {
+          method: "POST",
+          headers: file ? undefined : { "Content-Type": "application/json" },
+          body,
+        },
+      );
+      setText("");
+      setReportDate("");
+      onSubmitted(toJob(result, file?.name || "Pasted field report"));
+    } catch (reason) {
+      setError(
+        reason instanceof Error
+          ? reason.message
+          : "The report could not be submitted.",
+      );
+    } finally {
+      setBusy(false);
+    }
+  };
+  return (
+    <>
+      <Context project={project} />
+      <section className="page-intro">
+        <div>
+          <p className="eyebrow">New report</p>
+          <h1>Bring in a field report</h1>
+          <p>
+            Paste a daily note or upload a report. The system preserves the
+            source and creates a job for review.
+          </p>
+        </div>
+        <div className="limit-note">
+          <strong>Supported</strong>
+          <span>TXT, DOCX, text PDF, XLSX</span>
+          <span>10 MB · PDF up to 20 pages</span>
+        </div>
+      </section>
+      {!fixtureMode && !project?.active_schedule_version_id && (
+        <div className="prerequisite" role="status">
+          <strong>An active schedule is required</strong>
+          <p>Import and activate a schedule before submitting a report.</p>
+          <button className="secondary" onClick={onImport}>
+            Go to schedule import
+          </button>
+        </div>
+      )}
+      <form
+        aria-busy={busy}
+        data-dirty={!!text.trim() || !!file}
+        className="intake-grid"
+        onSubmit={submit}
+      >
+        <section className="panel report-panel">
+          <h2>Report source</h2>
+          <label>
+            Paste report text
+            <textarea
+              value={text}
+              onChange={(event) => setText(event.target.value)}
+              rows={9}
+              disabled={busy || !!file}
+              aria-describedby="report-writing-hint"
+            />
+          </label>
+          <div id="report-writing-hint" className="helper">
+            <p>
+              <strong>Write it like a site note.</strong> Name the work and
+              location, then say what happened. For quantity progress, include
+              the amount and unit; say whether it is today’s additional work or
+              the total completed so far. Put the work date in the note or use
+              Report date.
+            </p>
+            <p>
+              Example: “Ground floor slab concreting: 25 m³ completed in total
+              as of 19 October 2026.”
+            </p>
+            <p>
+              Activity codes are optional. Percentage-only updates can be
+              reviewed, but quantity-based activities need a measured quantity
+              before approval. Missing details may need clarification.
+            </p>
+          </div>
+          <div className="or-rule">
+            <span>or upload a file</span>
+          </div>
+          <label className="file-drop">
+            <strong>{file ? file.name : "Choose a report file"}</strong>
+            <span>TXT, DOCX, PDF or XLSX · max 10 MB</span>
+            <input
+              disabled={busy}
+              type="file"
+              accept=".txt,.docx,.pdf,.xlsx"
+              onChange={(event) => {
+                const selected = event.target.files?.[0] || null;
+                if (selected && selected.size > 10 * 1024 * 1024) {
+                  setError("Choose a file smaller than 10 MB.");
+                  event.target.value = "";
+                  return;
+                }
+                setError("");
+                setMappingId(null);
+                setFile(selected);
+              }}
+            />
+          </label>
+          {file && (
+            <button
+              type="button"
+              disabled={busy}
+              className="text-button"
+              onClick={(event) => {
+                setFile(null);
+                setMappingId(null);
+                const input =
+                  event.currentTarget.parentElement?.querySelector<HTMLInputElement>(
+                    'input[type="file"]',
+                  );
+                if (input) input.value = "";
+              }}
+            >
+              Remove file and use text
+            </button>
+          )}
+          {file?.name.toLowerCase().endsWith(".xlsx") && project && (
+            <ReportMapping
+              key={file.name + file.lastModified}
+              file={file}
+              projectId={project.id}
+              api={api}
+              onConfirmed={setMappingId}
+            />
+          )}
+        </section>
+        <aside className="panel settings-panel">
+          <h2>Report context</h2>
+          <label>
+            Report date
+            <input
+              disabled={busy}
+              type="date"
+              value={reportDate}
+              onChange={(event) => setReportDate(event.target.value)}
+            />
+          </label>
+          <p className="helper">Upload time is never used as a work date.</p>
+          {error && (
+            <p className="form-error" role="alert">
+              {error}
+            </p>
+          )}
+          <button
+            className="primary full"
+            disabled={
+              busy ||
+              !project ||
+              (!fixtureMode && !project.active_schedule_version_id)
+            }
+          >
+            {busy ? "Submitting…" : "Create review job"} →
+          </button>
+          <p className="muted small">
+            No progress is applied before a reviewer approves a proposal.
+          </p>
+        </aside>
+      </form>
+    </>
+  );
 }
-function JobStatus({ canReview, connectionError, job, project, onBack, onReview, onRetry, onTranscribed }: { canReview: boolean; onTranscribed: (value: Record<string, unknown>) => void; connectionError: string; job: Job; project: Project | null; onBack: () => void; onReview: () => void; onRetry: () => Promise<void> }) { const [retrying, setRetrying] = useState(false); const [reanalysisBusy, setReanalysisBusy] = useBusy(); return <><Context project={project} /><div className="job-header"><button className="back-button" disabled={reanalysisBusy} onClick={() => { if (canLeave()) onBack(); }}>← Back to intake</button><p className="eyebrow">ANALYSIS JOB</p><h1>{job.reportName}</h1><p className="muted">Job ID <code>{job.id}</code></p></div><section className="panel job-panel"><h2>{job.state === "ready_for_review" ? job.proposalIds.length ? "Ready for review" : job.proposalCount ? "Review queue complete" : "No observations to review" : job.state === "failed" ? "Could not complete" : job.state === "stale" ? "Schedule changed" : job.state === "needs_transcription" ? "Transcription needed" : "Processing report"}</h2>{job.error && <p className="form-error" role="alert">{job.error}</p>}<div className={"progress-track " + (!["ready_for_review", "failed", "stale", "needs_transcription"].includes(job.state) ? "processing" : "")} aria-hidden="true"><span style={{ width: job.progress + "%" }} /></div>{connectionError && <p className="form-error" role="alert">{connectionError}</p>}{job.state === "ready_for_review" ? job.proposalIds.length ? <button className="primary" onClick={onReview}>Open review queue →</button> : <p role="status">{job.proposalCount ? "No proposals remain pending for this report." : "No reviewable observations were extracted from this report."}</p> : <><p className="muted">Current stage: {job.stage.replaceAll("_", " ")}. {job.state === "failed" ? job.attempts && job.attempts >= 3 ? "Processing stopped after three attempts. Contact an administrator or submit a corrected report." : "Review the error and retry when ready." : job.state === "stale" ? "The active schedule changed. This job cannot update the new schedule; contact an administrator to reprocess the report." : job.state === "needs_transcription" ? "This document needs readable text. Attach a reviewed page transcription below." : "Checking for updates every two seconds."}</p>{job.state === "failed" && (!job.attempts || job.attempts < 3) && <button className="secondary" disabled={retrying} onClick={() => { setRetrying(true); void onRetry().finally(() => setRetrying(false)); }}>{retrying ? "Retrying…" : "Retry failed job"}</button>}</>}{job.state === "needs_transcription" && project && <ReportTranscription projectId={project.id} jobId={job.id} api={api} onSubmitted={onTranscribed} />}</section><AgentRunStatus jobId={job.id} jobState={job.state} runAvailable={job.agentRunAvailable === true} enabled={!fixtureMode} requestApi={api} />{canReview && !fixtureMode && project && job.reportId && ["ready_for_review", "failed", "stale"].includes(job.state) && <ReportReanalysis projectId={project.id} reportId={job.reportId} jobId={job.id} parentJobId={job.parentJobId} reason={job.reanalysisReason} request={api} onSubmitted={value => onTranscribed({ ...value, report_name: job.reportName })} onBusy={setReanalysisBusy} />}</>; }
-function Review({ proposalId, project, position, total, onBack, onNext, onRevised, onDecided }: { proposalId: string; project: Project | null; position: number; total: number; onBack: () => Promise<void>; onNext: () => Promise<void>; onRevised: (proposal: Proposal) => void; onDecided: (id: string) => void }) {
+function JobStatus({
+  canReview,
+  connectionError,
+  job,
+  project,
+  onBack,
+  onReview,
+  onRetry,
+  onTranscribed,
+}: {
+  canReview: boolean;
+  onTranscribed: (value: Record<string, unknown>) => void;
+  connectionError: string;
+  job: Job;
+  project: Project | null;
+  onBack: () => void;
+  onReview: () => void;
+  onRetry: () => Promise<void>;
+}) {
+  const [retrying, setRetrying] = useState(false);
+  const [reanalysisBusy, setReanalysisBusy] = useBusy();
+  return (
+    <>
+      <Context project={project} />
+      <div className="job-header">
+        <button
+          className="back-button"
+          disabled={reanalysisBusy}
+          onClick={() => {
+            if (canLeave()) onBack();
+          }}
+        >
+          ← Back to intake
+        </button>
+        <p className="eyebrow">ANALYSIS JOB</p>
+        <h1>{job.reportName}</h1>
+        <p className="muted">
+          Job ID <code>{job.id}</code>
+        </p>
+      </div>
+      <section className="panel job-panel">
+        <h2>
+          {job.state === "ready_for_review"
+            ? job.proposalIds.length
+              ? "Ready for review"
+              : job.proposalCount
+                ? "Review queue complete"
+                : "No observations to review"
+            : job.state === "failed"
+              ? "Could not complete"
+              : job.state === "stale"
+                ? "Schedule changed"
+                : job.state === "needs_transcription"
+                  ? "Transcription needed"
+                  : "Processing report"}
+        </h2>
+        {job.error && (
+          <p className="form-error" role="alert">
+            {job.error}
+          </p>
+        )}
+        <div
+          className={
+            "progress-track " +
+            (![
+              "ready_for_review",
+              "failed",
+              "stale",
+              "needs_transcription",
+            ].includes(job.state)
+              ? "processing"
+              : "")
+          }
+          aria-hidden="true"
+        >
+          <span style={{ width: job.progress + "%" }} />
+        </div>
+        {connectionError && (
+          <p className="form-error" role="alert">
+            {connectionError}
+          </p>
+        )}
+        {job.state === "ready_for_review" ? (
+          job.proposalIds.length ? (
+            <button className="primary" onClick={onReview}>
+              Open review queue →
+            </button>
+          ) : (
+            <p role="status">
+              {job.proposalCount
+                ? "No proposals remain pending for this report."
+                : "No reviewable observations were extracted from this report."}
+            </p>
+          )
+        ) : (
+          <>
+            <p className="muted">
+              Current stage: {job.stage.replaceAll("_", " ")}.{" "}
+              {job.state === "failed"
+                ? job.attempts && job.attempts >= 3
+                  ? "Processing stopped after three attempts. Contact an administrator or submit a corrected report."
+                  : "Review the error and retry when ready."
+                : job.state === "stale"
+                  ? "The active schedule changed. This job cannot update the new schedule; contact an administrator to reprocess the report."
+                  : job.state === "needs_transcription"
+                    ? "This document needs readable text. Attach a reviewed page transcription below."
+                    : "Checking for updates every two seconds."}
+            </p>
+            {job.state === "failed" && (!job.attempts || job.attempts < 3) && (
+              <button
+                className="secondary"
+                disabled={retrying}
+                onClick={() => {
+                  setRetrying(true);
+                  void onRetry().finally(() => setRetrying(false));
+                }}
+              >
+                {retrying ? "Retrying…" : "Retry failed job"}
+              </button>
+            )}
+          </>
+        )}
+        {job.state === "needs_transcription" && project && (
+          <ReportTranscription
+            projectId={project.id}
+            jobId={job.id}
+            api={api}
+            onSubmitted={onTranscribed}
+          />
+        )}
+      </section>
+      <AgentRunStatus
+        jobId={job.id}
+        jobState={job.state}
+        runAvailable={job.agentRunAvailable === true}
+        enabled={!fixtureMode}
+        requestApi={api}
+      />
+      {canReview &&
+        !fixtureMode &&
+        project &&
+        job.reportId &&
+        ["ready_for_review", "failed", "stale"].includes(job.state) && (
+          <ReportReanalysis
+            projectId={project.id}
+            reportId={job.reportId}
+            jobId={job.id}
+            parentJobId={job.parentJobId}
+            reason={job.reanalysisReason}
+            request={api}
+            onSubmitted={(value) =>
+              onTranscribed({ ...value, report_name: job.reportName })
+            }
+            onBusy={setReanalysisBusy}
+          />
+        )}
+    </>
+  );
+}
+function Review({
+  proposalId,
+  project,
+  position,
+  total,
+  onBack,
+  onNext,
+  onRevised,
+  onDecided,
+}: {
+  proposalId: string;
+  project: Project | null;
+  position: number;
+  total: number;
+  onBack: () => Promise<void>;
+  onNext: () => Promise<void>;
+  onRevised: (proposal: Proposal) => void;
+  onDecided: (id: string) => void;
+}) {
   const [blockerCategory, setBlockerCategory] = useState("");
-  const [proposal, setProposal] = useState<Proposal | null>(fixtureMode ? fixtureProposal : null), [error, setError] = useState(""), [reason, setReason] = useDraft("review:" + proposalId + ":reason", ""), [selected, setSelected] = useDraft<string | null>("review:" + proposalId + ":selected", null), [warningResolutions, setWarningResolutions] = useDraft<string[]>("review:" + proposalId + ":warnings", []), [quantity, setQuantity] = useDraft("review:" + proposalId + ":quantity", ""), [unit, setUnit] = useDraft("review:" + proposalId + ":unit", ""), [quantitySemantics, setQuantitySemantics] = useDraft("review:" + proposalId + ":quantitySemantics", ""), [effectiveDate, setEffectiveDate] = useDraft("review:" + proposalId + ":effectiveDate", ""), [reportedPercent, setReportedPercent] = useDraft("review:" + proposalId + ":percent", ""), [busy, setBusy] = useBusy();
+  const [proposal, setProposal] = useState<Proposal | null>(
+      fixtureMode ? fixtureProposal : null,
+    ),
+    [error, setError] = useState(""),
+    [reason, setReason] = useDraft("review:" + proposalId + ":reason", ""),
+    [selected, setSelected] = useDraft<string | null>(
+      "review:" + proposalId + ":selected",
+      null,
+    ),
+    [warningResolutions, setWarningResolutions] = useDraft<string[]>(
+      "review:" + proposalId + ":warnings",
+      [],
+    ),
+    [quantity, setQuantity] = useDraft(
+      "review:" + proposalId + ":quantity",
+      "",
+    ),
+    [unit, setUnit] = useDraft("review:" + proposalId + ":unit", ""),
+    [quantitySemantics, setQuantitySemantics] = useDraft(
+      "review:" + proposalId + ":quantitySemantics",
+      "",
+    ),
+    [effectiveDate, setEffectiveDate] = useDraft(
+      "review:" + proposalId + ":effectiveDate",
+      "",
+    ),
+    [reportedPercent, setReportedPercent] = useDraft(
+      "review:" + proposalId + ":percent",
+      "",
+    ),
+    [busy, setBusy] = useBusy();
   const [proposalReload, setProposalReload] = useState(0);
-  const [manualCandidates, setManualCandidates] = useState<Proposal["candidates"]>([]);
+  const [manualCandidates, setManualCandidates] = useState<
+    Proposal["candidates"]
+  >([]);
   const [scopeEdit, setScopeEdit] = useState("");
   const [aliasText, setAliasText] = useState("");
   const [subactivityKey, setSubactivityKey] = useState("");
-  const [endpointTime, setEndpointTime] = useDraft("review:" + proposalId + ":endpointTime", "");
+  const [endpointTime, setEndpointTime] = useDraft(
+    "review:" + proposalId + ":endpointTime",
+    "",
+  );
   const [endpointTimeTouched, setEndpointTimeTouched] = useState(false);
-  const [approvalKey] = useState(() => "approve:" + proposalId + ":" + crypto.randomUUID());
+  const [approvalKey] = useState(
+    () => "approve:" + proposalId + ":" + crypto.randomUUID(),
+  );
   useEffect(() => {
     let active = true;
-    if (!fixtureMode) api<Proposal>("/proposals/" + proposalId)
-      .then(value => { if (active) setProposal(value); })
-      .catch(value => { if (active) setError(value.message); });
-    return () => { active = false; };
+    if (!fixtureMode)
+      api<Proposal>("/proposals/" + proposalId)
+        .then((value) => {
+          if (active) setProposal(value);
+        })
+        .catch((value) => {
+          if (active) setError(value.message);
+        });
+    return () => {
+      active = false;
+    };
   }, [proposalId, proposalReload]);
   useEffect(() => {
     if (!proposal) return;
     const heading = document.querySelector<HTMLElement>(".review-header h1");
-    if (heading) { heading.tabIndex = -1; heading.focus({ preventScroll: true }); }
+    if (heading) {
+      heading.tabIndex = -1;
+      heading.focus({ preventScroll: true });
+    }
   }, [proposal?.id]);
-  if (!proposal) return <><p role={error ? "alert" : "status"}>{error || "Loading review proposal…"}</p><button className="back-button" onClick={() => void onBack().catch(value => setError(value.message))}>Back to job</button></>;
+  if (!proposal)
+    return (
+      <>
+        <p role={error ? "alert" : "status"}>
+          {error || "Loading review proposal…"}
+        </p>
+        <button
+          className="back-button"
+          onClick={() =>
+            void onBack().catch((value) => setError(value.message))
+          }
+        >
+          Back to job
+        </button>
+      </>
+    );
   const chosen = selected ?? proposal.chosen_activity_id ?? "";
   const pending = proposal.review_state === "pending";
   const blockerEvent = proposal.proposed_effects.event_type === "blocker";
-  const lifecycle = ["actual_start", "actual_finish"].includes(String(proposal.proposed_effects.event_type));
-  const unresolvedLifecycle = !lifecycle && ["actual_start", "actual_finish"].includes(proposal.observation.event_type || "");
-  const endpoint = (proposal.proposed_effects.endpoint || {}) as { local_date?: string; local_time?: string | null; precision?: string; timezone?: string | null };
-  const dirty = !!blockerCategory || !!scopeEdit || !!subactivityKey || (lifecycle && endpointTimeTouched) || chosen !== (proposal.chosen_activity_id || "") || !!quantity.trim() || !!unit || !!quantitySemantics || !!effectiveDate || !!reportedPercent || warningResolutions.length > 0;
+  const lifecycle = ["actual_start", "actual_finish"].includes(
+    String(proposal.proposed_effects.event_type),
+  );
+  const unresolvedLifecycle =
+    !lifecycle &&
+    ["actual_start", "actual_finish"].includes(
+      proposal.observation.event_type || "",
+    );
+  const endpoint = (proposal.proposed_effects.endpoint || {}) as {
+    local_date?: string;
+    local_time?: string | null;
+    precision?: string;
+    timezone?: string | null;
+  };
+  const dirty =
+    !!blockerCategory ||
+    !!scopeEdit ||
+    !!subactivityKey ||
+    (lifecycle && endpointTimeTouched) ||
+    chosen !== (proposal.chosen_activity_id || "") ||
+    !!quantity.trim() ||
+    !!unit ||
+    !!quantitySemantics ||
+    !!effectiveDate ||
+    !!reportedPercent ||
+    warningResolutions.length > 0;
   const effects = proposal.proposed_effects;
-  const percentBasis = ["manual_physical", "milestone"].includes(proposal.chosen_activity_measurement_basis || "");
+  const percentBasis = ["manual_physical", "milestone"].includes(
+    proposal.chosen_activity_measurement_basis || "",
+  );
   const blockers = [
-    ...(unresolvedLifecycle ? ["This start/finish assertion needs a supported date before it can update progress. Request clarification or submit an amended report with the work date; no quantity is required."] : []),
+    ...(unresolvedLifecycle
+      ? [
+          "This start/finish assertion needs a supported date before it can update progress. Request clarification or submit an amended report with the work date; no quantity is required.",
+        ]
+      : []),
     ...(!chosen ? ["Select a schedule candidate before approving."] : []),
     ...(dirty ? ["Save your changes with Revise before approving."] : []),
-    ...(proposal.warnings.length ? ["Resolve the warnings and save the revision before approving."] : []),
-    ...(!effects.effective_date ? ["A work date is required for a progress update."] : []),
-    ...(!lifecycle && !unresolvedLifecycle && !blockerEvent ? (percentBasis ? (effects.reported_percent == null ? ["A reported percent is required for this activity."] : []) : (effects.quantity == null ? ["A measured quantity is required for a progress update."] : [])) : []),
-    ...(!lifecycle && !unresolvedLifecycle && !blockerEvent && !percentBasis && !effects.unit ? ["A measured unit is required for a progress update."] : []),
-    ...(!lifecycle && !unresolvedLifecycle && !blockerEvent && !percentBasis && !["delta", "cumulative"].includes(String(effects.quantity_semantics)) ? ["The report does not establish whether the quantity is an increment or a cumulative total."] : []),
+    ...(proposal.warnings.length
+      ? ["Resolve the warnings and save the revision before approving."]
+      : []),
+    ...(!effects.effective_date
+      ? ["A work date is required for a progress update."]
+      : []),
+    ...(!lifecycle && !unresolvedLifecycle && !blockerEvent
+      ? percentBasis
+        ? effects.reported_percent == null
+          ? ["A reported percent is required for this activity."]
+          : []
+        : effects.quantity == null
+          ? ["A measured quantity is required for a progress update."]
+          : []
+      : []),
+    ...(!lifecycle &&
+    !unresolvedLifecycle &&
+    !blockerEvent &&
+    !percentBasis &&
+    !effects.unit
+      ? ["A measured unit is required for a progress update."]
+      : []),
+    ...(!lifecycle &&
+    !unresolvedLifecycle &&
+    !blockerEvent &&
+    !percentBasis &&
+    !["delta", "cumulative"].includes(String(effects.quantity_semantics))
+      ? [
+          "The report does not establish whether the quantity is an increment or a cumulative total.",
+        ]
+      : []),
   ];
   const revise = async () => {
     if (!reason.trim()) throw new Error("Add a reason before revising.");
-    if (reportedPercent.trim() && (!Number.isFinite(Number(reportedPercent)) || Number(reportedPercent) < 0 || Number(reportedPercent) > 100)) throw new Error("Percent must be between 0 and 100.");
-    if (quantity.trim() && (!Number.isFinite(Number(quantity)) || Number(quantity) < 0)) throw new Error("Quantity must be a finite, non-negative number.");
+    if (
+      reportedPercent.trim() &&
+      (!Number.isFinite(Number(reportedPercent)) ||
+        Number(reportedPercent) < 0 ||
+        Number(reportedPercent) > 100)
+    )
+      throw new Error("Percent must be between 0 and 100.");
+    if (
+      quantity.trim() &&
+      (!Number.isFinite(Number(quantity)) || Number(quantity) < 0)
+    )
+      throw new Error("Quantity must be a finite, non-negative number.");
     const proposed_effects: Record<string, unknown> = {};
     if (blockerCategory) proposed_effects.blocker_category = blockerCategory;
     if (scopeEdit) proposed_effects.scope = scopeEdit;
-    if ((scopeEdit || effects.scope) === "subactivity" && (scopeEdit || subactivityKey)) proposed_effects.evidence = (effects.evidence as { fields: string[] }[] || []).map(e => ({ ...e, fields: [...new Set([...e.fields, "scope", "subactivity_key"])] }));
-    if (subactivityKey.trim()) proposed_effects.subactivity_key = subactivityKey.trim();
-    if (scopeEdit === "whole_activity") { proposed_effects.subactivity_key = null; proposed_effects.scheduled_parent_id = null; }
-    if (reportedPercent.trim()) proposed_effects.reported_percent = reportedPercent.trim();
+    if (
+      (scopeEdit || effects.scope) === "subactivity" &&
+      (scopeEdit || subactivityKey)
+    )
+      proposed_effects.evidence = (
+        (effects.evidence as { fields: string[] }[]) || []
+      ).map((e) => ({
+        ...e,
+        fields: [...new Set([...e.fields, "scope", "subactivity_key"])],
+      }));
+    if (subactivityKey.trim())
+      proposed_effects.subactivity_key = subactivityKey.trim();
+    if (scopeEdit === "whole_activity") {
+      proposed_effects.subactivity_key = null;
+      proposed_effects.scheduled_parent_id = null;
+    }
+    if (reportedPercent.trim())
+      proposed_effects.reported_percent = reportedPercent.trim();
     if (quantity.trim()) proposed_effects.quantity = quantity.trim();
     if (unit) proposed_effects.unit = unit;
-    if (quantitySemantics) proposed_effects.quantity_semantics = quantitySemantics;
-    if (lifecycle && (effectiveDate || endpointTimeTouched)) proposed_effects.endpoint = { ...(effectiveDate ? { local_date: effectiveDate } : {}), ...(endpointTimeTouched ? { local_time: endpointTime || null, precision: endpointTime ? "minute" : "date" } : {}) };
+    if (quantitySemantics)
+      proposed_effects.quantity_semantics = quantitySemantics;
+    if (lifecycle && (effectiveDate || endpointTimeTouched))
+      proposed_effects.endpoint = {
+        ...(effectiveDate ? { local_date: effectiveDate } : {}),
+        ...(endpointTimeTouched
+          ? {
+              local_time: endpointTime || null,
+              precision: endpointTime ? "minute" : "date",
+            }
+          : {}),
+      };
     else if (effectiveDate) proposed_effects.effective_date = effectiveDate;
-    const field_changes = { ...(Object.keys(proposed_effects).length ? { proposed_effects } : {}), ...(warningResolutions.length ? { resolve_warnings: warningResolutions } : {}) };
+    const field_changes = {
+      ...(Object.keys(proposed_effects).length ? { proposed_effects } : {}),
+      ...(warningResolutions.length
+        ? { resolve_warnings: warningResolutions }
+        : {}),
+    };
     const next = fixtureMode
-      ? { ...proposal, revision: proposal.revision + 1, chosen_activity_id: chosen || null, mapping_state: chosen ? "suggested" : "unmatched", warnings: proposal.warnings.filter(item => !warningResolutions.includes(item)), proposed_effects: { ...effects, ...proposed_effects } }
-      : await api<Proposal>("/proposals/" + proposal.id + "/revise", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ expected_proposal_revision: proposal.revision, chosen_activity_id: chosen || null, field_changes, reason: reason.trim() }) });
-    setProposal(next); setBlockerCategory(""); setReason(""); setSelected(null); setWarningResolutions([]); setQuantity(""); setUnit(""); setQuantitySemantics(""); setEffectiveDate(""); setReportedPercent(""); setEndpointTime(""); setEndpointTimeTouched(false);
-    setManualCandidates([]); setScopeEdit(""); setSubactivityKey("");
+      ? {
+          ...proposal,
+          revision: proposal.revision + 1,
+          chosen_activity_id: chosen || null,
+          mapping_state: chosen ? "suggested" : "unmatched",
+          warnings: proposal.warnings.filter(
+            (item) => !warningResolutions.includes(item),
+          ),
+          proposed_effects: { ...effects, ...proposed_effects },
+        }
+      : await api<Proposal>("/proposals/" + proposal.id + "/revise", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({
+            expected_proposal_revision: proposal.revision,
+            chosen_activity_id: chosen || null,
+            field_changes,
+            reason: reason.trim(),
+          }),
+        });
+    setProposal(next);
+    setBlockerCategory("");
+    setReason("");
+    setSelected(null);
+    setWarningResolutions([]);
+    setQuantity("");
+    setUnit("");
+    setQuantitySemantics("");
+    setEffectiveDate("");
+    setReportedPercent("");
+    setEndpointTime("");
+    setEndpointTimeTouched(false);
+    setManualCandidates([]);
+    setScopeEdit("");
+    setSubactivityKey("");
     onRevised(next);
   };
   const reject = async () => {
     if (!reason.trim()) throw new Error("Add a reason before rejecting.");
-    const result = fixtureMode ? { review_state: "rejected" }
-      : await api<{ review_state: string }>("/proposals/" + proposal.id + "/reject", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ expected_proposal_revision: proposal.revision, reason: reason.trim() }) });
-    setReason(""); setQuantity(""); setUnit(""); setQuantitySemantics(""); setEffectiveDate(""); setReportedPercent(""); setProposal({ ...proposal, review_state: result.review_state }); onDecided(proposal.id);
+    const result = fixtureMode
+      ? { review_state: "rejected" }
+      : await api<{ review_state: string }>(
+          "/proposals/" + proposal.id + "/reject",
+          {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({
+              expected_proposal_revision: proposal.revision,
+              reason: reason.trim(),
+            }),
+          },
+        );
+    setReason("");
+    setQuantity("");
+    setUnit("");
+    setQuantitySemantics("");
+    setEffectiveDate("");
+    setReportedPercent("");
+    setProposal({ ...proposal, review_state: result.review_state });
+    onDecided(proposal.id);
   };
   const approve = async () => {
-    const result = fixtureMode ? { state_revision: proposal.current_activity_revision + 1 }
-      : await api<{ state_revision: number }>("/proposals/" + proposal.id + "/approve", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ expected_proposal_revision: proposal.revision, expected_activity_revision: proposal.current_activity_revision, idempotency_key: approvalKey, resolution_notes: reason.trim() || null }) });
-    setReason(""); setProposal({ ...proposal, review_state: "approved", current_activity_revision: result.state_revision }); onDecided(proposal.id);
+    const result = fixtureMode
+      ? { state_revision: proposal.current_activity_revision + 1 }
+      : await api<{ state_revision: number }>(
+          "/proposals/" + proposal.id + "/approve",
+          {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({
+              expected_proposal_revision: proposal.revision,
+              expected_activity_revision: proposal.current_activity_revision,
+              idempotency_key: approvalKey,
+              resolution_notes: reason.trim() || null,
+            }),
+          },
+        );
+    setReason("");
+    setProposal({
+      ...proposal,
+      review_state: "approved",
+      current_activity_revision: result.state_revision,
+    });
+    onDecided(proposal.id);
   };
-  const act = (work: () => Promise<void>) => { if (busy) return; setBusy(true); setError(""); void work().catch(value => setError(value instanceof Error ? value.message : "Review action failed.")).finally(() => setBusy(false)); };
-  return <><Context project={project} /><div className="review-header"><button className="back-button" disabled={busy} onClick={() => { if (canLeave()) act(onBack); }}>← Back to job</button><p className="eyebrow" role="status">EVIDENCE REVIEW · {position} OF {total} · {proposal.review_state.toUpperCase()}</p><h1>Check one observation before it changes progress</h1></div><div className="review-grid"><section className="panel evidence-card"><h2>Source evidence</h2>{proposal.evidence.map(item => <figure key={item.fragment_id}><blockquote>“{item.quote}”</blockquote><figcaption>{item.locator} · <code>{item.fragment_id}</code></figcaption></figure>)}</section><section data-dirty={pending && (dirty || !!reason.trim())} className="panel decision-card"><h2>Proposed match</h2>{proposal.selection_explanation && <p className="helper">Agent assessment: {proposal.selection_explanation}</p>}<p>{proposal.observation.summary}</p><strong>{blockerEvent ? "Blocker report" : lifecycle || unresolvedLifecycle ? String(effects.event_type || proposal.observation.event_type).replaceAll("_", " ") : percentBasis ? effects.reported_percent == null ? "Percent needs confirmation" : `${effects.reported_percent}% complete` : `${proposal.observation.quantity || "—"} ${proposal.observation.unit || ""}`}</strong><label>Schedule candidate<select disabled={busy || !pending} value={chosen} onChange={event => setSelected(event.target.value)}><option value="">No candidate selected</option>{[...proposal.candidates, ...manualCandidates.filter(item => !proposal.candidates.some(c => c.id === item.id))].map(candidate => <option value={candidate.id} key={candidate.id}>{candidate.name} · {candidate.area}</option>)}</select></label>{pending && !fixtureMode && <PlannerResolution proposalId={proposal.id} disabled={busy} search={(query, offset) => api("/proposals/" + proposal.id + "/activities?q=" + encodeURIComponent(query) + "&offset=" + offset)} choose={item => { setManualCandidates([...manualCandidates.filter(c => c.id !== item.id), { ...item, work_type: "unknown", tags: [], rank: 0 }]); setSelected(item.id); }} resolve={async outcome => { act(async () => { if (!reason.trim()) throw new Error("Add a review reason first."); const next = await api<Proposal>("/proposals/" + proposal.id + "/resolve", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ expected_proposal_revision: proposal.revision, reason: reason.trim(), outcome }) }); setProposal(next); onDecided(proposal.id); }); }} />}{pending && !fixtureMode && <><label>Approve terminology for the selected activity<input disabled={busy} value={aliasText} onChange={e => setAliasText(e.target.value)} /></label><button className="secondary" disabled={busy || !chosen || !aliasText.trim()} onClick={() => act(async () => { if (!reason.trim()) throw new Error("Add a review reason first."); const snapshot = await api<{ revision: number; aliases: Record<string, string[]> }>("/proposals/" + proposal.id + "/aliases"); await api("/proposals/" + proposal.id + "/activities/" + chosen + "/aliases", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ expected_revision: snapshot.revision, aliases: [...(snapshot.aliases[chosen] || []), aliasText.trim()], reason: reason.trim() }) }); setAliasText(""); })}>Approve project alias</button></>}{blockerEvent && <><p>Blocker: {String(effects.blocker || "")}</p><label>Reviewed blocker category<select disabled={busy || !pending} value={blockerCategory || String(effects.blocker_category || "other")} onChange={e => setBlockerCategory(e.target.value)}>{["access", "design", "equipment", "inspection", "labour", "material", "safety", "weather", "other"].map(value => <option key={value}>{value}</option>)}</select></label><p className="helper">Approval stores the blocker and category without changing quantity or lifecycle dates.</p></>}{lifecycle && <><label>Reviewed scope<select disabled={busy || !pending} value={scopeEdit || String(effects.scope || "whole_activity")} onChange={e => setScopeEdit(e.target.value)}><option value="whole_activity">Whole scheduled activity</option><option value="subactivity">Subactivity only — no parent roll-up</option></select></label>{(scopeEdit || effects.scope) === "subactivity" && <><label>Subactivity identity<input disabled={busy || !pending} value={subactivityKey || String(effects.subactivity_key || "")} onChange={e => setSubactivityKey(e.target.value)} /></label><p className="helper">Scheduled parent: {[...proposal.candidates, ...manualCandidates].find(c => c.id === chosen)?.name || "Select an executable activity"}. Source evidence must establish this scope.</p></>}</>}{proposal.candidates.length === 0 && <p className="form-error">No supported schedule candidate was found for this observation.</p>}{proposal.missing_information.map(item => <p className="helper" key={item}>{item}</p>)}<ProposalAudit provenance={proposal.provenance} history={proposal.decision_history} disabled={busy} onRefresh={fixtureMode ? undefined : async () => { const next = await api<Proposal>("/proposals/" + proposal.id); setProposal(current => current ? { ...current, provenance: next.provenance, decision_history: next.decision_history } : current); }} /><dl className="effect-list">{Object.entries(proposal.proposed_effects).filter(([key]) => key !== "endpoint" && key !== "evidence").map(([key, value]) => <Fragment key={key}><dt>{key.replaceAll("_", " ")}</dt><dd>{value == null ? "—" : String(value).replaceAll("_", " ")}</dd></Fragment>)}{lifecycle && <><dt>Endpoint</dt><dd>{endpoint.local_date || "—"} {endpoint.local_time || ""} ({endpoint.precision || "unknown"} precision{endpoint.timezone ? `, ${endpoint.timezone}` : ""})</dd><dt>Scope</dt><dd>{String(effects.scope || "whole_activity").replaceAll("_", " ")}</dd><dt>Previous {effects.event_type === "actual_start" ? "actual start" : "actual finish"}</dt><dd>{effects.event_type === "actual_start" ? `${proposal.current_lifecycle_state?.actual_start || "—"} ${proposal.current_lifecycle_state?.actual_start_time || ""}` : `${proposal.current_lifecycle_state?.actual_finish || "—"} ${proposal.current_lifecycle_state?.actual_finish_time || ""}`}</dd><dt>Current status</dt><dd>{proposal.current_lifecycle_state?.status?.replaceAll("_", " ") || "not started"}</dd></>}</dl>{proposal.warnings.length > 0 && <fieldset className="validation-block" disabled={busy || !pending}><legend>Warnings need an explicit resolution</legend>{proposal.warnings.map(warning => <label key={warning}><input type="checkbox" checked={warningResolutions.includes(warning)} onChange={event => setWarningResolutions(event.target.checked ? [...warningResolutions, warning] : warningResolutions.filter(item => item !== warning))} /> {warning}</label>)}</fieldset>}{!lifecycle && !unresolvedLifecycle && !blockerEvent && percentBasis && <label>Correct reported percent <span className="optional">(0–100, supported by source)</span><input type="number" min="0" max="100" step="any" disabled={busy || !pending} value={reportedPercent} onChange={event => setReportedPercent(event.target.value)} /></label>}{!lifecycle && !unresolvedLifecycle && !blockerEvent && !percentBasis && <><label>Correct proposed quantity <span className="optional">(only if supported by source)</span><input disabled={busy || !pending} inputMode="decimal" value={quantity} onChange={event => setQuantity(event.target.value)} /></label><label>Correct unit <span className="optional">(if needed)</span><select disabled={busy || !pending} value={unit} onChange={event => setUnit(event.target.value)}><option value="">{effects.unit ? `Keep ${effects.unit}` : "Select unit"}</option>{units.map(value => <option key={value} value={value}>{value}</option>)}</select></label><label>Quantity meaning <span className="optional">(if needed)</span><select disabled={busy || !pending} value={quantitySemantics} onChange={event => setQuantitySemantics(event.target.value)}><option value="">{["delta", "cumulative"].includes(String(effects.quantity_semantics)) ? `Keep ${effects.quantity_semantics}` : "Select meaning"}</option><option value="delta">New work for this date</option><option value="cumulative">Total completed to date</option></select></label></>}{lifecycle && <label>Correct endpoint time <span className="optional">(leave blank for date only)</span><input type="time" disabled={busy || !pending} value={endpointTime} onChange={event => { setEndpointTime(event.target.value); setEndpointTimeTouched(true); }} /></label>}<label>Correct work date <span className="optional">(optional)</span><input disabled={busy || !pending} type="date" value={effectiveDate} onChange={event => setEffectiveDate(event.target.value)} /></label>{pending && !lifecycle && !unresolvedLifecycle && !blockerEvent && !percentBasis && effects.quantity == null && proposal.observation.quantity == null && <p className="helper">This activity uses quantity-based progress. Include a measured amount and unit, and say whether it is additional work or the total completed so far. A reported percentage alone does not establish a measured quantity.</p>}{pending && blockers.map(message => <p className="helper" key={message}>{message}</p>)}<label>Review reason <span className="optional">(required to revise or reject)</span><textarea disabled={busy || !pending} value={reason} onChange={event => setReason(event.target.value)} rows={3} /></label><div className="review-actions"><button className="secondary" disabled={busy || proposal.review_state !== "pending"} onClick={() => act(revise)}>Revise</button><button className="secondary danger-button" disabled={busy || proposal.review_state !== "pending"} onClick={() => act(reject)}>Reject</button><button className="primary" disabled={busy || proposal.review_state !== "pending" || blockers.length > 0 || proposal.mapping_state !== "suggested"} onClick={() => act(approve)}>Approve update</button>{proposal.review_state !== "pending" && <button className="secondary" disabled={busy} onClick={() => act(onNext)}>{position < total ? "Next proposal →" : "Finish review"}</button>}</div>{error && <div><p className="form-error" role="alert">{error}</p><button className="secondary" disabled={busy} onClick={() => { setProposal(null); setError(""); setProposalReload(value => value + 1); }}>Reload proposal</button></div>}</section></div></>;
+  const act = (work: () => Promise<void>) => {
+    if (busy) return;
+    setBusy(true);
+    setError("");
+    void work()
+      .catch((value) =>
+        setError(
+          value instanceof Error ? value.message : "Review action failed.",
+        ),
+      )
+      .finally(() => setBusy(false));
+  };
+  return (
+    <>
+      <Context project={project} />
+      <div className="review-header">
+        <button
+          className="back-button"
+          disabled={busy}
+          onClick={() => {
+            if (canLeave()) act(onBack);
+          }}
+        >
+          ← Back to job
+        </button>
+        <p className="eyebrow" role="status">
+          EVIDENCE REVIEW · {position} OF {total} ·{" "}
+          {proposal.review_state.toUpperCase()}
+        </p>
+        <h1>Check one observation before it changes progress</h1>
+      </div>
+      <div className="review-grid">
+        <section className="panel evidence-card">
+          <h2>Source evidence</h2>
+          {proposal.evidence.map((item) => (
+            <figure key={item.fragment_id}>
+              <blockquote>“{item.quote}”</blockquote>
+              <figcaption>
+                {item.locator} · <code>{item.fragment_id}</code>
+              </figcaption>
+            </figure>
+          ))}
+          <ProposalAudit
+            provenance={proposal.provenance}
+            history={proposal.decision_history}
+            disabled={busy}
+            onRefresh={
+              fixtureMode
+                ? undefined
+                : async () => {
+                    const next = await api<Proposal>(
+                      "/proposals/" + proposal.id,
+                    );
+                    setProposal((current) =>
+                      current
+                        ? {
+                            ...current,
+                            provenance: next.provenance,
+                            decision_history: next.decision_history,
+                          }
+                        : current,
+                    );
+                  }
+            }
+          />
+        </section>
+        <section
+          data-dirty={pending && (dirty || !!reason.trim())}
+          className="panel decision-card"
+        >
+          <h2>Proposed match</h2>
+          {proposal.selection_explanation && (
+            <p className="helper">
+              Agent assessment: {proposal.selection_explanation}
+            </p>
+          )}
+          <p>{proposal.observation.summary}</p>
+          <strong>
+            {blockerEvent
+              ? "Blocker report"
+              : lifecycle || unresolvedLifecycle
+                ? String(
+                    effects.event_type || proposal.observation.event_type,
+                  ).replaceAll("_", " ")
+                : percentBasis
+                  ? effects.reported_percent == null
+                    ? "Percent needs confirmation"
+                    : `${effects.reported_percent}% complete`
+                  : `${proposal.observation.quantity || "—"} ${proposal.observation.unit || ""}`}
+          </strong>
+          <label>
+            Schedule candidate
+            <select
+              disabled={busy || !pending}
+              value={chosen}
+              onChange={(event) => setSelected(event.target.value)}
+            >
+              <option value="">No candidate selected</option>
+              {[
+                ...proposal.candidates,
+                ...manualCandidates.filter(
+                  (item) => !proposal.candidates.some((c) => c.id === item.id),
+                ),
+              ].map((candidate) => (
+                <option value={candidate.id} key={candidate.id}>
+                  {candidate.name} · {candidate.area}
+                </option>
+              ))}
+            </select>
+          </label>
+          {pending && !fixtureMode && (
+            <details className="review-matching-tools">
+              <summary>Find another activity or resolve ambiguity</summary>{" "}
+              {pending && !fixtureMode && (
+                <PlannerResolution
+                  proposalId={proposal.id}
+                  disabled={busy}
+                  search={(query, offset) =>
+                    api(
+                      "/proposals/" +
+                        proposal.id +
+                        "/activities?q=" +
+                        encodeURIComponent(query) +
+                        "&offset=" +
+                        offset,
+                    )
+                  }
+                  choose={(item) => {
+                    setManualCandidates([
+                      ...manualCandidates.filter((c) => c.id !== item.id),
+                      { ...item, work_type: "unknown", tags: [], rank: 0 },
+                    ]);
+                    setSelected(item.id);
+                  }}
+                  resolve={async (outcome) => {
+                    act(async () => {
+                      if (!reason.trim())
+                        throw new Error("Add a review reason first.");
+                      const next = await api<Proposal>(
+                        "/proposals/" + proposal.id + "/resolve",
+                        {
+                          method: "POST",
+                          headers: { "Content-Type": "application/json" },
+                          body: JSON.stringify({
+                            expected_proposal_revision: proposal.revision,
+                            reason: reason.trim(),
+                            outcome,
+                          }),
+                        },
+                      );
+                      setProposal(next);
+                      onDecided(proposal.id);
+                    });
+                  }}
+                />
+              )}
+              {pending && !fixtureMode && (
+                <>
+                  <label>
+                    Approve terminology for the selected activity
+                    <input
+                      disabled={busy}
+                      value={aliasText}
+                      onChange={(e) => setAliasText(e.target.value)}
+                    />
+                  </label>
+                  <button
+                    className="secondary"
+                    disabled={busy || !chosen || !aliasText.trim()}
+                    onClick={() =>
+                      act(async () => {
+                        if (!reason.trim())
+                          throw new Error("Add a review reason first.");
+                        const snapshot = await api<{
+                          revision: number;
+                          aliases: Record<string, string[]>;
+                        }>("/proposals/" + proposal.id + "/aliases");
+                        await api(
+                          "/proposals/" +
+                            proposal.id +
+                            "/activities/" +
+                            chosen +
+                            "/aliases",
+                          {
+                            method: "POST",
+                            headers: { "Content-Type": "application/json" },
+                            body: JSON.stringify({
+                              expected_revision: snapshot.revision,
+                              aliases: [
+                                ...(snapshot.aliases[chosen] || []),
+                                aliasText.trim(),
+                              ],
+                              reason: reason.trim(),
+                            }),
+                          },
+                        );
+                        setAliasText("");
+                      })
+                    }
+                  >
+                    Approve project alias
+                  </button>
+                </>
+              )}
+            </details>
+          )}
+          {blockerEvent && (
+            <>
+              <p>Blocker: {String(effects.blocker || "")}</p>
+              <label>
+                Reviewed blocker category
+                <select
+                  disabled={busy || !pending}
+                  value={
+                    blockerCategory ||
+                    String(effects.blocker_category || "other")
+                  }
+                  onChange={(e) => setBlockerCategory(e.target.value)}
+                >
+                  {[
+                    "access",
+                    "design",
+                    "equipment",
+                    "inspection",
+                    "labour",
+                    "material",
+                    "safety",
+                    "weather",
+                    "other",
+                  ].map((value) => (
+                    <option key={value}>{value}</option>
+                  ))}
+                </select>
+              </label>
+              <p className="helper">
+                Approval stores the blocker and category without changing
+                quantity or lifecycle dates.
+              </p>
+            </>
+          )}
+          {lifecycle && (
+            <>
+              <label>
+                Reviewed scope
+                <select
+                  disabled={busy || !pending}
+                  value={scopeEdit || String(effects.scope || "whole_activity")}
+                  onChange={(e) => setScopeEdit(e.target.value)}
+                >
+                  <option value="whole_activity">
+                    Whole scheduled activity
+                  </option>
+                  <option value="subactivity">
+                    Subactivity only — no parent roll-up
+                  </option>
+                </select>
+              </label>
+              {(scopeEdit || effects.scope) === "subactivity" && (
+                <>
+                  <label>
+                    Subactivity identity
+                    <input
+                      disabled={busy || !pending}
+                      value={
+                        subactivityKey || String(effects.subactivity_key || "")
+                      }
+                      onChange={(e) => setSubactivityKey(e.target.value)}
+                    />
+                  </label>
+                  <p className="helper">
+                    Scheduled parent:{" "}
+                    {[...proposal.candidates, ...manualCandidates].find(
+                      (c) => c.id === chosen,
+                    )?.name || "Select an executable activity"}
+                    . Source evidence must establish this scope.
+                  </p>
+                </>
+              )}
+            </>
+          )}
+          {proposal.candidates.length === 0 && (
+            <p className="form-error">
+              No supported schedule candidate was found for this observation.
+            </p>
+          )}
+          {proposal.missing_information.map((item) => (
+            <p className="helper" key={item}>
+              {item}
+            </p>
+          ))}
+          <dl className="effect-list">
+            {Object.entries(proposal.proposed_effects)
+              .filter(([key]) => key !== "endpoint" && key !== "evidence")
+              .map(([key, value]) => (
+                <Fragment key={key}>
+                  <dt>{key.replaceAll("_", " ")}</dt>
+                  <dd>
+                    {value == null ? "—" : String(value).replaceAll("_", " ")}
+                  </dd>
+                </Fragment>
+              ))}
+            {lifecycle && (
+              <>
+                <dt>Endpoint</dt>
+                <dd>
+                  {endpoint.local_date || "—"} {endpoint.local_time || ""} (
+                  {endpoint.precision || "unknown"} precision
+                  {endpoint.timezone ? `, ${endpoint.timezone}` : ""})
+                </dd>
+                <dt>Scope</dt>
+                <dd>
+                  {String(effects.scope || "whole_activity").replaceAll(
+                    "_",
+                    " ",
+                  )}
+                </dd>
+                <dt>
+                  Previous{" "}
+                  {effects.event_type === "actual_start"
+                    ? "actual start"
+                    : "actual finish"}
+                </dt>
+                <dd>
+                  {effects.event_type === "actual_start"
+                    ? `${proposal.current_lifecycle_state?.actual_start || "—"} ${proposal.current_lifecycle_state?.actual_start_time || ""}`
+                    : `${proposal.current_lifecycle_state?.actual_finish || "—"} ${proposal.current_lifecycle_state?.actual_finish_time || ""}`}
+                </dd>
+                <dt>Current status</dt>
+                <dd>
+                  {proposal.current_lifecycle_state?.status?.replaceAll(
+                    "_",
+                    " ",
+                  ) || "not started"}
+                </dd>
+              </>
+            )}
+          </dl>
+          {proposal.warnings.length > 0 && (
+            <fieldset className="validation-block" disabled={busy || !pending}>
+              <legend>Warnings need an explicit resolution</legend>
+              {proposal.warnings.map((warning) => (
+                <label key={warning}>
+                  <input
+                    type="checkbox"
+                    checked={warningResolutions.includes(warning)}
+                    onChange={(event) =>
+                      setWarningResolutions(
+                        event.target.checked
+                          ? [...warningResolutions, warning]
+                          : warningResolutions.filter(
+                              (item) => item !== warning,
+                            ),
+                      )
+                    }
+                  />{" "}
+                  {warning}
+                </label>
+              ))}
+            </fieldset>
+          )}
+          {!lifecycle &&
+            !unresolvedLifecycle &&
+            !blockerEvent &&
+            percentBasis && (
+              <label>
+                Correct reported percent{" "}
+                <span className="optional">(0–100, supported by source)</span>
+                <input
+                  type="number"
+                  min="0"
+                  max="100"
+                  step="any"
+                  disabled={busy || !pending}
+                  value={reportedPercent}
+                  onChange={(event) => setReportedPercent(event.target.value)}
+                />
+              </label>
+            )}
+          {!lifecycle &&
+            !unresolvedLifecycle &&
+            !blockerEvent &&
+            !percentBasis && (
+              <>
+                <label>
+                  Correct proposed quantity{" "}
+                  <span className="optional">
+                    (only if supported by source)
+                  </span>
+                  <input
+                    disabled={busy || !pending}
+                    inputMode="decimal"
+                    value={quantity}
+                    onChange={(event) => setQuantity(event.target.value)}
+                  />
+                </label>
+                <label>
+                  Correct unit <span className="optional">(if needed)</span>
+                  <select
+                    disabled={busy || !pending}
+                    value={unit}
+                    onChange={(event) => setUnit(event.target.value)}
+                  >
+                    <option value="">
+                      {effects.unit ? `Keep ${effects.unit}` : "Select unit"}
+                    </option>
+                    {units.map((value) => (
+                      <option key={value} value={value}>
+                        {value}
+                      </option>
+                    ))}
+                  </select>
+                </label>
+                <label>
+                  Quantity meaning <span className="optional">(if needed)</span>
+                  <select
+                    disabled={busy || !pending}
+                    value={quantitySemantics}
+                    onChange={(event) =>
+                      setQuantitySemantics(event.target.value)
+                    }
+                  >
+                    <option value="">
+                      {["delta", "cumulative"].includes(
+                        String(effects.quantity_semantics),
+                      )
+                        ? `Keep ${effects.quantity_semantics}`
+                        : "Select meaning"}
+                    </option>
+                    <option value="delta">New work for this date</option>
+                    <option value="cumulative">Total completed to date</option>
+                  </select>
+                </label>
+              </>
+            )}
+          {lifecycle && (
+            <label>
+              Correct endpoint time{" "}
+              <span className="optional">(leave blank for date only)</span>
+              <input
+                type="time"
+                disabled={busy || !pending}
+                value={endpointTime}
+                onChange={(event) => {
+                  setEndpointTime(event.target.value);
+                  setEndpointTimeTouched(true);
+                }}
+              />
+            </label>
+          )}
+          <label>
+            Correct work date <span className="optional">(optional)</span>
+            <input
+              disabled={busy || !pending}
+              type="date"
+              value={effectiveDate}
+              onChange={(event) => setEffectiveDate(event.target.value)}
+            />
+          </label>
+          {pending &&
+            !lifecycle &&
+            !unresolvedLifecycle &&
+            !blockerEvent &&
+            !percentBasis &&
+            effects.quantity == null &&
+            proposal.observation.quantity == null && (
+              <p className="helper">
+                This activity uses quantity-based progress. Include a measured
+                amount and unit, and say whether it is additional work or the
+                total completed so far. A reported percentage alone does not
+                establish a measured quantity.
+              </p>
+            )}
+          {pending &&
+            blockers.map((message) => (
+              <p className="helper" key={message}>
+                {message}
+              </p>
+            ))}
+          <label>
+            Review reason{" "}
+            <span className="optional">(required to revise or reject)</span>
+            <textarea
+              disabled={busy || !pending}
+              value={reason}
+              onChange={(event) => setReason(event.target.value)}
+              rows={3}
+            />
+          </label>
+          <div className="review-actions">
+            <button
+              className="secondary"
+              disabled={busy || proposal.review_state !== "pending"}
+              onClick={() => act(revise)}
+            >
+              Revise
+            </button>
+            <button
+              className="secondary danger-button"
+              disabled={busy || proposal.review_state !== "pending"}
+              onClick={() => act(reject)}
+            >
+              Reject
+            </button>
+            <button
+              className="primary"
+              disabled={
+                busy ||
+                proposal.review_state !== "pending" ||
+                blockers.length > 0 ||
+                proposal.mapping_state !== "suggested"
+              }
+              onClick={() => act(approve)}
+            >
+              Approve update
+            </button>
+            {proposal.review_state !== "pending" && (
+              <button
+                className="secondary"
+                disabled={busy}
+                onClick={() => act(onNext)}
+              >
+                {position < total ? "Next proposal →" : "Finish review"}
+              </button>
+            )}
+          </div>
+          {error && (
+            <div>
+              <p className="form-error" role="alert">
+                {error}
+              </p>
+              <button
+                className="secondary"
+                disabled={busy}
+                onClick={() => {
+                  setProposal(null);
+                  setError("");
+                  setProposalReload((value) => value + 1);
+                }}
+              >
+                Reload proposal
+              </button>
+            </div>
+          )}
+        </section>
+      </div>
+    </>
+  );
 }
-function Progress({ project, canReview, onQueue }: { project: Project | null; canReview: boolean; onQueue: () => void }) {
-  const [data, setData] = useState<ProgressView | null>(fixtureMode ? fixtureProgress : null);
-  const [error, setError] = useState(""), [notice, setNotice] = useState(""), [reload, setReload] = useState(0);
-  const [editing, setEditing] = useState<string | null>(null), [editDate, setEditDate] = useState(""), [editTime, setEditTime] = useState(""), [reason, setReason] = useState("");
+function Progress({
+  project,
+  canReview,
+  onQueue,
+}: {
+  project: Project | null;
+  canReview: boolean;
+  onQueue: () => void;
+}) {
+  const [data, setData] = useState<ProgressView | null>(
+    fixtureMode ? fixtureProgress : null,
+  );
+  const [activitySearch, setActivitySearch] = useState(""),
+    [activityPage, setActivityPage] = useState(0);
+  const [error, setError] = useState(""),
+    [notice, setNotice] = useState(""),
+    [reload, setReload] = useState(0);
+  const [editing, setEditing] = useState<string | null>(null),
+    [editDate, setEditDate] = useState(""),
+    [editTime, setEditTime] = useState(""),
+    [reason, setReason] = useState("");
   const [busy, setBusy] = useBusy();
   useEffect(() => {
     if (fixtureMode) return;
     let cancelled = false;
-    setData(null); setError("");
-    if (!project) { setError("Select a project to view approved progress."); return; }
+    setData(null);
+    setError("");
+    if (!project) {
+      setError("Select a project to view approved progress.");
+      return;
+    }
     api<ProgressView>("/projects/" + project.id + "/progress")
-      .then(value => { if (!cancelled) setData(value); })
-      .catch(value => { if (!cancelled) setError(value.message); });
-    return () => { cancelled = true; };
+      .then((value) => {
+        if (!cancelled) setData(value);
+      })
+      .catch((value) => {
+        if (!cancelled) setError(value.message);
+      });
+    return () => {
+      cancelled = true;
+    };
   }, [project, reload]);
-  if (!data) return <section className="panel"><p className="muted" role={error ? "alert" : "status"}>{error || "Loading approved progress…"}</p>{error && project && <button className="secondary" onClick={() => setReload(value => value + 1)}>Try again</button>}</section>;
-  const download = () => { if (!fixtureMode) window.location.assign("/api/v1/projects/" + data.project_id + "/exports/approved.csv"); };
+  if (!data)
+    return (
+      <section className="panel">
+        <p className="muted" role={error ? "alert" : "status"}>
+          {error || "Loading approved progress…"}
+        </p>
+        {error && project && (
+          <button
+            className="secondary"
+            onClick={() => setReload((value) => value + 1)}
+          >
+            Try again
+          </button>
+        )}
+      </section>
+    );
+  const filteredActivities = data.items.filter((item) =>
+    (item.name + " " + item.external_id + " " + item.wbs)
+      .toLowerCase()
+      .includes(activitySearch.toLowerCase()),
+  );
+  const download = () => {
+    if (!fixtureMode)
+      window.location.assign(
+        "/api/v1/projects/" + data.project_id + "/exports/approved.csv",
+      );
+  };
   const beginCorrection = (event: ProgressItem["history"][number]) => {
-    setEditing(event.event_id); setEditDate(event.endpoint?.local_date || ""); setEditTime(event.endpoint?.local_time?.slice(0, 5) || ""); setReason(""); setError(""); setNotice("");
+    setEditing(event.event_id);
+    setEditDate(event.endpoint?.local_date || "");
+    setEditTime(event.endpoint?.local_time?.slice(0, 5) || "");
+    setReason("");
+    setError("");
+    setNotice("");
   };
-  const correct = async (item: ProgressItem, event: ProgressItem["history"][number]) => {
-    if (!reason.trim() || !editDate || !event.endpoint || !event.evidence?.length) throw new Error("A reason, date and stored evidence are required.");
-    const endpoint = { ...event.endpoint, local_date: editDate, local_time: editTime ? editTime + ":00" : null,
-      precision: editTime ? "minute" : "date", normalized_instant: null, raw_expression: `${editDate}${editTime ? " " + editTime : ""}` };
-    await api("/proposals/events/" + event.event_id + "/correct", { method: "POST", headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ expected_activity_revision: item.state_revision || 0, endpoint, evidence: event.evidence, reason: reason.trim() }) });
-    setEditing(null); setNotice("Correction submitted for review. The accepted dates have not changed."); setReload(value => value + 1);
+  const correct = async (
+    item: ProgressItem,
+    event: ProgressItem["history"][number],
+  ) => {
+    if (
+      !reason.trim() ||
+      !editDate ||
+      !event.endpoint ||
+      !event.evidence?.length
+    )
+      throw new Error("A reason, date and stored evidence are required.");
+    const endpoint = {
+      ...event.endpoint,
+      local_date: editDate,
+      local_time: editTime ? editTime + ":00" : null,
+      precision: editTime ? "minute" : "date",
+      normalized_instant: null,
+      raw_expression: `${editDate}${editTime ? " " + editTime : ""}`,
+    };
+    await api("/proposals/events/" + event.event_id + "/correct", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({
+        expected_activity_revision: item.state_revision || 0,
+        endpoint,
+        evidence: event.evidence,
+        reason: reason.trim(),
+      }),
+    });
+    setEditing(null);
+    setNotice(
+      "Correction submitted for review. The accepted dates have not changed.",
+    );
+    setReload((value) => value + 1);
   };
-  const retract = async (item: ProgressItem, event: ProgressItem["history"][number]) => {
-    if (!reason.trim()) throw new Error("A reason is required to retract an accepted event.");
-    await api("/proposals/events/" + event.event_id + "/retract", { method: "POST", headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ expected_activity_revision: item.state_revision || 0, idempotency_key: crypto.randomUUID(), reason: reason.trim() }) });
-    setEditing(null); setNotice("Accepted event retracted. Activity dates were recomputed."); setReload(value => value + 1);
+  const retract = async (
+    item: ProgressItem,
+    event: ProgressItem["history"][number],
+  ) => {
+    if (!reason.trim())
+      throw new Error("A reason is required to retract an accepted event.");
+    await api("/proposals/events/" + event.event_id + "/retract", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({
+        expected_activity_revision: item.state_revision || 0,
+        idempotency_key: crypto.randomUUID(),
+        reason: reason.trim(),
+      }),
+    });
+    setEditing(null);
+    setNotice("Accepted event retracted. Activity dates were recomputed.");
+    setReload((value) => value + 1);
   };
   const act = (work: () => Promise<void>) => {
     if (busy) return;
-    setBusy(true); setError(""); void work().catch(value => setError(value instanceof Error ? value.message : "Change failed.")).finally(() => setBusy(false));
+    setBusy(true);
+    setError("");
+    void work()
+      .catch((value) =>
+        setError(value instanceof Error ? value.message : "Change failed."),
+      )
+      .finally(() => setBusy(false));
   };
-  return <><Context project={project} />
-    <section className="page-intro"><div><p className="eyebrow">APPROVED PROGRESS</p><h1>Activity-level progress, with its history.</h1><p>{data.notice}</p></div><button className="secondary" onClick={download} disabled={fixtureMode}>Export approved CSV ↓</button></section>
-    {notice && <p className="success-state" role="status">{notice} {canReview && <button className="text-button" onClick={onQueue}>Open review queue →</button>}</p>}
-    {error && <p className="form-error" role="alert">{error}</p>}
-    <p className="helper">MOCK PMIS — prototype · Accepted changes are queued automatically. <button className="text-button" disabled={busy} onClick={() => setReload(value => value + 1)}>Refresh delivery status</button></p>
-    <section className="progress-summary" aria-label="Progress summary"><div><strong>{data.counts.activities}</strong><span>activities</span></div><div><strong>{data.counts.approved_events}</strong><span>approved events</span></div><div><strong>{data.counts.pending_review}</strong><span>pending review</span>{canReview && data.counts.pending_review > 0 && <button className="text-button" onClick={onQueue}>Open review queue →</button>}</div></section>
-    <section className="progress-list">{!data.items.length && <p role="status">No activities are available in the active schedule.</p>}{data.items.map(item => <article className="panel progress-item" key={item.activity_id}>
-      <div><p className="eyebrow">{item.external_id}</p><h2>{item.name}</h2><p className="muted">{item.wbs}</p></div>
-      <dl><dt>Approved quantity</dt><dd>{item.completed_quantity} {item.unit || ""}{item.planned_quantity ? " / " + item.planned_quantity : ""}</dd>
-        <dt>Actual start</dt><dd>{item.actual_start || "—"}{item.actual_start_time ? ` ${item.actual_start_time}` : ""}{item.actual_start_precision ? ` (${item.actual_start_precision})` : ""}</dd>
-        <dt>Actual finish</dt><dd>{item.actual_finish || "—"}{item.actual_finish_time ? ` ${item.actual_finish_time}` : ""}{item.actual_finish_precision ? ` (${item.actual_finish_precision})` : ""}</dd>
-        <dt>Status</dt><dd>{item.lifecycle_status?.replaceAll("_", " ") || "Not started"}</dd>
-        <dt>Physical progress</dt><dd>{item.physical_percent === null ? "Not calculated" : item.physical_percent + "%"}</dd>
-        <dt>Approved events</dt><dd>{item.approved_event_count}</dd></dl>
-      <p className="helper">MOCK PMIS — prototype: {item.delivery ? `${item.delivery.status} · revision ${item.delivery.revision} · ${item.delivery.attempts} attempts` : "No queued changes"}{item.delivery?.delivered_at ? ` · Read-back verified ${item.delivery.delivered_at}` : ""}</p>
-      {item.delivery?.last_error && <p className="form-error" role="alert">Delivery issue: {item.delivery.last_error}. Internal acceptance is saved.</p>}
-      {item.history.length > 0 && <details><summary>Decision history ({item.history.length})</summary>{item.history.map(event => <div className="history-row" key={event.event_id}>
-        <code>{event.work_date || "No work date"}</code><span>{event.event_type?.startsWith("actual_") ? `${event.event_type.replaceAll("_", " ")} · ${event.endpoint?.local_date || event.work_date || "—"} ${event.endpoint?.local_time || ""} (${event.endpoint?.precision || "date"})` : `${event.quantity || "—"} ${event.unit || ""}`}</span><span>{event.scope?.replaceAll("_", " ")}{event.subactivity_key ? ` · ${event.subactivity_key} · Parent ${item.external_id}` : ""}</span><span>{event.status || "Status unavailable"} · {event.source_locator || "Stored evidence"}</span>
-        {canReview && !fixtureMode && event.endpoint && event.active !== false && <button className="text-button" disabled={busy} onClick={() => beginCorrection(event)}>Correct or retract</button>}
-        {editing === event.event_id && <div className="correction-form"><p className="helper">Use only values supported by the stored source evidence. A correction creates a pending proposal.</p>
-          {event.evidence?.map(source => <blockquote key={source.fragment_id}>“{source.quote}”</blockquote>)}
-          <label>Correct actual date<input type="date" value={editDate} disabled={busy} onChange={change => setEditDate(change.target.value)} /></label>
-          <label>Correct actual time <span className="optional">(leave blank for date only)</span><input type="time" value={editTime} disabled={busy} onChange={change => setEditTime(change.target.value)} /></label>
-          <label>Correction or retraction reason<textarea value={reason} disabled={busy} onChange={change => setReason(change.target.value)} rows={3} /></label>
-          <button className="secondary" disabled={busy || !reason.trim() || !editDate || !event.evidence?.length} onClick={() => act(() => correct(item, event))}>Submit correction for review</button>
-          <button className="secondary danger-button" disabled={busy || !reason.trim()} onClick={() => act(() => retract(item, event))}>Retract accepted event</button>
-          <button className="quiet-button" disabled={busy} onClick={() => setEditing(null)}>Cancel</button>
-        </div>}
-      </div>)}</details>}
-    </article>)}</section>{!fixtureMode && <ExecutionHistory key={data.project_id + ":" + data.schedule_version} projectId={data.project_id} version={data.schedule_version} activities={data.items} request={api} />}</>;
+  return (
+    <>
+      <Context project={project} />
+      <section className="page-intro">
+        <div>
+          <p className="eyebrow">APPROVED PROGRESS</p>
+          <h1>Activity-level progress, with its history.</h1>
+          <p>{data.notice}</p>
+        </div>
+        <button className="secondary" onClick={download} disabled={fixtureMode}>
+          Export approved CSV ↓
+        </button>
+      </section>
+      {notice && (
+        <p className="success-state" role="status">
+          {notice}{" "}
+          {canReview && (
+            <button className="text-button" onClick={onQueue}>
+              Open review queue →
+            </button>
+          )}
+        </p>
+      )}
+      {error && (
+        <p className="form-error" role="alert">
+          {error}
+        </p>
+      )}
+      <p className="helper">
+        MOCK PMIS — prototype · Accepted changes are queued automatically.{" "}
+        <button
+          className="text-button"
+          disabled={busy}
+          onClick={() => setReload((value) => value + 1)}
+        >
+          Refresh delivery status
+        </button>
+      </p>
+      <section className="progress-summary" aria-label="Progress summary">
+        <div>
+          <strong>{data.counts.activities}</strong>
+          <span>activities</span>
+        </div>
+        <div>
+          <strong>{data.counts.approved_events}</strong>
+          <span>approved events</span>
+        </div>
+        <div>
+          <strong>{data.counts.pending_review}</strong>
+          <span>pending review</span>
+          {canReview && data.counts.pending_review > 0 && (
+            <button className="text-button" onClick={onQueue}>
+              Open review queue →
+            </button>
+          )}
+        </div>
+      </section>
+      <div className="progress-register-tools">
+        <label className="search-field">
+          <input
+            aria-label="Search approved activities"
+            placeholder="Search activities, codes or WBS…"
+            value={activitySearch}
+            disabled={busy}
+            onChange={(event) => {
+              if (canLeave()) {
+                setActivitySearch(event.target.value);
+                setActivityPage(0);
+              }
+            }}
+          />
+        </label>
+        <span>Approved activity register</span>
+      </div>
+      <section className="progress-list progress-register">
+        {!filteredActivities.length && (
+          <p role="status">
+            {data.items.length
+              ? "No activities match your search."
+              : "No activities are available in the active schedule."}
+          </p>
+        )}
+        {filteredActivities
+          .slice(activityPage * 50, (activityPage + 1) * 50)
+          .map((item) => (
+            <article className="panel progress-item" key={item.activity_id}>
+              <div>
+                <p className="eyebrow">{item.external_id}</p>
+                <h2>{item.name}</h2>
+                <p className="muted">{item.wbs}</p>
+              </div>
+              <dl>
+                <dt>Approved quantity</dt>
+                <dd>
+                  {item.completed_quantity} {item.unit || ""}
+                  {item.planned_quantity ? " / " + item.planned_quantity : ""}
+                </dd>
+                <dt>Actual start</dt>
+                <dd>
+                  {item.actual_start || "—"}
+                  {item.actual_start_time ? ` ${item.actual_start_time}` : ""}
+                  {item.actual_start_precision
+                    ? ` (${item.actual_start_precision})`
+                    : ""}
+                </dd>
+                <dt>Actual finish</dt>
+                <dd>
+                  {item.actual_finish || "—"}
+                  {item.actual_finish_time ? ` ${item.actual_finish_time}` : ""}
+                  {item.actual_finish_precision
+                    ? ` (${item.actual_finish_precision})`
+                    : ""}
+                </dd>
+                <dt>Status</dt>
+                <dd>
+                  {item.lifecycle_status?.replaceAll("_", " ") ||
+                    "Not reported"}
+                </dd>
+                <dt>Physical progress</dt>
+                <dd>
+                  {item.physical_percent === null
+                    ? "Not calculated"
+                    : item.physical_percent + "%"}
+                </dd>
+                <dt>Approved events</dt>
+                <dd>{item.approved_event_count}</dd>
+              </dl>
+              <p className="helper">
+                MOCK PMIS — prototype:{" "}
+                {item.delivery
+                  ? `${item.delivery.status} · revision ${item.delivery.revision} · ${item.delivery.attempts} attempts`
+                  : "No queued changes"}
+                {item.delivery?.delivered_at
+                  ? ` · Read-back verified ${item.delivery.delivered_at}`
+                  : ""}
+              </p>
+              {item.delivery?.last_error && (
+                <p className="form-error" role="alert">
+                  Delivery issue: {item.delivery.last_error}. Internal
+                  acceptance is saved.
+                </p>
+              )}
+              {item.history.length > 0 && (
+                <details>
+                  <summary>Decision history ({item.history.length})</summary>
+                  {item.history.map((event) => (
+                    <div className="history-row" key={event.event_id}>
+                      <code>{event.work_date || "No work date"}</code>
+                      <span>
+                        {event.event_type?.startsWith("actual_")
+                          ? `${event.event_type.replaceAll("_", " ")} · ${event.endpoint?.local_date || event.work_date || "—"} ${event.endpoint?.local_time || ""} (${event.endpoint?.precision || "date"})`
+                          : `${event.quantity || "—"} ${event.unit || ""}`}
+                      </span>
+                      <span>
+                        {event.scope?.replaceAll("_", " ")}
+                        {event.subactivity_key
+                          ? ` · ${event.subactivity_key} · Parent ${item.external_id}`
+                          : ""}
+                      </span>
+                      <span>
+                        {event.status || "Status unavailable"} ·{" "}
+                        {event.source_locator || "Stored evidence"}
+                      </span>
+                      {canReview &&
+                        !fixtureMode &&
+                        event.endpoint &&
+                        event.active !== false && (
+                          <button
+                            className="text-button"
+                            disabled={busy}
+                            onClick={() => beginCorrection(event)}
+                          >
+                            Correct or retract
+                          </button>
+                        )}
+                      {editing === event.event_id && (
+                        <div
+                          className="correction-form"
+                          data-dirty={!!reason.trim()}
+                        >
+                          <p className="helper">
+                            Use only values supported by the stored source
+                            evidence. A correction creates a pending proposal.
+                          </p>
+                          {event.evidence?.map((source) => (
+                            <blockquote key={source.fragment_id}>
+                              “{source.quote}”
+                            </blockquote>
+                          ))}
+                          <label>
+                            Correct actual date
+                            <input
+                              type="date"
+                              value={editDate}
+                              disabled={busy}
+                              onChange={(change) =>
+                                setEditDate(change.target.value)
+                              }
+                            />
+                          </label>
+                          <label>
+                            Correct actual time{" "}
+                            <span className="optional">
+                              (leave blank for date only)
+                            </span>
+                            <input
+                              type="time"
+                              value={editTime}
+                              disabled={busy}
+                              onChange={(change) =>
+                                setEditTime(change.target.value)
+                              }
+                            />
+                          </label>
+                          <label>
+                            Correction or retraction reason
+                            <textarea
+                              value={reason}
+                              disabled={busy}
+                              onChange={(change) =>
+                                setReason(change.target.value)
+                              }
+                              rows={3}
+                            />
+                          </label>
+                          <button
+                            className="secondary"
+                            disabled={
+                              busy ||
+                              !reason.trim() ||
+                              !editDate ||
+                              !event.evidence?.length
+                            }
+                            onClick={() => act(() => correct(item, event))}
+                          >
+                            Submit correction for review
+                          </button>
+                          <button
+                            className="secondary danger-button"
+                            disabled={busy || !reason.trim()}
+                            onClick={() => act(() => retract(item, event))}
+                          >
+                            Retract accepted event
+                          </button>
+                          <button
+                            className="quiet-button"
+                            disabled={busy}
+                            onClick={() => setEditing(null)}
+                          >
+                            Cancel
+                          </button>
+                        </div>
+                      )}
+                    </div>
+                  ))}
+                </details>
+              )}
+            </article>
+          ))}
+      </section>
+      <div className="pagination">
+        <button
+          className="secondary"
+          disabled={busy || !activityPage}
+          onClick={() => {
+            if (canLeave()) setActivityPage((value) => value - 1);
+          }}
+        >
+          Previous activities
+        </button>
+        <span>
+          Page {activityPage + 1} · {filteredActivities.length} matching
+          activities
+        </span>
+        <button
+          className="secondary"
+          disabled={
+            busy || (activityPage + 1) * 50 >= filteredActivities.length
+          }
+          onClick={() => {
+            if (canLeave()) setActivityPage((value) => value + 1);
+          }}
+        >
+          Next activities
+        </button>
+      </div>
+      {!fixtureMode && (
+        <ExecutionHistory
+          key={data.project_id + ":" + data.schedule_version}
+          projectId={data.project_id}
+          version={data.schedule_version}
+          activities={data.items}
+          request={api}
+        />
+      )}
+    </>
+  );
 }
-function TaskMappingEditor({ task, override, disabled, onChange }: { task: NativeImport["preview"]["tasks"][number]; override: TaskOverrideInput; disabled: boolean; onChange: (field: string, value: string) => void }) {
-  const basis = override.measurement_basis || (task.is_milestone ? "milestone" : "unsupported");
-  return <div className="import-row"><code>{task.source_task_id}</code><span>{task.external_id}</span><strong>{task.name}</strong>
-    <div className="task-mapping-fields">
-      <label>Discipline<select disabled={disabled} value={override.discipline || "unknown"} onChange={event => onChange("discipline", event.target.value)}>{disciplines.map(value => <option key={value} value={value}>{value.replaceAll("_", " ")}</option>)}</select></label>
-      <label>Work type<select disabled={disabled} value={override.work_type || "unknown"} onChange={event => onChange("work_type", event.target.value)}>{workTypes.map(value => <option key={value} value={value}>{value.replaceAll("_", " ")}</option>)}</select></label>
-      <label>Area<input disabled={disabled} value={override.area || ""} onChange={event => onChange("area", event.target.value)} /></label>
-      <label>Asset tags <span className="optional">(separate with semicolons)</span><input disabled={disabled} value={override.asset_tags || ""} onChange={event => onChange("asset_tags", event.target.value)} /></label>
-      <label>Aliases <span className="optional">(separate with semicolons)</span><input disabled={disabled} value={override.aliases || ""} onChange={event => onChange("aliases", event.target.value)} /></label>
-      <label>Measurement basis<select disabled={disabled} value={basis} onChange={event => onChange("measurement_basis", event.target.value)}><option value="unsupported">Unsupported</option><option value="quantity_ratio">Quantity ratio</option><option value="manual_physical">Manual physical</option><option value="milestone">Milestone</option></select></label>
-      {basis === "quantity_ratio" && <><label>Planned quantity<input disabled={disabled} type="number" min="0" step="any" value={override.planned_quantity || ""} onChange={event => onChange("planned_quantity", event.target.value)} /></label><label>Unit<select disabled={disabled} value={override.unit || ""} onChange={event => onChange("unit", event.target.value)}><option value="">Select unit</option>{units.map(value => <option key={value} value={value}>{value}</option>)}</select></label><label>Actual quantity at baseline<input disabled={disabled} type="number" min="0" step="any" value={override.baseline_quantity || ""} onChange={event => onChange("baseline_quantity", event.target.value)} /></label></>}
-    <p className="helper">Baseline quantity is the completed quantity at the baseline date. Later actual quantities come from reports and reviewer approval.</p></div><small>{task.source_wbs_id || "No WBS"} · {basis === "unsupported" ? "Numeric progress unsupported" : basis.replaceAll("_", " ")}</small>
-  </div>;
+function TaskMappingEditor({
+  task,
+  override,
+  disabled,
+  onChange,
+}: {
+  task: NativeImport["preview"]["tasks"][number];
+  override: TaskOverrideInput;
+  disabled: boolean;
+  onChange: (field: string, value: string) => void;
+}) {
+  const basis =
+    override.measurement_basis ||
+    (task.is_milestone ? "milestone" : "unsupported");
+  return (
+    <div className="import-row">
+      <code>{task.source_task_id}</code>
+      <span>{task.external_id}</span>
+      <strong>{task.name}</strong>
+      <div className="task-mapping-fields">
+        <label>
+          Discipline
+          <select
+            disabled={disabled}
+            value={override.discipline || "unknown"}
+            onChange={(event) => onChange("discipline", event.target.value)}
+          >
+            {disciplines.map((value) => (
+              <option key={value} value={value}>
+                {value.replaceAll("_", " ")}
+              </option>
+            ))}
+          </select>
+        </label>
+        <label>
+          Work type
+          <select
+            disabled={disabled}
+            value={override.work_type || "unknown"}
+            onChange={(event) => onChange("work_type", event.target.value)}
+          >
+            {workTypes.map((value) => (
+              <option key={value} value={value}>
+                {value.replaceAll("_", " ")}
+              </option>
+            ))}
+          </select>
+        </label>
+        <label>
+          Area
+          <input
+            disabled={disabled}
+            value={override.area || ""}
+            onChange={(event) => onChange("area", event.target.value)}
+          />
+        </label>
+        <label>
+          Asset tags{" "}
+          <span className="optional">(separate with semicolons)</span>
+          <input
+            disabled={disabled}
+            value={override.asset_tags || ""}
+            onChange={(event) => onChange("asset_tags", event.target.value)}
+          />
+        </label>
+        <label>
+          Aliases <span className="optional">(separate with semicolons)</span>
+          <input
+            disabled={disabled}
+            value={override.aliases || ""}
+            onChange={(event) => onChange("aliases", event.target.value)}
+          />
+        </label>
+        <label>
+          Measurement basis
+          <select
+            disabled={disabled}
+            value={basis}
+            onChange={(event) =>
+              onChange("measurement_basis", event.target.value)
+            }
+          >
+            <option value="unsupported">Unsupported</option>
+            <option value="quantity_ratio">Quantity ratio</option>
+            <option value="manual_physical">Manual physical</option>
+            <option value="milestone">Milestone</option>
+          </select>
+        </label>
+        {basis === "quantity_ratio" && (
+          <>
+            <label>
+              Planned quantity
+              <input
+                disabled={disabled}
+                type="number"
+                min="0"
+                step="any"
+                value={override.planned_quantity || ""}
+                onChange={(event) =>
+                  onChange("planned_quantity", event.target.value)
+                }
+              />
+            </label>
+            <label>
+              Unit
+              <select
+                disabled={disabled}
+                value={override.unit || ""}
+                onChange={(event) => onChange("unit", event.target.value)}
+              >
+                <option value="">Select unit</option>
+                {units.map((value) => (
+                  <option key={value} value={value}>
+                    {value}
+                  </option>
+                ))}
+              </select>
+            </label>
+            <label>
+              Actual quantity at baseline
+              <input
+                disabled={disabled}
+                type="number"
+                min="0"
+                step="any"
+                value={override.baseline_quantity || ""}
+                onChange={(event) =>
+                  onChange("baseline_quantity", event.target.value)
+                }
+              />
+            </label>
+          </>
+        )}
+        <p className="helper">
+          Baseline quantity is the completed quantity at the baseline date.
+          Later actual quantities come from reports and reviewer approval.
+        </p>
+      </div>
+      <small>
+        {task.source_wbs_id || "No WBS"} ·{" "}
+        {basis === "unsupported"
+          ? "Numeric progress unsupported"
+          : basis.replaceAll("_", " ")}
+      </small>
+    </div>
+  );
 }
-function ScheduleImport({ project, onActivated, onProjectCreated }: { project: Project | null; onActivated: () => Promise<void>; onProjectCreated: (project: Project) => void }) {
-  const [file, setFile] = useState<File | null>(null), [record, setRecord] = useDraft<NativeImport | null>("import:" + project?.id + ":record", null), [baselineDate, setBaselineDate] = useDraft("import:" + project?.id + ":baselineDate", ""), [reason, setReason] = useDraft("import:" + project?.id + ":reason", ""), [activeVersion, setActiveVersion] = useState(""), [selectedSourceProject, setSelectedSourceProject] = useDraft("import:" + project?.id + ":sourceProject", ""), [taskOverrides, setTaskOverrides] = useDraft<Record<string, TaskOverrideInput>>("import:" + project?.id + ":taskOverrides", {}), [taskSearch, setTaskSearch] = useState(""), [csvFile, setCsvFile] = useState<File | null>(null), [csvVersion, setCsvVersion] = useDraft<number | null>("import:" + project?.id + ":csvVersion", null), [projectName, setProjectName] = useState(""), [activation, setActivation] = useState(""), [error, setError] = useState(""), [busy, setBusy] = useBusy();
+function ScheduleImport({
+  project,
+  onActivated,
+  onProjectCreated,
+}: {
+  project: Project | null;
+  onActivated: () => Promise<void>;
+  onProjectCreated: (project: Project) => void;
+}) {
+  const [file, setFile] = useState<File | null>(null),
+    [record, setRecord] = useDraft<NativeImport | null>(
+      "import:" + project?.id + ":record",
+      null,
+    ),
+    [baselineDate, setBaselineDate] = useDraft(
+      "import:" + project?.id + ":baselineDate",
+      "",
+    ),
+    [reason, setReason] = useDraft("import:" + project?.id + ":reason", ""),
+    [activeVersion, setActiveVersion] = useState(""),
+    [selectedSourceProject, setSelectedSourceProject] = useDraft(
+      "import:" + project?.id + ":sourceProject",
+      "",
+    ),
+    [taskOverrides, setTaskOverrides] = useDraft<
+      Record<string, TaskOverrideInput>
+    >("import:" + project?.id + ":taskOverrides", {}),
+    [taskSearch, setTaskSearch] = useState(""),
+    [csvFile, setCsvFile] = useState<File | null>(null),
+    [csvVersion, setCsvVersion] = useDraft<number | null>(
+      "import:" + project?.id + ":csvVersion",
+      null,
+    ),
+    [projectName, setProjectName] = useState(""),
+    [activation, setActivation] = useState(""),
+    [error, setError] = useState(""),
+    [busy, setBusy] = useBusy();
   const [restoring, setRestoring] = useState(!fixtureMode && !!record);
   const [importNotice, setImportNotice] = useState("");
   const initialRecord = useRef(record);
   const importMounted = useRef(true);
-  useEffect(() => () => { importMounted.current = false; }, []);
+  useEffect(
+    () => () => {
+      importMounted.current = false;
+    },
+    [],
+  );
   const syncImport = async () => {
-    const current = record || initialRecord.current; if (!project || !current || fixtureMode) return;
-    const latest = await api<NativeImport>("/projects/" + project.id + "/schedule-imports/" + current.id);
+    const current = record || initialRecord.current;
+    if (!project || !current || fixtureMode) return;
+    const latest = await api<NativeImport>(
+      "/projects/" + project.id + "/schedule-imports/" + current.id,
+    );
     if (!importMounted.current) return;
-    if (latest.revision !== current.revision || latest.state !== current.state && !(current.state === "needs_mapping" && latest.state === "ready")) {
-      setTaskOverrides(Object.fromEntries(Object.entries(latest.reviewed_mapping?.task_overrides || {}).map(([id, fields]) => [id, Object.fromEntries(Object.entries(fields).map(([key, value]) => [key, Array.isArray(value) ? value.join("; ") : String(value ?? "")]))])));
-      setBaselineDate(latest.reviewed_mapping?.baseline_date || ""); setReason(latest.reviewed_mapping?.reason || ""); setImportNotice("This import changed on the server. Review the latest mapping before continuing.");
+    if (
+      latest.revision !== current.revision ||
+      (latest.state !== current.state &&
+        !(current.state === "needs_mapping" && latest.state === "ready"))
+    ) {
+      setTaskOverrides(
+        Object.fromEntries(
+          Object.entries(latest.reviewed_mapping?.task_overrides || {}).map(
+            ([id, fields]) => [
+              id,
+              Object.fromEntries(
+                Object.entries(fields).map(([key, value]) => [
+                  key,
+                  Array.isArray(value) ? value.join("; ") : String(value ?? ""),
+                ]),
+              ),
+            ],
+          ),
+        ),
+      );
+      setBaselineDate(latest.reviewed_mapping?.baseline_date || "");
+      setReason(latest.reviewed_mapping?.reason || "");
+      setImportNotice(
+        "This import changed on the server. Review the latest mapping before continuing.",
+      );
     }
-    setRecord(latest.state === "ready" && current.state === "needs_mapping" && latest.revision === current.revision ? { ...latest, state: "needs_mapping" } : latest); setSelectedSourceProject(latest.selected_source_project_id || "");
+    setRecord(
+      latest.state === "ready" &&
+        current.state === "needs_mapping" &&
+        latest.revision === current.revision
+        ? { ...latest, state: "needs_mapping" }
+        : latest,
+    );
+    setSelectedSourceProject(latest.selected_source_project_id || "");
   };
-  useEffect(() => { let active = true; if (fixtureMode || !initialRecord.current) return; syncImport().then(() => { if (active) setRestoring(false); }).catch(value => { if (active) setError("Could not restore this import. " + value.message); }); return () => { active = false; }; }, [project?.id]);
-  useEffect(() => { if (!project?.active_schedule_version_id || fixtureMode) { setActiveVersion(""); return; } setActiveVersion(""); let cancelled = false; api<ProgressView>("/projects/" + project.id + "/progress").then(value => { if (!cancelled) setActiveVersion(String(value.schedule_version)); }).catch(value => { if (!cancelled) setError("Could not read the active schedule version. " + value.message); }); return () => { cancelled = true; }; }, [project?.id, project?.active_schedule_version_id]);
-  const act = (work: () => Promise<void>) => { if (busy || restoring) return; setBusy(true); setError(""); void work().catch(async value => { setError(value instanceof Error ? value.message : "Schedule import failed."); if (value instanceof ApiError && value.code === "SCHEDULE_IMPORT_CONFLICT") { try { await syncImport(); } catch (refreshError) { setRestoring(true); setError("Could not refresh the changed import. Reload this page before continuing. " + (refreshError instanceof Error ? refreshError.message : "")); } } if (value instanceof ApiError && value.code === "SCHEDULE_VERSION_CONFLICT") { try { await onActivated(); } catch { setError("Could not refresh the schedule context. Reload before activating."); } } }).finally(() => setBusy(false)); };
-  const upload = async () => { if (!project || !file) throw new Error("Choose a native schedule file first."); if (fixtureMode) return setRecord(fixtureImport); const body = new FormData(); body.append("upload", file); const next = await api<NativeImport>("/projects/" + project.id + "/schedule-imports", { method: "POST", body }); setRecord(next); setSelectedSourceProject(next.selected_source_project_id || ""); setTaskOverrides({}); setTaskSearch(""); };
-  const chooseSourceProject = async () => { if (!project || !record || !selectedSourceProject) return; if (fixtureMode) return setRecord({ ...record, selected_source_project_id: selectedSourceProject, revision: record.revision + 1, state: "needs_mapping" }); setRecord(await api<NativeImport>("/projects/" + project.id + "/schedule-imports/" + record.id + "/select-project", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ expected_revision: record.revision, source_project_id: selectedSourceProject }) })); setTaskOverrides({}); setTaskSearch(""); };
-  const map = async () => { if (!project || !record) return; const task_overrides = Object.fromEntries(Object.entries(taskOverrides).map(([id, fields]) => [id, { ...Object.fromEntries(Object.entries(fields).filter(([key, value]) => !["asset_tags", "aliases"].includes(key) && value.trim())), ...Object.fromEntries(["asset_tags", "aliases"].filter(key => fields[key]?.trim()).map(key => [key, fields[key].split(";").map(value => value.trim()).filter(Boolean)])) }])); const mapping = { baseline_date: baselineDate, source_project_id: record.selected_source_project_id, task_overrides, reason }; if (!mapping.source_project_id || !baselineDate || !reason.trim()) throw new Error("Confirm a source project, baseline date and reviewer mapping reason."); if (fixtureMode) return setRecord({ ...record, state: "ready", revision: record.revision + 1 }); setRecord(await api<NativeImport>("/projects/" + project.id + "/schedule-imports/" + record.id + "/mapping", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ expected_revision: record.revision, mapping }) })); };
-  const stage = async () => { if (!project || !record) return; if (fixtureMode) return setRecord({ ...record, state: "staged", revision: record.revision + 1, staged_schedule_version_id: "fixture-version" }); setRecord(await api<NativeImport>("/projects/" + project.id + "/schedule-imports/" + record.id + "/stage", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ expected_revision: record.revision }) })); };
-  const activate = async () => { if (!project || !record?.schedule_version_id) return; if (project.active_schedule_version_id && !activeVersion) throw new Error("The current schedule version is still loading. Please try again."); const expected = activeVersion ? Number(activeVersion) : null; if (fixtureMode) return setActivation("Fixture schedule activated (no server change)."); const result = await api<{ version: number; state: string }>("/projects/" + project.id + "/schedules/" + (record.version || "") + "/activate", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ expected_active_version: expected }) }); setActivation(`Schedule version ${result.version} is ${result.state}.`); await onActivated(); };
-  const uploadCsv = async () => { if (!project || !csvFile) throw new Error("Choose a canonical CSV file."); if (fixtureMode) { setCsvVersion(1); return setActivation("Fixture CSV staged (no server change)."); } const body = new FormData(); body.append("upload", csvFile); const result = await api<{ version: number; state: string }>("/projects/" + project.id + "/schedules", { method: "POST", body }); setCsvVersion(result.version); setActivation(`CSV schedule version ${result.version} is ${result.state}; activate it explicitly.`); };
-  const activateCsv = async () => { if (!project || csvVersion === null) return; if (project.active_schedule_version_id && !activeVersion) throw new Error("The current schedule version is still loading. Please try again."); const expected = activeVersion ? Number(activeVersion) : null; if (fixtureMode) return setActivation("Fixture CSV activated (no server change)."); const result = await api<{ version: number; state: string }>("/projects/" + project.id + "/schedules/" + csvVersion + "/activate", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ expected_active_version: expected }) }); setActivation(`CSV schedule version ${result.version} is ${result.state}.`); await onActivated(); };
-  const createProject = async () => { if (!projectName.trim()) throw new Error("Enter a project name."); const next = fixtureMode ? { id: "fixture-created", name: projectName, timezone: "Asia/Kolkata", active_schedule_version_id: null } : await api<Project>("/projects", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ name: projectName, timezone: "Asia/Kolkata" }) }); onProjectCreated(next); setProjectName(""); };
-  const markMappingDirty = () => setRecord(current => current?.state === "ready" ? { ...current, state: "needs_mapping" } : current);
-  const updateOverride = (id: string, field: string, value: string) => { setTaskOverrides(current => { const next = { ...(current[id] || {}), [field]: value }; if (field === "measurement_basis" && value !== "quantity_ratio") { delete next.planned_quantity; delete next.baseline_quantity; delete next.unit; } return { ...current, [id]: next }; }); markMappingDirty(); };
-  return <><Context project={project} /><section className="panel"><h1>{project ? "Create a project" : "Create your first project"}</h1><p className="muted">Create a separate workspace for its schedule and reports.</p><label>Project name<input disabled={busy} value={projectName} onChange={event => setProjectName(event.target.value)} /></label><button className="primary" disabled={busy} onClick={() => act(createProject)}>Create project</button></section>{project && <><section className="page-intro"><div><p className="eyebrow">SCHEDULE IMPORT</p><h1>Inspect the source before it becomes a schedule.</h1><p>Source IDs, hierarchy and dependencies remain visible. Physical quantities are never inferred from the file.</p></div><div className="limit-note"><strong>Local parsing only</strong><span>P6 XER / PMXML · MSPDI / MPP · GT10 Excel · Cambridge snapshot</span><span>Canonical CSV also supported · 10 MB input</span></div></section>{restoring && <div className="session-notice"><p role="status">{error ? "The saved import could not be verified. Please retry before editing." : "Checking the saved import…"}</p>{error && <button className="secondary" disabled={busy} onClick={() => { setBusy(true); void syncImport().then(() => { setRestoring(false); setError(""); }).catch(value => setError(value.message)).finally(() => setBusy(false)); }}>Retry import refresh</button>}{error && <button className="text-button" disabled={busy} onClick={() => { setRecord(null); setTaskOverrides({}); setBaselineDate(""); setReason(""); setSelectedSourceProject(""); setRestoring(false); setError(""); }}>Start a new import</button>}</div>}{importNotice && <p className="session-notice" role="status">{importNotice}</p>}<div aria-busy={busy || restoring} data-dirty={!!file || !!csvFile || record?.state === "needs_mapping"} className="import-grid"><section className="panel import-upload"><h2>1. Upload source</h2><label className="file-drop"><strong>{file ? file.name : "Choose native schedule"}</strong><span>XER, XML, MPP, GT10 XLSX or Cambridge JSON · max 10 MB</span><input disabled={busy || restoring} type="file" accept=".xer,.xml,.mpp,.xlsx,.json" onChange={event => setFile(event.target.files?.[0] || null)} /></label><button className="primary full" disabled={!file || busy || restoring} onClick={() => act(upload)}>{busy ? "Reading source…" : "Read schedule source"}</button><div className="or-rule"><span>or canonical CSV</span></div><label className="file-drop"><strong>{csvFile ? csvFile.name : "Choose canonical schedule CSV"}</strong><input disabled={busy || restoring} type="file" accept=".csv,text/csv" onChange={event => setCsvFile(event.target.files?.[0] || null)} /></label><button className="secondary full" disabled={!csvFile || busy || restoring} onClick={() => act(uploadCsv)}>Stage canonical CSV</button>{csvVersion !== null && <div className="csv-activation"><label>Current active version <span className="optional">(blank if none)</span><input inputMode="numeric" value={activeVersion} readOnly /></label><button className="primary full" disabled={busy} onClick={() => act(activateCsv)}>Activate CSV version {csvVersion}</button></div>}</section>{record && <section className="panel import-preview"><div className="panel-heading"><div><p className="eyebrow">{record.source_format.replaceAll("_", " ")}</p><h2>{record.preview.projects.find(item => item.source_project_id === record.selected_source_project_id)?.name || record.preview.projects[0]?.name || "Source schedule"}</h2></div><span className="mode-pill">{record.state.replaceAll("_", " ")}</span></div>{record.preview.projects.length > 1 && !record.selected_source_project_id && <><label>Source project<select disabled={busy || restoring} value={selectedSourceProject} onChange={event => setSelectedSourceProject(event.target.value)}><option value="">Select a project</option>{record.preview.projects.map(item => <option key={item.source_project_id} value={item.source_project_id}>{item.name} ({item.source_project_id})</option>)}</select></label><button className="secondary" disabled={!selectedSourceProject || busy || restoring} onClick={() => act(chooseSourceProject)}>Load selected project</button></>}<div className="import-counts"><span><strong>{record.preview.tasks.length}</strong> tasks</span><span><strong>{record.preview.wbs.length}</strong> WBS nodes</span><span><strong>{record.preview.relationships.length}</strong> links</span></div>{record.preview.issues.map((issue, index) => <p className="form-error" key={index}>{issue.severity}: {issue.message}</p>)}<p className="helper" role="status">{record.preview.tasks.filter(task => !task.is_summary && (taskOverrides[task.source_task_id]?.measurement_basis || (task.is_milestone ? "milestone" : "unsupported")) === "unsupported").length} activities still have unsupported measurement.</p><section aria-label="Source activities and reviewer overrides"><h3>Source activities and reviewer overrides</h3><label>Find activity<input type="search" value={taskSearch} onChange={event => setTaskSearch(event.target.value)} placeholder="Search task ID, name or WBS" /></label><p className="helper">{record.preview.tasks.filter(task => !task.is_summary && [task.source_task_id, task.external_id, task.name, task.source_wbs_id || ""].some(value => value.toLowerCase().includes(taskSearch.toLowerCase()))).length} of {record.preview.tasks.filter(task => !task.is_summary).length} activities shown</p>{record.preview.tasks.filter(task => !task.is_summary && [task.source_task_id, task.external_id, task.name, task.source_wbs_id || ""].some(value => value.toLowerCase().includes(taskSearch.toLowerCase()))).map(task => <TaskMappingEditor key={task.source_task_id} task={task} override={taskOverrides[task.source_task_id] || {}} disabled={busy || restoring || record.state === "staged"} onChange={(field, value) => updateOverride(task.source_task_id, field, value)} />)}</section><details><summary>Dependencies</summary>{record.preview.relationships.map((link, index) => <p className="import-row" key={index}><code>{link.predecessor_source_task_id}</code><span>{link.relation_type}</span><code>{link.successor_source_task_id}</code></p>)}</details></section>} {record && <aside className="panel import-map"><h2>2. Reviewer mapping</h2><label>Baseline date<input type="date" value={baselineDate} onChange={event => { setBaselineDate(event.target.value); markMappingDirty(); }} disabled={busy || restoring || record.state === "staged"} /></label><label>Reviewer reason<textarea value={reason} onChange={event => { setReason(event.target.value); markMappingDirty(); }} rows={4} placeholder="Why this mapping and baseline are valid" disabled={busy || restoring || record.state === "staged"} /></label><p className="helper">Unmapped leaves stay unsupported. Summary nodes cannot become matching activities.</p><button className="secondary full" disabled={busy || restoring || record.state === "ready" || record.state === "staged" || !record.selected_source_project_id} onClick={() => act(map)}>Validate mapping</button><button className="primary full" disabled={busy || restoring || record.state !== "ready"} onClick={() => act(stage)}>Stage schedule →</button>{record.state === "staged" && <><p className="helper">Staged version is not active until you explicitly activate it.</p><label>Current active version <span className="optional">(blank if none)</span><input inputMode="numeric" value={activeVersion} readOnly /></label><button className="secondary full" disabled={!record.version || busy || restoring} onClick={() => act(activate)}>Activate staged version</button></>}</aside>}</div>{activation && <p className="success-state" role="status">{activation}</p>}</>}{error && <p className="form-error" role="alert">{error}</p>}</>;
+  useEffect(() => {
+    let active = true;
+    if (fixtureMode || !initialRecord.current) return;
+    syncImport()
+      .then(() => {
+        if (active) setRestoring(false);
+      })
+      .catch((value) => {
+        if (active) setError("Could not restore this import. " + value.message);
+      });
+    return () => {
+      active = false;
+    };
+  }, [project?.id]);
+  useEffect(() => {
+    if (!project?.active_schedule_version_id || fixtureMode) {
+      setActiveVersion("");
+      return;
+    }
+    setActiveVersion("");
+    let cancelled = false;
+    api<ProgressView>("/projects/" + project.id + "/progress")
+      .then((value) => {
+        if (!cancelled) setActiveVersion(String(value.schedule_version));
+      })
+      .catch((value) => {
+        if (!cancelled)
+          setError(
+            "Could not read the active schedule version. " + value.message,
+          );
+      });
+    return () => {
+      cancelled = true;
+    };
+  }, [project?.id, project?.active_schedule_version_id]);
+  const act = (work: () => Promise<void>) => {
+    if (busy || restoring) return;
+    setBusy(true);
+    setError("");
+    void work()
+      .catch(async (value) => {
+        setError(
+          value instanceof Error ? value.message : "Schedule import failed.",
+        );
+        if (
+          value instanceof ApiError &&
+          value.code === "SCHEDULE_IMPORT_CONFLICT"
+        ) {
+          try {
+            await syncImport();
+          } catch (refreshError) {
+            setRestoring(true);
+            setError(
+              "Could not refresh the changed import. Reload this page before continuing. " +
+                (refreshError instanceof Error ? refreshError.message : ""),
+            );
+          }
+        }
+        if (
+          value instanceof ApiError &&
+          value.code === "SCHEDULE_VERSION_CONFLICT"
+        ) {
+          try {
+            await onActivated();
+          } catch {
+            setError(
+              "Could not refresh the schedule context. Reload before activating.",
+            );
+          }
+        }
+      })
+      .finally(() => setBusy(false));
+  };
+  const upload = async () => {
+    if (!project || !file)
+      throw new Error("Choose a native schedule file first.");
+    if (fixtureMode) return setRecord(fixtureImport);
+    const body = new FormData();
+    body.append("upload", file);
+    const next = await api<NativeImport>(
+      "/projects/" + project.id + "/schedule-imports",
+      { method: "POST", body },
+    );
+    setRecord(next);
+    setSelectedSourceProject(next.selected_source_project_id || "");
+    setTaskOverrides({});
+    setTaskSearch("");
+  };
+  const chooseSourceProject = async () => {
+    if (!project || !record || !selectedSourceProject) return;
+    if (fixtureMode)
+      return setRecord({
+        ...record,
+        selected_source_project_id: selectedSourceProject,
+        revision: record.revision + 1,
+        state: "needs_mapping",
+      });
+    setRecord(
+      await api<NativeImport>(
+        "/projects/" +
+          project.id +
+          "/schedule-imports/" +
+          record.id +
+          "/select-project",
+        {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({
+            expected_revision: record.revision,
+            source_project_id: selectedSourceProject,
+          }),
+        },
+      ),
+    );
+    setTaskOverrides({});
+    setTaskSearch("");
+  };
+  const map = async () => {
+    if (!project || !record) return;
+    const task_overrides = Object.fromEntries(
+      Object.entries(taskOverrides).map(([id, fields]) => [
+        id,
+        {
+          ...Object.fromEntries(
+            Object.entries(fields).filter(
+              ([key, value]) =>
+                !["asset_tags", "aliases"].includes(key) && value.trim(),
+            ),
+          ),
+          ...Object.fromEntries(
+            ["asset_tags", "aliases"]
+              .filter((key) => fields[key]?.trim())
+              .map((key) => [
+                key,
+                fields[key]
+                  .split(";")
+                  .map((value) => value.trim())
+                  .filter(Boolean),
+              ]),
+          ),
+        },
+      ]),
+    );
+    const mapping = {
+      baseline_date: baselineDate,
+      source_project_id: record.selected_source_project_id,
+      task_overrides,
+      reason,
+    };
+    if (!mapping.source_project_id || !baselineDate || !reason.trim())
+      throw new Error(
+        "Confirm a source project, baseline date and reviewer mapping reason.",
+      );
+    if (fixtureMode)
+      return setRecord({
+        ...record,
+        state: "ready",
+        revision: record.revision + 1,
+      });
+    setRecord(
+      await api<NativeImport>(
+        "/projects/" +
+          project.id +
+          "/schedule-imports/" +
+          record.id +
+          "/mapping",
+        {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ expected_revision: record.revision, mapping }),
+        },
+      ),
+    );
+  };
+  const stage = async () => {
+    if (!project || !record) return;
+    if (fixtureMode)
+      return setRecord({
+        ...record,
+        state: "staged",
+        revision: record.revision + 1,
+        staged_schedule_version_id: "fixture-version",
+      });
+    setRecord(
+      await api<NativeImport>(
+        "/projects/" + project.id + "/schedule-imports/" + record.id + "/stage",
+        {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ expected_revision: record.revision }),
+        },
+      ),
+    );
+  };
+  const activate = async () => {
+    if (!project || !record?.schedule_version_id) return;
+    if (project.active_schedule_version_id && !activeVersion)
+      throw new Error(
+        "The current schedule version is still loading. Please try again.",
+      );
+    const expected = activeVersion ? Number(activeVersion) : null;
+    if (fixtureMode)
+      return setActivation("Fixture schedule activated (no server change).");
+    const result = await api<{ version: number; state: string }>(
+      "/projects/" +
+        project.id +
+        "/schedules/" +
+        (record.version || "") +
+        "/activate",
+      {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ expected_active_version: expected }),
+      },
+    );
+    setActivation(`Schedule version ${result.version} is ${result.state}.`);
+    await onActivated();
+  };
+  const uploadCsv = async () => {
+    if (!project || !csvFile) throw new Error("Choose a canonical CSV file.");
+    if (fixtureMode) {
+      setCsvVersion(1);
+      return setActivation("Fixture CSV staged (no server change).");
+    }
+    const body = new FormData();
+    body.append("upload", csvFile);
+    const result = await api<{ version: number; state: string }>(
+      "/projects/" + project.id + "/schedules",
+      { method: "POST", body },
+    );
+    setCsvVersion(result.version);
+    setActivation(
+      `CSV schedule version ${result.version} is ${result.state}; activate it explicitly.`,
+    );
+  };
+  const activateCsv = async () => {
+    if (!project || csvVersion === null) return;
+    if (project.active_schedule_version_id && !activeVersion)
+      throw new Error(
+        "The current schedule version is still loading. Please try again.",
+      );
+    const expected = activeVersion ? Number(activeVersion) : null;
+    if (fixtureMode)
+      return setActivation("Fixture CSV activated (no server change).");
+    const result = await api<{ version: number; state: string }>(
+      "/projects/" + project.id + "/schedules/" + csvVersion + "/activate",
+      {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ expected_active_version: expected }),
+      },
+    );
+    setActivation(`CSV schedule version ${result.version} is ${result.state}.`);
+    await onActivated();
+  };
+  const createProject = async () => {
+    if (!projectName.trim()) throw new Error("Enter a project name.");
+    const next = fixtureMode
+      ? {
+          id: "fixture-created",
+          name: projectName,
+          timezone: "Asia/Kolkata",
+          active_schedule_version_id: null,
+        }
+      : await api<Project>("/projects", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ name: projectName, timezone: "Asia/Kolkata" }),
+        });
+    onProjectCreated(next);
+    setProjectName("");
+  };
+  const markMappingDirty = () =>
+    setRecord((current) =>
+      current?.state === "ready"
+        ? { ...current, state: "needs_mapping" }
+        : current,
+    );
+  const updateOverride = (id: string, field: string, value: string) => {
+    setTaskOverrides((current) => {
+      const next = { ...(current[id] || {}), [field]: value };
+      if (field === "measurement_basis" && value !== "quantity_ratio") {
+        delete next.planned_quantity;
+        delete next.baseline_quantity;
+        delete next.unit;
+      }
+      return { ...current, [id]: next };
+    });
+    markMappingDirty();
+  };
+  return (
+    <>
+      <Context project={project} />
+      {!project && <h1>Create your first project</h1>}
+      <details
+        className="panel project-create"
+        open={project ? undefined : true}
+      >
+        <summary>
+          {project ? "Create another project" : "Project details"}
+        </summary>
+        <p className="muted">
+          Create a separate workspace for its schedule and reports.
+        </p>
+        <label>
+          Project name
+          <input
+            disabled={busy}
+            value={projectName}
+            onChange={(event) => setProjectName(event.target.value)}
+          />
+        </label>
+        <button
+          className="primary"
+          disabled={busy}
+          onClick={() => act(createProject)}
+        >
+          Create project
+        </button>
+      </details>
+      {project && (
+        <>
+          <section className="page-intro">
+            <div>
+              <p className="eyebrow">SCHEDULE IMPORT</p>
+              <h1>Inspect the source before it becomes a schedule.</h1>
+              <p>
+                Source IDs, hierarchy and dependencies remain visible. Physical
+                quantities are never inferred from the file.
+              </p>
+            </div>
+            <div className="limit-note">
+              <strong>Local parsing only</strong>
+              <span>
+                P6 XER / PMXML · MSPDI / MPP · GT10 Excel · Cambridge snapshot
+              </span>
+              <span>Canonical CSV also supported · 10 MB input</span>
+            </div>
+          </section>
+          {restoring && (
+            <div className="session-notice">
+              <p role="status">
+                {error
+                  ? "The saved import could not be verified. Please retry before editing."
+                  : "Checking the saved import…"}
+              </p>
+              {error && (
+                <button
+                  className="secondary"
+                  disabled={busy}
+                  onClick={() => {
+                    setBusy(true);
+                    void syncImport()
+                      .then(() => {
+                        setRestoring(false);
+                        setError("");
+                      })
+                      .catch((value) => setError(value.message))
+                      .finally(() => setBusy(false));
+                  }}
+                >
+                  Retry import refresh
+                </button>
+              )}
+              {error && (
+                <button
+                  className="text-button"
+                  disabled={busy}
+                  onClick={() => {
+                    setRecord(null);
+                    setTaskOverrides({});
+                    setBaselineDate("");
+                    setReason("");
+                    setSelectedSourceProject("");
+                    setRestoring(false);
+                    setError("");
+                  }}
+                >
+                  Start a new import
+                </button>
+              )}
+            </div>
+          )}
+          {importNotice && (
+            <p className="session-notice" role="status">
+              {importNotice}
+            </p>
+          )}
+          <ol
+            className="import-steps"
+            aria-label="Native schedule import stages"
+          >
+            {[
+              "Upload source",
+              "Inspect & map",
+              "Validate & stage",
+              "Activate version",
+            ].map((label, index) => {
+              const step =
+                record?.state === "staged" || csvVersion !== null
+                  ? 3
+                  : record?.state === "ready"
+                    ? 2
+                    : record
+                      ? 1
+                      : 0;
+              return (
+                <li
+                  key={label}
+                  aria-current={index === step ? "step" : undefined}
+                  className={index < step ? "complete" : ""}
+                >
+                  <span>{index < step ? "✓" : index + 1}</span>
+                  <strong>{label}</strong>
+                </li>
+              );
+            })}
+          </ol>
+          <div
+            aria-busy={busy || restoring}
+            data-dirty={
+              !!file || !!csvFile || record?.state === "needs_mapping"
+            }
+            className="import-grid"
+          >
+            <section className="panel import-upload">
+              <h2>1. Upload source</h2>
+              <label className="file-drop">
+                <strong>{file ? file.name : "Choose native schedule"}</strong>
+                <span>
+                  XER, XML, MPP, GT10 XLSX or Cambridge JSON · max 10 MB
+                </span>
+                <input
+                  disabled={busy || restoring}
+                  type="file"
+                  accept=".xer,.xml,.mpp,.xlsx,.json"
+                  onChange={(event) => setFile(event.target.files?.[0] || null)}
+                />
+              </label>
+              <button
+                className="primary full"
+                disabled={!file || busy || restoring}
+                onClick={() => act(upload)}
+              >
+                {busy ? "Reading source…" : "Read schedule source"}
+              </button>
+              <div className="or-rule">
+                <span>or canonical CSV</span>
+              </div>
+              <label className="file-drop">
+                <strong>
+                  {csvFile ? csvFile.name : "Choose canonical schedule CSV"}
+                </strong>
+                <input
+                  disabled={busy || restoring}
+                  type="file"
+                  accept=".csv,text/csv"
+                  onChange={(event) =>
+                    setCsvFile(event.target.files?.[0] || null)
+                  }
+                />
+              </label>
+              <button
+                className="secondary full"
+                disabled={!csvFile || busy || restoring}
+                onClick={() => act(uploadCsv)}
+              >
+                Stage canonical CSV
+              </button>
+              {csvVersion !== null && (
+                <div className="csv-activation">
+                  <label>
+                    Current active version{" "}
+                    <span className="optional">(blank if none)</span>
+                    <input inputMode="numeric" value={activeVersion} readOnly />
+                  </label>
+                  <button
+                    className="primary full"
+                    disabled={busy}
+                    onClick={() => act(activateCsv)}
+                  >
+                    Activate CSV version {csvVersion}
+                  </button>
+                </div>
+              )}
+            </section>
+            {record && (
+              <section className="panel import-preview">
+                <div className="panel-heading">
+                  <div>
+                    <p className="eyebrow">
+                      {record.source_format.replaceAll("_", " ")}
+                    </p>
+                    <h2>
+                      {record.preview.projects.find(
+                        (item) =>
+                          item.source_project_id ===
+                          record.selected_source_project_id,
+                      )?.name ||
+                        record.preview.projects[0]?.name ||
+                        "Source schedule"}
+                    </h2>
+                  </div>
+                  <span className="mode-pill">
+                    {record.state.replaceAll("_", " ")}
+                  </span>
+                </div>
+                {record.preview.projects.length > 1 &&
+                  !record.selected_source_project_id && (
+                    <>
+                      <label>
+                        Source project
+                        <select
+                          disabled={busy || restoring}
+                          value={selectedSourceProject}
+                          onChange={(event) =>
+                            setSelectedSourceProject(event.target.value)
+                          }
+                        >
+                          <option value="">Select a project</option>
+                          {record.preview.projects.map((item) => (
+                            <option
+                              key={item.source_project_id}
+                              value={item.source_project_id}
+                            >
+                              {item.name} ({item.source_project_id})
+                            </option>
+                          ))}
+                        </select>
+                      </label>
+                      <button
+                        className="secondary"
+                        disabled={!selectedSourceProject || busy || restoring}
+                        onClick={() => act(chooseSourceProject)}
+                      >
+                        Load selected project
+                      </button>
+                    </>
+                  )}
+                <div className="import-counts">
+                  <span>
+                    <strong>{record.preview.tasks.length}</strong> tasks
+                  </span>
+                  <span>
+                    <strong>{record.preview.wbs.length}</strong> WBS nodes
+                  </span>
+                  <span>
+                    <strong>{record.preview.relationships.length}</strong> links
+                  </span>
+                </div>
+                {record.preview.issues.map((issue, index) => (
+                  <p className="form-error" key={index}>
+                    {issue.severity}: {issue.message}
+                  </p>
+                ))}
+                <p className="helper" role="status">
+                  {
+                    record.preview.tasks.filter(
+                      (task) =>
+                        !task.is_summary &&
+                        (taskOverrides[task.source_task_id]
+                          ?.measurement_basis ||
+                          (task.is_milestone ? "milestone" : "unsupported")) ===
+                          "unsupported",
+                    ).length
+                  }{" "}
+                  activities still have unsupported measurement.
+                </p>
+                <section aria-label="Source activities and reviewer overrides">
+                  <h3>Source activities and reviewer overrides</h3>
+                  <label>
+                    Find activity
+                    <input
+                      type="search"
+                      value={taskSearch}
+                      onChange={(event) => setTaskSearch(event.target.value)}
+                      placeholder="Search task ID, name or WBS"
+                    />
+                  </label>
+                  <p className="helper">
+                    {
+                      record.preview.tasks.filter(
+                        (task) =>
+                          !task.is_summary &&
+                          [
+                            task.source_task_id,
+                            task.external_id,
+                            task.name,
+                            task.source_wbs_id || "",
+                          ].some((value) =>
+                            value
+                              .toLowerCase()
+                              .includes(taskSearch.toLowerCase()),
+                          ),
+                      ).length
+                    }{" "}
+                    of{" "}
+                    {
+                      record.preview.tasks.filter((task) => !task.is_summary)
+                        .length
+                    }{" "}
+                    activities shown
+                  </p>
+                  {record.preview.tasks
+                    .filter(
+                      (task) =>
+                        !task.is_summary &&
+                        [
+                          task.source_task_id,
+                          task.external_id,
+                          task.name,
+                          task.source_wbs_id || "",
+                        ].some((value) =>
+                          value
+                            .toLowerCase()
+                            .includes(taskSearch.toLowerCase()),
+                        ),
+                    )
+                    .map((task) => (
+                      <TaskMappingEditor
+                        key={task.source_task_id}
+                        task={task}
+                        override={taskOverrides[task.source_task_id] || {}}
+                        disabled={
+                          busy || restoring || record.state === "staged"
+                        }
+                        onChange={(field, value) =>
+                          updateOverride(task.source_task_id, field, value)
+                        }
+                      />
+                    ))}
+                </section>
+                <details>
+                  <summary>Dependencies</summary>
+                  {record.preview.relationships.map((link, index) => (
+                    <p className="import-row" key={index}>
+                      <code>{link.predecessor_source_task_id}</code>
+                      <span>{link.relation_type}</span>
+                      <code>{link.successor_source_task_id}</code>
+                    </p>
+                  ))}
+                </details>
+              </section>
+            )}{" "}
+            {record && (
+              <aside className="panel import-map">
+                <h2>2. Reviewer mapping</h2>
+                <label>
+                  Baseline date
+                  <input
+                    type="date"
+                    value={baselineDate}
+                    onChange={(event) => {
+                      setBaselineDate(event.target.value);
+                      markMappingDirty();
+                    }}
+                    disabled={busy || restoring || record.state === "staged"}
+                  />
+                </label>
+                <label>
+                  Reviewer reason
+                  <textarea
+                    value={reason}
+                    onChange={(event) => {
+                      setReason(event.target.value);
+                      markMappingDirty();
+                    }}
+                    rows={4}
+                    placeholder="Why this mapping and baseline are valid"
+                    disabled={busy || restoring || record.state === "staged"}
+                  />
+                </label>
+                <p className="helper">
+                  Unmapped leaves stay unsupported. Summary nodes cannot become
+                  matching activities.
+                </p>
+                <button
+                  className="secondary full"
+                  disabled={
+                    busy ||
+                    restoring ||
+                    record.state === "ready" ||
+                    record.state === "staged" ||
+                    !record.selected_source_project_id
+                  }
+                  onClick={() => act(map)}
+                >
+                  Validate mapping
+                </button>
+                <button
+                  className="primary full"
+                  disabled={busy || restoring || record.state !== "ready"}
+                  onClick={() => act(stage)}
+                >
+                  Stage schedule →
+                </button>
+                {record.state === "staged" && (
+                  <>
+                    <p className="helper">
+                      Staged version is not active until you explicitly activate
+                      it.
+                    </p>
+                    <label>
+                      Current active version{" "}
+                      <span className="optional">(blank if none)</span>
+                      <input
+                        inputMode="numeric"
+                        value={activeVersion}
+                        readOnly
+                      />
+                    </label>
+                    <button
+                      className="secondary full"
+                      disabled={!record.version || busy || restoring}
+                      onClick={() => act(activate)}
+                    >
+                      Activate staged version
+                    </button>
+                  </>
+                )}
+              </aside>
+            )}
+          </div>
+          {activation && (
+            <p className="success-state" role="status">
+              {activation}
+            </p>
+          )}
+        </>
+      )}
+      {error && (
+        <p className="form-error" role="alert">
+          {error}
+        </p>
+      )}
+    </>
+  );
 }
-function Empty({ onStart }: { onStart: () => void }) { return <section className="panel empty-state"><p className="eyebrow">NO ACTIVE JOB</p><h1>Start with a field report</h1><button className="primary" onClick={onStart}>Go to intake →</button></section>; }
+function Empty({ onStart }: { onStart: () => void }) {
+  return (
+    <section className="panel empty-state">
+      <p className="eyebrow">NO ACTIVE JOB</p>
+      <h1>Start with a field report</h1>
+      <button className="primary" onClick={onStart}>
+        Go to intake →
+      </button>
+    </section>
+  );
+}
 createRoot(document.getElementById("root")!).render(<App />);

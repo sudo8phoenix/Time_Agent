@@ -41,6 +41,7 @@ for (const width of [390, 1440]) test(`planner search beyond shortlist and subac
   await page.getByRole("button", { name: /Create review job/ }).click();
   await page.getByRole("button", { name: /Open review queue/ }).click();
   await expect(page.getByRole("button", { name: "Approve update" })).toBeDisabled();
+  await page.getByText("Find another activity or resolve ambiguity", { exact: true }).click();
   await page.getByLabel("Search the pinned schedule").fill("F8");
   await page.getByRole("button", { name: "Search activities" }).click();
   await page.getByRole("button", { name: /EXC-F8 · Excavation F8/ }).click();

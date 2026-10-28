@@ -41,6 +41,14 @@ Read list responses individually: pagination and response envelopes vary by endp
 Some handlers return dictionaries without declared response models; the generated
 schema does not fully describe those response bodies.
 
+## Schedule timeline reads
+
+`GET /api/v1/projects/{project_id}/progress` includes nullable ISO `planned_start`
+and `planned_finish` on each activity, directly from the imported Activity record.
+The existing membership and session dependencies still authorize the read. These
+fields do not update ActivityState or contribute to accepted progress. A missing
+endpoint remains null; the frontend does not synthesize dates or dependencies.
+
 ## Examples
 
 Use local synthetic data. Keep cookie files private and remove them after use.

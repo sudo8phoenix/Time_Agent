@@ -169,6 +169,8 @@ def progress_view(
             "wbs": a.wbs,
             "is_leaf": a.is_leaf,
             "measurement_basis": a.measurement_basis,
+            "planned_start": a.planned_start.isoformat() if a.planned_start else None,
+            "planned_finish": a.planned_finish.isoformat() if a.planned_finish else None,
             "planned_quantity": str(a.planned_quantity) if a.planned_quantity is not None else None,
             "unit": a.unit,
             "completed_quantity": str(states[a.id].completed_quantity) if a.id in states else "0",
